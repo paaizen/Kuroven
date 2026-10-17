@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 64" width="250" height="64" role="img" aria-label="Kuroven">
+  <rect width="250" height="64" rx="16" fill="#2b2d31"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".55" stroke-width="2"/>
+  <path d="M17 14h9v36h-9z" fill="#eef3f9"/>
+  <path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/>
+  <path d="M26 34H40L54 50H41z" fill="#eef3f9"/>
+  <path d="M9 55L55 9" stroke="#9cc3f0" stroke-opacity=".25" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="78" y="43" font-family="'Trebuchet MS','Segoe UI',Arial,sans-serif" font-size="32" font-weight="800" letter-spacing="1.5" fill="#dbdee1">Kuroven</text>
+</svg>
