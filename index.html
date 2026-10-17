@@ -130,6 +130,29 @@ main#v-home{max-width:900px}
 #wAuth{text-align:left}#wAuth h2{margin:0 0 12px;font-size:1.15rem;text-align:center}#wAuth input{width:100%;margin:0 0 12px}
 #wMsg.err{color:#fb7185}#wMsg.ok{color:#6ee7a8}.av2 b{font-size:.85rem;line-height:1}
 
+/* En ligne */
+.btn.alt{background:var(--bg);color:var(--tx);border:2px solid var(--ac)}
+.btn.sm{padding:6px 10px;font-size:.85rem}
+.avi{width:40px;height:40px;border-radius:50%;background:var(--ac);color:#14233a;font-weight:800;display:flex;align-items:center;justify-content:center;object-fit:cover;flex:none;overflow:hidden}
+#pfAv .avi{width:96px;height:96px;font-size:2.2rem;margin:0 auto 10px}
+.av2{overflow:hidden}.av2 img{width:100%;height:100%;object-fit:cover}
+.fr-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 10px;margin-bottom:8px;flex-wrap:wrap}
+.fr-row .g{flex:1;min-width:110px}.fr-row small{display:block;color:var(--mut)}
+.fr-row .btn{flex:none}
+.rs{font-weight:800;min-width:74px}.rs.w{color:#3ba55d}.rs.l{color:#fb7185}.rs.d{color:var(--mut)}
+.rk{font-weight:800;width:26px;text-align:center;color:var(--mut)}
+.mlg{display:grid;gap:10px;margin:12px 0}
+.mlb{display:flex;flex-direction:column;gap:3px;background:var(--card);border:2px solid var(--bd);border-radius:14px;padding:14px;color:var(--tx);font:inherit;text-align:left;cursor:pointer}
+.mlb:hover{border-color:var(--ac)}.mlb b{font-size:1.05rem}.mlb small{color:var(--mut)}
+.eloc{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:center;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px}
+.eloc b{font-size:1.9rem}.eloc span{font-weight:800;color:var(--ac)}.eloc small{color:var(--mut);width:100%;text-align:center}
+.pfn{display:flex;gap:8px;margin:6px 0}
+#wt{position:fixed;inset:0;z-index:19;background:rgba(10,12,18,.82);display:flex;align-items:center;justify-content:center;padding:16px}
+#wt[hidden],#inv[hidden],#live[hidden]{display:none}
+#inv{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:18;background:var(--card);border:2px solid var(--ac);border-radius:14px;padding:12px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:94vw;box-shadow:0 10px 28px rgba(0,0,0,.4)}
+#live{background:var(--ac);color:#14233a;text-align:center;padding:9px;font-weight:800;cursor:pointer;border:0;width:100%;font:inherit;font-weight:800}
+#claim{margin-top:8px}
+#frBadge{background:#fb7185;color:#fff;border-color:#fb7185}
 /* Style planche de manga */
 .gc{border:2px solid var(--bd)}
 .gc .art{background:#313338;border-bottom:2px solid var(--bd)}
@@ -168,30 +191,31 @@ main#v-home{max-width:900px}
 </style>
 </head>
 <body>
-<header class="top"><div class="in"><button class="logo" data-go="home" aria-label="Retour à l’accueil Kuroven"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><span>Kuroven</span></button><span class="pill">Bêta</span><div class="menu"><button class="pm" id="pm" aria-haspopup="true" aria-expanded="false" aria-controls="pd"><span class="av2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg></span><span id="pmName">Invité</span><span aria-hidden="true">▾</span></button><div id="pd" role="menu"><div class="who"><b id="pdName">Invité</b><small id="pdSub">Non connecté · invité</small></div><button id="pdAuth" role="menuitem">Se connecter</button><button disabled role="menuitem">Mon profil <em>bientôt</em></button><button disabled role="menuitem">Amis <em>bientôt</em></button><button disabled role="menuitem">Historique des parties <em>bientôt</em></button><hr><button data-go="set" role="menuitem">Paramètres</button><button id="pdSwitch" role="menuitem">Changer de profil</button></div></div></div></header>
+<header class="top"><div class="in"><button class="logo" data-go="home" aria-label="Retour à l’accueil Kuroven"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><span>Kuroven</span></button><span class="pill">Bêta</span><div class="menu"><button class="pm" id="pm" aria-haspopup="true" aria-expanded="false" aria-controls="pd"><span class="av2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg></span><span id="pmName">Invité</span><span aria-hidden="true">▾</span></button><div id="pd" role="menu"><div class="who"><b id="pdName">Invité</b><small id="pdSub">Non connecté · invité</small></div><button id="pdAuth" role="menuitem">Se connecter</button><button data-go="prof" role="menuitem">Mon profil</button><button data-go="fr" role="menuitem">Amis <em id="frBadge" hidden></em></button><button data-go="lb" role="menuitem">Classement</button><button data-go="prof" role="menuitem">Historique des parties</button><hr><button data-go="set" role="menuitem">Paramètres</button><button id="pdSwitch" role="menuitem">Changer de profil</button></div></div></div></header>
+<button id="live" hidden><span id="liveT"></span></button>
 <main id="v-home">
 <section class="hero"><svg class="hero-bg" viewBox="0 0 900 300" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><defs><linearGradient id="hsky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b3556"/><stop offset=".6" stop-color="#4a5b8f"/><stop offset="1" stop-color="#8fb0e0"/></linearGradient><pattern id="hdots" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3.0" cy="3.0" r="1.6" fill="#ffffff"/></pattern><pattern id="hdots2" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="2.5" cy="2.5" r="1.5" fill="#111"/></pattern><clipPath id="hmoonclip"><circle cx="690" cy="104" r="78"/></clipPath></defs><rect width="900" height="300" fill="url(#hsky)"/><rect width="900" height="300" fill="url(#hdots)" opacity=".16"/><g fill="#111" opacity=".22"><polygon points="786.0,104.9 1309.9,92.0 1309.5,128.1"/><polygon points="785.1,117.0 1306.8,167.2 1301.1,208.6"/><polygon points="783.2,127.2 1296.3,233.5 1286.4,273.4"/><polygon points="781.7,132.3 1286.5,273.0 1278.2,300.1"/><polygon points="775.0,148.7 1246.3,377.7 1230.7,407.4"/><polygon points="769.6,157.7 1209.2,442.9 1198.9,458.1"/><polygon points="765.2,163.7 1182.5,480.6 1168.7,498.0"/><polygon points="757.6,172.1 1137.9,532.7 1115.6,554.9"/><polygon points="752.7,176.7 1103.1,566.3 1087.0,580.2"/><polygon points="742.5,184.4 1046.1,611.6 1011.7,634.0"/><polygon points="729.8,191.4 956.0,664.0 938.1,672.2"/><polygon points="719.5,195.3 889.9,690.9 871.7,696.8"/><polygon points="710.5,197.8 831.4,707.7 813.1,711.7"/><polygon points="704.5,198.9 803.5,713.5 764.2,719.5"/><polygon points="692.2,200.0 715.0,723.5 693.8,724.0"/><polygon points="675.6,198.9 616.6,719.6 577.2,713.7"/><polygon points="670.2,197.9 583.0,714.7 541.6,706.0"/><polygon points="658.0,194.5 499.6,694.1 467.3,682.6"/><polygon points="650.4,191.5 453.4,677.1 415.4,659.9"/><polygon points="637.7,184.5 370.2,635.1 334.6,612.0"/><polygon points="627.8,177.1 297.4,583.9 279.4,568.6"/><polygon points="622.9,172.6 263.6,554.1 249.4,540.2"/><polygon points="616.7,166.0 222.0,510.6 211.0,497.6"/><polygon points="609.5,156.4 179.3,455.5 161.7,428.6"/><polygon points="605.2,149.1 150.8,410.0 134.7,379.7"/><polygon points="599.8,136.9 111.7,327.5 103.5,305.1"/><polygon points="595.9,123.0 85.2,240.6 79.5,212.4"/><polygon points="594.8,116.2 77.0,196.7 73.3,168.2"/><polygon points="594.0,102.4 70.0,102.2 70.3,85.5"/><polygon points="595.1,89.6 75.8,19.1 78.2,3.4"/><polygon points="596.9,80.8 84.0,-27.0 93.4,-64.9"/><polygon points="598.2,75.8 92.1,-60.1 103.1,-95.9"/><polygon points="603.1,63.3 122.1,-144.7 135.4,-173.2"/><polygon points="606.8,56.2 148.4,-197.8 156.6,-212.1"/><polygon points="613.4,46.1 183.1,-253.1 208.5,-286.6"/><polygon points="620.5,37.8 228.7,-310.2 253.9,-336.7"/><polygon points="632.8,26.9 303.8,-381.0 337.3,-405.9"/><polygon points="637.9,23.4 343.1,-409.9 364.3,-423.5"/><polygon points="648.5,17.4 405.5,-446.9 438.9,-462.9"/><polygon points="655.5,14.4 450.1,-467.7 484.0,-480.8"/><polygon points="670.9,9.9 547.2,-499.3 585.8,-507.2"/><polygon points="675.7,9.1 577.2,-505.6 618.5,-511.9"/><polygon points="686.9,8.1 657.3,-515.1 682.1,-515.9"/><polygon points="701.6,8.7 744.4,-513.6 785.2,-508.6"/><polygon points="710.2,10.1 800.0,-506.2 840.3,-497.5"/><polygon points="722.0,13.5 885.5,-484.4 908.2,-476.4"/><polygon points="730.4,16.9 941.6,-462.7 959.9,-454.2"/><polygon points="738.3,21.0 993.5,-436.6 1010.3,-426.9"/><polygon points="751.0,29.9 1066.9,-388.3 1100.3,-360.8"/><polygon points="756.0,34.3 1110.3,-351.8 1122.3,-340.4"/><polygon points="767.3,47.1 1180.3,-275.5 1198.2,-251.1"/><polygon points="770.9,52.3 1206.5,-239.0 1218.3,-220.5"/><polygon points="776.8,63.0 1242.1,-178.1 1258.6,-143.3"/><polygon points="780.5,72.0 1269.8,-115.6 1278.9,-90.0"/><polygon points="782.8,79.3 1283.6,-75.1 1294.1,-35.4"/><polygon points="784.9,89.7 1300.7,-2.8 1305.1,26.0"/></g><circle cx="690" cy="104" r="86" fill="#fff" opacity=".18"/><circle cx="690" cy="104" r="78" fill="#fff" stroke="#111" stroke-width="4"/><g clip-path="url(#hmoonclip)"><rect x="600" y="20" width="180" height="170" fill="url(#hdots2)" opacity=".28"/><circle cx="660" cy="86" r="14" fill="none" stroke="#111" stroke-width="2" opacity=".35"/><circle cx="716" cy="128" r="9" fill="none" stroke="#111" stroke-width="2" opacity=".35"/></g><path d="M0 230L70 170L130 215L210 150L290 220L360 180L440 232L540 168L640 226L740 176L830 222L900 190V300H0z" fill="#1b2340" opacity=".85"/><path d="M0 262L90 226L170 258L260 214L350 260L450 232L560 266L670 228L780 262L900 236V300H0z" fill="#0d1226"/><g fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round"><path d="M812 300C808 262 792 236 764 212" stroke-width="30"/><path d="M764 212C736 202 690 210 628 198" stroke-width="12"/><path d="M628 198C606 194 590 186 574 176" stroke-width="6"/><path d="M796 244C826 214 856 196 900 176" stroke-width="13"/><path d="M830 214C842 186 836 160 850 132" stroke-width="8"/><path d="M690 206C682 226 660 236 648 252" stroke-width="5"/><path d="M770 218C766 190 780 168 764 140" stroke-width="7"/></g><g fill="#111" stroke="#111" stroke-linejoin="round"><path d="M684 204C676 168 688 144 708 142C728 144 738 170 732 204Z"/><path d="M696 142C696 126 722 126 722 144C722 150 718 156 708 156C698 156 696 150 696 142Z"/><path d="M692 204C690 224 688 238 684 252" fill="none" stroke-width="9" stroke-linecap="round"/><path d="M714 204C718 222 724 236 732 248" fill="none" stroke-width="9" stroke-linecap="round"/><path d="M744 214L752 120" fill="none" stroke-width="4" stroke-linecap="round"/></g><path d="M698 150C700 140 712 136 718 142" fill="none" stroke="#9cc3f0" stroke-width="2.5" stroke-linecap="round"/><path d="M700 166C698 182 698 194 700 202" fill="none" stroke="#9cc3f0" stroke-width="2.2" stroke-linecap="round" opacity=".8"/><circle cx="752" cy="118" r="5" fill="none" stroke="#111" stroke-width="2.5"/><ellipse cx="572.6" cy="248.0" rx="4.8" ry="3.2" transform="rotate(-59 572.6 248.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="861.4" cy="59.4" rx="5.1" ry="3.4" transform="rotate(7 861.4 59.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="535.5" cy="131.0" rx="4.7" ry="3.1" transform="rotate(24 535.5 131.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="795.5" cy="77.7" rx="3.6" ry="2.4" transform="rotate(-31 795.5 77.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="712.4" cy="261.7" rx="5.6" ry="3.7" transform="rotate(11 712.4 261.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="665.8" cy="219.1" rx="4.2" ry="2.8" transform="rotate(-48 665.8 219.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="776.2" cy="214.2" rx="3.6" ry="2.4" transform="rotate(-9 776.2 214.2)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="626.9" cy="234.3" rx="6.0" ry="4.0" transform="rotate(-36 626.9 234.3)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="854.2" cy="53.1" rx="4.8" ry="3.2" transform="rotate(-15 854.2 53.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="528.9" cy="141.9" rx="3.6" ry="2.4" transform="rotate(49 528.9 141.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="739.9" cy="254.9" rx="3.3" ry="2.2" transform="rotate(-36 739.9 254.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="551.7" cy="169.5" rx="3.6" ry="2.4" transform="rotate(-58 551.7 169.5)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="708.8" cy="261.0" rx="4.5" ry="3.0" transform="rotate(-10 708.8 261.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="751.4" cy="270.0" rx="5.0" ry="3.3" transform="rotate(-53 751.4 270.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="622.0" cy="278.8" rx="3.7" ry="2.4" transform="rotate(60 622.0 278.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="788.1" cy="268.2" rx="5.1" ry="3.4" transform="rotate(-32 788.1 268.2)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="536.4" cy="127.8" rx="5.1" ry="3.4" transform="rotate(21 536.4 127.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="814.4" cy="60.8" rx="5.9" ry="3.9" transform="rotate(-18 814.4 60.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="672.8" cy="276.7" rx="3.4" ry="2.2" transform="rotate(9 672.8 276.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="823.8" cy="118.9" rx="3.9" ry="2.6" transform="rotate(-8 823.8 118.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="553.8" cy="191.1" rx="5.7" ry="3.8" transform="rotate(-48 553.8 191.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="529.6" cy="227.4" rx="4.8" ry="3.2" transform="rotate(37 529.6 227.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="789.6" cy="99.6" rx="4.6" ry="3.1" transform="rotate(29 789.6 99.6)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="607.8" cy="271.4" rx="4.4" ry="2.9" transform="rotate(-12 607.8 271.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="846.8" cy="128.6" rx="3.8" ry="2.5" transform="rotate(20 846.8 128.6)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="840.4" cy="102.1" rx="6.2" ry="4.2" transform="rotate(-54 840.4 102.1)" fill="#fff" stroke="#111" stroke-width="1"/><path d="M0 286C140 272 260 296 420 284S700 276 900 290V300H0z" fill="#111"/></svg><div id="heroPh" class="hero-ph" aria-hidden="true"></div>
 <h1>Le morpion et les quiz des fans d’anime</h1>
 <p>Prouve tes cases avec des personnages, défie tes amis, grimpe au classement. Tout est gratuit.</p>
-<button class="btn" data-go="ttt">Jouer au morpion</button>
+<button class="btn" data-go="ml">Jouer au morpion</button>
 </section>
 <h2>Jeux disponibles</h2>
 <div class="games">
-<button class="gc m1" data-go="ttt"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><clipPath id="tc1"><rect x="70" y="40" width="28" height="28" rx="5"/></clipPath><clipPath id="tc2"><rect x="102" y="40" width="28" height="28" rx="5"/></clipPath><clipPath id="tc3"><rect x="102" y="72" width="28" height="28" rx="5"/></clipPath><clipPath id="tc4"><rect x="70" y="104" width="28" height="28" rx="5"/></clipPath><clipPath id="tc5"><rect x="134" y="104" width="28" height="28" rx="5"/></clipPath></defs><rect width="200" height="140" fill="#313338"/><rect x="70.0" y="8.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="84.0" cy="22.0" r="11" fill="#fff"/><g transform="translate(74.0 12.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 40L40 14M8 14l32 26"/><circle cx="24" cy="23" r="11" fill="#fff"/><rect x="19" y="30" width="10" height="7" rx="2" fill="#fff"/><path d="M13 19q11-12 22 0z" fill="#e11d48"/><circle cx="20" cy="24" r="2.5" fill="#111"/><circle cx="28" cy="24" r="2.5" fill="#111"/></g><rect x="102.0" y="8.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="116.0" cy="22.0" r="11" fill="#fff"/><g transform="translate(106.0 12.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 41L29 19" stroke-width="4.5"/><path d="M35 5l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#facc15"/></g><rect x="134.0" y="8.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="148.0" cy="22.0" r="11" fill="#fff"/><g transform="translate(138.0 12.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 12V5"/><circle cx="24" cy="5" r="2.5" fill="#e11d48"/><rect x="9" y="12" width="30" height="26" rx="5" fill="#94a3b8"/><rect x="14" y="19" width="8" height="6" fill="#22d3ee"/><rect x="26" y="19" width="8" height="6" fill="#22d3ee"/><path d="M17 32h14"/></g><rect x="38.0" y="40.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="52.0" cy="54.0" r="11" fill="#fff"/><g transform="translate(42.0 44.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 4l5 15 15 5-15 5-5 15-5-15-15-5 15-5z" fill="#9ca3af"/><circle cx="24" cy="24" r="3.5" fill="#fff"/></g><rect x="38.0" y="72.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="52.0" cy="86.0" r="11" fill="#fff"/><g transform="translate(42.0 76.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M11 22L7 5l13 10zM37 22l4-17-13 10z" fill="#e11d48"/><circle cx="24" cy="28" r="13" fill="#e11d48"/><path d="M16 26l6 3M32 26l-6 3M17 36q7 4 14 0"/></g><rect x="38.0" y="104.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="52.0" cy="118.0" r="11" fill="#fff"/><g transform="translate(42.0 108.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 3v7M24 38v7M3 24h7M38 24h7M9 9l5 5M34 34l5 5M39 9l-5 5M14 34l-5 5"/><circle cx="24" cy="24" r="10" fill="#facc15"/></g><rect x="70" y="40" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="84.0" cy="50.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M73.36 68q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc1)"><image data-pt="1" x="70" y="40" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="71.5" y="41.5" width="25" height="25" rx="4" fill="none" stroke="#60a5fa" stroke-width="3"/><circle cx="76" cy="46" r="5" fill="#60a5fa"/><path d="M73.8 43.8l4.4 4.4M78.2 43.8l-4.4 4.4" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><rect x="102" y="40" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="116.0" cy="50.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M105.36 68q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc2)"><image data-pt="2" x="102" y="40" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="103.5" y="41.5" width="25" height="25" rx="4" fill="none" stroke="#fb7185" stroke-width="3"/><circle cx="108" cy="46" r="5" fill="#fb7185"/><circle cx="108" cy="46" r="2.2" fill="none" stroke="#fff" stroke-width="1.3"/><rect x="134" y="40" width="28" height="28" rx="5" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5" stroke-dasharray="3 2.5"/><rect x="70" y="72" width="28" height="28" rx="5" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5" stroke-dasharray="3 2.5"/><rect x="102" y="72" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="116.0" cy="82.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M105.36 100q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc3)"><image data-pt="3" x="102" y="72" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="103.5" y="73.5" width="25" height="25" rx="4" fill="none" stroke="#60a5fa" stroke-width="3"/><circle cx="108" cy="78" r="5" fill="#60a5fa"/><path d="M105.8 75.8l4.4 4.4M110.2 75.8l-4.4 4.4" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><rect x="134" y="72" width="28" height="28" rx="5" fill="#2b2d31" stroke="#9cc3f0" stroke-width="2"/><path d="M143.0 86.0h10M148.0 81.0v10" stroke="#9cc3f0" stroke-width="2" stroke-linecap="round"/><rect x="70" y="104" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="84.0" cy="114.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M73.36 132q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc4)"><image data-pt="4" x="70" y="104" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="71.5" y="105.5" width="25" height="25" rx="4" fill="none" stroke="#fb7185" stroke-width="3"/><circle cx="76" cy="110" r="5" fill="#fb7185"/><circle cx="76" cy="110" r="2.2" fill="none" stroke="#fff" stroke-width="1.3"/><rect x="102" y="104" width="28" height="28" rx="5" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5" stroke-dasharray="3 2.5"/><rect x="134" y="104" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="148.0" cy="114.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M137.36 132q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc5)"><image data-pt="5" x="134" y="104" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="135.5" y="105.5" width="25" height="25" rx="4" fill="none" stroke="#60a5fa" stroke-width="3"/><circle cx="140" cy="110" r="5" fill="#60a5fa"/><path d="M137.8 107.8l4.4 4.4M142.2 107.8l-4.4 4.4" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><rect x="6" y="8" width="26" height="22" rx="6" fill="#60a5fa"/><path d="M14 15l10 8M24 15l-10 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="168" y="8" width="26" height="22" rx="6" fill="#fb7185"/><circle cx="181" cy="19" r="5.2" fill="none" stroke="#fff" stroke-width="2.2"/></svg></span><span class="tx"><b>Morpion anime</b><small>Une grille 3×3 : pour poser ton symbole, cite un personnage qui correspond aux deux critères de la case.</small><span class="go">Jouer</span></span></button>
+<button class="gc m1" data-go="ml"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><clipPath id="tc1"><rect x="70" y="40" width="28" height="28" rx="5"/></clipPath><clipPath id="tc2"><rect x="102" y="40" width="28" height="28" rx="5"/></clipPath><clipPath id="tc3"><rect x="102" y="72" width="28" height="28" rx="5"/></clipPath><clipPath id="tc4"><rect x="70" y="104" width="28" height="28" rx="5"/></clipPath><clipPath id="tc5"><rect x="134" y="104" width="28" height="28" rx="5"/></clipPath></defs><rect width="200" height="140" fill="#313338"/><rect x="70.0" y="8.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="84.0" cy="22.0" r="11" fill="#fff"/><g transform="translate(74.0 12.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 40L40 14M8 14l32 26"/><circle cx="24" cy="23" r="11" fill="#fff"/><rect x="19" y="30" width="10" height="7" rx="2" fill="#fff"/><path d="M13 19q11-12 22 0z" fill="#e11d48"/><circle cx="20" cy="24" r="2.5" fill="#111"/><circle cx="28" cy="24" r="2.5" fill="#111"/></g><rect x="102.0" y="8.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="116.0" cy="22.0" r="11" fill="#fff"/><g transform="translate(106.0 12.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 41L29 19" stroke-width="4.5"/><path d="M35 5l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#facc15"/></g><rect x="134.0" y="8.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="148.0" cy="22.0" r="11" fill="#fff"/><g transform="translate(138.0 12.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 12V5"/><circle cx="24" cy="5" r="2.5" fill="#e11d48"/><rect x="9" y="12" width="30" height="26" rx="5" fill="#94a3b8"/><rect x="14" y="19" width="8" height="6" fill="#22d3ee"/><rect x="26" y="19" width="8" height="6" fill="#22d3ee"/><path d="M17 32h14"/></g><rect x="38.0" y="40.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="52.0" cy="54.0" r="11" fill="#fff"/><g transform="translate(42.0 44.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 4l5 15 15 5-15 5-5 15-5-15-15-5 15-5z" fill="#9ca3af"/><circle cx="24" cy="24" r="3.5" fill="#fff"/></g><rect x="38.0" y="72.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="52.0" cy="86.0" r="11" fill="#fff"/><g transform="translate(42.0 76.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M11 22L7 5l13 10zM37 22l4-17-13 10z" fill="#e11d48"/><circle cx="24" cy="28" r="13" fill="#e11d48"/><path d="M16 26l6 3M32 26l-6 3M17 36q7 4 14 0"/></g><rect x="38.0" y="104.0" width="28" height="28" rx="5" fill="#2b2d31" stroke="#1e1f22" stroke-width="1.5"/><circle cx="52.0" cy="118.0" r="11" fill="#fff"/><g transform="translate(42.0 108.0) scale(.4167)" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 3v7M24 38v7M3 24h7M38 24h7M9 9l5 5M34 34l5 5M39 9l-5 5M14 34l-5 5"/><circle cx="24" cy="24" r="10" fill="#facc15"/></g><rect x="70" y="40" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="84.0" cy="50.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M73.36 68q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc1)"><image data-pt="1" x="70" y="40" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="71.5" y="41.5" width="25" height="25" rx="4" fill="none" stroke="#60a5fa" stroke-width="3"/><circle cx="76" cy="46" r="5" fill="#60a5fa"/><path d="M73.8 43.8l4.4 4.4M78.2 43.8l-4.4 4.4" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><rect x="102" y="40" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="116.0" cy="50.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M105.36 68q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc2)"><image data-pt="2" x="102" y="40" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="103.5" y="41.5" width="25" height="25" rx="4" fill="none" stroke="#fb7185" stroke-width="3"/><circle cx="108" cy="46" r="5" fill="#fb7185"/><circle cx="108" cy="46" r="2.2" fill="none" stroke="#fff" stroke-width="1.3"/><rect x="134" y="40" width="28" height="28" rx="5" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5" stroke-dasharray="3 2.5"/><rect x="70" y="72" width="28" height="28" rx="5" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5" stroke-dasharray="3 2.5"/><rect x="102" y="72" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="116.0" cy="82.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M105.36 100q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc3)"><image data-pt="3" x="102" y="72" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="103.5" y="73.5" width="25" height="25" rx="4" fill="none" stroke="#60a5fa" stroke-width="3"/><circle cx="108" cy="78" r="5" fill="#60a5fa"/><path d="M105.8 75.8l4.4 4.4M110.2 75.8l-4.4 4.4" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><rect x="134" y="72" width="28" height="28" rx="5" fill="#2b2d31" stroke="#9cc3f0" stroke-width="2"/><path d="M143.0 86.0h10M148.0 81.0v10" stroke="#9cc3f0" stroke-width="2" stroke-linecap="round"/><rect x="70" y="104" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="84.0" cy="114.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M73.36 132q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc4)"><image data-pt="4" x="70" y="104" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="71.5" y="105.5" width="25" height="25" rx="4" fill="none" stroke="#fb7185" stroke-width="3"/><circle cx="76" cy="110" r="5" fill="#fb7185"/><circle cx="76" cy="110" r="2.2" fill="none" stroke="#fff" stroke-width="1.3"/><rect x="102" y="104" width="28" height="28" rx="5" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5" stroke-dasharray="3 2.5"/><rect x="134" y="104" width="28" height="28" rx="5" fill="#1e1f22"/><circle cx="148.0" cy="114.08" r="5.6000000000000005" fill="#4a4d55"/><path d="M137.36 132q0-10.08 10.64-10.08t10.64 10.08z" fill="#4a4d55"/><g clip-path="url(#tc5)"><image data-pt="5" x="134" y="104" width="28" height="28" preserveAspectRatio="xMidYMin slice"/></g><rect x="135.5" y="105.5" width="25" height="25" rx="4" fill="none" stroke="#60a5fa" stroke-width="3"/><circle cx="140" cy="110" r="5" fill="#60a5fa"/><path d="M137.8 107.8l4.4 4.4M142.2 107.8l-4.4 4.4" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><rect x="6" y="8" width="26" height="22" rx="6" fill="#60a5fa"/><path d="M14 15l10 8M24 15l-10 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="168" y="8" width="26" height="22" rx="6" fill="#fb7185"/><circle cx="181" cy="19" r="5.2" fill="none" stroke="#fff" stroke-width="2.2"/></svg></span><span class="tx"><b>Morpion anime</b><small>Une grille 3×3 : pour poser ton symbole, cite un personnage qui correspond aux deux critères de la case.</small><span class="go">Jouer</span></span></button>
 <button class="gc m2" data-go="hl"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><clipPath id="hc1"><rect x="13" y="11" width="78" height="62" rx="5"/></clipPath><clipPath id="hc2"><rect x="109" y="11" width="78" height="62" rx="5"/></clipPath></defs><rect width="200" height="140" fill="#313338"/><rect x="10" y="8" width="84" height="94" rx="9" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5"/><rect x="13" y="11" width="78" height="62" rx="5" fill="#1e1f22"/><circle cx="52.0" cy="34.879999999999995" r="9.600000000000001" fill="#4a4d55"/><path d="M33.76 72q0-20.88 18.240000000000002-20.88t18.240000000000002 20.88z" fill="#4a4d55"/><g clip-path="url(#hc1)"><image data-pt="6" x="13" y="11" width="78" height="62" preserveAspectRatio="xMidYMin slice"/></g><rect x="20" y="79" width="64" height="6" rx="3" fill="#4a4d55"/><text x="52.0" y="98" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="11" fill="#dbdee1">12 480</text><rect x="106" y="8" width="84" height="94" rx="9" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5"/><rect x="109" y="11" width="78" height="62" rx="5" fill="#1e1f22"/><circle cx="148.0" cy="34.879999999999995" r="9.600000000000001" fill="#4a4d55"/><path d="M129.76 72q0-20.88 18.240000000000002-20.88t18.240000000000002 20.88z" fill="#4a4d55"/><g clip-path="url(#hc2)"><image data-pt="7" x="109" y="11" width="78" height="62" preserveAspectRatio="xMidYMin slice"/></g><rect x="116" y="79" width="64" height="6" rx="3" fill="#4a4d55"/><text x="148.0" y="100" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="17" fill="#9cc3f0">?</text><circle cx="100" cy="55" r="11" fill="#ffd400" stroke="#1e1f22" stroke-width="2"/><text x="100" y="59" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="10" fill="#1e1f22">VS</text><rect x="10" y="110" width="84" height="22" rx="7" fill="#3ba55d"/><path d="M30 124l5-8 5 8z" fill="#fff"/><text x="62" y="125" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="11" fill="#fff">Plus</text><rect x="106" y="110" width="84" height="22" rx="7" fill="#e8833a"/><path d="M122 116l5 8 5-8z" fill="#fff"/><text x="156" y="125" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="11" fill="#fff">Moins</text></svg></span><span class="tx"><b>Plus ou moins</b><small>Quel personnage a le plus de favoris ? Bats ton record de série.</small><span class="go">Jouer</span></span></button>
 <button class="gc m3" data-go="gs"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><filter id="gb" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3.2"/><feColorMatrix type="saturate" values="0"/></filter><clipPath id="gc"><rect x="62" y="8" width="76" height="86" rx="8"/></clipPath></defs><rect width="200" height="140" fill="#313338"/><rect x="62" y="8" width="76" height="86" rx="8" fill="#1e1f22"/><g clip-path="url(#gc)"><circle cx="100.0" cy="38.959999999999994" r="15.200000000000001" fill="#4a4d55"/><path d="M71.12 94q0-30.959999999999997 28.88-30.959999999999997t28.88 30.959999999999997z" fill="#4a4d55"/><image data-pt="8" x="62" y="8" width="76" height="86" preserveAspectRatio="xMidYMin slice" filter="url(#gb)"/></g><rect x="62" y="8" width="76" height="86" rx="8" fill="none" stroke="#4a4d55" stroke-width="2"/><text x="100" y="62" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="34" fill="#1e1f22" stroke="#1e1f22" stroke-width="6" stroke-linejoin="round">?</text><text x="100" y="62" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="34" fill="#ffd400">?</text><rect x="22" y="101" width="156" height="19" rx="6" fill="#1e1f22" stroke="#4a4d55" stroke-width="1.5"/><text x="31" y="114" font-family="Arial,Helvetica,sans-serif" font-size="9" fill="#949ba4">Tape au moins 3 lettres…</text><circle cx="78" cy="130" r="4.2" fill="#fb7185"/><path d="M76.2 128.2l3.6 3.6M79.8 128.2l-3.6 3.6" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><circle cx="89" cy="130" r="4.2" fill="#fb7185"/><path d="M87.2 128.2l3.6 3.6M90.8 128.2l-3.6 3.6" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/><circle cx="100" cy="130" r="4.2" fill="none" stroke="#9cc3f0" stroke-width="2"/><circle cx="111" cy="130" r="4.2" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5"/><circle cx="122" cy="130" r="4.2" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.5"/></svg></span><span class="tx"><b>Qui est-ce ?</b><small>Retrouve le personnage sur un portrait flouté, en 5 essais.</small><span class="go">Jouer</span></span></button>
 <button class="gc m4" data-go="bt"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><clipPath id="bc"><rect x="62" y="8" width="76" height="76" rx="8"/></clipPath></defs><rect width="200" height="140" fill="#313338"/><rect x="62" y="8" width="76" height="76" rx="8" fill="#1e1f22"/><g clip-path="url(#bc)"><circle cx="100.0" cy="35.36" r="15.200000000000001" fill="#4a4d55"/><path d="M71.12 84q0-27.36 28.88-27.36t28.88 27.36z" fill="#4a4d55"/><image data-pt="9" x="-14" y="-6" width="228" height="342" preserveAspectRatio="xMidYMin meet"/></g><rect x="62" y="8" width="76" height="76" rx="8" fill="none" stroke="#4a4d55" stroke-width="2"/><circle cx="84" cy="94" r="3.6" fill="#9cc3f0"/><circle cx="95" cy="94" r="3.6" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.3"/><circle cx="106" cy="94" r="3.6" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.3"/><circle cx="117" cy="94" r="3.6" fill="#2b2d31" stroke="#4a4d55" stroke-width="1.3"/><text x="100" y="107" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="8.5" fill="#dbdee1">Indice 1 sur 4 : les cheveux</text><rect x="22" y="112" width="156" height="19" rx="6" fill="#1e1f22" stroke="#4a4d55" stroke-width="1.5"/><text x="31" y="125" font-family="Arial,Helvetica,sans-serif" font-size="9" fill="#949ba4">Tape au moins 3 lettres…</text></svg></span><span class="tx"><b>Blind test visuel</b><small>Devine le personnage avec un seul détail : les cheveux, puis les yeux, puis le visage.</small><span class="go">Jouer</span></span></button>
 <button class="gc m5" data-go="dt"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs></defs><rect width="200" height="140" fill="#313338"/><rect x="10" y="8" width="62" height="17" rx="8.5" fill="#60a5fa"/><text x="41" y="20" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9.5" fill="#fff">Joueur 1</text><rect x="128" y="8" width="62" height="17" rx="8.5" fill="#fb7185"/><text x="159" y="20" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9.5" fill="#fff">Joueur 2</text><circle cx="100" cy="17" r="11" fill="#2b2d31" stroke="#9cc3f0" stroke-width="2.5"/><text x="100" y="21" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="11" fill="#dbdee1">12</text><rect x="20" y="36" width="160" height="8" rx="4" fill="#4a4d55"/><rect x="20" y="49" width="104" height="8" rx="4" fill="#4a4d55"/><rect x="10" y="68" width="86" height="28" rx="8" fill="#2b2d31" stroke="#4a4d55" stroke-width="2"/><circle cx="23" cy="82" r="7" fill="#1e1f22"/><text x="23" y="85.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9" fill="#dbdee1">A</text><rect x="36" y="78" width="38" height="7" rx="3.5" fill="#949ba4" opacity=".8"/><rect x="104" y="68" width="86" height="28" rx="8" fill="#2f6b45" stroke="#3ba55d" stroke-width="2"/><circle cx="117" cy="82" r="7" fill="#1e1f22"/><text x="117" y="85.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9" fill="#dbdee1">B</text><rect x="130" y="78" width="44" height="7" rx="3.5" fill="#c7f0d4" opacity=".8"/><rect x="10" y="102" width="86" height="28" rx="8" fill="#2b2d31" stroke="#4a4d55" stroke-width="2"/><circle cx="23" cy="116" r="7" fill="#1e1f22"/><text x="23" y="119.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9" fill="#dbdee1">C</text><rect x="36" y="112" width="38" height="7" rx="3.5" fill="#949ba4" opacity=".8"/><rect x="104" y="102" width="86" height="28" rx="8" fill="#2b2d31" stroke="#4a4d55" stroke-width="2"/><circle cx="117" cy="116" r="7" fill="#1e1f22"/><text x="117" y="119.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9" fill="#dbdee1">D</text><rect x="130" y="112" width="44" height="7" rx="3.5" fill="#949ba4" opacity=".8"/></svg></span><span class="tx"><b>Duel de thèmes</b><small>Chacun choisit un anime, l’autre répond à un QCM dessus. À deux sur le même écran.</small><span class="go">Jouer</span></span></button>
 </div>
 <h2>Prochainement</h2>
-<div class="soon"><span>Parties classées (Elo)</span><span>Jouer en ligne avec ses amis</span><span>Profil et photo</span><span>Salons et tournois</span><span>Blind test audio</span></div>
+<div class="soon"><span>Les autres jeux en ligne</span><span>Salons et tournois</span><span>Blind test audio</span><span>Connexion Google</span></div>
 </main>
 <main id="v-set" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <h1>Paramètres</h1>
 <div class="set"><h2>Apparence</h2><p>Auto suit le réglage de ton appareil.</p><div class="seg" data-key="theme"><button data-v="auto">Auto</button><button data-v="light">Clair</button><button data-v="dark">Sombre</button></div></div>
 <div class="set"><h2>Morpion : temps par tour</h2><p>Durée pour répondre avant de perdre son tour.</p><div class="seg" data-key="tt"><button data-v="10">10 s</button><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="60">60 s</button></div></div>
-<div class="set"><h2>Compte</h2><p>Pseudo, photo de profil, amis et historique arrivent avec la connexion (prochaine grande étape).</p></div>
+<div class="set"><h2>Compte</h2><p>Ton pseudo, ta photo, tes amis et ton historique sont dans le menu en haut à droite (« Mon profil »).</p></div>
 </main>
 <main id="v-bt" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
@@ -251,7 +275,47 @@ main#v-home{max-width:900px}
 <div class="grid" id="g"></div>
 <div class="msg" id="msg"></div>
 <div class="row"><button class="btn" id="nw">Nouvelle grille</button></div>
+<div class="row"><button class="btn alt" id="claim" hidden>Adversaire absent : réclamer la victoire</button></div>
 </main>
+<main id="v-ml" hidden>
+<button class="btn back" data-go="home">← Accueil</button>
+<h1>Morpion anime</h1>
+<div id="mlElo"></div>
+<div class="mlg">
+<button class="mlb" id="mlRank"><b>Partie classée</b><small>Contre un joueur de ton niveau. Ton Elo monte ou descend.</small></button>
+<button class="mlb" id="mlQuick"><b>Partie rapide</b><small>Contre un joueur au hasard, sans enjeu.</small></button>
+<button class="mlb" id="mlFr"><b>Défier un ami</b><small>Amical ou classé, ton ami reçoit l’invitation.</small></button>
+<button class="mlb" id="mlLocal"><b>2 joueurs, même écran</b><small>Sans compte, à tour de rôle.</small></button>
+<button class="mlb" data-go="lb"><b>Classement</b><small>Les meilleurs joueurs de morpion.</small></button>
+</div>
+<div class="msg" id="mlMsg"></div>
+</main>
+<main id="v-prof" hidden>
+<button class="btn back" data-go="home">← Accueil</button>
+<h1>Mon profil</h1>
+<div class="set" style="text-align:center"><div id="pfAv"></div>
+<div class="row"><label class="btn alt sm" for="pfFile">Changer la photo</label><input type="file" id="pfFile" accept="image/*" hidden></div>
+<div class="pfn"><input id="pfPs" maxlength="20" aria-label="Pseudo" autocomplete="off"><button class="btn sm" id="pfSave">Enregistrer</button></div>
+<div class="msg" id="pfMsg"></div></div>
+<div class="set"><h2>Morpion anime · Elo</h2><div id="pfElo"></div></div>
+<div class="set"><h2>Dernières parties</h2><div id="pfHist"></div></div>
+</main>
+<main id="v-fr" hidden>
+<button class="btn back" data-go="home">← Accueil</button>
+<h1>Amis</h1>
+<input id="frQ" placeholder="Chercher un joueur par pseudo…" autocomplete="off">
+<div id="frRes"></div>
+<div class="msg" id="frMsg"></div>
+<div id="frInc"></div><div id="frList"></div><div id="frOut"></div>
+</main>
+<main id="v-lb" hidden>
+<button class="btn back" data-go="ml">← Morpion</button>
+<h1>Classement</h1>
+<p class="sub">Morpion anime · Elo des parties classées</p>
+<div id="lbList"></div>
+</main>
+<div id="wt" role="dialog" aria-modal="true" hidden><div class="wbox"><h1 id="wtT">Recherche…</h1><p class="sub">La partie démarre dès qu’un adversaire arrive.</p><button class="btn wb alt" id="wtX">Annuler</button></div></div>
+<div id="inv" hidden><span id="invT"></span><button class="btn sm" id="invY">Accepter</button><button class="btn alt sm" id="invN">Refuser</button></div>
 <div id="wl" role="dialog" aria-modal="true" aria-labelledby="wlT" hidden><div class="wbox"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><h1 id="wlT">Bienvenue sur Kuroven</h1><p class="sub">Comment veux-tu jouer ?</p>
 <div id="wMain">
 <button class="btn wb" id="wLogin">Se connecter</button>
@@ -352,31 +416,31 @@ const QS='query($s:String){Page(perPage:8){characters(search:$s,sort:FAVOURITES_
 const QD='query($id:Int){Character(id:$id){id gender bloodType favourites media(type:ANIME,perPage:50,sort:POPULARITY_DESC){edges{characterRole node{genres seasonYear source tags{name rank isMediaSpoiler}}}}}}';
 const $=id=>document.getElementById(id);
 const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-let R,K,B,used,turn,over,sel,tm,left,busy,deb,seq=0;
+let R,K,B,used,turn,over,sel,tm,left,busy,deb,seq=0,onl=null,miss=0,RI,CI,wres=null,wait=null,curView='home';
 const pickN=(a,n)=>[...a].sort(()=>Math.random()-.5).slice(0,n);
-function start(){R=pickN(ROWS,3);K=pickN(COLS,3);B=Array(9).fill(null);used=new Set();turn=0;over=false;busy=false;$('msg').textContent='';draw();timer()}
-function cell(k){const b=B[k];if(!b)return `<button class="c" data-k="${k}" ${over||busy?'disabled':''}></button>`;
-return `<div class="c f p${b.p}"><img src="${b.img}" alt="${b.name}"><span class="bd">${b.p?'◯':'✕'}</span><span class="nm">${b.name}</span></div>`}
-function draw(){let h='<div></div>'+K.map(c=>hd(c)).join('');R.forEach((r,i)=>{h+=hd(r);for(let j=0;j<3;j++)h+=cell(i*3+j)});$('g').innerHTML=h;$('p0').classList.toggle('on',turn===0&&!over);$('p1').classList.toggle('on',turn===1&&!over)}
+function start(){onlDetach();RI=pickN([...ROWS.keys()],3);CI=pickN([...COLS.keys()],3);R=RI.map(i=>ROWS[i]);K=CI.map(i=>COLS[i]);B=Array(9).fill(null);used=new Set();turn=0;over=false;busy=false;miss=0;wres=null;$('msg').textContent='';draw();timer()}
+function cell(k){const b=B[k];if(!b)return `<button class="c" data-k="${k}" ${over||busy||(onl&&turn!==onl.me)?'disabled':''}></button>`;
+return `<div class="c f p${b.p}"><img src="${esc(safeImg(b.img))}" alt="${esc(b.name)}"><span class="bd">${b.p?'◯':'✕'}</span><span class="nm">${esc(b.name)}</span></div>`}
+function draw(){let h='<div></div>'+K.map(c=>hd(c)).join('');R.forEach((r,i)=>{h+=hd(r);for(let j=0;j<3;j++)h+=cell(i*3+j)});$('g').innerHTML=h;$('p0').classList.toggle('on',turn===0&&!over);$('p1').classList.toggle('on',turn===1&&!over);$('p0').textContent=PN()[0]+(onl&&onl.me===0?' (toi)':'');$('p1').textContent=PN()[1]+(onl&&onl.me===1?' (toi)':'');syncNw()}
 $('g').addEventListener('error',e=>{if(e.target.tagName==='IMG'&&e.target.classList.contains('ic')){fbIc(e.target);return}if(e.target.tagName==='IMG'){const f=document.createElement('div');f.className='fb';f.textContent=e.target.alt;e.target.replaceWith(f)}},true);
-function timer(){clearInterval(tm);left=+store.get('tt','20')||20;$('t').textContent=left;tm=setInterval(()=>{if(over||busy)return;left--;$('t').textContent=left;if(left<=0){$('msg').textContent='⏱️ Temps écoulé, tour perdu.';close();next()}},1000)}
+function timer(){clearInterval(tm);left=onl?30:(+store.get('tt','20')||20);$('t').textContent=left;tm=setInterval(()=>{if(over||busy)return;left--;$('t').textContent=Math.max(left,0);if(left<=0){if(onl&&turn!==onl.me)return;$('msg').textContent='⏱️ Temps écoulé, tour perdu.';close();advance(true)}},1000)}
 function next(){turn=1-turn;draw();timer()}
 function close(){$('m').classList.remove('on');sel=null}
 function end(t){over=true;clearInterval(tm);draw();$('msg').textContent=t}
-async function pick(ch){if(sel==null||used.has(ch.id))return;const k=sel,i=Math.floor(k/3),j=k%3;close();busy=true;$('msg').textContent='Vérification…';draw();
+async function pick(ch){if(sel==null||used.has(ch.id))return;if(onl&&(turn!==onl.me||over))return;const k=sel,i=Math.floor(k/3),j=k%3;close();busy=true;$('msg').textContent='Vérification…';draw();
 try{const d=(await gql(QD,{id:ch.id})).Character;busy=false;
-if(!ok(R[i],d)||!ok(K[j],d)){$('msg').textContent=`❌ ${ch.name.full} ne correspond pas. Tour perdu.`;next();return}
-used.add(ch.id);B[k]={p:turn,name:ch.name.full,img:ch.image.large};
+if(!ok(R[i],d)||!ok(K[j],d)){$('msg').textContent=`❌ ${ch.name.full} ne correspond pas. Tour perdu.`;advance(true);return}
+used.add(ch.id);B[k]={p:turn,name:ch.name.full.slice(0,60),img:ch.image.large};
 const w=L.find(l=>l.every(x=>B[x]&&B[x].p===turn));
-if(w)return end(`🏆 Joueur ${turn+1} gagne !`);
-if(B.every(Boolean))return end('🤝 Égalité !');
-$('msg').textContent=`✅ ${ch.name.full}`;next()}
+if(w)return finishGame(turn);
+if(B.every(Boolean))return finishGame('d');
+$('msg').textContent=`✅ ${ch.name.full}`;advance(false)}
 catch(e){busy=false;$('msg').textContent='Erreur AniList : '+e.message+'. Clique sur la case et réessaie.';draw()}}
-$('g').addEventListener('click',e=>{const b=e.target.closest('button.c');if(!b||over||busy)return;sel=+b.dataset.k;$('q').textContent=`${R[Math.floor(sel/3)].l}  ×  ${K[sel%3].l}`;$('in').value='';$('sg').innerHTML='<div class="hint">Tape au moins 3 lettres.</div>';$('m').classList.add('on');$('in').focus()});
+$('g').addEventListener('click',e=>{const b=e.target.closest('button.c');if(!b||over||busy||(onl&&turn!==onl.me))return;sel=+b.dataset.k;$('q').textContent=`${R[Math.floor(sel/3)].l}  ×  ${K[sel%3].l}`;$('in').value='';$('sg').innerHTML='<div class="hint">Tape au moins 3 lettres.</div>';$('m').classList.add('on');$('in').focus()});
 $('in').addEventListener('input',()=>{clearTimeout(deb);const s=$('in').value.trim();if(s.length<3){$('sg').innerHTML='<div class="hint">Tape au moins 3 lettres.</div>';return}
 const my=++seq;deb=setTimeout(async()=>{$('sg').innerHTML='<div class="hint">Recherche…</div>';try{const l=(await gql(QS,{s})).Page.characters.filter(c=>!used.has(c.id));if(my!==seq)return;window._r=l;$('sg').innerHTML=l.map((c,n)=>`<button class="s" data-n="${n}"><img src="${c.image.large}" alt=""><span>${c.name.full}</span></button>`).join('')||'<div class="hint">Aucun résultat.</div>'}catch(e){$('sg').innerHTML='<div class="hint">Erreur AniList : '+e.message+'</div>'}},350)});
 $('sg').addEventListener('click',e=>{const b=e.target.closest('.s');if(b)pick(window._r[+b.dataset.n])});
-$('cl').onclick=close;$('nw').onclick=start;
+$('cl').onclick=close;
 /* Navigation */
 function syncSeg(){document.querySelectorAll('.seg').forEach(g=>{const cur=store.get(g.dataset.key,g.dataset.key==='tt'?'20':'auto');g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===cur)))})}
 document.addEventListener('click',e=>{const b=e.target.closest('.seg button');if(!b)return;const k=b.parentElement.dataset.key;store.set(k,b.dataset.v);if(k==='theme')applyTheme(b.dataset.v);syncSeg()});
@@ -385,7 +449,14 @@ function menuOpen(o){pd.classList.toggle('on',o);pm.setAttribute('aria-expanded'
 pm.addEventListener('click',e=>{e.stopPropagation();menuOpen(!pd.classList.contains('on'))});
 document.addEventListener('click',e=>{if(!e.target.closest('.menu'))menuOpen(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')menuOpen(false)});
-function show(v){menuOpen(false);if(v==='set')syncSeg();document.querySelectorAll('main').forEach(m=>m.hidden=m.id!=='v-'+v);if(v==='ttt')start();else{over=true;clearInterval(tm)}if(v==='hl')hlStart();if(v==='gs')gsNext();clearInterval(dtTm);if(v==='bt')btNext();if(v==='dt')dtReset();window.scrollTo(0,0)}
+function show(v){if((v==='prof'||v==='fr')&&!me){openWelcome();return}
+menuOpen(false);if(v==='set')syncSeg();
+if(v!=='ttt'&&onl&&onl.done)onlDetach();
+curView=v;document.querySelectorAll('main').forEach(m=>m.hidden=m.id!=='v-'+v);
+if(v==='ttt'){if(!onl)start();else{draw();if(!over)timer()}}else{if(!onl)over=true;clearInterval(tm)}
+if(v==='hl')hlStart();if(v==='gs')gsNext();clearInterval(dtTm);if(v==='bt')btNext();if(v==='dt')dtReset();
+if(v==='ml')renderMl();if(v==='prof')loadProfile();if(v==='fr')loadFriends();if(v==='lb')loadLb();
+updateLive();window.scrollTo(0,0)}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)show(b.dataset.go)});
 document.addEventListener('error',e=>{const t=e.target;if(t.classList&&t.classList.contains('pi')){const f=document.createElement('div');f.className='fb';f.textContent=t.alt||'?';t.replaceWith(f)}},true);
 /* Plus ou moins */
@@ -459,7 +530,7 @@ function renderUser(){
   $('pdSub').textContent=me?'Connecté · '+me.email:'Non connecté · invité';
   $('pdAuth').textContent=me?'Se déconnecter':'Se connecter / Créer un compte';
   $('pdSwitch').hidden=!!me;
-  const av=document.querySelector('.av2');if(me)av.innerHTML='<b>'+n.charAt(0).toUpperCase()+'</b>';else av.innerHTML=AV0;
+  const av=document.querySelector('.av2');if(me)av.innerHTML=me.avatar?'<img alt="" src="'+esc(me.avatar)+'">':'<b>'+esc(n.charAt(0).toUpperCase())+'</b>';else av.innerHTML=AV0;
 }
 function wmsg(t,c){const m=$('wMsg');m.textContent=t||'';m.className=c||''}
 function authBack(){$('wAuth').hidden=true;$('wMain').hidden=false;wmsg('')}
@@ -503,16 +574,208 @@ $('wAuth').addEventListener('submit',async ev=>{
   finally{$('aGo').disabled=false}
 });
 async function loadMe(user){
-  if(!user){me=null;renderUser();return}
+  if(!user){me=null;renderUser();onlLogout();return}
   const r=await sb.from('profiles').select('pseudo,avatar_url').eq('id',user.id).maybeSingle();
   let ps=r.data&&r.data.pseudo;const want=user.user_metadata&&user.user_metadata.pseudo;
   if(r.data&&want&&want!==ps&&/^joueur_[0-9a-f]{8}$/.test(ps)){const u=await sb.from('profiles').update({pseudo:want}).eq('id',user.id);if(!u.error)ps=want}
   me={id:user.id,email:user.email,pseudo:ps||want||'Joueur',avatar:r.data&&r.data.avatar_url};
-  store.set('mode','account');wl.hidden=true;renderUser();
+  store.set('mode','account');wl.hidden=true;renderUser();onlLogin();
 }
 if(sb)sb.auth.onAuthStateChange((ev,sess)=>{setTimeout(()=>loadMe(sess&&sess.user),0)});
-$('pdAuth').onclick=async()=>{menuOpen(false);if(me&&sb){await sb.auth.signOut();me=null;store.set('mode','guest');renderUser()}else openWelcome()};
+$('pdAuth').onclick=async()=>{menuOpen(false);if(me&&sb){await sb.auth.signOut();me=null;store.set('mode','guest');renderUser();onlLogout();if(curView==='prof'||curView==='fr')show('home')}else openWelcome()};
 $('pdSwitch').onclick=()=>{menuOpen(false);openWelcome()};
+/* ===== En ligne : Elo, parties, amis, profil ===== */
+const RK=[[1800,'Légende'],[1600,'Maître'],[1400,'Expert'],[1250,'Initié'],[1100,'Apprenti'],[0,'Novice']];
+function rk(e){return(RK.find(r=>e>=r[0])||RK[5])[1]}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeImg(u){return /^https:\/\/s\d+\.anilist\.co\//.test(u||'')?u:''}
+function avh(p){return p&&p.avatar_url?'<img class="avi" alt="" src="'+esc(p.avatar_url)+'">':'<span class="avi">'+esc(((p&&p.pseudo)||'?').charAt(0).toUpperCase())+'</span>'}
+let tickT=null,tickN=0,invShown=null;
+const PN=()=>onl?onl.names:['Joueur 1','Joueur 2'];
+
+/* --- état d'une partie en ligne --- */
+function newState(){return{ri:pickN([...ROWS.keys()],3),ci:pickN([...COLS.keys()],3),b:Array(9).fill(null),used:[],turn:0,over:false,w:null,miss:0,seq:1,rs:null}}
+function okI(a,n){return Array.isArray(a)&&a.length===3&&a.every(i=>Number.isInteger(i)&&i>=0&&i<n)}
+function okSt(st){return !!st&&Array.isArray(st.b)&&st.b.length===9&&st.b.every(c=>c===null||(c&&(c.p===0||c.p===1)&&typeof c.name==='string'))&&okI(st.ri,ROWS.length)&&okI(st.ci,COLS.length)&&(st.turn===0||st.turn===1)&&Array.isArray(st.used)&&st.used.every(Number.isInteger)&&Number.isInteger(st.seq)}
+function winnerOf(b){for(const l of L){const a=b[l[0]];if(a&&b[l[1]]&&b[l[2]]&&b[l[1]].p===a.p&&b[l[2]].p===a.p)return a.p}return b.every(Boolean)?'d':null}
+function myResult(st){if(st.rs===0||st.rs===1)return st.rs===0?'p2':'p1';const w=winnerOf(st.b);if(w===null)return(st.miss||0)>=6?'draw':null;return w==='d'?'draw':(w===0?'p1':'p2')}
+function resText(st){const n=onl.names,r=myResult(st);let t='';if(st.rs===0||st.rs===1)t=n[st.rs]+' a abandonné. ';if(r==='draw')return t+'🤝 Égalité !';if(r)return t+'🏆 '+n[r==='p1'?0:1]+' gagne !';return t}
+function stateObj(){return{ri:RI,ci:CI,b:B,used:[...used],turn,over,w:over?wres:null,miss,seq:(onl.seq||0)+1,rs:onl.rs==null?null:onl.rs}}
+async function pushState(){if(!onl||onl.done||!sb)return;const st=stateObj();onl.seq=st.seq;onl.last=Date.now();const r=await sb.from('matches').update({state:st}).eq('id',onl.id);if(r.error){$('msg').textContent='Connexion instable, nouvel essai…';setTimeout(pushState,1500)}}
+function advance(timeout){if(timeout)miss++;else miss=0;if(miss>=6)return finishGame('d');turn=1-turn;draw();timer();if(onl)pushState()}
+function finishGame(r){over=true;clearInterval(tm);wres=r;draw();$('msg').textContent=r==='d'?'🤝 Égalité !':'🏆 '+PN()[r]+' gagne !';if(onl){pushState().then(()=>submitMine(stateObj()))}}
+async function submitMine(st){if(!onl||onl.sub||!sb)return;const r=myResult(st);if(!r)return;onl.sub=true;const x=await sb.rpc('submit_result',{p_id:onl.id,p_result:r});if(x.error){onl.sub=false;return}if(x.data&&x.data.status!=='playing')endOnline(x.data)}
+function applyRemote(m){
+  if(!onl||onl.done||m.id!==onl.id)return;
+  const st=m.state;
+  if(okSt(st)&&st.seq>onl.seq){
+    onl.seq=st.seq;onl.last=Date.now();
+    RI=st.ri;CI=st.ci;R=RI.map(i=>ROWS[i]);K=CI.map(i=>COLS[i]);B=st.b;used=new Set(st.used);
+    const was=turn;turn=st.turn;over=!!st.over||st.rs===0||st.rs===1;miss=st.miss||0;busy=false;
+    if(over){clearInterval(tm);$('msg').textContent=resText(st)}
+    else $('msg').textContent=turn===onl.me?'À toi de jouer !':'Tour de '+onl.names[turn]+'…';
+    if(curView==='ttt'){draw();if(!over&&(turn!==was||onl.fresh))timer()}
+    onl.fresh=false;
+  }
+  if(m.status!=='playing'){endOnline(m);return}
+  if(okSt(st)){
+    if(st.rs===0||st.rs===1||st.over)submitMine(st);
+    if(onl.rs!=null&&(st.rs==null))pushState();
+  }
+}
+async function endOnline(m){
+  if(!onl||onl.done)return;onl.done=true;clearInterval(tm);over=true;
+  let t=$('msg').textContent;
+  if(m.status==='finished'){
+    const res=m.result;t=(onl.rs!=null?onl.names[onl.rs]+' a abandonné. ':'')+(res==='draw'?'🤝 Égalité !':'🏆 '+onl.names[res==='p1'?0:1]+' gagne !');
+    if(m.ranked){const d=onl.me===0?m.elo_delta1:m.elo_delta2;
+      if(d==null)t+=' Partie non comptée (3 parties classées par jour au maximum contre le même joueur).';
+      else{const r=await sb.from('ratings').select('elo').eq('user_id',me.id).eq('game','ttt').maybeSingle();const e=r.data?r.data.elo:null;t+=' Elo '+(d>=0?'+':'')+d+(e!=null?' → '+e+' ('+rk(e)+')':'')}}
+  }else if(m.status==='disputed')t='Les deux joueurs ne sont pas d’accord sur le résultat : partie non comptée.';
+  else t='Partie annulée.';
+  $('msg').textContent=t;$('claim').hidden=true;if(curView==='ttt')draw();updateLive();
+  if(onl.ch){try{sb.removeChannel(onl.ch)}catch(e){}onl.ch=null}
+}
+function onlDetach(){if(onl&&onl.ch){try{sb.removeChannel(onl.ch)}catch(e){}}onl=null;$('claim').hidden=true;updateLive()}
+function updateLive(){const on=!!onl&&!onl.done&&curView!=='ttt';$('live').hidden=!on;if(on)$('liveT').textContent='⚔️ Partie en cours contre '+onl.opp.pseudo+' — Reprendre'}
+async function startOnline(m,silent){
+  if(!sb||!me)return;wtHide();
+  const mine=m.p1===me.id?0:1,oid=mine===0?m.p2:m.p1;
+  const pr=await sb.from('profiles').select('id,pseudo,avatar_url').eq('id',oid).maybeSingle();
+  const opp=pr.data||{id:oid,pseudo:'Adversaire'};
+  onlDetach();wres=null;
+  onl={id:m.id,me:mine,ranked:m.ranked,opp,names:mine===0?[me.pseudo,opp.pseudo]:[opp.pseudo,me.pseudo],seq:0,last:Date.now(),rs:null,sub:false,done:false,fresh:true,ch:null};
+  try{onl.ch=sb.channel('m-'+m.id).on('postgres_changes',{event:'UPDATE',schema:'public',table:'matches',filter:'id=eq.'+m.id},p=>applyRemote(p.new)).subscribe()}catch(e){}
+  $('inv').hidden=true;
+  applyRemote(m);
+  if(!silent)show('ttt');else updateLive();
+}
+let nwT=0;
+$('nw').onclick=()=>{
+  if(!onl){start();return}
+  if(onl.done||over){onlDetach();show('ml');return}
+  if(Date.now()-nwT>4000){nwT=Date.now();$('nw').textContent='Confirmer l’abandon ?';return}
+  nwT=0;resign()};
+function resign(){onl.rs=onl.me;over=true;clearInterval(tm);$('msg').textContent='Tu as abandonné.';draw();pushState();onl.sub=true;
+  sb.rpc('submit_result',{p_id:onl.id,p_result:onl.me===0?'p2':'p1'}).then(x=>{if(x.data&&x.data.status!=='playing')endOnline(x.data)})}
+function syncNw(){$('nw').textContent=onl?((onl.done||over)?'Retour au menu':'Abandonner'):'Nouvelle grille'}
+$('claim').onclick=async()=>{if(!onl)return;const x=await sb.rpc('claim_win',{p_id:onl.id});if(x.data&&x.data.status!=='playing')endOnline(x.data);else $('msg').textContent='Pas encore possible : l’adversaire a encore un peu de temps.'};
+$('live').onclick=()=>show('ttt');
+
+/* --- recherche d'adversaire --- */
+function wtShow(m,t){wait=m;$('wtT').textContent=t;$('wt').hidden=false}
+function wtHide(){wait=null;$('wt').hidden=true}
+$('wtX').onclick=async()=>{if(wait&&sb)await sb.rpc('cancel_match',{p_id:wait.id});wtHide()};
+async function findOnline(ranked){
+  if(!me||!sb){openWelcome();return}
+  if(onl&&!onl.done){$('mlMsg').textContent='Une partie est déjà en cours. Reprends-la ou abandonne-la d’abord.';return}
+  $('mlMsg').textContent='';
+  const r=await sb.rpc('find_match',{p_game:'ttt',p_ranked:ranked,p_state:newState()});
+  if(r.error){$('mlMsg').textContent='Erreur : '+r.error.message;return}
+  if(r.data.status==='playing')startOnline(r.data);else wtShow(r.data,ranked?'Recherche d’un adversaire de ton niveau…':'Recherche d’un adversaire…')}
+async function inviteFriend(uid,pseudo,ranked){
+  if(onl&&!onl.done){$('frMsg').textContent='Une partie est déjà en cours.';return}
+  const r=await sb.rpc('invite_friend',{p_friend:uid,p_game:'ttt',p_ranked:ranked,p_state:newState()});
+  if(r.error){$('frMsg').textContent='Erreur : '+r.error.message;return}
+  wtShow(r.data,'En attente de '+pseudo+'…')}
+
+/* --- boucle de mise à jour --- */
+function startTick(){if(!tickT)tickT=setInterval(tick,2500)}
+function stopTick(){clearInterval(tickT);tickT=null}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+async function tick(){
+  if(!sb||!me||document.hidden)return;tickN++;
+  try{
+    if(onl&&!onl.done){
+      const r=await sb.from('matches').select('*').eq('id',onl.id).maybeSingle();if(r.data)applyRemote(r.data);
+      const idle=onl&&!onl.done&&!over&&turn!==onl.me&&Date.now()-onl.last>65000;$('claim').hidden=!(idle&&curView==='ttt');
+    }else if(wait){
+      const r=await sb.from('matches').select('*').eq('id',wait.id).maybeSingle();
+      if(r.data){if(r.data.status==='playing')startOnline(r.data);else if(r.data.status!=='waiting')wtHide()}
+    }
+    if(tickN%3===1)await pollSocial();
+  }catch(e){}
+}
+async function pollSocial(){
+  const i=await sb.from('matches').select('id,p1,ranked').eq('invited',me.id).eq('status','waiting').gt('created_at',new Date(Date.now()-9*60000).toISOString()).order('created_at',{ascending:false}).limit(1);
+  const inv=i.data&&i.data[0];
+  if(inv&&!(onl&&!onl.done)){if(invShown!==inv.id){invShown=inv.id;const p=await sb.from('profiles').select('pseudo').eq('id',inv.p1).maybeSingle();$('invT').textContent=(p.data?p.data.pseudo:'Un ami')+' t’invite à une partie '+(inv.ranked?'classée':'amicale')+'.';$('inv').dataset.id=inv.id;$('inv').hidden=false}}
+  else{$('inv').hidden=true;if(!inv)invShown=null}
+  if(!onl&&!wait){
+    const g=await sb.from('matches').select('*').eq('status','playing').eq('game','ttt').gt('updated_at',new Date(Date.now()-10*60000).toISOString()).order('created_at',{ascending:false}).limit(3);
+    const m=(g.data||[]).find(x=>(x.p1===me.id?x.r1:x.r2)==null);if(m)startOnline(m,true);
+  }
+  const f=await sb.from('friendships').select('id',{count:'exact',head:true}).eq('addressee',me.id).eq('status','pending');
+  const n=f.count||0;$('frBadge').hidden=!n;$('frBadge').textContent=n}
+$('invY').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;const r=await sb.rpc('accept_invite',{p_id:id});if(r.error){$('mlMsg').textContent='Invitation expirée.';return}startOnline(r.data)};
+$('invN').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;await sb.rpc('cancel_match',{p_id:id})};
+function onlLogout(){stopTick();onlDetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;invShown=null}
+function onlLogin(){tickN=0;startTick();setTimeout(tick,400)}
+
+/* --- menu du morpion --- */
+async function renderMl(){
+  $('mlMsg').textContent='';const c=$('mlElo');
+  if(!me||!sb){c.innerHTML='<p class="hint">Connecte-toi pour jouer en ligne et obtenir un classement Elo.</p>';return}
+  const r=await sb.from('ratings').select('*').eq('user_id',me.id).eq('game','ttt').maybeSingle();const d=r.data||{elo:1000,played:0,wins:0,losses:0,draws:0};
+  c.innerHTML='<div class="eloc"><b>'+d.elo+'</b><span>'+rk(d.elo)+'</span><small>'+d.played+' classée'+(d.played>1?'s':'')+' · '+d.wins+' V · '+d.losses+' D · '+d.draws+' N</small></div>'}
+$('mlQuick').onclick=()=>findOnline(false);
+$('mlRank').onclick=()=>findOnline(true);
+$('mlFr').onclick=()=>{if(!me){openWelcome();return}show('fr')};
+$('mlLocal').onclick=()=>{if(onl&&!onl.done){$('mlMsg').textContent='Une partie en ligne est en cours. Reprends-la ou abandonne-la d’abord.';return}onlDetach();show('ttt')};
+
+/* --- amis --- */
+let frT;
+$('frQ').addEventListener('input',()=>{clearTimeout(frT);const q=$('frQ').value.trim();if(q.length<2){$('frRes').innerHTML='';return}
+  frT=setTimeout(async()=>{const r=await sb.from('profiles').select('id,pseudo,avatar_url').ilike('pseudo',q.replace(/[%_\\]/g,'\\$&')+'%').neq('id',me.id).limit(8);
+    $('frRes').innerHTML=(r.data||[]).map(p=>'<div class="fr-row">'+avh(p)+'<div class="g"><b>'+esc(p.pseudo)+'</b></div><button class="btn sm" data-a="add" data-u="'+esc(p.id)+'">Ajouter</button></div>').join('')||'<div class="hint">Aucun joueur trouvé.</div>'},300)});
+async function loadFriends(){
+  $('frMsg').textContent='';
+  const f=await sb.from('friendships').select('id,requester,addressee,status').order('created_at',{ascending:false});
+  if(f.error){$('frList').innerHTML='<div class="hint">Erreur : '+esc(f.error.message)+'</div>';return}
+  const rows=f.data||[],oid=r=>r.requester===me.id?r.addressee:r.requester,ids=[...new Set(rows.map(oid))];
+  const pf={},rt={};
+  if(ids.length){const[p,r]=await Promise.all([sb.from('profiles').select('id,pseudo,avatar_url').in('id',ids),sb.from('ratings').select('user_id,elo').eq('game','ttt').in('user_id',ids)]);(p.data||[]).forEach(x=>pf[x.id]=x);(r.data||[]).forEach(x=>rt[x.user_id]=x.elo)}
+  const row=(r,btns)=>{const p=pf[oid(r)]||{id:oid(r),pseudo:'?'},e=rt[p.id]==null?1000:rt[p.id];return'<div class="fr-row">'+avh(p)+'<div class="g"><b>'+esc(p.pseudo)+'</b><small>Elo '+e+' · '+rk(e)+'</small></div>'+btns(r,p)+'</div>'};
+  const inc=rows.filter(r=>r.status==='pending'&&r.addressee===me.id),out=rows.filter(r=>r.status==='pending'&&r.requester===me.id),fr=rows.filter(r=>r.status==='accepted');
+  $('frInc').innerHTML=inc.length?'<h2>Demandes reçues</h2>'+inc.map(r=>row(r,()=>'<button class="btn sm" data-a="acc" data-id="'+r.id+'">Accepter</button><button class="btn alt sm" data-a="del" data-id="'+r.id+'">Refuser</button>')).join(''):'';
+  $('frList').innerHTML='<h2>Mes amis</h2>'+(fr.length?fr.map(r=>row(r,(r,p)=>'<button class="btn sm" data-a="ch" data-r="0" data-u="'+esc(p.id)+'" data-n="'+esc(p.pseudo)+'">Amical</button><button class="btn alt sm" data-a="ch" data-r="1" data-u="'+esc(p.id)+'" data-n="'+esc(p.pseudo)+'">Classé</button><button class="btn alt sm" data-a="del" data-id="'+r.id+'" aria-label="Retirer cet ami">✕</button>')).join(''):'<div class="hint">Pas encore d’ami. Cherche un pseudo ci-dessus.</div>');
+  $('frOut').innerHTML=out.length?'<h2>Demandes envoyées</h2>'+out.map(r=>row(r,()=>'<button class="btn alt sm" data-a="del" data-id="'+r.id+'">Annuler</button>')).join(''):''}
+$('v-fr').addEventListener('click',async e=>{const b=e.target.closest('button[data-a]');if(!b||!me)return;const a=b.dataset.a;
+  if(a==='add'){b.disabled=true;const r=await sb.from('friendships').insert({requester:me.id,addressee:b.dataset.u});$('frMsg').textContent=r.error?(r.error.code==='23505'?'Vous êtes déjà en lien avec ce joueur.':'Erreur : '+r.error.message):'Demande envoyée.';if(!r.error){b.textContent='Envoyée'}else b.disabled=false;loadFriends()}
+  else if(a==='acc'){await sb.from('friendships').update({status:'accepted'}).eq('id',b.dataset.id);loadFriends();pollSocial()}
+  else if(a==='del'){await sb.from('friendships').delete().eq('id',b.dataset.id);loadFriends();pollSocial()}
+  else if(a==='ch')inviteFriend(b.dataset.u,b.dataset.n,b.dataset.r==='1')});
+
+/* --- profil --- */
+async function loadProfile(){
+  $('pfAv').innerHTML=avh({pseudo:me.pseudo,avatar_url:me.avatar});$('pfPs').value=me.pseudo;$('pfMsg').textContent='';
+  const r=await sb.from('ratings').select('*').eq('user_id',me.id).eq('game','ttt').maybeSingle();const d=r.data||{elo:1000,played:0,wins:0,losses:0,draws:0};
+  $('pfElo').innerHTML='<div class="eloc"><b>'+d.elo+'</b><span>'+rk(d.elo)+'</span><small>'+d.played+' classée'+(d.played>1?'s':'')+' · '+d.wins+' V · '+d.losses+' D · '+d.draws+' N</small></div>';
+  const h=await sb.from('matches').select('id,p1,p2,ranked,result,elo_delta1,elo_delta2,created_at').eq('status','finished').order('created_at',{ascending:false}).limit(10);
+  const ms=h.data||[];if(!ms.length){$('pfHist').innerHTML='<div class="hint">Aucune partie en ligne pour l’instant.</div>';return}
+  const ids=[...new Set(ms.map(m=>m.p1===me.id?m.p2:m.p1))];const p=await sb.from('profiles').select('id,pseudo').in('id',ids);const pn={};(p.data||[]).forEach(x=>pn[x.id]=x.pseudo);
+  $('pfHist').innerHTML=ms.map(m=>{const first=m.p1===me.id,mine=first?'p1':'p2',res=m.result===mine?'Victoire':m.result==='draw'?'Nul':'Défaite',cls=res==='Victoire'?'w':res==='Défaite'?'l':'d',dl=first?m.elo_delta1:m.elo_delta2;
+    return'<div class="fr-row"><span class="rs '+cls+'">'+res+'</span><div class="g"><b>contre '+esc(pn[first?m.p2:m.p1]||'?')+'</b><small>'+(m.ranked?'Classée'+(dl!=null?' · '+(dl>=0?'+':'')+dl+' Elo':' · non comptée'):'Amicale')+' · '+new Date(m.created_at).toLocaleDateString('fr-FR')+'</small></div></div>'}).join('')}
+$('pfSave').onclick=async()=>{if(!me)return;const v=$('pfPs').value.trim();if(!/^[A-Za-z0-9_-]{3,20}$/.test(v)){$('pfMsg').textContent='Pseudo invalide : 3 à 20 caractères, lettres, chiffres, _ ou -.';return}
+  const r=await sb.from('profiles').update({pseudo:v}).eq('id',me.id);
+  if(r.error){$('pfMsg').textContent=r.error.code==='23505'?'Ce pseudo est déjà pris.':'Erreur : '+r.error.message;return}
+  me.pseudo=v;renderUser();$('pfMsg').textContent='Pseudo enregistré.'};
+$('pfFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f||!me)return;$('pfMsg').textContent='Envoi de la photo…';
+  try{const bmp=await createImageBitmap(f),s=Math.min(bmp.width,bmp.height),c=document.createElement('canvas');c.width=c.height=256;c.getContext('2d').drawImage(bmp,(bmp.width-s)/2,(bmp.height-s)/2,s,s,0,0,256,256);
+    const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.85)),path=me.id+'/avatar.jpg';
+    const up=await sb.storage.from('avatars').upload(path,blob,{upsert:true,contentType:'image/jpeg'});if(up.error)throw up.error;
+    const url=sb.storage.from('avatars').getPublicUrl(path).data.publicUrl+'?v='+Date.now();
+    const u=await sb.from('profiles').update({avatar_url:url}).eq('id',me.id);if(u.error)throw u.error;
+    me.avatar=url;renderUser();loadProfile();$('pfMsg').textContent='Photo mise à jour.'}
+  catch(err){$('pfMsg').textContent='Échec de l’envoi : '+(err.message||err)}};
+
+/* --- classement --- */
+async function loadLb(){
+  const c=$('lbList');c.innerHTML='<div class="hint">Chargement…</div>';
+  if(!sb){c.innerHTML='<div class="hint">Classement indisponible.</div>';return}
+  const r=await sb.from('ratings').select('elo,played,profiles(pseudo,avatar_url)').eq('game','ttt').gt('played',0).order('elo',{ascending:false}).limit(25);
+  if(r.error){c.innerHTML='<div class="hint">Erreur : '+esc(r.error.message)+'</div>';return}
+  c.innerHTML=(r.data||[]).map((x,i)=>'<div class="fr-row"><span class="rk">'+(i+1)+'</span>'+avh(x.profiles)+'<div class="g"><b>'+esc(x.profiles&&x.profiles.pseudo)+'</b><small>'+rk(x.elo)+' · '+x.played+' parties</small></div><b>'+x.elo+'</b></div>').join('')||'<div class="hint">Personne n’est encore classé. Joue une partie classée pour ouvrir la marche.</div>'}
 renderUser();if(!store.get('mode',''))openWelcome();
 show('home');
 /* Portraits AniList dans les illustrations de l'accueil */
