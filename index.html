@@ -170,7 +170,33 @@ main#v-home{max-width:900px}
 #inv{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:18;background:var(--card);border:2px solid var(--ac);border-radius:14px;padding:12px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:94vw;box-shadow:0 10px 28px rgba(0,0,0,.4)}
 #live{background:var(--ac);color:#14233a;text-align:center;padding:9px;font-weight:800;cursor:pointer;border:0;width:100%;font:inherit;font-weight:800}
 #claim{margin-top:8px}
-#frBadge{background:#fb7185;color:#fff;border-color:#fb7185}
+#frBadge,#msgBadge{background:#fb7185;color:#fff;border-color:#fb7185}
+.ib{position:relative;width:40px;height:40px;border-radius:50%;background:var(--bg);border:1px solid var(--bd);color:var(--tx);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.ib:hover{border-color:var(--ac)}.ib svg{width:20px;height:20px}
+.ibn{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:#fb7185;color:#fff;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ibn[hidden],#msgW[hidden],#gcB[hidden],#gcP[hidden],#sh[hidden]{display:none}
+.msr{display:flex;align-items:center;gap:10px;width:100%;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:8px;color:var(--tx);font:inherit;text-align:left;cursor:pointer}
+.msr:hover{border-color:var(--ac)}.msr .g{flex:1;min-width:0}.msr .g b,.msr .g small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.msr small{color:var(--mut)}.msr .tm{color:var(--mut);font-size:.75rem}
+.msr .un{background:#fb7185;color:#fff;border-radius:999px;font-size:.72rem;font-weight:700;min-width:20px;text-align:center;padding:2px 6px}
+.msH{display:flex;align-items:center;gap:8px;margin-bottom:8px}.msH .g{flex:1;min-width:0}.msH .g b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.msH small{color:var(--mut)}
+.msL,#gcL{overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.msL{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;height:min(55vh,460px)}
+.msM{max-width:84%;display:flex;flex-direction:column}.msM .b{padding:7px 11px;border-radius:14px;overflow-wrap:anywhere;white-space:pre-wrap}
+.msM.me{align-self:flex-end;align-items:flex-end}.msM.me .b{background:var(--ac);color:#14233a;border-bottom-right-radius:4px}
+.msM.th{align-self:flex-start}.msM.th .b{background:var(--bg);border:1px solid var(--bd);border-bottom-left-radius:4px}
+.msM small{color:var(--mut);font-size:.7rem;padding:0 6px}
+.msS{align-self:center;color:var(--mut);font-size:.8rem;text-align:center}
+.msC{align-self:center;width:min(100%,320px);border:2px solid var(--ac);border-radius:14px;padding:10px 12px;background:var(--bg);display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}.msC small{color:var(--mut)}
+.msI{display:flex;gap:8px;margin-top:8px}.msI input{flex:1;min-width:0}
+#gcB{position:fixed;right:14px;bottom:14px;z-index:17;width:54px;height:54px;border-radius:50%;background:var(--ac);color:#14233a;border:0;font-size:1.45rem;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35);padding:0}
+#gcP{position:fixed;right:14px;bottom:80px;z-index:17;width:min(340px,calc(100vw - 28px));background:var(--card);border:2px solid var(--ac);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);display:flex;flex-direction:column;max-height:min(52vh,380px)}
+#gcP .gh{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;border-bottom:1px solid var(--bd)}
+#gcL{flex:1;padding:8px;min-height:110px}
+#gcQ{display:flex;gap:6px;flex-wrap:wrap;padding:6px 8px 0}#gcQ button{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:999px;padding:4px 10px;font:inherit;font-size:.8rem;cursor:pointer}
+#gcP .msI{padding:6px 8px 8px;margin:0}#gcMsg{padding:0 10px 6px;font-size:.8rem}
+#sh{position:fixed;inset:0;z-index:25;background:rgba(10,12,18,.72);display:flex;align-items:center;justify-content:center;padding:16px}
+.shc{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;width:min(420px,100%);max-height:85vh;overflow:auto}
+.shc h2{margin-top:0}
 .atBox{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;text-align:center;margin-bottom:10px}
 .atBox .btn{font-size:1.05rem;padding:12px 22px}
 .atBar{height:8px;border-radius:999px;background:var(--bg);margin:12px 0 8px;overflow:hidden}
@@ -260,8 +286,11 @@ button.pc:disabled{cursor:default}
 </style>
 </head>
 <body>
-<header class="top"><div class="in"><button class="logo" data-go="home" aria-label="Retour à l’accueil Kuroven"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><span>Kuroven</span></button><span class="pill">Bêta</span><div class="rt"><div class="bellw" id="bellW" hidden><button id="bell" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" aria-controls="bp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="bellN" hidden></span></button><div id="bp" role="region" aria-label="Notifications"><div class="bh"><b>Notifications</b><span><button id="bAll">Tout marquer comme lu</button><button id="bClr">Effacer les lues</button></span></div><div class="bl" id="bList"></div></div></div><div class="menu"><button class="pm" id="pm" aria-haspopup="true" aria-expanded="false" aria-controls="pd"><span class="av2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg></span><span id="pmName">Invité</span><span aria-hidden="true">▾</span></button><div id="pd" role="menu"><div class="who"><b id="pdName">Invité</b><small id="pdSub">Non connecté · invité</small></div><button id="pdAuth" role="menuitem">Se connecter</button><button data-go="prof" role="menuitem">Mon profil</button><button data-go="fr" role="menuitem">Amis <em id="frBadge" hidden></em></button><button data-go="lb" role="menuitem">Classement</button><button data-go="prof" role="menuitem">Historique des parties</button><hr><button data-go="set" role="menuitem">Paramètres</button><button id="pdSwitch" role="menuitem">Changer de profil</button></div></div></div></div></header>
+<header class="top"><div class="in"><button class="logo" data-go="home" aria-label="Retour à l’accueil Kuroven"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><span>Kuroven</span></button><span class="pill">Bêta</span><div class="rt"><div class="bellw" id="msgW" hidden><button class="ib" id="msgB" data-go="msg" aria-label="Messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span class="ibn" id="msgN" hidden></span></button></div><div class="bellw" id="bellW" hidden><button id="bell" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" aria-controls="bp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="bellN" hidden></span></button><div id="bp" role="region" aria-label="Notifications"><div class="bh"><b>Notifications</b><span><button id="bAll">Tout marquer comme lu</button><button id="bClr">Effacer les lues</button></span></div><div class="bl" id="bList"></div></div></div><div class="menu"><button class="pm" id="pm" aria-haspopup="true" aria-expanded="false" aria-controls="pd"><span class="av2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg></span><span id="pmName">Invité</span><span aria-hidden="true">▾</span></button><div id="pd" role="menu"><div class="who"><b id="pdName">Invité</b><small id="pdSub">Non connecté · invité</small></div><button id="pdAuth" role="menuitem">Se connecter</button><button data-go="prof" role="menuitem">Mon profil</button><button data-go="fr" role="menuitem">Amis <em id="frBadge" hidden></em></button><button data-go="msg" role="menuitem">Messages <em id="msgBadge" hidden></em></button><button data-go="lb" role="menuitem">Classement</button><button data-go="prof" role="menuitem">Historique des parties</button><hr><button data-go="set" role="menuitem">Paramètres</button><button id="pdSwitch" role="menuitem">Changer de profil</button></div></div></div></div></header>
 <button id="live" hidden><span id="liveT"></span></button>
+<button id="gcB" hidden aria-label="Chat de la partie"><span id="gcI">💬</span><span class="ibn" id="gcN" hidden></span></button>
+<div id="gcP" hidden role="dialog" aria-label="Chat de la partie"><div class="gh"><b>💬 Chat de la partie</b><span><button class="btn alt sm" id="gcM" type="button">🔕 Couper</button> <button class="btn alt sm" id="gcX" type="button" aria-label="Fermer le chat">✕</button></span></div><div id="gcL" role="log" aria-live="polite"></div><div id="gcQ"></div><div class="msI"><input id="gcIn" maxlength="500" placeholder="Un message…" autocomplete="off"><button class="btn sm" id="gcS" type="button">Envoyer</button></div><div class="msg" id="gcMsg"></div></div>
+<div id="sh" hidden><div class="shc" role="dialog" aria-modal="true"><div id="shB"></div><div class="msg" id="shMsg"></div><div class="row" style="margin-top:10px"><button class="btn alt" id="shX" type="button">Fermer</button></div></div></div>
 <main id="v-home">
 <section class="hero"><svg class="hero-bg" viewBox="0 0 900 300" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><defs><linearGradient id="hsky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b3556"/><stop offset=".6" stop-color="#4a5b8f"/><stop offset="1" stop-color="#8fb0e0"/></linearGradient><pattern id="hdots" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3.0" cy="3.0" r="1.6" fill="#ffffff"/></pattern><pattern id="hdots2" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="2.5" cy="2.5" r="1.5" fill="#111"/></pattern><clipPath id="hmoonclip"><circle cx="690" cy="104" r="78"/></clipPath></defs><rect width="900" height="300" fill="url(#hsky)"/><rect width="900" height="300" fill="url(#hdots)" opacity=".16"/><g fill="#111" opacity=".22"><polygon points="786.0,104.9 1309.9,92.0 1309.5,128.1"/><polygon points="785.1,117.0 1306.8,167.2 1301.1,208.6"/><polygon points="783.2,127.2 1296.3,233.5 1286.4,273.4"/><polygon points="781.7,132.3 1286.5,273.0 1278.2,300.1"/><polygon points="775.0,148.7 1246.3,377.7 1230.7,407.4"/><polygon points="769.6,157.7 1209.2,442.9 1198.9,458.1"/><polygon points="765.2,163.7 1182.5,480.6 1168.7,498.0"/><polygon points="757.6,172.1 1137.9,532.7 1115.6,554.9"/><polygon points="752.7,176.7 1103.1,566.3 1087.0,580.2"/><polygon points="742.5,184.4 1046.1,611.6 1011.7,634.0"/><polygon points="729.8,191.4 956.0,664.0 938.1,672.2"/><polygon points="719.5,195.3 889.9,690.9 871.7,696.8"/><polygon points="710.5,197.8 831.4,707.7 813.1,711.7"/><polygon points="704.5,198.9 803.5,713.5 764.2,719.5"/><polygon points="692.2,200.0 715.0,723.5 693.8,724.0"/><polygon points="675.6,198.9 616.6,719.6 577.2,713.7"/><polygon points="670.2,197.9 583.0,714.7 541.6,706.0"/><polygon points="658.0,194.5 499.6,694.1 467.3,682.6"/><polygon points="650.4,191.5 453.4,677.1 415.4,659.9"/><polygon points="637.7,184.5 370.2,635.1 334.6,612.0"/><polygon points="627.8,177.1 297.4,583.9 279.4,568.6"/><polygon points="622.9,172.6 263.6,554.1 249.4,540.2"/><polygon points="616.7,166.0 222.0,510.6 211.0,497.6"/><polygon points="609.5,156.4 179.3,455.5 161.7,428.6"/><polygon points="605.2,149.1 150.8,410.0 134.7,379.7"/><polygon points="599.8,136.9 111.7,327.5 103.5,305.1"/><polygon points="595.9,123.0 85.2,240.6 79.5,212.4"/><polygon points="594.8,116.2 77.0,196.7 73.3,168.2"/><polygon points="594.0,102.4 70.0,102.2 70.3,85.5"/><polygon points="595.1,89.6 75.8,19.1 78.2,3.4"/><polygon points="596.9,80.8 84.0,-27.0 93.4,-64.9"/><polygon points="598.2,75.8 92.1,-60.1 103.1,-95.9"/><polygon points="603.1,63.3 122.1,-144.7 135.4,-173.2"/><polygon points="606.8,56.2 148.4,-197.8 156.6,-212.1"/><polygon points="613.4,46.1 183.1,-253.1 208.5,-286.6"/><polygon points="620.5,37.8 228.7,-310.2 253.9,-336.7"/><polygon points="632.8,26.9 303.8,-381.0 337.3,-405.9"/><polygon points="637.9,23.4 343.1,-409.9 364.3,-423.5"/><polygon points="648.5,17.4 405.5,-446.9 438.9,-462.9"/><polygon points="655.5,14.4 450.1,-467.7 484.0,-480.8"/><polygon points="670.9,9.9 547.2,-499.3 585.8,-507.2"/><polygon points="675.7,9.1 577.2,-505.6 618.5,-511.9"/><polygon points="686.9,8.1 657.3,-515.1 682.1,-515.9"/><polygon points="701.6,8.7 744.4,-513.6 785.2,-508.6"/><polygon points="710.2,10.1 800.0,-506.2 840.3,-497.5"/><polygon points="722.0,13.5 885.5,-484.4 908.2,-476.4"/><polygon points="730.4,16.9 941.6,-462.7 959.9,-454.2"/><polygon points="738.3,21.0 993.5,-436.6 1010.3,-426.9"/><polygon points="751.0,29.9 1066.9,-388.3 1100.3,-360.8"/><polygon points="756.0,34.3 1110.3,-351.8 1122.3,-340.4"/><polygon points="767.3,47.1 1180.3,-275.5 1198.2,-251.1"/><polygon points="770.9,52.3 1206.5,-239.0 1218.3,-220.5"/><polygon points="776.8,63.0 1242.1,-178.1 1258.6,-143.3"/><polygon points="780.5,72.0 1269.8,-115.6 1278.9,-90.0"/><polygon points="782.8,79.3 1283.6,-75.1 1294.1,-35.4"/><polygon points="784.9,89.7 1300.7,-2.8 1305.1,26.0"/></g><circle cx="690" cy="104" r="86" fill="#fff" opacity=".18"/><circle cx="690" cy="104" r="78" fill="#fff" stroke="#111" stroke-width="4"/><g clip-path="url(#hmoonclip)"><rect x="600" y="20" width="180" height="170" fill="url(#hdots2)" opacity=".28"/><circle cx="660" cy="86" r="14" fill="none" stroke="#111" stroke-width="2" opacity=".35"/><circle cx="716" cy="128" r="9" fill="none" stroke="#111" stroke-width="2" opacity=".35"/></g><path d="M0 230L70 170L130 215L210 150L290 220L360 180L440 232L540 168L640 226L740 176L830 222L900 190V300H0z" fill="#1b2340" opacity=".85"/><path d="M0 262L90 226L170 258L260 214L350 260L450 232L560 266L670 228L780 262L900 236V300H0z" fill="#0d1226"/><g fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round"><path d="M812 300C808 262 792 236 764 212" stroke-width="30"/><path d="M764 212C736 202 690 210 628 198" stroke-width="12"/><path d="M628 198C606 194 590 186 574 176" stroke-width="6"/><path d="M796 244C826 214 856 196 900 176" stroke-width="13"/><path d="M830 214C842 186 836 160 850 132" stroke-width="8"/><path d="M690 206C682 226 660 236 648 252" stroke-width="5"/><path d="M770 218C766 190 780 168 764 140" stroke-width="7"/></g><g fill="#111" stroke="#111" stroke-linejoin="round"><path d="M684 204C676 168 688 144 708 142C728 144 738 170 732 204Z"/><path d="M696 142C696 126 722 126 722 144C722 150 718 156 708 156C698 156 696 150 696 142Z"/><path d="M692 204C690 224 688 238 684 252" fill="none" stroke-width="9" stroke-linecap="round"/><path d="M714 204C718 222 724 236 732 248" fill="none" stroke-width="9" stroke-linecap="round"/><path d="M744 214L752 120" fill="none" stroke-width="4" stroke-linecap="round"/></g><path d="M698 150C700 140 712 136 718 142" fill="none" stroke="#9cc3f0" stroke-width="2.5" stroke-linecap="round"/><path d="M700 166C698 182 698 194 700 202" fill="none" stroke="#9cc3f0" stroke-width="2.2" stroke-linecap="round" opacity=".8"/><circle cx="752" cy="118" r="5" fill="none" stroke="#111" stroke-width="2.5"/><ellipse cx="572.6" cy="248.0" rx="4.8" ry="3.2" transform="rotate(-59 572.6 248.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="861.4" cy="59.4" rx="5.1" ry="3.4" transform="rotate(7 861.4 59.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="535.5" cy="131.0" rx="4.7" ry="3.1" transform="rotate(24 535.5 131.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="795.5" cy="77.7" rx="3.6" ry="2.4" transform="rotate(-31 795.5 77.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="712.4" cy="261.7" rx="5.6" ry="3.7" transform="rotate(11 712.4 261.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="665.8" cy="219.1" rx="4.2" ry="2.8" transform="rotate(-48 665.8 219.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="776.2" cy="214.2" rx="3.6" ry="2.4" transform="rotate(-9 776.2 214.2)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="626.9" cy="234.3" rx="6.0" ry="4.0" transform="rotate(-36 626.9 234.3)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="854.2" cy="53.1" rx="4.8" ry="3.2" transform="rotate(-15 854.2 53.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="528.9" cy="141.9" rx="3.6" ry="2.4" transform="rotate(49 528.9 141.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="739.9" cy="254.9" rx="3.3" ry="2.2" transform="rotate(-36 739.9 254.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="551.7" cy="169.5" rx="3.6" ry="2.4" transform="rotate(-58 551.7 169.5)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="708.8" cy="261.0" rx="4.5" ry="3.0" transform="rotate(-10 708.8 261.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="751.4" cy="270.0" rx="5.0" ry="3.3" transform="rotate(-53 751.4 270.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="622.0" cy="278.8" rx="3.7" ry="2.4" transform="rotate(60 622.0 278.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="788.1" cy="268.2" rx="5.1" ry="3.4" transform="rotate(-32 788.1 268.2)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="536.4" cy="127.8" rx="5.1" ry="3.4" transform="rotate(21 536.4 127.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="814.4" cy="60.8" rx="5.9" ry="3.9" transform="rotate(-18 814.4 60.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="672.8" cy="276.7" rx="3.4" ry="2.2" transform="rotate(9 672.8 276.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="823.8" cy="118.9" rx="3.9" ry="2.6" transform="rotate(-8 823.8 118.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="553.8" cy="191.1" rx="5.7" ry="3.8" transform="rotate(-48 553.8 191.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="529.6" cy="227.4" rx="4.8" ry="3.2" transform="rotate(37 529.6 227.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="789.6" cy="99.6" rx="4.6" ry="3.1" transform="rotate(29 789.6 99.6)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="607.8" cy="271.4" rx="4.4" ry="2.9" transform="rotate(-12 607.8 271.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="846.8" cy="128.6" rx="3.8" ry="2.5" transform="rotate(20 846.8 128.6)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="840.4" cy="102.1" rx="6.2" ry="4.2" transform="rotate(-54 840.4 102.1)" fill="#fff" stroke="#111" stroke-width="1"/><path d="M0 286C140 272 260 296 420 284S700 276 900 290V300H0z" fill="#111"/></svg><div id="heroPh" class="hero-ph" aria-hidden="true"></div>
 <h1>Le morpion et les quiz des fans d’anime</h1>
@@ -437,6 +466,12 @@ button.pc:disabled{cursor:default}
 <div class="msg" id="frMsg"></div>
 <div id="frInc"></div><div id="frList"></div><div id="frOut"></div>
 </main>
+<main id="v-msg" hidden>
+<button class="btn back" data-go="home">← Accueil</button>
+<h1>Messages</h1>
+<div id="msgBody"></div>
+<div class="msg" id="msMsg"></div>
+</main>
 <main id="v-lb" hidden>
 <button class="btn back" data-go="ml">← Retour</button>
 <h1>Classement</h1>
@@ -586,14 +621,14 @@ function menuOpen(o){pd.classList.toggle('on',o);pm.setAttribute('aria-expanded'
 pm.addEventListener('click',e=>{e.stopPropagation();menuOpen(!pd.classList.contains('on'))});
 document.addEventListener('click',e=>{if(!e.target.closest('.menu'))menuOpen(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')menuOpen(false)});
-function show(v){if(v==='rc'&&!ron&&!lc&&!(rm&&rm.status==='playing'))v='ml';if(v==='rm'&&!me){openWelcome();return}if(v==='fr'&&!me){openWelcome();return}if(v==='prof'&&!profId){openWelcome();return}
+function show(v){if(v==='rc'&&!ron&&!lc&&!(rm&&rm.status==='playing'))v='ml';if(v==='rm'&&!me){openWelcome();return}if(v==='fr'&&!me){openWelcome();return}if(v==='msg'&&!me){openWelcome();return}if(v==='prof'&&!profId){openWelcome();return}
 menuOpen(false);if(v==='set')syncSeg();
 if(v!=='ttt'&&onl&&onl.done)onlDetach();
 if(v!=='rc'){try{au.pause()}catch(e){}if(ron&&ron.done)ronDetach();if(lc){lc=null;rcClear()}}
 curView=v;document.querySelectorAll('main').forEach(m=>m.hidden=m.id!=='v-'+v);
 if(v==='ttt'){if(!onl)start();else{draw();if(!over)timer()}}else{if(!onl)over=true;clearInterval(tm)}
 if(v!=='at'){atStop();if(aon&&aon.done)aonDetach()}else atEnter();if(v==='hl')hlStart();if(v==='gs')gsNext();clearInterval(dtTm);if(v==='bt')btNext();if(v==='dt')dtReset();
-if(v==='rc')rcEnter();if(v==='rm')rmEnter();if(v==='uc')ucEnter();if(v==='ml')renderMl();if(v==='prof')loadProfile(profId);if(v==='fr')loadFriends();if(v==='lb')loadLb();
+if(v==='rc')rcEnter();if(v==='rm')rmEnter();if(v==='uc')ucEnter();if(v==='ml')renderMl();if(v==='prof')loadProfile(profId);if(v==='fr')loadFriends();if(v==='msg')msEnter();if(v==='lb')loadLb();
 updateLive();window.scrollTo(0,0)}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;if(b.dataset.hub)hubGame=b.dataset.hub;if(b.dataset.go==='prof'&&!b.dataset.user)profId=me?me.id:null;show(b.dataset.go)});
 document.addEventListener('error',e=>{const t=e.target;if(t.classList&&t.classList.contains('pi')){const f=document.createElement('div');f.className='fb';f.textContent=t.alt||'?';t.replaceWith(f)}},true);
@@ -1025,7 +1060,7 @@ function updateLive(){let t='';
   else if(rm&&(rm.status==='lobby'||rm.status==='playing')&&curView!=='rc'&&curView!=='rm')t='🏁 Salon '+rm.code+' en cours — Reprendre';
   else if(uo&&uo.v&&(uo.v.status==='lobby'||uo.v.status==='playing')&&curView!=='uc')t='🕵️ Undercover '+uo.v.code+' en cours — Reprendre';
   else if(ron&&!ron.done&&curView!=='rc')t='🎮 '+GN[ron.g]+' en cours contre '+ron.opp.pseudo+' — Reprendre';
-  $('live').hidden=!t;$('liveT').textContent=t}
+  $('live').hidden=!t;$('liveT').textContent=t;try{gcSync()}catch(e){}}
 async function startOnline(m,silent){
   if(!sb||!me)return;wtHide();
   if(m.game==='at')return startAtOnline(m,silent);
@@ -1128,8 +1163,8 @@ async function pollSocial(){
   await notifLoad()}
 $('invY').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;const r=await sb.rpc('accept_invite',{p_id:id});if(r.error){$('mlMsg').textContent='Invitation expirée.';return}startOnline(r.data)};
 $('invN').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;await sb.rpc('cancel_match',{p_id:id})};
-function onlLogout(){stopTick();onlDetach();aonDetach();ronDetach();rmDetach();ucODetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;$('bellW').hidden=true;NT=[];invShown=null}
-function onlLogin(){tickN=0;startTick();setTimeout(tick,400);setTimeout(rmResume,900);setTimeout(ucOResume,1300)}
+function onlLogout(){stopTick();onlDetach();aonDetach();ronDetach();rmDetach();ucODetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;$('bellW').hidden=true;NT=[];invShown=null;msStop()}
+function onlLogin(){tickN=0;startTick();setTimeout(tick,400);setTimeout(rmResume,900);setTimeout(ucOResume,1300);msStart()}
 
 /* --- menu d'un jeu --- */
 const HUB={
@@ -1176,13 +1211,14 @@ async function loadFriends(){
   const row=(r,btns)=>{const p=pf[oid(r)]||{id:oid(r),pseudo:'?'},e=rt[p.id]==null?1000:rt[p.id];return'<div class="fr-row">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+'</b><small>Elo '+e+' · '+rk(e)+'</small></div>'+btns(r,p)+'</div>'};
   const inc=rows.filter(r=>r.status==='pending'&&r.addressee===me.id),out=rows.filter(r=>r.status==='pending'&&r.requester===me.id),fr=rows.filter(r=>r.status==='accepted');
   $('frInc').innerHTML=inc.length?'<h2>Demandes reçues</h2>'+inc.map(r=>row(r,()=>'<button class="btn sm" data-a="acc" data-id="'+r.id+'">Accepter</button><button class="btn alt sm" data-a="del" data-id="'+r.id+'">Refuser</button>')).join(''):'';
-  $('frList').innerHTML='<h2>Mes amis</h2>'+(fr.length?fr.map(r=>row(r,(r,p)=>'<button class="btn sm" data-a="ch" data-r="0" data-u="'+esc(p.id)+'" data-n="'+esc(p.pseudo)+'">Amical</button><button class="btn alt sm" data-a="ch" data-r="1" data-u="'+esc(p.id)+'" data-n="'+esc(p.pseudo)+'">Classé</button><button class="btn alt sm" data-a="del" data-id="'+r.id+'" aria-label="Retirer cet ami">✕</button>')).join(''):'<div class="hint">Pas encore d’ami. Cherche un pseudo ci-dessus.</div>');
+  $('frList').innerHTML='<h2>Mes amis</h2>'+(fr.length?fr.map(r=>row(r,(r,p)=>'<button class="btn alt sm" data-a="dm" data-u="'+esc(p.id)+'" aria-label="Écrire à '+esc(p.pseudo)+'">💬</button><button class="btn sm" data-a="ch" data-r="0" data-u="'+esc(p.id)+'" data-n="'+esc(p.pseudo)+'">Amical</button><button class="btn alt sm" data-a="ch" data-r="1" data-u="'+esc(p.id)+'" data-n="'+esc(p.pseudo)+'">Classé</button><button class="btn alt sm" data-a="del" data-id="'+r.id+'" aria-label="Retirer cet ami">✕</button>')).join(''):'<div class="hint">Pas encore d’ami. Cherche un pseudo ci-dessus.</div>');
   $('frOut').innerHTML=out.length?'<h2>Demandes envoyées</h2>'+out.map(r=>row(r,()=>'<button class="btn alt sm" data-a="del" data-id="'+r.id+'">Annuler</button>')).join(''):''}
 $('frGame').onchange=()=>{hubGame=$('frGame').value;loadFriends()};
 $('v-fr').addEventListener('click',async e=>{const b=e.target.closest('button[data-a]');if(!b||!me)return;const a=b.dataset.a;
   if(a==='add'){b.disabled=true;const r=await sb.from('friendships').insert({requester:me.id,addressee:b.dataset.u});$('frMsg').textContent=r.error?(r.error.code==='23505'?'Vous êtes déjà en lien avec ce joueur.':'Erreur : '+r.error.message):'Demande envoyée.';if(!r.error){b.textContent='Envoyée'}else b.disabled=false;loadFriends()}
   else if(a==='acc'){await sb.from('friendships').update({status:'accepted'}).eq('id',b.dataset.id);loadFriends();pollSocial()}
   else if(a==='del'){await sb.from('friendships').delete().eq('id',b.dataset.id);loadFriends();pollSocial()}
+  else if(a==='dm')openDm(b.dataset.u);
   else if(a==='ch')inviteFriend(b.dataset.u,b.dataset.n,b.dataset.r==='1',$('frGame').value)});
 
 /* --- profils (le sien et celui des autres) --- */
@@ -1765,7 +1801,7 @@ function rmRender(){
     const c=$('rmCode');if(c)c.addEventListener('keydown',e=>{if(e.key==='Enter')rmJoin()});return}
   if(rm.status==='lobby'){
     const n=rm.players.length;
-    b.innerHTML='<p class="sub">'+(rm.mode==='elim'?'Tournoi à élimination : à la fin de chaque épreuve, le dernier sort, jusqu’au champion. Épreuves (en boucle) : '+esc(rmGameList()):(rm.games.length>1?'Tournoi en '+rm.games.length+' épreuves':'Salon')+' : '+esc(rmGameList()))+'</p><div class="rmCode" aria-label="Code du salon">'+esc(rm.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p><h2>Joueurs ('+n+' sur '+rm.max+')</h2>'+rmRows().map(p=>'<div class="fr-row">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===rm.host?' 👑':'')+'</b></div></div>').join('')+'<div class="row" style="margin-top:12px">'+(rm.isHost?'<button class="btn" data-rm="start"'+(n<2?' disabled':'')+'>'+(n<2?'Attends au moins un autre joueur':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-rm="leave">Quitter</button></div>';return}
+    b.innerHTML='<p class="sub">'+(rm.mode==='elim'?'Tournoi à élimination : à la fin de chaque épreuve, le dernier sort, jusqu’au champion. Épreuves (en boucle) : '+esc(rmGameList()):(rm.games.length>1?'Tournoi en '+rm.games.length+' épreuves':'Salon')+' : '+esc(rmGameList()))+'</p><div class="rmCode" aria-label="Code du salon">'+esc(rm.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p><h2>Joueurs ('+n+' sur '+rm.max+')</h2>'+rmRows().map(p=>'<div class="fr-row">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===rm.host?' 👑':'')+'</b></div></div>').join('')+'<div class="row" style="margin-top:12px">'+(rm.isHost?'<button class="btn" data-rm="start"'+(n<2?' disabled':'')+'>'+(n<2?'Attends au moins un autre joueur':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-rm="inv">📨 Inviter des amis</button><button class="btn alt" data-rm="leave">Quitter</button></div>';return}
   if(rm.status==='playing'){
     b.innerHTML='<p class="sub">Une partie est en cours dans ce salon ('+esc(rmGameList())+').</p>'+rmBoard(false)+'<div class="row" style="margin-top:12px"><button class="btn" data-rm="resume">Reprendre la partie</button><button class="btn alt" data-rm="leave">Quitter</button></div>';return}
   if(rm.status==='finished'){
@@ -1790,6 +1826,7 @@ $('rmBody').addEventListener('click',async e=>{
     case 'create':rmCreate();break;
     case 'join':rmJoin();break;
     case 'start':{b.disabled=true;const r=await sb.rpc('room_start',{p_id:rm.id});if(r.error){rmSay('Erreur : '+r.error.message);b.disabled=false}else{rmSay('');rmApply(r.data)}break}
+    case 'inv':msPickInvite('room',rm.id);break;
     case 'leave':rmLeave(b);break;
     case 'resume':show('rc');break;
     case 'done':rmDetach();rmView='home';rmRender();break}});
@@ -1984,7 +2021,7 @@ function ucORender(keep){
   if(v.status==='lobby'){
     const n=v.players.length;
     h='<p class="sub">Undercover en ligne · '+n+' sur '+v.max+' joueurs'+(v.white?' · avec Mr White (si 6 joueurs ou plus)':'')+'</p><div class="rmCode" aria-label="Code de la partie">'+esc(v.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p>'+ucOList(v)+
-      '<div class="row" style="margin-top:12px">'+(isMe(v.host)?'<button class="btn" data-uc="ostart"'+(n<3?' disabled':'')+'>'+(n<3?'Attends au moins 3 joueurs':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-uc="oleave">Quitter</button></div>'}
+      '<div class="row" style="margin-top:12px">'+(isMe(v.host)?'<button class="btn" data-uc="ostart"'+(n<3?' disabled':'')+'>'+(n<3?'Attends au moins 3 joueurs':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-uc="oinv">📨 Inviter des amis</button><button class="btn alt" data-uc="oleave">Quitter</button></div>'}
   else if(v.status==='playing'){
     const my=uo.my,alive=me_&&me_.alive,phase=v.phase;
     h='<div class="btStep">Tour '+v.round+' · '+(phase==='clue'?'Les indices':phase==='vote'?'Le vote':'Mr White tente de deviner')+' <span id="ucT" class="ucT"></span></div>'+
@@ -2029,6 +2066,7 @@ async function ucOAct(a,b){
     case 'oclue':{if(uo.busy)return;const w=($('ucClue').value||'').trim();if(!w){ucSay('Écris un mot.');return}uo.busy=true;b.disabled=true;done(await sb.rpc('uc_clue',{p_id:id,p_word:w}));break}
     case 'ovote':{if(uo.busy)return;uo.busy=true;done(await sb.rpc('uc_vote',{p_id:id,p_target:b.dataset.u}));break}
     case 'oguess':{if(uo.busy||!uo.pick)return;uo.busy=true;const p=uo.pick;uo.pick=null;done(await sb.rpc('uc_guess',{p_id:id,p_char:p.id}));break}
+    case 'oinv':msPickInvite('uc',id);break;
     case 'onopick':uo.pick=null;ucORender(true);break;
     case 'ohide':uo.hide=!uo.hide;ucORender(true);break;
     case 'oleave':
@@ -2066,6 +2104,239 @@ $('ucBody').addEventListener('keydown',e=>{
   if(e.target.id==='ucIn')ucLAdd();
   else if(e.target.id==='ucClue'){const b=document.querySelector('[data-uc=oclue]');if(b)ucOAct('oclue',b)}
   else if(e.target.id==='ucCode'){const b=document.querySelector('[data-uc=ojoin2]');if(b)ucOAct('ojoin2',b)}});
+
+/* ===== Messagerie : messages privés, groupes, invitations de jeu, chat en partie ===== */
+const MS={list:[],view:'list',chat:null,msgs:[],users:{},last:0,unread:0,html:'',busy:false,busy2:false,friends:null};
+let msT=null,msTn=0;
+const msTime=s=>{const d=new Date(s*1000),n=new Date();return d.toDateString()===n.toDateString()?d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})};
+const avs=p=>avh(p).replace(/ data-user="[^"]*"/g,'');
+function msSay(t){const e=$('msMsg');if(e)e.textContent=t||''}
+function msBadge(n){MS.unread=n;const b=$('msgN');b.hidden=!n;b.textContent=n>99?'99+':n;const m=$('msgBadge');m.hidden=!n;m.textContent=n}
+const msOther=c=>(c.members||[]).find(x=>x.id!==(me&&me.id))||{id:'',pseudo:'?'};
+const msTitle=c=>c.kind==='dm'?msOther(c).pseudo:(c.name||'Groupe');
+function msStart(){$('msgW').hidden=false;if(!msT)msT=setInterval(msTick,3000);setTimeout(msTick,600)}
+function msStop(){clearInterval(msT);msT=null;msTn=0;$('msgW').hidden=true;msBadge(0);MS.chat=null;MS.msgs=[];MS.list=[];MS.view='list';gcReset();GC.key='';gcSync()}
+async function msTick(){
+  if(!sb||!me||document.hidden)return;msTn++;
+  try{
+    if(curView==='msg'){
+      if(MS.view==='chat')await msFetch();else if(MS.view==='list')await msLoadList()}
+    else{const r=await sb.rpc('chat_unread');if(!r.error)msBadge(+r.data||0)}
+    await gcTick()}
+  catch(e){}}
+function msEnter(){MS.view='list';MS.chat=null;msSay('');$('msgBody').innerHTML='<div class="hint">Chargement…</div>';msLoadList()}
+async function msLoadList(){
+  const r=await sb.rpc('chat_list');if(r.error){if(MS.view==='list')$('msgBody').innerHTML='<div class="hint">Erreur : '+esc(r.error.message)+'</div>';return}
+  MS.list=r.data||[];msBadge(MS.list.reduce((a,c)=>a+(c.unread||0),0));
+  if(curView==='msg'&&MS.view==='list')msRenderList()}
+function msRenderList(){
+  let h='<div class="row" style="margin-bottom:10px"><button class="btn" data-ms="newdm">✉️ Nouveau message</button><button class="btn alt" data-ms="newgrp">👥 Nouveau groupe</button></div>';
+  if(!MS.list.length)h+='<div class="hint">Aucune conversation pour l’instant. Écris à un ami avec « Nouveau message », ou crée un groupe pour organiser vos parties.</div>';
+  MS.list.forEach(c=>{
+    const o=c.kind==='dm'?msOther(c):null,l=c.last;
+    const pv=l?(l.k==='invite'?'🎮 Invitation à jouer':l.k==='sys'?'…':(l.u===me.id?'Toi : ':'')+l.b):'Aucun message';
+    h+='<button class="msr" data-ms="open" data-id="'+esc(c.id)+'">'+(o?avs(o):'<span class="avi">👥</span>')+'<span class="g"><b>'+esc(msTitle(c))+'</b><small>'+esc(pv.slice(0,80))+'</small></span>'+(l?'<span class="tm">'+msTime(l.at)+'</span>':'')+(c.unread?'<span class="un">'+c.unread+'</span>':'')+'</button>'});
+  $('msgBody').innerHTML=h}
+/* --- messages (rendu commun à la page Messages et au chat de partie) --- */
+function chInv(m,users){
+  const t=m.m||{},mine=m.u===me.id,who=mine?'Tu':((users[m.u]&&users[m.u].pseudo)||'?');
+  let ti,sub,act='';
+  if(t.t==='room'){ti='🏁 '+esc(who)+' invite à un salon';sub=(t.games||[]).map(g=>GN[g]||g).join(' → ')+' · code '+t.code;act='Rejoindre'}
+  else if(t.t==='uc'){ti='🕵️ '+esc(who)+' invite à un Undercover';sub='Code '+t.code;act='Rejoindre'}
+  else{ti='⚔️ '+esc(who)+' lance un défi';sub=(GN[t.game]||'Jeu')+' · '+(t.ranked?'classée':'amicale');act='Accepter'}
+  return'<div class="msC"><b>'+ti+'</b><small>'+esc(sub)+'</small>'+(m.live?(mine?'<span class="hint">En attente de joueurs…</span>':'<button class="btn sm" data-ms="join" data-id="'+m.id+'">'+act+'</button>'):'<span class="hint">Invitation terminée</span>')+'</div>'}
+function chMsg(m,users,prevU,showName){
+  const nm=u=>esc((users[u]&&users[u].pseudo)||'?'),mine=me&&m.u===me.id;
+  if(m.k==='sys')return'<div class="msS"><b>'+nm(m.u)+'</b> '+esc(m.b)+'</div>';
+  if(m.k==='invite')return chInv(m,users);
+  return'<div class="msM '+(mine?'me':'th')+'">'+(showName&&!mine&&prevU!==m.u?'<small>'+nm(m.u)+'</small>':'')+'<div class="b">'+esc(m.b)+'</div><small>'+msTime(m.at)+'</small></div>'}
+function chList(msgs,users,showName){let p=null;return msgs.map(m=>{const h=chMsg(m,users,p,showName);p=m.k==='text'?m.u:null;return h}).join('')}
+function chPut(el,html,force){const near=el.scrollHeight-el.scrollTop-el.clientHeight<90;el.innerHTML=html;if(force||near)el.scrollTop=el.scrollHeight}
+/* --- conversation --- */
+async function msOpen(id){
+  MS.view='chat';MS.chat=null;MS.msgs=[];MS.last=0;MS.users={};MS.html='';msSay('');
+  $('msgBody').innerHTML='<div class="hint">Chargement…</div>';
+  const r=await sb.rpc('chat_fetch',{p_chat:id,p_after:0});
+  if(r.error){MS.view='list';msSay(r.error.message);msLoadList();return}
+  MS.chat=r.data.chat;Object.assign(MS.users,r.data.users);MS.msgs=r.data.msgs;MS.last=MS.msgs.reduce((a,m)=>Math.max(a,m.id),0);
+  if(curView!=='msg')return;
+  const c=MS.chat,dm=c.kind==='dm';
+  $('msgBody').innerHTML='<div class="msH"><button class="btn alt sm" data-ms="back" aria-label="Retour aux conversations">←</button>'+(dm?avs(msOther(c)):'<span class="avi">👥</span>')+'<div class="g"><b>'+esc(msTitle(c))+'</b>'+(dm?'':'<small>'+c.members.length+' membres</small>')+'</div>'+(dm?'':'<button class="btn alt sm" data-ms="members" aria-label="Membres du groupe">👥</button>')+'<button class="btn sm" data-ms="invite">🎮 Jouer</button></div>'+
+    '<div class="msL" id="msL" role="log" aria-live="polite"></div><div class="msI"><input id="msIn" maxlength="500" placeholder="Écris un message…" autocomplete="off"><button class="btn" data-ms="send">Envoyer</button></div>';
+  msRenderMsgs(true);msFetch();const i=$('msIn');if(i)i.focus()}
+function msRenderMsgs(force){
+  const el=$('msL');if(!el||!MS.chat)return;
+  const h=chList(MS.msgs,MS.users,MS.chat.kind==='group')||'<div class="msS">Aucun message. Dis bonjour !</div>';
+  if(!force&&h===MS.html)return;MS.html=h;chPut(el,h,force)}
+async function msFetch(){
+  if(MS.busy2||!MS.chat)return;MS.busy2=true;const id=MS.chat.id;
+  try{
+    const full=MS.msgs.some(m=>m.k==='invite'&&m.live);
+    const r=await sb.rpc('chat_fetch',{p_chat:id,p_after:full?0:MS.last});
+    if(r.error){if(/introuvable/i.test(r.error.message||'')&&MS.chat&&MS.chat.id===id){MS.view='list';MS.chat=null;msEnter()}return}
+    if(!MS.chat||MS.chat.id!==id)return;
+    MS.chat=r.data.chat;Object.assign(MS.users,r.data.users);
+    if(full)MS.msgs=r.data.msgs;else r.data.msgs.forEach(m=>{if(!MS.msgs.some(x=>x.id===m.id))MS.msgs.push(m)});
+    MS.last=MS.msgs.reduce((a,m)=>Math.max(a,m.id),0);
+    if(curView==='msg'&&MS.view==='chat')msRenderMsgs();
+    const u=await sb.rpc('chat_unread');if(!u.error)msBadge(+u.data||0)}
+  finally{MS.busy2=false}}
+async function msSend(){
+  const i=$('msIn');if(!i||!MS.chat||MS.busy)return;const t=i.value.trim();if(!t)return;MS.busy=true;
+  try{const r=await sb.rpc('chat_send',{p_chat:MS.chat.id,p_body:t});if(r.error){msSay(r.error.message);return}
+    i.value='';msSay('');if(!MS.msgs.some(x=>x.id===r.data.id))MS.msgs.push(r.data);MS.last=Math.max(MS.last,r.data.id);msRenderMsgs(true)}
+  finally{MS.busy=false;if(i)i.focus()}}
+async function openDm(uid){
+  if(!me||!sb){openWelcome();return}
+  const r=await sb.rpc('chat_dm',{p_friend:uid});if(r.error){showMsg(r.error.message);return}
+  show('msg');await msOpen(r.data)}
+async function msFriends(){
+  const f=await sb.from('friendships').select('requester,addressee,status').eq('status','accepted');
+  const ids=(f.data||[]).map(r=>r.requester===me.id?r.addressee:r.requester);if(!ids.length)return[];
+  const p=await sb.from('profiles').select('id,pseudo,avatar_url').in('id',ids);return(p.data||[]).sort((a,b)=>String(a.pseudo).localeCompare(String(b.pseudo)))}
+async function msNew(kind){
+  MS.view=kind;$('msgBody').innerHTML='<div class="hint">Chargement…</div>';
+  const fr=await msFriends();if(MS.view!==kind)return;MS.friends=fr;
+  const g=kind==='newgrp';
+  let h='<button class="btn alt sm" data-ms="back">← Retour</button><h2>'+(g?'Nouveau groupe':'Écrire à un ami')+'</h2>';
+  if(!fr.length)h+='<div class="hint">Tu n’as pas encore d’amis. Ajoute-en depuis la page Amis.</div>';
+  else{
+    if(g)h+='<input id="msGn" maxlength="40" placeholder="Nom du groupe" autocomplete="off" style="margin-bottom:8px"><div class="hint">Coche les amis à ajouter (19 maximum).</div>';
+    h+=fr.map(p=>g?'<label class="fr-row"><input type="checkbox" data-pick="'+esc(p.id)+'">'+avs(p)+'<span class="g"><b>'+esc(p.pseudo)+'</b></span></label>':'<button class="msr" data-ms="dm" data-u="'+esc(p.id)+'">'+avs(p)+'<span class="g"><b>'+esc(p.pseudo)+'</b></span></button>').join('');
+    if(g)h+='<div class="row" style="margin-top:8px"><button class="btn" data-ms="mk">Créer le groupe</button></div>'}
+  $('msgBody').innerHTML=h}
+async function msMakeGroup(){
+  const nm=($('msGn').value||'').trim(),ids=[...document.querySelectorAll('#msgBody [data-pick]:checked')].map(x=>x.dataset.pick);
+  if(!nm){msSay('Donne un nom au groupe.');return}if(!ids.length){msSay('Coche au moins un ami.');return}
+  const r=await sb.rpc('chat_group_create',{p_name:nm,p_members:ids});if(r.error){msSay(r.error.message);return}
+  msSay('');await msOpen(r.data)}
+/* --- invitations --- */
+async function msJoin(m){
+  const t=m.m||{};if(busyOnline()){msSay('Termine ou quitte ta partie en cours d’abord.');return}
+  msSay('Connexion…');
+  if(t.t==='room'){const r=await sb.rpc('room_join',{p_code:t.code});if(r.error){msSay(r.error.message);msFetch();return}msSay('');rmAttach(r.data)}
+  else if(t.t==='uc'){const r=await sb.rpc('uc_join',{p_code:t.code});if(r.error){msSay(r.error.message);msFetch();return}msSay('');ucOAttach(r.data)}
+  else{const r=await sb.rpc('accept_invite',{p_id:t.ref});if(r.error){msSay('Ce défi a expiré.');msFetch();return}msSay('');startOnline(r.data)}}
+const shOpen=h=>{$('shB').innerHTML=h;$('shMsg').textContent='';$('sh').hidden=false};
+const shClose=()=>{$('sh').hidden=true;$('shB').innerHTML=''};
+const shSay=t=>{$('shMsg').textContent=t||''};
+function msInviteSheet(){
+  const c=MS.chat;if(!c)return;const dm=c.kind==='dm',o=dm?msOther(c):null;
+  let h='<h2>Inviter à jouer</h2>';
+  if(dm)h+='<div class="rmF"><label for="shG">⚔️ Défier '+esc(o.pseudo)+' en duel</label><select id="shG">'+Object.keys(GN).map(g=>'<option value="'+g+'">'+esc(GN[g])+'</option>').join('')+'</select></div><div class="row"><button class="btn" data-sh="duel" data-r="0">Partie amicale</button><button class="btn alt" data-sh="duel" data-r="1">Partie classée</button></div>';
+  const hasRm=rm&&rm.status==='lobby',hasUc=uo&&uo.v&&uo.v.status==='lobby';
+  if(hasRm)h+='<div class="row" style="margin-top:10px"><button class="btn" data-sh="send" data-t="room" data-ref="'+esc(rm.id)+'" data-c="'+esc(c.id)+'">🏁 Inviter dans mon salon '+esc(rm.code)+'</button></div>';
+  if(hasUc)h+='<div class="row" style="margin-top:10px"><button class="btn" data-sh="send" data-t="uc" data-ref="'+esc(uo.id)+'" data-c="'+esc(c.id)+'">🕵️ Inviter dans mon Undercover '+esc(uo.v.code)+'</button></div>';
+  if(!hasRm&&!hasUc)h+='<p class="hint">Pour jouer à plusieurs : crée un salon ou une partie Undercover, puis envoie l’invitation depuis son écran d’attente (bouton « Inviter des amis »).</p>';
+  shOpen(h)}
+async function msPickInvite(type,ref){
+  if(!me||!sb){openWelcome();return}
+  shOpen('<h2>Inviter des amis</h2><div class="hint">Chargement…</div>');
+  const[l,fr]=await Promise.all([sb.rpc('chat_list'),msFriends()]);
+  const gs=(l.data||[]).filter(c=>c.kind==='group');
+  const btn=a=>'<button class="btn sm" data-sh="send" data-t="'+type+'" data-ref="'+esc(ref)+'" '+a+'>Inviter</button>';
+  let h='<h2>Inviter des amis</h2>';
+  if(gs.length)h+='<div class="hint">Groupes</div>'+gs.map(c=>'<div class="fr-row"><span class="avi">👥</span><div class="g"><b>'+esc(c.name)+'</b></div>'+btn('data-c="'+esc(c.id)+'"')+'</div>').join('');
+  h+=fr.length?'<div class="hint">Amis</div>'+fr.map(p=>'<div class="fr-row">'+avs(p)+'<div class="g"><b>'+esc(p.pseudo)+'</b></div>'+btn('data-u="'+esc(p.id)+'"')+'</div>').join(''):'<div class="hint">Ajoute des amis pour pouvoir les inviter.</div>';
+  shOpen(h)}
+async function msInviteTo(type,ref,chat,friend){
+  let id=chat;if(!id){const d=await sb.rpc('chat_dm',{p_friend:friend});if(d.error)return d.error.message;id=d.data}
+  const r=await sb.rpc('chat_invite',{p_chat:id,p_type:type,p_ref:ref});return r.error?r.error.message:null}
+async function msDuel(ranked){
+  const c=MS.chat,o=msOther(c);if(busyOnline()){shSay('Une partie est déjà en cours : termine-la d’abord.');return}
+  const g=$('shG').value;
+  const r=await sb.rpc('invite_friend',{p_friend:o.id,p_game:g,p_ranked:ranked,p_state:initState(g)});
+  if(r.error){shSay(r.error.message);return}
+  const m=r.data;shClose();await sb.rpc('chat_invite',{p_chat:c.id,p_type:'duel',p_ref:m.id});wtShow(m,'En attente de '+o.pseudo+'…')}
+async function msMembers(){
+  const c=MS.chat;if(!c||c.kind!=='group')return;
+  const fr=await msFriends(),inn=new Set(c.members.map(m=>m.id)),add=fr.filter(p=>!inn.has(p.id));
+  shOpen('<h2>'+esc(c.name)+'</h2>'+c.members.map(p=>'<div class="fr-row">'+avs(p)+'<div class="g"><b>'+esc(p.pseudo)+(p.id===c.owner?' 👑':'')+(p.id===me.id?' (toi)':'')+'</b></div></div>').join('')+
+    '<div class="hint">Ajouter un ami</div>'+(add.length?add.map(p=>'<div class="fr-row">'+avs(p)+'<div class="g"><b>'+esc(p.pseudo)+'</b></div><button class="btn sm" data-sh="add" data-u="'+esc(p.id)+'">Ajouter</button></div>').join(''):'<div class="hint">Tous tes amis sont déjà dans le groupe.</div>')+
+    '<div class="row" style="margin-top:10px"><button class="btn alt" data-sh="leave">Quitter le groupe</button></div>')}
+let shQ=0;
+$('sh').addEventListener('click',async e=>{
+  if(e.target===$('sh')||e.target.closest('#shX')){shClose();return}
+  const b=e.target.closest('[data-sh]');if(!b||b.disabled)return;const a=b.dataset.sh;
+  if(a==='send'){b.disabled=true;const err=await msInviteTo(b.dataset.t,b.dataset.ref,b.dataset.c,b.dataset.u);if(err){shSay(err);b.disabled=false}else{b.textContent='✓ Envoyée';shSay('');if(curView==='msg'&&MS.view==='chat')msFetch()}}
+  else if(a==='duel')msDuel(b.dataset.r==='1');
+  else if(a==='add'){b.disabled=true;const r=await sb.rpc('chat_group_add',{p_chat:MS.chat.id,p_user:b.dataset.u});if(r.error){shSay(r.error.message);b.disabled=false}else{b.textContent='✓ Ajouté';shSay('');msFetch()}}
+  else if(a==='leave'){
+    if(Date.now()-shQ>4000){shQ=Date.now();b.textContent='Confirmer : quitter le groupe ?';return}
+    shQ=0;const r=await sb.rpc('chat_group_leave',{p_chat:MS.chat.id});if(r.error){shSay(r.error.message);return}
+    shClose();MS.chat=null;MS.view='list';msEnter()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sh').hidden)shClose()});
+$('v-msg').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-ms]');if(!b||b.disabled||!me)return;const a=b.dataset.ms;
+  if(a==='open')msOpen(b.dataset.id);
+  else if(a==='back'){MS.view='list';MS.chat=null;msEnter()}
+  else if(a==='newdm'||a==='newgrp')msNew(a);
+  else if(a==='dm'){const r=await sb.rpc('chat_dm',{p_friend:b.dataset.u});if(r.error){msSay(r.error.message);return}msOpen(r.data)}
+  else if(a==='mk')msMakeGroup();
+  else if(a==='send')msSend();
+  else if(a==='invite')msInviteSheet();
+  else if(a==='members')msMembers();
+  else if(a==='join'){const m=MS.msgs.find(x=>String(x.id)===b.dataset.id);if(m)msJoin(m)}});
+$('v-msg').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='msIn')msSend()});
+/* --- chat en pleine partie (duel, salon, Undercover) --- */
+const GC={key:'',ctx:null,chat:null,msgs:[],users:{},last:0,open:false,news:0,busy:false,ens:false,retry:0};
+const gcMuted=()=>store.get('gcmute','0')==='1';
+function gcCtx(){
+  if(!me||!sb)return null;
+  if(curView==='ttt'&&onl)return{k:'match',r:onl.id};
+  if(curView==='at'&&aon)return{k:'match',r:aon.id};
+  if(curView==='rc'){if(ron)return{k:'match',r:ron.id};if(rm)return{k:'room',r:rm.id}}
+  if(curView==='rm'&&rm)return{k:'room',r:rm.id};
+  if(curView==='uc'&&uo&&uo.v&&uo.v.status!=='playing')return{k:'uc',r:uo.id};
+  return null}
+function gcReset(){GC.chat=null;GC.msgs=[];GC.users={};GC.last=0;GC.open=false;GC.news=0;GC.ens=false;GC.retry=0;$('gcP').hidden=true;$('gcL').innerHTML='';$('gcMsg').textContent=''}
+function gcBadge(){const n=$('gcN'),mu=gcMuted();n.hidden=!(GC.news>0&&!GC.open&&!mu);n.textContent=GC.news>9?'9+':GC.news;$('gcI').textContent=mu?'🔕':'💬';$('gcM').textContent=mu?'🔔 Réactiver':'🔕 Couper'}
+function gcSync(){
+  const c=gcCtx(),k=c?c.k+':'+c.r:'';
+  if(k!==GC.key){GC.key=k;GC.ctx=c;gcReset()}
+  $('gcB').hidden=!c;if(!c)$('gcP').hidden=true;gcBadge()}
+function gcRender(force){
+  const el=$('gcL');
+  if(gcMuted()){el.innerHTML='<div class="msS">Chat coupé. Réactive-le pour voir les messages.</div>';$('gcIn').disabled=true;$('gcS').disabled=true;return}
+  $('gcIn').disabled=false;$('gcS').disabled=false;
+  const h=chList(GC.msgs,GC.users,GC.ctx&&GC.ctx.k!=='match')||'<div class="msS">Aucun message. Lance la conversation !</div>';
+  chPut(el,h,force)}
+async function gcEnsure(){
+  if(GC.chat||GC.ens||!GC.ctx)return;GC.ens=true;const key=GC.key;
+  try{const r=await sb.rpc('chat_game',{p_kind:GC.ctx.k,p_ref:GC.ctx.r});if(key!==GC.key)return;
+    if(r.error){GC.retry=Date.now()+15000;return}GC.chat=r.data;await gcFetch(true)}
+  finally{if(key===GC.key)GC.ens=false}}
+async function gcFetch(init){
+  const key=GC.key,id=GC.chat;if(!id)return;
+  const r=await sb.rpc('chat_fetch',{p_chat:id,p_after:GC.last});if(key!==GC.key||r.error)return;
+  Object.assign(GC.users,r.data.users);
+  const add=r.data.msgs.filter(m=>!GC.msgs.some(x=>x.id===m.id));add.forEach(m=>GC.msgs.push(m));
+  if(add.length)GC.last=Math.max(GC.last,...add.map(m=>m.id));
+  if(GC.open||init)GC.news=0;
+  if(add.length&&GC.open)gcRender();gcBadge()}
+async function gcTick(){
+  if(!GC.ctx||gcMuted())return;
+  if(!GC.chat){if(Date.now()>=GC.retry)await gcEnsure();return}
+  if(GC.open)await gcFetch(false);
+  else{const r=await sb.rpc('chat_news',{p_chat:GC.chat,p_after:GC.last});if(!r.error){GC.news=+r.data||0;gcBadge()}}}
+async function gcToggle(){
+  if(GC.open){GC.open=false;$('gcP').hidden=true;gcBadge();return}
+  GC.open=true;GC.news=0;$('gcP').hidden=false;gcBadge();gcRender(true);
+  if(!GC.chat)await gcEnsure();else await gcFetch(false);
+  gcRender(true);if(!gcMuted())$('gcIn').focus()}
+async function gcSend(text){
+  if(!GC.chat||GC.busy||gcMuted())return;const t=(text||'').trim();if(!t)return;GC.busy=true;
+  try{const r=await sb.rpc('chat_send',{p_chat:GC.chat,p_body:t});
+    if(r.error){$('gcMsg').textContent=r.error.message;return}
+    $('gcMsg').textContent='';if(!GC.msgs.some(x=>x.id===r.data.id))GC.msgs.push(r.data);GC.last=Math.max(GC.last,r.data.id);gcRender(true)}
+  finally{GC.busy=false}}
+$('gcB').onclick=gcToggle;
+$('gcX').onclick=()=>{if(GC.open)gcToggle()};
+$('gcM').onclick=()=>{store.set('gcmute',gcMuted()?'0':'1');gcBadge();gcRender(true);if(!gcMuted()&&GC.chat)gcFetch(false)};
+$('gcS').onclick=async()=>{const i=$('gcIn'),t=i.value;if(!t.trim())return;await gcSend(t);i.value=''};
+$('gcIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('gcS').onclick()});
+$('gcQ').innerHTML=['GG 🤝','Bien joué !','Bonne chance 🍀','😂','🔥','Revanche ?'].map(t=>'<button type="button" data-q="'+esc(t)+'">'+esc(t)+'</button>').join('');
+$('gcQ').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(b)gcSend(b.dataset.q)});
 
 renderUser();if(!store.get('mode',''))openWelcome();
 show('home');
