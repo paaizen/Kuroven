@@ -232,6 +232,18 @@ select{padding:10px;border-radius:10px;border:2px solid var(--bd);background:var
 @media(prefers-reduced-motion:reduce){.btFrame img{transition:none}}
 /* Jeux en duel et parties locales */
 .rmCode{font-size:2.4rem;font-weight:900;letter-spacing:.25em;text-align:center;color:var(--ac);background:var(--card);border:2px dashed var(--bd);border-radius:14px;padding:10px 0 10px .25em;margin:10px 0;user-select:all}
+.uc-card{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--card);border:2px solid var(--bd);border-radius:16px;padding:18px;text-align:center;margin:8px 0}
+.uc-big{font-size:1.3rem;font-weight:900}.uc-name{font-size:2rem;font-weight:900;color:var(--ac);word-break:break-word}
+.ucch{display:flex;flex-direction:column;align-items:center;gap:6px}.ucch img{width:min(55vw,200px);aspect-ratio:3/4;object-fit:cover;border-radius:14px;border:2px solid var(--bd)}.ucch small{color:var(--mut)}
+.ucch .uccov{width:min(40vw,110px);margin-top:4px;border-radius:10px}
+.ucpair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:center;margin:10px 0}.ucpair .ucch img{width:100%;max-width:200px}.ucpair .ucch .uccov{width:min(100%,110px)}
+.uc-role{font-weight:800;font-size:.8rem;border-radius:999px;padding:3px 10px;color:#fff;display:inline-block}.r-civil{background:#16803c}.r-imp{background:#c8223f}.r-white{background:#6b7280}
+.ucv{width:100%;margin-bottom:8px}.ucv.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 22%,var(--card))}
+.ucopt{display:flex;gap:8px;align-items:center;margin:10px 0}.ucopt input{width:auto}
+.ucrules{margin:16px 0;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 14px}.ucrules summary{cursor:pointer;font-weight:700}.ucrules li{margin:8px 0;line-height:1.4}
+.ucw{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:999px;padding:2px 9px;margin:3px 4px 0 0;font-size:.85rem}
+.ucdead{opacity:.6}.uccur{border:2px solid var(--ac)}.ucT{margin-left:8px;color:var(--mut)}
+.gc.m8 .go{background:#4d7c0f}
 .rmF{display:grid;gap:6px;margin:10px 0}.rmF label{font-weight:700;margin-top:6px}
 #rmCode{text-transform:uppercase;letter-spacing:.2em;text-align:center;max-width:180px}
 [hidden]{display:none!important}
@@ -266,7 +278,7 @@ button.pc:disabled{cursor:default}
 <button class="gc m6" data-go="ml" data-hub="at"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect width="200" height="140" fill="#313338"/><rect x="14" y="65" width="8" height="18" rx="4" fill="#eef3f9"/><rect x="28" y="57" width="8" height="34" rx="4" fill="#9cc3f0"/><rect x="42" y="48" width="8" height="52" rx="4" fill="#9cc3f0"/><rect x="56" y="59" width="8" height="30" rx="4" fill="#eef3f9"/><rect x="70" y="42" width="8" height="64" rx="4" fill="#9cc3f0"/><rect x="84" y="53" width="8" height="42" rx="4" fill="#9cc3f0"/><rect x="98" y="61" width="8" height="26" rx="4" fill="#eef3f9"/><rect x="112" y="45" width="8" height="58" rx="4" fill="#9cc3f0"/><rect x="126" y="56" width="8" height="36" rx="4" fill="#9cc3f0"/><rect x="140" y="63" width="8" height="22" rx="4" fill="#eef3f9"/><rect x="154" y="51" width="8" height="46" rx="4" fill="#9cc3f0"/><rect x="168" y="59" width="8" height="30" rx="4" fill="#9cc3f0"/><path d="M54 82a46 46 0 0 1 92 0" fill="none" stroke="#111" stroke-width="13" stroke-linecap="round"/><path d="M54 82a46 46 0 0 1 92 0" fill="none" stroke="#eef3f9" stroke-width="7" stroke-linecap="round"/><rect x="42" y="78" width="22" height="40" rx="10" fill="#111"/><rect x="45" y="81" width="16" height="34" rx="8" fill="#1f8fd1"/><rect x="136" y="78" width="22" height="40" rx="10" fill="#111"/><rect x="139" y="81" width="16" height="34" rx="8" fill="#1f8fd1"/><path d="M172 22v28a8 8 0 1 1-4-7V28l-20 5" fill="none" stroke="#111" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M172 22v28a8 8 0 1 1-4-7V28l-20 5" fill="none" stroke="#ffd400" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="tx"><b>Blind test audio</b><small>Reconnais l’anime à l’écoute d’un opening ou d’un ending. L’extrait s’allonge à chaque erreur.</small><span class="go">Jouer</span></span></button>
 </div>
 <h2>Jouer à plusieurs</h2>
-<div class="games"><button class="gc m7" data-go="rm"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect width="200" height="140" fill="#313338"/><g fill="#eef3f9" opacity=".18"><circle cx="14" cy="20" r="2"/><circle cx="186" cy="30" r="2.5"/><circle cx="170" cy="12" r="1.5"/><circle cx="26" cy="60" r="1.5"/><circle cx="188" cy="64" r="1.5"/></g><rect x="52" y="8" width="96" height="22" rx="8" fill="#eef3f9" stroke="#111" stroke-width="3"/><text x="100" y="24" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="14" letter-spacing="3" fill="#111">K7Q2MX</text><path d="M100 30v6" stroke="#111" stroke-width="3" stroke-linecap="round"/><rect x="74" y="78" width="52" height="44" rx="5" fill="#9cc3f0" stroke="#111" stroke-width="3"/><rect x="22" y="94" width="50" height="28" rx="5" fill="#6b6f78" stroke="#111" stroke-width="3"/><rect x="128" y="102" width="50" height="20" rx="5" fill="#6b6f78" stroke="#111" stroke-width="3"/><text x="100" y="108" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="22" fill="#111">1</text><text x="47" y="114" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="16" fill="#111">2</text><text x="153" y="116" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="13" fill="#111">3</text><g stroke="#111" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M88 46l5 8 7-12 7 12 5-8-2 12H90z" fill="#facc15"/><circle cx="100" cy="66" r="13" fill="#fff"/><path d="M87 64q1-14 13-14t13 14q-7-6-13-4t-13 4z" fill="#e11d48"/><circle cx="95" cy="68" r="1.8" fill="#111" stroke="none"/><circle cx="105" cy="68" r="1.8" fill="#111" stroke="none"/><circle cx="47" cy="84" r="11" fill="#fff"/><path d="M36 82q1-12 11-12t11 12q-5-5-11-3t-11 3z" fill="#60a5fa"/><circle cx="43" cy="86" r="1.6" fill="#111" stroke="none"/><circle cx="51" cy="86" r="1.6" fill="#111" stroke="none"/><circle cx="153" cy="92" r="10" fill="#fff"/><path d="M143 90q1-11 10-11t10 11q-5-4-10-3t-10 3z" fill="#3ba55d"/><circle cx="149" cy="94" r="1.5" fill="#111" stroke="none"/><circle cx="157" cy="94" r="1.5" fill="#111" stroke="none"/></g></svg></span><span class="tx"><b>Salons et tournois</b><small>Crée un salon, partage le code : jusqu’à 12 joueurs, mêmes questions pour tous, classement en direct. Plusieurs épreuves à la suite = un tournoi.</small><span class="go">Jouer</span></span></button></div>
+<div class="games"><button class="gc m7" data-go="rm"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect width="200" height="140" fill="#313338"/><g fill="#eef3f9" opacity=".18"><circle cx="14" cy="20" r="2"/><circle cx="186" cy="30" r="2.5"/><circle cx="170" cy="12" r="1.5"/><circle cx="26" cy="60" r="1.5"/><circle cx="188" cy="64" r="1.5"/></g><rect x="52" y="8" width="96" height="22" rx="8" fill="#eef3f9" stroke="#111" stroke-width="3"/><text x="100" y="24" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="14" letter-spacing="3" fill="#111">K7Q2MX</text><path d="M100 30v6" stroke="#111" stroke-width="3" stroke-linecap="round"/><rect x="74" y="78" width="52" height="44" rx="5" fill="#9cc3f0" stroke="#111" stroke-width="3"/><rect x="22" y="94" width="50" height="28" rx="5" fill="#6b6f78" stroke="#111" stroke-width="3"/><rect x="128" y="102" width="50" height="20" rx="5" fill="#6b6f78" stroke="#111" stroke-width="3"/><text x="100" y="108" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="22" fill="#111">1</text><text x="47" y="114" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="16" fill="#111">2</text><text x="153" y="116" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="13" fill="#111">3</text><g stroke="#111" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M88 46l5 8 7-12 7 12 5-8-2 12H90z" fill="#facc15"/><circle cx="100" cy="66" r="13" fill="#fff"/><path d="M87 64q1-14 13-14t13 14q-7-6-13-4t-13 4z" fill="#e11d48"/><circle cx="95" cy="68" r="1.8" fill="#111" stroke="none"/><circle cx="105" cy="68" r="1.8" fill="#111" stroke="none"/><circle cx="47" cy="84" r="11" fill="#fff"/><path d="M36 82q1-12 11-12t11 12q-5-5-11-3t-11 3z" fill="#60a5fa"/><circle cx="43" cy="86" r="1.6" fill="#111" stroke="none"/><circle cx="51" cy="86" r="1.6" fill="#111" stroke="none"/><circle cx="153" cy="92" r="10" fill="#fff"/><path d="M143 90q1-11 10-11t10 11q-5-4-10-3t-10 3z" fill="#3ba55d"/><circle cx="149" cy="94" r="1.5" fill="#111" stroke="none"/><circle cx="157" cy="94" r="1.5" fill="#111" stroke="none"/></g></svg></span><span class="tx"><b>Salons et tournois</b><small>Crée un salon, partage le code : jusqu’à 12 joueurs, mêmes questions pour tous, classement en direct. Plusieurs épreuves à la suite = un tournoi.</small><span class="go">Jouer</span></span></button><button class="gc m8" data-go="uc"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect width="200" height="140" fill="#313338"/><g stroke="#111" stroke-width="3"><circle cx="34" cy="70" r="15" fill="#8fb8ea"/><path d="M10 124c0-20 11-30 24-30s24 10 24 30z" fill="#8fb8ea"/><circle cx="78" cy="70" r="15" fill="#8fb8ea"/><path d="M54 124c0-20 11-30 24-30s24 10 24 30z" fill="#8fb8ea"/><circle cx="122" cy="70" r="15" fill="#fb7185"/><path d="M98 124c0-20 11-30 24-30s24 10 24 30z" fill="#fb7185"/><circle cx="166" cy="70" r="15" fill="#8fb8ea"/><path d="M142 124c0-20 11-30 24-30s24 10 24 30z" fill="#8fb8ea"/></g><circle cx="122" cy="30" r="14" fill="#facc15" stroke="#111" stroke-width="3"/><text x="122" y="37" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="20" fill="#111">?</text></svg></span><span class="tx"><b>Undercover</b><small>Un personnage secret pour chacun, sauf un infiltré. Un mot chacun, puis on vote. En local ou en ligne.</small><span class="go">Jouer</span></span></button></div>
 <h2>Prochainement</h2>
 <div class="soon"><span>Signalement des images</span></div>
 </main>
@@ -375,6 +387,12 @@ button.pc:disabled{cursor:default}
 <h1>Salons et tournois</h1>
 <div id="rmBody"></div>
 <div class="msg" id="rmMsg"></div>
+</main>
+<main id="v-uc" hidden>
+<button class="btn back" data-go="home">← Accueil</button>
+<h1>Undercover</h1>
+<div id="ucBody"></div>
+<div class="msg" id="ucMsg"></div>
 </main>
 <main id="v-ml" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
@@ -575,7 +593,7 @@ if(v!=='rc'){try{au.pause()}catch(e){}if(ron&&ron.done)ronDetach();if(lc){lc=nul
 curView=v;document.querySelectorAll('main').forEach(m=>m.hidden=m.id!=='v-'+v);
 if(v==='ttt'){if(!onl)start();else{draw();if(!over)timer()}}else{if(!onl)over=true;clearInterval(tm)}
 if(v!=='at'){atStop();if(aon&&aon.done)aonDetach()}else atEnter();if(v==='hl')hlStart();if(v==='gs')gsNext();clearInterval(dtTm);if(v==='bt')btNext();if(v==='dt')dtReset();
-if(v==='rc')rcEnter();if(v==='rm')rmEnter();if(v==='ml')renderMl();if(v==='prof')loadProfile(profId);if(v==='fr')loadFriends();if(v==='lb')loadLb();
+if(v==='rc')rcEnter();if(v==='rm')rmEnter();if(v==='uc')ucEnter();if(v==='ml')renderMl();if(v==='prof')loadProfile(profId);if(v==='fr')loadFriends();if(v==='lb')loadLb();
 updateLive();window.scrollTo(0,0)}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;if(b.dataset.hub)hubGame=b.dataset.hub;if(b.dataset.go==='prof'&&!b.dataset.user)profId=me?me.id:null;show(b.dataset.go)});
 document.addEventListener('error',e=>{const t=e.target;if(t.classList&&t.classList.contains('pi')){const f=document.createElement('div');f.className='fb';f.textContent=t.alt||'?';t.replaceWith(f)}},true);
@@ -655,7 +673,7 @@ const AT='https://api.animethemes.moe',ATINC='animethemes.song.artists,animethem
 const QAP='query($p:Int){Page(page:$p,perPage:50){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,format_in:[TV,MOVIE,OVA,ONA]){id title{romaji english} coverImage{large} seasonYear}}}';
 let atPool=[],atUsed=new Set(),atAns=null,atStage=0,atStart=0,atOver=false,atScore=0,atTm=null,atAf=0,atBusy=false,atN=0,atSolo=true,aon=null,atRT=null,atQT=0;
 const au=new Audio();au.preload='auto';
-let ron=null,lc=null,rm=null,rmT=null,rmView='home',rmNote='',rcCur=null,rcTT=null,rcAf=0,rcAt=null;
+let ron=null,lc=null,rm=null,uo=null,ucL=null,rmT=null,rmView='home',rmNote='',rcCur=null,rcTT=null,rcAf=0,rcAt=null;
 const nz=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 function atMsg(t){$('atMsg').textContent=t||''}
 function atStop(){clearTimeout(atTm);cancelAnimationFrame(atAf);try{au.pause()}catch(e){}$('atBar').style.width='0'}
@@ -954,7 +972,7 @@ function avh(p){const u=p&&safeStore(p.avatar_url),d=p&&p.id?' data-user="'+esc(
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let tickT=null,tickN=0,invShown=null;
 const PN=()=>onl?onl.names:['Joueur 1','Joueur 2'];
-function busyOnline(){return(onl&&!onl.done)||(aon&&!aon.done)||(ron&&!ron.done)||(rm&&(rm.status==='lobby'||rm.status==='playing'))}
+function busyOnline(){return(onl&&!onl.done)||(aon&&!aon.done)||(ron&&!ron.done)||(rm&&(rm.status==='lobby'||rm.status==='playing'))||(uo&&uo.v&&(uo.v.status==='lobby'||uo.v.status==='playing'))}
 
 /* --- morpion en ligne : état d'une partie --- */
 function newState(){return{ri:pickN([...ROWS.keys()],3),ci:pickN([...COLS.keys()],3),b:Array(9).fill(null),used:[],turn:0,over:false,w:null,miss:0,seq:1,rs:null}}
@@ -1005,6 +1023,7 @@ function updateLive(){let t='';
   if(onl&&!onl.done&&curView!=='ttt')t='⚔️ Morpion en cours contre '+onl.opp.pseudo+' — Reprendre';
   else if(aon&&!aon.done&&curView!=='at')t='🎧 Blind test en cours contre '+aon.opp.pseudo+' — Reprendre';
   else if(rm&&(rm.status==='lobby'||rm.status==='playing')&&curView!=='rc'&&curView!=='rm')t='🏁 Salon '+rm.code+' en cours — Reprendre';
+  else if(uo&&uo.v&&(uo.v.status==='lobby'||uo.v.status==='playing')&&curView!=='uc')t='🕵️ Undercover '+uo.v.code+' en cours — Reprendre';
   else if(ron&&!ron.done&&curView!=='rc')t='🎮 '+GN[ron.g]+' en cours contre '+ron.opp.pseudo+' — Reprendre';
   $('live').hidden=!t;$('liveT').textContent=t}
 async function startOnline(m,silent){
@@ -1031,7 +1050,7 @@ function resign(){onl.rs=onl.me;over=true;clearInterval(tm);$('msg').textContent
   sb.rpc('submit_result',{p_id:onl.id,p_result:onl.me===0?'p2':'p1'}).then(x=>{if(x.data&&x.data.status!=='playing')endOnline(x.data)})}
 function syncNw(){$('nw').textContent=onl?((onl.done||over)?'Retour au menu':'Abandonner'):'Nouvelle grille'}
 $('claim').onclick=async()=>{if(!onl)return;const x=await sb.rpc('claim_win',{p_id:onl.id});if(x.data&&x.data.status!=='playing')endOnline(x.data);else $('msg').textContent='Pas encore possible : l’adversaire a encore un peu de temps.'};
-$('live').onclick=()=>show(onl&&!onl.done?'ttt':(ron&&!ron.done?'rc':(rm&&rm.status==='playing'?'rc':(rm?'rm':'at'))));
+$('live').onclick=()=>show(uo&&uo.v&&(uo.v.status==='lobby'||uo.v.status==='playing')?'uc':onl&&!onl.done?'ttt':(ron&&!ron.done?'rc':(rm&&rm.status==='playing'?'rc':(rm?'rm':'at'))));
 
 /* --- recherche d'adversaire (rapide, classée, ami) --- */
 function wtShow(m,t){wait=m;$('wtT').textContent=t;$('wt').hidden=false}
@@ -1109,8 +1128,8 @@ async function pollSocial(){
   await notifLoad()}
 $('invY').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;const r=await sb.rpc('accept_invite',{p_id:id});if(r.error){$('mlMsg').textContent='Invitation expirée.';return}startOnline(r.data)};
 $('invN').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;await sb.rpc('cancel_match',{p_id:id})};
-function onlLogout(){stopTick();onlDetach();aonDetach();ronDetach();rmDetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;$('bellW').hidden=true;NT=[];invShown=null}
-function onlLogin(){tickN=0;startTick();setTimeout(tick,400);setTimeout(rmResume,900)}
+function onlLogout(){stopTick();onlDetach();aonDetach();ronDetach();rmDetach();ucODetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;$('bellW').hidden=true;NT=[];invShown=null}
+function onlLogin(){tickN=0;startTick();setTimeout(tick,400);setTimeout(rmResume,900);setTimeout(ucOResume,1300)}
 
 /* --- menu d'un jeu --- */
 const HUB={
@@ -1774,6 +1793,280 @@ $('rmBody').addEventListener('click',async e=>{
     case 'leave':rmLeave(b);break;
     case 'resume':show('rc');break;
     case 'done':rmDetach();rmView='home';rmRender();break}});
+/* ===== Undercover : le même personnage pour tous, sauf un (ou deux) ===== */
+const UCR={civil:'Civil',imp:'Undercover',white:'Mr White'};
+let UCP=null,ucView='menu',ucNote='',ucQ=0;const ucCC={};
+function ucSay(t){$('ucMsg').textContent=t||''}
+function ucSet(h){$('ucBody').innerHTML=h}
+const QC1='query($id:Int){Character(id:$id){id name{full} image{large} favourites media(type:ANIME,perPage:1,sort:POPULARITY_DESC){nodes{title{romaji english} coverImage{large}}}}}';
+
+/* --- les 200 personnages les plus aimés (AniList), regroupés par anime --- */
+async function ucPool(){
+  if(UCP&&UCP.length>=20)return UCP;
+  try{const s=JSON.parse(sessionStorage.getItem('ucpool')||'null');if(Array.isArray(s)&&s.length>=20){UCP=s;return UCP}}catch(e){}
+  const pages=await Promise.all([1,2,3,4].map(p=>fetchChars(p,50).catch(()=>[])));
+  const seen=new Set(),L=[];
+  for(const c of pages.flat()){if(c&&c.im&&safeImg(c.im)&&!seen.has(c.id)){seen.add(c.id);L.push({id:c.id,n:c.n,im:c.im,a:c.a,ac:c.ac})}}
+  if(L.length<20)throw new Error('AniList ne répond pas assez, réessaie dans un instant');
+  UCP=L;try{sessionStorage.setItem('ucpool',JSON.stringify(L))}catch(e){}
+  return L}
+function ucGroups(L,min){const m=new Map();for(const c of L){if(!c.a)continue;if(!m.has(c.a))m.set(c.a,[]);m.get(c.a).push(c)}return[...m.values()].filter(g=>g.length>=min)}
+function ucPair(L){let gs=ucGroups(L,3);if(!gs.length)gs=ucGroups(L,2);if(!gs.length)return shuf(L).slice(0,2);return shuf(shuf(gs)[0]).slice(0,2)}
+async function ucChar(id){
+  if(ucCC[id])return ucCC[id];
+  const p=UCP&&UCP.find(c=>c.id===id);if(p)return ucCC[id]=p;
+  const d=await gql(QC1,{id});return ucCC[id]=chView(d.Character)}
+const ucCard=(c,extra)=>c?'<div class="ucch"><img src="'+esc(safeImg(c.im))+'" alt=""><b>'+esc(c.n)+'</b>'+(c.a?'<small>'+esc(c.a)+'</small>':'')+(extra||'')+'</div>':'<div class="ucch"><div class="fb">?</div><b>…</b></div>';
+const ucComp=(n,white)=>{if(n<3)return'Il faut au moins 3 joueurs.';const im=n>=9?2:1,w=white&&n>=6?1:0;return(n-im-w)+' civils, '+im+' undercover'+(w?', 1 Mr White':'')+'.'};
+
+/* ===================== Écran principal ===================== */
+async function ucEnter(){
+  ucSay(ucNote);ucNote='';
+  if(!uo&&!ucL&&me&&sb&&!busyOnline()){const r=await sb.rpc('uc_mine');if(r.data&&!uo&&curView==='uc'){ucOAttach(r.data,true);return}}
+  ucRender()}
+function ucRender(){
+  if(curView!=='uc')return;
+  if(uo)return ucORender();
+  if(ucL)return ucLRender();
+  if(ucView==='lsetup')return ucLSetup();
+  if(ucView==='ocreate')return ucOForm();
+  if(ucView==='ojoin')return ucOJoinForm();
+  ucSet('<p class="sub">Un personnage d’anime secret pour chacun. Mais l’un de vous a un autre personnage… saurez-vous le démasquer ?</p><div class="mlg"><button class="mlb" data-uc="local"><b>Jouer en local</b><small>Un seul téléphone qu’on se passe. Sans compte, de 3 à 12 joueurs.</small></button><button class="mlb" data-uc="ocreate"><b>Créer une partie en ligne</b><small>Chacun sur son téléphone, tu partages un code. Compte requis.</small></button><button class="mlb" data-uc="ojoin"><b>Rejoindre avec un code</b><small>Un ami t’a donné le code de sa partie.</small></button></div>'+
+  '<details class="ucrules"><summary>Règles du jeu</summary><ul><li>Chaque joueur reçoit en secret un personnage d’anime parmi les 200 les plus aimés. Tous les <b>civils</b> ont le même. Le ou les <b>undercover</b> ont un personnage proche, souvent de la même série, sans le savoir. En option, <b>Mr White</b> n’a aucun personnage.</li><li>À tour de rôle, chacun dit <b>un seul mot</b> ou une courte expression qui décrit son personnage, sans jamais le nommer.</li><li>Puis on discute et on vote : le joueur qui a le plus de voix est éliminé et son rôle est révélé. En cas d’égalité, le hasard tranche en ligne ; en local, revotez.</li><li>Les civils gagnent s’ils éliminent tous les infiltrés. Les infiltrés gagnent s’il ne reste qu’<b>un seul civil</b>. Un Mr White éliminé peut tenter de deviner le personnage des civils : s’il trouve, il gagne.</li></ul></details>')}
+
+/* ===================== Local : un téléphone qu'on se passe ===================== */
+const ucNames=()=>{try{const a=JSON.parse(store.get('ucnames','[]'));return Array.isArray(a)?a.filter(x=>typeof x==='string').slice(0,12):[]}catch(e){return[]}};
+function ucLSetup(){
+  ucView='lsetup';const names=ucNames(),n=names.length,white=store.get('ucwhite','0')==='1'&&n>=6;
+  ucSet('<p class="sub">Écris le prénom de chaque joueur, de 3 à 12.</p><div class="row" style="margin:0 0 10px"><input id="ucIn" maxlength="20" placeholder="Prénom du joueur" autocomplete="off"><button class="btn" data-uc="ladd">Ajouter</button></div><div>'+
+    names.map((x,i)=>'<div class="fr-row"><span class="avi">'+esc(x.charAt(0).toUpperCase())+'</span><div class="g"><b>'+esc(x)+'</b></div><button class="btn alt sm" data-uc="ldel" data-i="'+i+'">Retirer</button></div>').join('')+
+    '</div><label class="ucopt"><input type="checkbox" id="ucWhite"'+(white?' checked':'')+(n<6?' disabled':'')+'><span>Ajouter un Mr White (à partir de 6 joueurs)</span></label><p class="hint" id="ucComp">'+ucComp(n,white)+'</p><div class="row"><button class="btn" data-uc="lgo"'+(n<3?' disabled':'')+'>Lancer la partie</button><button class="btn alt" data-uc="menu">Retour</button></div>');
+  const i=$('ucIn');if(i&&n<12)i.focus()}
+function ucLAdd(){
+  const i=$('ucIn');if(!i)return;const v=i.value.trim().replace(/\s+/g,' ').slice(0,20),names=ucNames();
+  if(!v)return;
+  if(names.length>=12){ucSay('12 joueurs au maximum.');return}
+  if(names.some(x=>x.toLowerCase()===v.toLowerCase())){ucSay('Ce prénom est déjà dans la liste.');return}
+  names.push(v);store.set('ucnames',JSON.stringify(names));ucSay('');ucLSetup()}
+async function ucLStart(){
+  const names=ucNames();if(names.length<3)return;ucSay('Choix des personnages…');
+  let L;try{L=await ucPool()}catch(e){ucSay('Erreur : '+e.message);return}
+  const[civ,imp]=ucPair(L),n=names.length,im=n>=9?2:1,wh=store.get('ucwhite','0')==='1'&&n>=6;
+  const roles=shuf([...Array(im).fill('imp'),...(wh?['white']:[]),...Array(n-im-(wh?1:0)).fill('civil')]);
+  ucL={ps:names.map((nm,i)=>({n:nm,role:roles[i],alive:true})),civ,imp,step:'pass',i:0,round:1,order:[],res:null,out:null,sel:null,back:null,gshow:false};
+  ucSay('');ucLRender()}
+function ucLOrder(){
+  const al=ucL.ps.map((p,i)=>i).filter(i=>ucL.ps[i].alive),o=shuf(al);
+  if(o.length>1&&ucL.ps[o[0]].role==='white'){const t=o[0];o[0]=o[1];o[1]=t}
+  ucL.order=o}
+function ucLCheck(){
+  const al=ucL.ps.filter(p=>p.alive),civ=al.filter(p=>p.role==='civil').length,bad=al.length-civ;
+  if(bad===0){ucL.res='civils';ucL.step='end'}
+  else if(civ<=1){ucL.res='infiltres';ucL.step='end'}
+  else{ucL.round++;ucLOrder();ucL.sel=null;ucL.step='talk'}
+  ucLRender()}
+const ucLQuit=()=>'<div class="row" style="margin-top:14px"><button class="btn alt sm" data-uc="lquit">Arrêter la partie</button></div>';
+function ucLRender(){
+  const g=ucL;if(!g)return;const P=g.ps;let h='';
+  if(g.step==='pass'){
+    h='<div class="uc-card"><div class="uc-big">Passe le téléphone à</div><div class="uc-name">'+esc(P[g.i].n)+'</div><p class="hint">Les autres, ne regardez pas l’écran.</p><button class="btn" data-uc="lshow">Révéler mon personnage</button></div>'}
+  else if(g.step==='show'){
+    const p=P[g.i];
+    h='<div class="uc-card">'+(p.role==='white'?'<div class="uc-big">Tu es Mr White</div><p class="sub">Tu n’as pas de personnage. Écoute bien les autres, fais semblant de savoir, et essaie de deviner le personnage des civils.</p>':
+      '<div class="uc-big">Ton personnage</div>'+ucCard(p.role==='imp'?g.imp:g.civ).replace('<small>','<small hidden>')+'<p class="hint">Retiens-le, ne le dis à personne.</p>')+
+      '<button class="btn" data-uc="lnext">'+(g.back?'J’ai vu, retour':(g.i<P.length-1?'Suivant':'Terminé, on commence'))+'</button></div>'}
+  else if(g.step==='talk'){
+    h='<h2>Tour '+g.round+' : un mot chacun</h2><p class="sub">Dans cet ordre, chacun dit <b>un seul mot</b> ou une courte expression qui décrit son personnage, sans le nommer.</p>'+
+      g.order.map((i,k)=>'<div class="fr-row"><span class="rk">'+(k+1)+'</span><div class="g"><b>'+esc(P[i].n)+'</b></div><button class="btn alt sm" data-uc="lrev" data-i="'+i+'">Revoir mon personnage</button></div>').join('')+
+      (P.some(p=>!p.alive)?'<p class="hint">Éliminés : '+P.filter(p=>!p.alive).map(p=>esc(p.n)+' ('+UCR[p.role]+')').join(', ')+'</p>':'')+
+      '<div class="row" style="margin-top:12px"><button class="btn" data-uc="lvote">Discuter puis passer au vote</button></div>'}
+  else if(g.step==='vote'){
+    h='<h2>Qui est éliminé ?</h2><p class="sub">Votez à voix haute, en pointant du doigt. Choisis le joueur qui a le plus de voix. En cas d’égalité, rediscutez et revotez.</p>'+
+      P.map((p,i)=>p.alive?'<button class="mlb ucv'+(g.sel===i?' on':'')+'" data-uc="lsel" data-i="'+i+'"><b>'+esc(p.n)+'</b></button>':'').join('')+
+      '<div class="row" style="margin-top:12px"><button class="btn" data-uc="lelim"'+(g.sel==null?' disabled':'')+'>'+(g.sel==null?'Choisis un joueur':'Éliminer '+esc(P[g.sel].n))+'</button><button class="btn alt" data-uc="ltalk">Retour</button></div>'}
+  else if(g.step==='out'){
+    const p=P[g.out];
+    h='<div class="uc-card"><div class="uc-big">'+esc(p.n)+' est éliminé(e)</div><div class="uc-role r-'+p.role+'">C’était : '+UCR[p.role]+'</div>'+(p.role==='white'?'<p class="sub">Mr White a une dernière chance : deviner le personnage des civils.</p>':'')+'<button class="btn" data-uc="lafter">'+(p.role==='white'?'Il tente de deviner':'Continuer')+'</button></div>'}
+  else if(g.step==='guess'){
+    const p=P[g.out];
+    h='<div class="uc-card"><div class="uc-big">'+esc(p.n)+', dis à voix haute…</div><p class="sub">Quel est le personnage des civils ? Les autres, quand il a répondu, affichez la réponse pour vérifier.</p>'+(g.gshow?ucCard(g.civ)+'<div class="row"><button class="btn" data-uc="lfound">Il a trouvé</button><button class="btn alt" data-uc="lmiss">Raté</button></div>':'<button class="btn" data-uc="lans">Afficher la réponse</button>')+'</div>'}
+  else if(g.step==='end'){
+    const w=g.res;
+    h='<h2 style="text-align:center">'+(w==='civils'?'🏆 Les civils gagnent !':w==='white'?'🏆 Mr White a deviné, il gagne !':'🕵️ Les infiltrés gagnent !')+'</h2><div class="ucpair">'+
+      '<div><div class="hint">Personnage des civils</div>'+ucCard(g.civ,g.civ.ac?'<img class="uccov" src="'+esc(safeImg(g.civ.ac))+'" alt="">':'')+'</div>'+
+      '<div><div class="hint">Personnage des undercover</div>'+ucCard(g.imp,g.imp.ac?'<img class="uccov" src="'+esc(safeImg(g.imp.ac))+'" alt="">':'')+'</div></div>'+
+      '<h2>Les rôles</h2>'+P.map(p=>'<div class="fr-row"><span class="avi">'+esc(p.n.charAt(0).toUpperCase())+'</span><div class="g"><b>'+esc(p.n)+'</b></div><span class="uc-role r-'+p.role+'">'+UCR[p.role]+'</span></div>').join('')+
+      '<div class="row" style="margin-top:12px"><button class="btn" data-uc="lagain">Rejouer, mêmes joueurs</button><button class="btn alt" data-uc="lsetup">Changer les joueurs</button></div><div class="row" style="margin-top:8px"><button class="btn alt" data-uc="lmenu">Menu</button></div>'}
+  ucSet(h+(g.step==='end'?'':ucLQuit()));window.scrollTo(0,0)}
+function ucLAct(a,b){
+  const g=ucL;
+  switch(a){
+    case 'lshow':g.step='show';break;
+    case 'lnext':
+      if(g.back){g.step=g.back;g.back=null;g.i=g.bi;break}
+      if(g.i<g.ps.length-1){g.i++;g.step='pass'}else{g.round=1;ucLOrder();g.step='talk'}break;
+    case 'lrev':g.bi=g.i;g.i=+b.dataset.i;g.back='talk';g.step='pass';break;
+    case 'lvote':g.sel=null;g.step='vote';break;
+    case 'ltalk':g.step='talk';break;
+    case 'lsel':g.sel=+b.dataset.i;break;
+    case 'lelim':if(g.sel==null)return;g.out=g.sel;g.ps[g.out].alive=false;g.step='out';break;
+    case 'lafter':if(g.ps[g.out].role==='white'){g.gshow=false;g.step='guess'}else return ucLCheck();break;
+    case 'lans':g.gshow=true;break;
+    case 'lfound':g.res='white';g.step='end';break;
+    case 'lmiss':return ucLCheck();
+    case 'lagain':ucL=null;return ucLStart();
+    case 'lsetup':ucL=null;return ucLSetup();
+    case 'lmenu':ucL=null;ucView='menu';break;
+    case 'lquit':if(Date.now()-ucQ>4000){ucQ=Date.now();b.textContent='Confirmer : arrêter la partie ?';return}ucQ=0;ucL=null;ucView='menu';break}
+  ucRender()}
+
+/* ===================== En ligne ===================== */
+function ucODetach(){if(uo){clearInterval(uo.tm);clearInterval(uo.tk)}uo=null;updateLive()}
+function ucOAttach(v,silent){
+  ucODetach();
+  uo={id:v.id,v:null,t0:Date.now(),polling:false,pick:null,busy:false,starting:false,sig:'',rv:null,my:null,names:{},tm:setInterval(ucOTick,2000),tk:setInterval(ucOClock,1000)};
+  ucOApply(v);
+  if(!silent)show('uc');else updateLive()}
+async function ucOResume(){
+  if(uo||ucL||!me||!sb||busyOnline())return;
+  const r=await sb.rpc('uc_mine');if(r.data&&!uo&&!busyOnline())ucOAttach(r.data,true)}
+async function ucOTick(){
+  if(!uo||!sb||document.hidden||uo.polling)return;uo.polling=true;const id=uo.id;
+  try{
+    const r=await sb.rpc('uc_get',{p_id:id});if(!uo||uo.id!==id)return;
+    if(r.error){if(/introuvable/i.test(r.error.message||'')){ucNote='Tu n’es plus dans cette partie.';ucODetach();ucView='menu';if(curView==='uc')ucEnter()}return}
+    ucOApply(r.data)}
+  catch(e){}
+  finally{if(uo)uo.polling=false}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&uo)ucOTick()});
+const ucOIsMe=u=>!!me&&u===me.id;
+const ucOName=u=>{const p=uo&&uo.v&&uo.v.players.find(x=>x.id===u);return p?p.pseudo:'?'};
+function ucOApply(v){
+  if(!uo||!v||v.id!==uo.id)return;
+  const old=uo.v;uo.v=v;uo.t0=Date.now();
+  if(v.status==='closed'){ucNote='La partie a été fermée par l’hôte.';ucODetach();ucView='menu';if(curView==='uc')ucEnter();return}
+  if(v.status==='finished'&&(!old||old.status!=='finished')){clearInterval(uo.tm);uo.tm=null;ucOFetchReveal(v)}
+  if(v.me&&v.me.char&&(!uo.my||uo.my.id!==v.me.char)){const id=v.me.char;ucChar(id).then(c=>{if(uo&&uo.v&&uo.v.me&&uo.v.me.char===id){uo.my=c;if(curView==='uc')ucORender(true)}}).catch(()=>{})}
+  const sig=[v.status,v.phase,v.round,v.turn_uid,v.guess_by,v.result,v.players.map(p=>p.id+p.alive+p.voted+(p.role||'')).join(','),v.clues.length,v.log.length].join('|');
+  const changed=sig!==uo.sig;uo.sig=sig;
+  if(curView==='uc'&&changed)ucORender();
+  updateLive()}
+async function ucOFetchReveal(v){
+  try{const ids=[v.reveal.civ,v.reveal.imp],g=v.log.length?v.log[v.log.length-1].guess:null;if(g)ids.push(g);
+    const cs=await Promise.all(ids.map(ucChar));if(!uo||uo.id!==v.id)return;
+    uo.rv={civ:cs[0],imp:cs[1],guess:g?cs[2]:null};if(curView==='uc')ucORender(true)}
+  catch(e){}}
+function ucOClock(){
+  const e=$('ucT');if(!e||!uo||!uo.v||uo.v.status!=='playing')return;
+  const l=Math.max(0,(uo.v.left||0)-Math.floor((Date.now()-uo.t0)/1000));e.textContent='⏱️ '+l+' s'}
+function ucOForm(){
+  ucView='ocreate';
+  ucSet('<p class="sub">Choisis la taille de la partie. Tes amis la rejoignent avec le code.</p><div class="rmF"><label for="ucMax">Nombre de joueurs maximum</label><select id="ucMax">'+Array.from({length:10},(_,i)=>'<option value="'+(i+3)+'"'+(i+3===8?' selected':'')+'>'+(i+3)+'</option>').join('')+'</select></div><label class="ucopt"><input type="checkbox" id="ucWhite"><span>Ajouter un Mr White (si 6 joueurs ou plus)</span></label><div class="row"><button class="btn" data-uc="ocreate2">Créer la partie</button><button class="btn alt" data-uc="menu">Retour</button></div>')}
+function ucOJoinForm(){
+  ucView='ojoin';
+  ucSet('<label for="ucCode" style="font-weight:700">Code de la partie</label><div class="row" style="margin-top:6px"><input id="ucCode" maxlength="6" placeholder="CODE" autocapitalize="characters" autocomplete="off"><button class="btn" data-uc="ojoin2">Rejoindre</button></div><div class="row" style="margin-top:10px"><button class="btn alt" data-uc="menu">Retour</button></div>');
+  const c=$('ucCode');if(c)c.focus()}
+function ucOList(v,opts){
+  const mine=me&&me.id,byU={};v.clues.forEach(c=>{(byU[c.u]=byU[c.u]||[]).push(c)});
+  return v.players.map(p=>{
+    const cl=(byU[p.id]||[]).map(c=>'<span class="ucw">T'+c.r+' · '+esc(c.w)+'</span>').join('');
+    const cur=v.status==='playing'&&v.phase==='clue'&&v.turn_uid===p.id;
+    return'<div class="fr-row'+(p.alive?'':' ucdead')+(cur?' uccur':'')+'">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===v.host?' 👑':'')+(p.id===mine?' (toi)':'')+'</b><small>'+
+      (!p.alive?'Éliminé · '+UCR[p.role||'civil']:cur?'Parle en ce moment…':(v.phase==='vote'&&v.status==='playing'&&p.alive?(p.voted?'A voté ✓':'Vote en cours…'):''))+'</small>'+(cl?'<div class="ucwl">'+cl+'</div>':'')+'</div></div>'}).join('')}
+function ucOLog(v){
+  if(!v.log.length)return'';
+  return'<h2>Éliminations</h2>'+v.log.map(l=>{
+    const vs=l.votes&&Object.keys(l.votes).length?'<small>Votes : '+Object.entries(l.votes).map(([a,b])=>esc(ucOName(a))+' → '+esc(ucOName(b))).join(', ')+'</small>':'';
+    return'<div class="fr-row"><div class="g"><b>Tour '+l.r+' : '+esc(ucOName(l.out))+'</b> <span class="uc-role r-'+l.role+'">'+UCR[l.role]+'</span>'+(l.left?'<small>a quitté la partie</small>':vs)+'</div></div>'}).join('')}
+function ucORender(keep){
+  if(!uo||!uo.v||curView!=='uc')return;
+  const v=uo.v,dr=$('ucClue')?$('ucClue').value:'',me_=v.me,isMe=ucOIsMe;let h='';
+  if(v.status==='lobby'){
+    const n=v.players.length;
+    h='<p class="sub">Undercover en ligne · '+n+' sur '+v.max+' joueurs'+(v.white?' · avec Mr White (si 6 joueurs ou plus)':'')+'</p><div class="rmCode" aria-label="Code de la partie">'+esc(v.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p>'+ucOList(v)+
+      '<div class="row" style="margin-top:12px">'+(isMe(v.host)?'<button class="btn" data-uc="ostart"'+(n<3?' disabled':'')+'>'+(n<3?'Attends au moins 3 joueurs':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-uc="oleave">Quitter</button></div>'}
+  else if(v.status==='playing'){
+    const my=uo.my,alive=me_&&me_.alive,phase=v.phase;
+    h='<div class="btStep">Tour '+v.round+' · '+(phase==='clue'?'Les indices':phase==='vote'?'Le vote':'Mr White tente de deviner')+' <span id="ucT" class="ucT"></span></div>'+
+      '<p class="sub">'+(v.n_imp>1?v.n_imp+' undercover':'1 undercover')+(v.has_white?' et 1 Mr White':'')+' parmi vous.</p>'+
+      '<div class="uc-card ucme">'+(me_.role==='white'?'<b>Tu es Mr White</b><p class="sub">Tu n’as pas de personnage : écoute les indices, bluffe, et si on t’élimine, devine le personnage des civils.</p>':'<small class="hint">Ton personnage (secret)</small>'+(uo.hide?'<button class="btn alt sm" data-uc="ohide">Afficher</button>':ucCard(my)+'<button class="btn alt sm" data-uc="ohide">Masquer</button>'))+'</div>';
+    if(!alive)h+='<p class="sub"><b>Tu es éliminé.</b> Tu regardes la suite.</p>';
+    if(phase==='clue'){
+      if(alive&&isMe(v.turn_uid))h+='<div class="uc-card"><b>C’est à toi !</b><p class="sub">Un seul mot ou une courte expression qui décrit ton personnage, sans le nommer.</p><input id="ucClue" maxlength="40" placeholder="Ton mot…" autocomplete="off"><button class="btn" data-uc="oclue">Envoyer</button></div>';
+      else h+='<p class="sub">C’est au tour de <b>'+esc(ucOName(v.turn_uid))+'</b>.</p>'}
+    else if(phase==='vote'){
+      const nv=v.players.filter(p=>p.alive&&p.voted).length,na=v.players.filter(p=>p.alive).length;
+      if(alive)h+='<h2>Pour qui votes-tu ?</h2>'+v.players.filter(p=>p.alive&&p.id!==me.id).map(p=>'<button class="mlb ucv'+(me_.vote===p.id?' on':'')+'" data-uc="ovote" data-u="'+esc(p.id)+'"><b>'+esc(p.pseudo)+'</b></button>').join('')+'<p class="hint">Tu peux changer ton vote tant que tout le monde n’a pas voté. '+nv+' sur '+na+' ont voté.</p>';
+      else h+='<p class="sub">'+nv+' sur '+na+' ont voté.</p>'}
+    else{
+      if(isMe(v.guess_by))h+='<div class="uc-card"><b>Dernière chance, Mr White !</b><p class="sub">Quel est le personnage des civils ?</p>'+(uo.pick?'<div class="ucch"><b>'+esc(uo.pick.n)+'</b></div><button class="btn" data-uc="oguess">Valider « '+esc(uo.pick.n)+' »</button><button class="btn alt sm" data-uc="onopick">Changer</button>':'<input id="ucGuess" placeholder="Cherche un personnage (3 lettres)…" autocomplete="off"><div id="ucGSg"></div>')+'</div>';
+      else h+='<p class="sub"><b>'+esc(ucOName(v.guess_by))+'</b> était Mr White. Il tente de deviner le personnage des civils…</p>'}
+    h+='<h2>Les joueurs</h2>'+ucOList(v)+ucOLog(v)+'<div class="row" style="margin-top:14px"><button class="btn alt sm" data-uc="oleave">Quitter la partie</button></div>'}
+  else if(v.status==='finished'){
+    const w=v.result,rv=uo.rv;
+    h='<h2 style="text-align:center">'+(w==='civils'?'🏆 Les civils gagnent !':w==='white'?'🏆 Mr White a deviné, il gagne !':'🕵️ Les infiltrés gagnent !')+'</h2>'+
+      '<div class="ucpair"><div><div class="hint">Personnage des civils</div>'+ucCard(rv&&rv.civ,rv&&rv.civ&&rv.civ.ac?'<img class="uccov" src="'+esc(safeImg(rv.civ.ac))+'" alt="">':'')+'</div><div><div class="hint">Personnage des undercover</div>'+ucCard(rv&&rv.imp,rv&&rv.imp&&rv.imp.ac?'<img class="uccov" src="'+esc(safeImg(rv.imp.ac))+'" alt="">':'')+'</div></div>'+
+      (rv&&rv.guess?'<p class="sub">Mr White avait proposé : <b>'+esc(rv.guess.n)+'</b></p>':'')+
+      '<h2>Les rôles</h2>'+v.players.map(p=>'<div class="fr-row">'+avh(p)+'<div class="g"><b>'+esc(p.pseudo)+(p.id===(me&&me.id)?' (toi)':'')+'</b></div><span class="uc-role r-'+(p.role||'civil')+'">'+UCR[p.role||'civil']+'</span></div>').join('')+ucOLog(v)+
+      '<div class="row" style="margin-top:12px"><button class="btn" data-uc="odone">Terminer</button></div>'}
+  ucSet(h);
+  if($('ucClue')){$('ucClue').value=dr||'';if(!keep)$('ucClue').focus()}
+  if($('ucGuess'))attach($('ucGuess'),$('ucGSg'),c=>{uo.pick={id:c.id,n:c.name.full};ucORender(true)});
+  ucOClock();window.scrollTo(0,keep?window.scrollY:0)}
+async function ucOAct(a,b){
+  if(a==='ocreate'||a==='ojoin'){if(!me){openWelcome();return}if(busyOnline()){ucSay('Termine ou quitte ta partie en cours d’abord.');return}ucView=a;ucSay('');return ucRender()}
+  if(a==='ocreate2'){
+    ucSay('Création…');const r=await sb.rpc('uc_create',{p_max:+$('ucMax').value,p_white:$('ucWhite').checked});
+    if(r.error){ucSay('Erreur : '+r.error.message);return}ucSay('');ucOAttach(r.data);return}
+  if(a==='ojoin2'){
+    const code=($('ucCode').value||'').trim();if(code.length<4){ucSay('Écris le code de la partie.');return}
+    ucSay('Connexion…');const r=await sb.rpc('uc_join',{p_code:code});
+    if(r.error){ucSay(r.error.message);return}ucSay('');ucOAttach(r.data);return}
+  if(!uo)return;
+  const id=uo.id,done=r=>{if(!uo||uo.id!==id)return;uo.busy=false;if(r.error){ucSay('Erreur : '+r.error.message);ucOTick();return}ucSay('');ucOApply(r.data)};
+  switch(a){
+    case 'ostart':b.disabled=true;await ucOStart();if(b)b.disabled=false;break;
+    case 'oclue':{if(uo.busy)return;const w=($('ucClue').value||'').trim();if(!w){ucSay('Écris un mot.');return}uo.busy=true;b.disabled=true;done(await sb.rpc('uc_clue',{p_id:id,p_word:w}));break}
+    case 'ovote':{if(uo.busy)return;uo.busy=true;done(await sb.rpc('uc_vote',{p_id:id,p_target:b.dataset.u}));break}
+    case 'oguess':{if(uo.busy||!uo.pick)return;uo.busy=true;const p=uo.pick;uo.pick=null;done(await sb.rpc('uc_guess',{p_id:id,p_char:p.id}));break}
+    case 'onopick':uo.pick=null;ucORender(true);break;
+    case 'ohide':uo.hide=!uo.hide;ucORender(true);break;
+    case 'oleave':
+      if(Date.now()-ucQ>4000){ucQ=Date.now();b.textContent='Confirmer : quitter la partie ?';return}
+      ucQ=0;try{await sb.rpc('uc_leave',{p_id:id})}catch(e){}
+      ucODetach();ucView='menu';ucEnter();break;
+    case 'odone':ucODetach();ucView='menu';ucEnter();break}}
+async function ucOStart(){
+  if(!uo||uo.starting)return;uo.starting=true;ucSay('Choix des personnages…');
+  try{
+    const L=await ucPool();let gs=ucGroups(L,3);if(!gs.length)gs=ucGroups(L,2);
+    if(!gs.length)throw new Error('pas assez de personnages regroupés par anime');
+    const groups=shuf(gs).slice(0,30).map(g=>shuf(g).slice(0,12).map(c=>c.id));
+    const r=await sb.rpc('uc_start',{p_id:uo.id,p_groups:groups});
+    if(r.error)throw new Error(r.error.message);
+    ucSay('');ucOApply(r.data)}
+  catch(e){ucSay('Erreur : '+e.message)}
+  finally{if(uo)uo.starting=false}}
+
+/* --- clics et clavier --- */
+$('ucBody').addEventListener('click',e=>{
+  const b=e.target.closest('[data-uc]');if(!b||b.disabled)return;const a=b.dataset.uc;
+  if(a==='menu'){ucView='menu';ucSay('');ucRender();return}
+  if(a==='local'){if(uo||busyOnline()){ucSay('Quitte ta partie en cours d’abord.');return}ucSay('');ucLSetup();return}
+  if(a==='ladd'){ucLAdd();return}
+  if(a==='ldel'){const n=ucNames();n.splice(+b.dataset.i,1);store.set('ucnames',JSON.stringify(n));ucLSetup();return}
+  if(a==='lgo'){ucLStart();return}
+  if(a[0]==='l'&&ucL){ucLAct(a,b);return}
+  if(a[0]==='o'||uo){ucOAct(a,b);return}});
+$('ucBody').addEventListener('change',e=>{
+  if(e.target.id==='ucWhite'&&ucView==='lsetup'){store.set('ucwhite',e.target.checked?'1':'0');ucLSetup()}
+  else if(e.target.id==='ucWhite'){/* création en ligne : rien à faire */}});
+$('ucBody').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  if(e.target.id==='ucIn')ucLAdd();
+  else if(e.target.id==='ucClue'){const b=document.querySelector('[data-uc=oclue]');if(b)ucOAct('oclue',b)}
+  else if(e.target.id==='ucCode'){const b=document.querySelector('[data-uc=ojoin2]');if(b)ucOAct('ojoin2',b)}});
+
 renderUser();if(!store.get('mode',''))openWelcome();
 show('home');
 /* Portraits AniList dans les illustrations de l'accueil */
