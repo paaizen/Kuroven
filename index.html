@@ -186,6 +186,7 @@ main#v-home{max-width:900px}
 .msM.th{align-self:flex-start}.msM.th .b{background:var(--bg);border:1px solid var(--bd);border-bottom-left-radius:4px}
 .msM small{color:var(--mut);font-size:.7rem;padding:0 6px}
 .msS{align-self:center;color:var(--mut);font-size:.8rem;text-align:center}
+.flg{background:none;border:0;color:var(--mut);cursor:pointer;font-size:.8rem;padding:0 4px;opacity:.55}.flg:hover,.flg:focus-visible{opacity:1;color:var(--bad,#ef4444)}
 .msC{align-self:center;width:min(100%,320px);border:2px solid var(--ac);border-radius:14px;padding:10px 12px;background:var(--bg);display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}.msC small{color:var(--mut)}
 .msI{display:flex;gap:8px;margin-top:8px}.msI input{flex:1;min-width:0}
 #gcB{position:fixed;right:14px;bottom:14px;z-index:17;width:54px;height:54px;border-radius:50%;background:var(--ac);color:#14233a;border:0;font-size:1.45rem;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35);padding:0}
@@ -1017,7 +1018,13 @@ function winnerOf(b){for(const l of L){const a=b[l[0]];if(a&&b[l[1]]&&b[l[2]]&&b
 function myResult(st){if(st.rs===0||st.rs===1)return st.rs===0?'p2':'p1';const w=winnerOf(st.b);if(w===null)return(st.miss||0)>=6?'draw':null;return w==='d'?'draw':(w===0?'p1':'p2')}
 function resText(st){const n=onl.names,r=myResult(st);let t='';if(st.rs===0||st.rs===1)t=n[st.rs]+' a abandonné. ';if(r==='draw')return t+'🤝 Égalité !';if(r)return t+'🏆 '+n[r==='p1'?0:1]+' gagne !';return t}
 function stateObj(){return{ri:RI,ci:CI,b:B,used:[...used],turn,over,w:over?wres:null,miss,seq:(onl.seq||0)+1,rs:onl.rs==null?null:onl.rs}}
-async function pushState(){if(!onl||onl.done||!sb)return;const st=stateObj();onl.seq=st.seq;onl.last=Date.now();const r=await sb.from('matches').update({state:st}).eq('id',onl.id);if(r.error){$('msg').textContent='Connexion instable, nouvel essai…';setTimeout(pushState,1500)}}
+async function pushState(){if(!onl||onl.done||!sb)return;const st=stateObj();onl.seq=st.seq;onl.last=Date.now();const r=await sb.from('matches').update({state:st}).eq('id',onl.id);if(r.error){if(r.error.code==='P0001'||/refus|invalide|termin|ton tour|déjà|seul coup|Coup|Abandon/i.test(r.error.message||'')){onlResync(r.error.message);return}$('msg').textContent='Connexion instable, nouvel essai…';setTimeout(pushState,1500)}}
+async function onlResync(why){
+  if(!onl||!sb)return;const id=onl.id;
+  const q=await sb.from('matches').select('*').eq('id',id).maybeSingle();
+  if(!onl||onl.id!==id)return;
+  if(q.data){onl.seq=0;onl.fresh=true;applyRemote(q.data)}
+  if(onl&&!onl.done&&curView==='ttt')$('msg').textContent='Le serveur a refusé ce coup ('+(why||'règle non respectée')+'). Plateau remis à jour.'}
 function advance(timeout){if(timeout)miss++;else miss=0;if(miss>=6)return finishGame('d');turn=1-turn;draw();timer();if(onl)pushState()}
 function finishGame(r){over=true;clearInterval(tm);wres=r;draw();$('msg').textContent=r==='d'?'🤝 Égalité !':'🏆 '+PN()[r]+' gagne !';if(onl){pushState().then(()=>submitMine(stateObj()))}}
 async function submitMine(st){if(!onl||onl.sub||!sb)return;const r=myResult(st);if(!r)return;onl.sub=true;const x=await sb.rpc('submit_result',{p_id:onl.id,p_result:r});if(x.error){onl.sub=false;return}if(x.data&&x.data.status!=='playing')endOnline(x.data)}
@@ -1272,15 +1279,19 @@ async function loadProfile(id){
   }else if(me){
     const f=await sb.from('friendships').select('id,requester,addressee,status').or('requester.eq.'+id+',addressee.eq.'+id);
     const fr=(f.data||[])[0],a=$('pbAct');
+    const bl=await sb.rpc('my_blocks');const isB=!bl.error&&(bl.data||[]).some(x=>x.id===id);
+    if(isB){a.innerHTML='<span class="hint">🚫 Tu as bloqué ce joueur.</span><button class="btn alt sm" data-a="unblk" data-u="'+esc(id)+'">Débloquer</button>';return}
     if(!fr)a.innerHTML='<button class="btn" data-a="add" data-u="'+esc(id)+'">Ajouter en ami</button>';
     else if(fr.status==='accepted')a.innerHTML='<select id="pbGame" aria-label="Jeu">'+Object.keys(GN).map(g=>'<option value="'+g+'">'+GN[g]+'</option>').join('')+'</select><button class="btn sm" data-a="ch" data-r="0" data-u="'+esc(id)+'" data-n="'+esc(p.pseudo)+'">Défier (amical)</button><button class="btn alt sm" data-a="ch" data-r="1" data-u="'+esc(id)+'" data-n="'+esc(p.pseudo)+'">Défier (classé)</button>';
     else if(fr.addressee===me.id)a.innerHTML='<button class="btn" data-a="acc" data-id="'+fr.id+'">Accepter sa demande</button>';
     else a.innerHTML='<button class="btn alt" disabled>Demande envoyée</button>';
+    a.insertAdjacentHTML('beforeend','<button class="btn alt sm" data-rp="user" data-u="'+esc(id)+'" data-n="'+esc(p.pseudo)+'">⚑ Signaler / bloquer</button>');
   }
 }
 $('pbAct').addEventListener('click',async e=>{const b=e.target.closest('button[data-a]');if(!b||!me)return;const a=b.dataset.a;
   if(a==='add'){const r=await sb.from('friendships').insert({requester:me.id,addressee:b.dataset.u});$('pbMsg').textContent=r.error?'Erreur : '+r.error.message:'Demande envoyée.';loadProfile(profId)}
   else if(a==='acc'){await sb.from('friendships').update({status:'accepted'}).eq('id',b.dataset.id);loadProfile(profId)}
+  else if(a==='unblk'){const r=await sb.rpc('unblock_user',{p_user:b.dataset.u});$('pbMsg').textContent=r.error?r.error.message:'Joueur débloqué.';loadProfile(profId)}
   else if(a==='ch')inviteFriend(b.dataset.u,b.dataset.n,b.dataset.r==='1',($('pbGame')||{}).value||'ttt')});
 $('pfSave').onclick=async()=>{if(!me)return;const v=$('pfPs').value.trim();if(!/^[A-Za-z0-9_-]{3,20}$/.test(v)){$('pfMsg').textContent='Pseudo invalide : 3 à 20 caractères, lettres, chiffres, _ ou -.';return}
   const r=await sb.from('profiles').update({pseudo:v,bio:$('pfBio').value.trim().slice(0,160)||null,fav_anime:$('pfFav').value.trim().slice(0,60)||null,banner_color:pfColor}).eq('id',me.id);
@@ -2136,6 +2147,7 @@ function msRenderList(){
     const o=c.kind==='dm'?msOther(c):null,l=c.last;
     const pv=l?(l.k==='invite'?'🎮 Invitation à jouer':l.k==='sys'?'…':(l.u===me.id?'Toi : ':'')+l.b):'Aucun message';
     h+='<button class="msr" data-ms="open" data-id="'+esc(c.id)+'">'+(o?avs(o):'<span class="avi">👥</span>')+'<span class="g"><b>'+esc(msTitle(c))+'</b><small>'+esc(pv.slice(0,80))+'</small></span>'+(l?'<span class="tm">'+msTime(l.at)+'</span>':'')+(c.unread?'<span class="un">'+c.unread+'</span>':'')+'</button>'});
+  h+='<div class="row" style="margin-top:14px"><button class="btn alt sm" data-ms="blocks">🚫 Joueurs bloqués</button></div>';
   $('msgBody').innerHTML=h}
 /* --- messages (rendu commun à la page Messages et au chat de partie) --- */
 function chInv(m,users){
@@ -2149,7 +2161,7 @@ function chMsg(m,users,prevU,showName){
   const nm=u=>esc((users[u]&&users[u].pseudo)||'?'),mine=me&&m.u===me.id;
   if(m.k==='sys')return'<div class="msS"><b>'+nm(m.u)+'</b> '+esc(m.b)+'</div>';
   if(m.k==='invite')return chInv(m,users);
-  return'<div class="msM '+(mine?'me':'th')+'">'+(showName&&!mine&&prevU!==m.u?'<small>'+nm(m.u)+'</small>':'')+'<div class="b">'+esc(m.b)+'</div><small>'+msTime(m.at)+'</small></div>'}
+  return'<div class="msM '+(mine?'me':'th')+'">'+(showName&&!mine&&prevU!==m.u?'<small>'+nm(m.u)+'</small>':'')+'<div class="b">'+esc(m.b)+'</div><small>'+msTime(m.at)+(mine?'':' <button class="flg" type="button" data-rp="message" data-id="'+esc(m.id)+'" data-u="'+esc(m.u)+'" data-n="'+nm(m.u)+'" aria-label="Signaler ce message" title="Signaler">⚑</button>')+'</small></div>'}
 function chList(msgs,users,showName){let p=null;return msgs.map(m=>{const h=chMsg(m,users,p,showName);p=m.k==='text'?m.u:null;return h}).join('')}
 function chPut(el,html,force){const near=el.scrollHeight-el.scrollTop-el.clientHeight<90;el.innerHTML=html;if(force||near)el.scrollTop=el.scrollHeight}
 /* --- conversation --- */
@@ -2254,10 +2266,36 @@ async function msMembers(){
   shOpen('<h2>'+esc(c.name)+'</h2>'+c.members.map(p=>'<div class="fr-row">'+avs(p)+'<div class="g"><b>'+esc(p.pseudo)+(p.id===c.owner?' 👑':'')+(p.id===me.id?' (toi)':'')+'</b></div></div>').join('')+
     '<div class="hint">Ajouter un ami</div>'+(add.length?add.map(p=>'<div class="fr-row">'+avs(p)+'<div class="g"><b>'+esc(p.pseudo)+'</b></div><button class="btn sm" data-sh="add" data-u="'+esc(p.id)+'">Ajouter</button></div>').join(''):'<div class="hint">Tous tes amis sont déjà dans le groupe.</div>')+
     '<div class="row" style="margin-top:10px"><button class="btn alt" data-sh="leave">Quitter le groupe</button></div>')}
+function rpOpen(o){
+  const k=o.kind;
+  let h='<h2>Signaler '+esc(o.name||'ce joueur')+'</h2>';
+  if(k==='user')h+='<div class="rmF"><label for="rpK">Que signaler ?</label><select id="rpK"><option value="user">Son profil (pseudo, description)</option><option value="avatar">Sa photo</option><option value="banner">Sa bannière</option></select></div>';
+  else h+='<div class="hint">Le message sera transmis à la modération.</div>';
+  h+='<div class="rmF"><label for="rpR">Motif</label><select id="rpR"><option value="insulte">Insultes / harcèlement</option><option value="spam">Spam</option><option value="triche">Triche</option><option value="contenu">Contenu inapproprié</option><option value="autre">Autre</option></select></div>'+
+     '<div class="rmF"><label for="rpD">Détail (facultatif)</label><input id="rpD" maxlength="200" autocomplete="off"></div>'+
+     '<div class="row"><button class="btn" data-sh="rp" data-u="'+esc(o.u)+'" data-k="'+esc(k)+'" data-ref="'+esc(o.ref||'')+'">Envoyer le signalement</button>'+
+     '<button class="btn alt" data-sh="blk" data-u="'+esc(o.u)+'" data-n="'+esc(o.name||'ce joueur')+'">🚫 Bloquer</button></div>';
+  shOpen(h)}
+async function blOpen(){
+  const r=await sb.rpc('my_blocks');if(r.error){msSay(r.error.message);return}
+  const l=r.data||[];
+  shOpen('<h2>Joueurs bloqués</h2>'+(l.length?l.map(p=>'<div class="fr-row">'+avs(p)+'<div class="g"><b>'+esc(p.pseudo)+'</b></div><button class="btn alt sm" data-sh="unblk" data-u="'+esc(p.id)+'">Débloquer</button></div>').join(''):'<div class="hint">Tu n’as bloqué personne.</div>'))}
+function afterBlock(){
+  if(curView==='msg'){MS.view='list';MS.chat=null;msEnter()}
+  else if(curView==='prof'&&profId)loadProfile(profId);
+  else if(curView==='fr')loadFriends();
+  if(GC.chat){GC.msgs=[];GC.last=0;gcFetch(true).then(()=>{if(GC.open)gcRender(true)})}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-rp]');if(!b||!me)return;rpOpen({u:b.dataset.u,name:b.dataset.n,kind:b.dataset.rp,ref:b.dataset.id})});
 let shQ=0;
 $('sh').addEventListener('click',async e=>{
   if(e.target===$('sh')||e.target.closest('#shX')){shClose();return}
   const b=e.target.closest('[data-sh]');if(!b||b.disabled)return;const a=b.dataset.sh;
+  if(a==='rp'){b.disabled=true;const kk=$('rpK')?$('rpK').value:b.dataset.k;
+    const r=await sb.rpc('report_user',{p_user:b.dataset.u,p_kind:kk,p_ref:b.dataset.ref||null,p_reason:$('rpR').value,p_detail:($('rpD').value||'').trim()||null});
+    if(r.error){shSay(r.error.message);b.disabled=false}else{b.textContent='✓ Signalement envoyé';shSay('Merci, la modération va regarder ça.')}return}
+  if(a==='blk'){if(Date.now()-shQ>4000){shQ=Date.now();b.textContent='Confirmer : bloquer '+b.dataset.n+' ?';return}
+    shQ=0;const r=await sb.rpc('block_user',{p_user:b.dataset.u});if(r.error){shSay(r.error.message);return}shClose();afterBlock();return}
+  if(a==='unblk'){b.disabled=true;const r=await sb.rpc('unblock_user',{p_user:b.dataset.u});if(r.error){shSay(r.error.message);b.disabled=false}else{const row=b.closest('.fr-row');if(row)row.remove();shSay('Débloqué.');if(curView==='prof'&&profId)loadProfile(profId)}return}
   if(a==='send'){b.disabled=true;const err=await msInviteTo(b.dataset.t,b.dataset.ref,b.dataset.c,b.dataset.u);if(err){shSay(err);b.disabled=false}else{b.textContent='✓ Envoyée';shSay('');if(curView==='msg'&&MS.view==='chat')msFetch()}}
   else if(a==='duel')msDuel(b.dataset.r==='1');
   else if(a==='add'){b.disabled=true;const r=await sb.rpc('chat_group_add',{p_chat:MS.chat.id,p_user:b.dataset.u});if(r.error){shSay(r.error.message);b.disabled=false}else{b.textContent='✓ Ajouté';shSay('');msFetch()}}
@@ -2276,6 +2314,7 @@ $('v-msg').addEventListener('click',async e=>{
   else if(a==='send')msSend();
   else if(a==='invite')msInviteSheet();
   else if(a==='members')msMembers();
+  else if(a==='blocks')blOpen();
   else if(a==='join'){const m=MS.msgs.find(x=>String(x.id)===b.dataset.id);if(m)msJoin(m)}});
 $('v-msg').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='msIn')msSend()});
 /* --- chat en pleine partie (duel, salon, Undercover) --- */
