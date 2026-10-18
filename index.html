@@ -94,6 +94,24 @@ main#v-home{max-width:900px}
 @media(prefers-reduced-motion:reduce){.gc{transition:none}.gc:hover{transform:none}}
 /* Menu profil */
 .menu{position:relative}
+.top .in>.rt{display:flex;align-items:center;gap:8px}
+.bellw{position:relative}
+#bell{position:relative;width:40px;height:40px;border-radius:50%;background:var(--bg);border:1px solid var(--bd);color:var(--tx);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+#bell:hover{border-color:var(--ac)}
+#bell svg{width:20px;height:20px}
+#bellN{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:#fb7185;color:#fff;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+#bp{position:absolute;right:0;top:calc(100% + 8px);width:min(340px,calc(100vw - 24px));background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:6px;box-shadow:0 10px 28px rgba(0,0,0,.3);display:none;z-index:30}
+#bp.on{display:block}
+#bp .bh{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px 8px;border-bottom:1px solid var(--bd);margin-bottom:4px}
+#bp .bh button{background:none;border:0;color:var(--ac);font:inherit;font-size:.85rem;cursor:pointer;padding:4px}
+#bp .bl{max-height:min(60vh,380px);overflow:auto}
+#bp .bi{display:block;width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;border-radius:8px;padding:9px 10px;color:var(--tx);font:inherit;cursor:pointer}
+#bp .bi:hover{background:var(--bg)}
+#bp .bi.un{border-left-color:#fb7185;background:rgba(251,113,133,.08)}
+#bp .bi b{display:block;font-weight:600}
+#bp .bi small{display:block;color:var(--mut)}
+#bp .be{padding:18px 10px;color:var(--mut);text-align:center}
+@media(max-width:600px){#bp{position:fixed;left:12px;right:12px;top:66px;width:auto}}
 .pm{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--bd);border-radius:999px;padding:4px 10px 4px 4px;cursor:pointer;color:var(--tx);font:inherit;font-weight:700}
 .pm:hover{border-color:var(--ac)}
 .av2{width:30px;height:30px;border-radius:50%;background:var(--ac);color:#14233a;display:flex;align-items:center;justify-content:center}
@@ -230,7 +248,7 @@ button.pc:disabled{cursor:default}
 </style>
 </head>
 <body>
-<header class="top"><div class="in"><button class="logo" data-go="home" aria-label="Retour à l’accueil Kuroven"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><span>Kuroven</span></button><span class="pill">Bêta</span><div class="menu"><button class="pm" id="pm" aria-haspopup="true" aria-expanded="false" aria-controls="pd"><span class="av2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg></span><span id="pmName">Invité</span><span aria-hidden="true">▾</span></button><div id="pd" role="menu"><div class="who"><b id="pdName">Invité</b><small id="pdSub">Non connecté · invité</small></div><button id="pdAuth" role="menuitem">Se connecter</button><button data-go="prof" role="menuitem">Mon profil</button><button data-go="fr" role="menuitem">Amis <em id="frBadge" hidden></em></button><button data-go="lb" role="menuitem">Classement</button><button data-go="prof" role="menuitem">Historique des parties</button><hr><button data-go="set" role="menuitem">Paramètres</button><button id="pdSwitch" role="menuitem">Changer de profil</button></div></div></div></header>
+<header class="top"><div class="in"><button class="logo" data-go="home" aria-label="Retour à l’accueil Kuroven"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><span>Kuroven</span></button><span class="pill">Bêta</span><div class="rt"><div class="bellw" id="bellW" hidden><button id="bell" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" aria-controls="bp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="bellN" hidden></span></button><div id="bp" role="region" aria-label="Notifications"><div class="bh"><b>Notifications</b><span><button id="bAll">Tout marquer comme lu</button><button id="bClr">Effacer les lues</button></span></div><div class="bl" id="bList"></div></div></div><div class="menu"><button class="pm" id="pm" aria-haspopup="true" aria-expanded="false" aria-controls="pd"><span class="av2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg></span><span id="pmName">Invité</span><span aria-hidden="true">▾</span></button><div id="pd" role="menu"><div class="who"><b id="pdName">Invité</b><small id="pdSub">Non connecté · invité</small></div><button id="pdAuth" role="menuitem">Se connecter</button><button data-go="prof" role="menuitem">Mon profil</button><button data-go="fr" role="menuitem">Amis <em id="frBadge" hidden></em></button><button data-go="lb" role="menuitem">Classement</button><button data-go="prof" role="menuitem">Historique des parties</button><hr><button data-go="set" role="menuitem">Paramètres</button><button id="pdSwitch" role="menuitem">Changer de profil</button></div></div></div></div></header>
 <button id="live" hidden><span id="liveT"></span></button>
 <main id="v-home">
 <section class="hero"><svg class="hero-bg" viewBox="0 0 900 300" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><defs><linearGradient id="hsky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b3556"/><stop offset=".6" stop-color="#4a5b8f"/><stop offset="1" stop-color="#8fb0e0"/></linearGradient><pattern id="hdots" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3.0" cy="3.0" r="1.6" fill="#ffffff"/></pattern><pattern id="hdots2" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="2.5" cy="2.5" r="1.5" fill="#111"/></pattern><clipPath id="hmoonclip"><circle cx="690" cy="104" r="78"/></clipPath></defs><rect width="900" height="300" fill="url(#hsky)"/><rect width="900" height="300" fill="url(#hdots)" opacity=".16"/><g fill="#111" opacity=".22"><polygon points="786.0,104.9 1309.9,92.0 1309.5,128.1"/><polygon points="785.1,117.0 1306.8,167.2 1301.1,208.6"/><polygon points="783.2,127.2 1296.3,233.5 1286.4,273.4"/><polygon points="781.7,132.3 1286.5,273.0 1278.2,300.1"/><polygon points="775.0,148.7 1246.3,377.7 1230.7,407.4"/><polygon points="769.6,157.7 1209.2,442.9 1198.9,458.1"/><polygon points="765.2,163.7 1182.5,480.6 1168.7,498.0"/><polygon points="757.6,172.1 1137.9,532.7 1115.6,554.9"/><polygon points="752.7,176.7 1103.1,566.3 1087.0,580.2"/><polygon points="742.5,184.4 1046.1,611.6 1011.7,634.0"/><polygon points="729.8,191.4 956.0,664.0 938.1,672.2"/><polygon points="719.5,195.3 889.9,690.9 871.7,696.8"/><polygon points="710.5,197.8 831.4,707.7 813.1,711.7"/><polygon points="704.5,198.9 803.5,713.5 764.2,719.5"/><polygon points="692.2,200.0 715.0,723.5 693.8,724.0"/><polygon points="675.6,198.9 616.6,719.6 577.2,713.7"/><polygon points="670.2,197.9 583.0,714.7 541.6,706.0"/><polygon points="658.0,194.5 499.6,694.1 467.3,682.6"/><polygon points="650.4,191.5 453.4,677.1 415.4,659.9"/><polygon points="637.7,184.5 370.2,635.1 334.6,612.0"/><polygon points="627.8,177.1 297.4,583.9 279.4,568.6"/><polygon points="622.9,172.6 263.6,554.1 249.4,540.2"/><polygon points="616.7,166.0 222.0,510.6 211.0,497.6"/><polygon points="609.5,156.4 179.3,455.5 161.7,428.6"/><polygon points="605.2,149.1 150.8,410.0 134.7,379.7"/><polygon points="599.8,136.9 111.7,327.5 103.5,305.1"/><polygon points="595.9,123.0 85.2,240.6 79.5,212.4"/><polygon points="594.8,116.2 77.0,196.7 73.3,168.2"/><polygon points="594.0,102.4 70.0,102.2 70.3,85.5"/><polygon points="595.1,89.6 75.8,19.1 78.2,3.4"/><polygon points="596.9,80.8 84.0,-27.0 93.4,-64.9"/><polygon points="598.2,75.8 92.1,-60.1 103.1,-95.9"/><polygon points="603.1,63.3 122.1,-144.7 135.4,-173.2"/><polygon points="606.8,56.2 148.4,-197.8 156.6,-212.1"/><polygon points="613.4,46.1 183.1,-253.1 208.5,-286.6"/><polygon points="620.5,37.8 228.7,-310.2 253.9,-336.7"/><polygon points="632.8,26.9 303.8,-381.0 337.3,-405.9"/><polygon points="637.9,23.4 343.1,-409.9 364.3,-423.5"/><polygon points="648.5,17.4 405.5,-446.9 438.9,-462.9"/><polygon points="655.5,14.4 450.1,-467.7 484.0,-480.8"/><polygon points="670.9,9.9 547.2,-499.3 585.8,-507.2"/><polygon points="675.7,9.1 577.2,-505.6 618.5,-511.9"/><polygon points="686.9,8.1 657.3,-515.1 682.1,-515.9"/><polygon points="701.6,8.7 744.4,-513.6 785.2,-508.6"/><polygon points="710.2,10.1 800.0,-506.2 840.3,-497.5"/><polygon points="722.0,13.5 885.5,-484.4 908.2,-476.4"/><polygon points="730.4,16.9 941.6,-462.7 959.9,-454.2"/><polygon points="738.3,21.0 993.5,-436.6 1010.3,-426.9"/><polygon points="751.0,29.9 1066.9,-388.3 1100.3,-360.8"/><polygon points="756.0,34.3 1110.3,-351.8 1122.3,-340.4"/><polygon points="767.3,47.1 1180.3,-275.5 1198.2,-251.1"/><polygon points="770.9,52.3 1206.5,-239.0 1218.3,-220.5"/><polygon points="776.8,63.0 1242.1,-178.1 1258.6,-143.3"/><polygon points="780.5,72.0 1269.8,-115.6 1278.9,-90.0"/><polygon points="782.8,79.3 1283.6,-75.1 1294.1,-35.4"/><polygon points="784.9,89.7 1300.7,-2.8 1305.1,26.0"/></g><circle cx="690" cy="104" r="86" fill="#fff" opacity=".18"/><circle cx="690" cy="104" r="78" fill="#fff" stroke="#111" stroke-width="4"/><g clip-path="url(#hmoonclip)"><rect x="600" y="20" width="180" height="170" fill="url(#hdots2)" opacity=".28"/><circle cx="660" cy="86" r="14" fill="none" stroke="#111" stroke-width="2" opacity=".35"/><circle cx="716" cy="128" r="9" fill="none" stroke="#111" stroke-width="2" opacity=".35"/></g><path d="M0 230L70 170L130 215L210 150L290 220L360 180L440 232L540 168L640 226L740 176L830 222L900 190V300H0z" fill="#1b2340" opacity=".85"/><path d="M0 262L90 226L170 258L260 214L350 260L450 232L560 266L670 228L780 262L900 236V300H0z" fill="#0d1226"/><g fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round"><path d="M812 300C808 262 792 236 764 212" stroke-width="30"/><path d="M764 212C736 202 690 210 628 198" stroke-width="12"/><path d="M628 198C606 194 590 186 574 176" stroke-width="6"/><path d="M796 244C826 214 856 196 900 176" stroke-width="13"/><path d="M830 214C842 186 836 160 850 132" stroke-width="8"/><path d="M690 206C682 226 660 236 648 252" stroke-width="5"/><path d="M770 218C766 190 780 168 764 140" stroke-width="7"/></g><g fill="#111" stroke="#111" stroke-linejoin="round"><path d="M684 204C676 168 688 144 708 142C728 144 738 170 732 204Z"/><path d="M696 142C696 126 722 126 722 144C722 150 718 156 708 156C698 156 696 150 696 142Z"/><path d="M692 204C690 224 688 238 684 252" fill="none" stroke-width="9" stroke-linecap="round"/><path d="M714 204C718 222 724 236 732 248" fill="none" stroke-width="9" stroke-linecap="round"/><path d="M744 214L752 120" fill="none" stroke-width="4" stroke-linecap="round"/></g><path d="M698 150C700 140 712 136 718 142" fill="none" stroke="#9cc3f0" stroke-width="2.5" stroke-linecap="round"/><path d="M700 166C698 182 698 194 700 202" fill="none" stroke="#9cc3f0" stroke-width="2.2" stroke-linecap="round" opacity=".8"/><circle cx="752" cy="118" r="5" fill="none" stroke="#111" stroke-width="2.5"/><ellipse cx="572.6" cy="248.0" rx="4.8" ry="3.2" transform="rotate(-59 572.6 248.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="861.4" cy="59.4" rx="5.1" ry="3.4" transform="rotate(7 861.4 59.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="535.5" cy="131.0" rx="4.7" ry="3.1" transform="rotate(24 535.5 131.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="795.5" cy="77.7" rx="3.6" ry="2.4" transform="rotate(-31 795.5 77.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="712.4" cy="261.7" rx="5.6" ry="3.7" transform="rotate(11 712.4 261.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="665.8" cy="219.1" rx="4.2" ry="2.8" transform="rotate(-48 665.8 219.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="776.2" cy="214.2" rx="3.6" ry="2.4" transform="rotate(-9 776.2 214.2)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="626.9" cy="234.3" rx="6.0" ry="4.0" transform="rotate(-36 626.9 234.3)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="854.2" cy="53.1" rx="4.8" ry="3.2" transform="rotate(-15 854.2 53.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="528.9" cy="141.9" rx="3.6" ry="2.4" transform="rotate(49 528.9 141.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="739.9" cy="254.9" rx="3.3" ry="2.2" transform="rotate(-36 739.9 254.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="551.7" cy="169.5" rx="3.6" ry="2.4" transform="rotate(-58 551.7 169.5)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="708.8" cy="261.0" rx="4.5" ry="3.0" transform="rotate(-10 708.8 261.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="751.4" cy="270.0" rx="5.0" ry="3.3" transform="rotate(-53 751.4 270.0)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="622.0" cy="278.8" rx="3.7" ry="2.4" transform="rotate(60 622.0 278.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="788.1" cy="268.2" rx="5.1" ry="3.4" transform="rotate(-32 788.1 268.2)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="536.4" cy="127.8" rx="5.1" ry="3.4" transform="rotate(21 536.4 127.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="814.4" cy="60.8" rx="5.9" ry="3.9" transform="rotate(-18 814.4 60.8)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="672.8" cy="276.7" rx="3.4" ry="2.2" transform="rotate(9 672.8 276.7)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="823.8" cy="118.9" rx="3.9" ry="2.6" transform="rotate(-8 823.8 118.9)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="553.8" cy="191.1" rx="5.7" ry="3.8" transform="rotate(-48 553.8 191.1)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="529.6" cy="227.4" rx="4.8" ry="3.2" transform="rotate(37 529.6 227.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="789.6" cy="99.6" rx="4.6" ry="3.1" transform="rotate(29 789.6 99.6)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="607.8" cy="271.4" rx="4.4" ry="2.9" transform="rotate(-12 607.8 271.4)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="846.8" cy="128.6" rx="3.8" ry="2.5" transform="rotate(20 846.8 128.6)" fill="#fff" stroke="#111" stroke-width="1"/><ellipse cx="840.4" cy="102.1" rx="6.2" ry="4.2" transform="rotate(-54 840.4 102.1)" fill="#fff" stroke="#111" stroke-width="1"/><path d="M0 286C140 272 260 296 420 284S700 276 900 290V300H0z" fill="#111"/></svg><div id="heroPh" class="hero-ph" aria-hidden="true"></div>
@@ -275,7 +293,7 @@ button.pc:disabled{cursor:default}
 <div class="msg" id="atMsg"></div>
 <div id="atRev" class="fr-row rev" hidden><img id="atCov" alt="" width="96" height="136"><div class="g"><b id="atTitle"></b><small id="atInfo"></small></div></div>
 <div id="atRes" class="eloc" hidden></div>
-<div class="row"><button class="btn" id="atNx">Extrait suivant</button><button class="btn alt" id="atQuit" hidden>Abandonner</button></div>
+<div class="row"><button class="btn alt" id="atSkip">🤷 Je ne sais pas</button><button class="btn" id="atNx">Extrait suivant</button><button class="btn alt" id="atQuit" hidden>Abandonner</button></div>
 <div class="row"><button class="btn alt" id="atClaim" hidden>Adversaire absent : réclamer la victoire</button></div>
 <p class="sub"><small>Musiques fournies par <a href="https://animethemes.moe" target="_blank" rel="noopener">AnimeThemes</a>. Elles appartiennent à leurs ayants droit. Pour les suites, choisis la bonne saison.</small></p>
 </main>
@@ -289,7 +307,7 @@ button.pc:disabled{cursor:default}
 <div id="btSg"></div>
 <div class="msg" id="btMsg"></div>
 <div id="btRev" class="fr-row rev" hidden><img id="btCov" alt="" width="96" height="136"><div class="g"><b id="btRt"></b><small id="btRi"></small></div></div>
-<div class="row"><button class="btn" id="btNx">Personnage suivant</button></div>
+<div class="row"><button class="btn alt" id="btSkip">🤷 Je ne sais pas</button><button class="btn" id="btNx">Personnage suivant</button></div>
 <p class="sub">Score : <b id="btScore">0</b></p>
 </main>
 <main id="v-dt" hidden>
@@ -329,7 +347,7 @@ button.pc:disabled{cursor:default}
 <div id="gsSg"></div>
 <div class="msg" id="gsMsg"></div>
 <div id="gsRev" class="fr-row rev" hidden><img id="gsCov" alt="" width="96" height="136"><div class="g"><b id="gsRt"></b><small id="gsRi"></small></div></div>
-<div class="row"><button class="btn" id="gsNx">Personnage suivant</button></div>
+<div class="row"><button class="btn alt" id="gsSkip">🤷 Je ne sais pas</button><button class="btn" id="gsNx">Personnage suivant</button></div>
 </main>
 <main id="v-ttt" hidden>
 <button class="btn back" data-go="ml" data-hub="ttt">← Menu du jeu</button>
@@ -586,6 +604,7 @@ function gsDraw(m){$('gsImg').src=GCH.im;$('gsImg').style.filter=`blur(${BL[gl]}
 async function gsNext(){gOver=false;gl=0;$('gsRev').hidden=true;$('gsIn').value='';$('gsSg').innerHTML='';$('gsMsg').textContent='Chargement…';try{const p=1+Math.floor(Math.random()*300);GCH=(await fetchChars(p,1))[0];gsDraw()}catch(e){$('gsMsg').textContent='Erreur AniList : '+e.message}}
 function gsGuess(c){if(gOver||!GCH)return;if(c.id===GCH.id){gOver=true;$('gsImg').style.filter='none';$('gsMsg').textContent=`🏆 Bravo, c’est ${GCH.n} ! (essai ${gl+1} sur 5)`;revFill('gs',revOfCh(GCH));return}gl++;if(gl>=5){gOver=true;gl=4;$('gsImg').style.filter='none';$('gsMsg').textContent=`❌ Perdu. C’était ${GCH.n}.`;revFill('gs',revOfCh(GCH));return}gsDraw(`❌ Ce n’est pas ${c.name.full}. Essai ${gl+1} sur 5`)}
 $('gsNx').onclick=gsNext;
+$('gsSkip').onclick=()=>{if(gOver||!GCH)return;gOver=true;$('gsImg').style.filter='none';$('gsMsg').textContent=`🤷 Pas trouvé. C’était ${GCH.n}.`;revFill('gs',revOfCh(GCH))};
 function attach(inp,list,cb){let t,n=0,r=[];inp.addEventListener('input',()=>{clearTimeout(t);const q=inp.value.trim();if(q.length<3){list.innerHTML='<div class="hint">Tape au moins 3 lettres.</div>';return}const my=++n;t=setTimeout(async()=>{list.innerHTML='<div class="hint">Recherche…</div>';try{r=(await gql(QS,{s:q})).Page.characters;if(my!==n)return;list.innerHTML=r.map((c,i)=>`<button class="s" data-n="${i}"><img src="${c.image.large}" alt=""><span>${c.name.full}</span></button>`).join('')||'<div class="hint">Aucun résultat.</div>'}catch(e){list.innerHTML='<div class="hint">Erreur AniList : '+e.message+'</div>'}},350)});list.addEventListener('click',e=>{const b=e.target.closest('.s');if(b){const c=r[+b.dataset.n];inp.value='';list.innerHTML='';cb(c)}})}
 attach($('gsIn'),$('gsSg'),gsGuess);
 /* Blind test visuel */
@@ -595,7 +614,8 @@ function btEnd(){btN++;if(btN>=10){$('btMsg').textContent+=' Partie terminée : 
 function btDraw(m){const s=BTS[bl],im=$('btImg');im.style.transformOrigin=s[2];im.style.transform='scale('+s[1]+')';const pts=4-bl;$('btStep').textContent='Manche '+Math.min(btN+1,10)+' sur 10 · Indice '+(bl+1)+' sur 4 : '+s[0]+' ('+pts+' point'+(pts>1?'s':'')+')';$('btMsg').textContent=m||''}
 async function btNext(){$('btRev').hidden=true;if(btN>=10){btN=0;btScore=0;$('btScore').textContent='0'}$('btNx').textContent='Personnage suivant';bOver=false;bl=0;$('btIn').value='';$('btSg').innerHTML='';$('btMsg').textContent='Chargement…';try{const p=1+Math.floor(Math.random()*150);const c=(await fetchChars(p,1))[0];BT=c;const im=$('btImg');im.style.transition='none';im.src=c.im;btDraw();requestAnimationFrame(()=>requestAnimationFrame(()=>{im.style.transition=''}))}catch(e){$('btMsg').textContent='Erreur AniList : '+e.message}}
 function btGuess(c){if(bOver||!BT)return;if(c.id===BT.id){const pts=4-bl;btScore+=pts;bOver=true;bl=3;btDraw();$('btMsg').textContent='🏆 Bravo, c’est '+BT.n+' ! +'+pts+' point'+(pts>1?'s':'');$('btScore').textContent=btScore;btEnd();revFill('bt',revOfCh(BT));return}bl++;if(bl>3){bl=3;bOver=true;btDraw();$('btMsg').textContent='❌ Perdu. C’était '+BT.n+'.';btEnd();revFill('bt',revOfCh(BT));return}btDraw('❌ Ce n’est pas '+c.name.full+'. Nouvel indice !')}
-$('btNx').onclick=btNext;attach($('btIn'),$('btSg'),btGuess);
+$('btNx').onclick=btNext;
+$('btSkip').onclick=()=>{if(bOver||!BT)return;bOver=true;bl=3;btDraw();$('btMsg').textContent='🤷 Pas trouvé. C’était '+BT.n+'.';btEnd();revFill('bt',revOfCh(BT))};attach($('btIn'),$('btSg'),btGuess);
 /* Duel de thèmes (même écran) */
 const QM='query($s:String){Page(perPage:6){media(search:$s,type:ANIME,sort:POPULARITY_DESC,isAdult:false){id title{romaji english} coverImage{large} seasonYear}}}';
 const QMD='query($id:Int){Media(id:$id){id title{romaji english} seasonYear episodes characters(sort:FAVOURITES_DESC,perPage:14){edges{role node{id name{full}}}}}}';
@@ -698,6 +718,7 @@ function atGuess(m){
   atStage++;
   if(atStage>3){atStage=3;atEndRound(0,'❌ Perdu. C’était '+mt(atAns.a)+'.');return}
   atDraw('❌ Ce n’est pas '+mt(m)+'. Extrait plus long !');atPlayClip()}
+$('atSkip').onclick=()=>{if(atOver||!atAns)return;atEndRound(0,'🤷 Pas trouvé. C’était '+mt(atAns.a)+'.')};
 function atEndRound(pts,txt){
   atOver=true;clearInterval(atRT);atReveal();
   if(aon&&!aon.done){aonRoundDone(pts,txt);return}
@@ -1053,6 +1074,27 @@ async function tick(){
     if(tickN%3===1)await pollSocial();
   }catch(e){}
 }
+/* --- Notifications (la cloche) --- */
+let NT=[];
+const NLINK=['fr','rm','prof','lb'];
+function ntAgo(d){const m=Math.round((Date.now()-new Date(d))/60000);if(m<1)return 'à l’instant';if(m<60)return 'il y a '+m+' min';const h=Math.round(m/60);if(h<24)return 'il y a '+h+' h';return 'il y a '+Math.round(h/24)+' j'}
+function ntRender(){
+  const n=NT.filter(x=>!x.read_at).length;$('bellN').hidden=!n;$('bellN').textContent=n>9?'9+':n;
+  $('bell').setAttribute('aria-label',n?'Notifications ('+n+' non lue'+(n>1?'s':'')+')':'Notifications');
+  $('bList').innerHTML=NT.length?NT.map(x=>'<button class="bi'+(x.read_at?'':' un')+'" data-id="'+(+x.id)+'" data-l="'+esc(x.link||'')+'"><b>'+esc(x.title)+'</b>'+(x.body?'<small>'+esc(x.body)+'</small>':'')+'<small>'+ntAgo(x.created_at)+'</small></button>').join(''):'<div class="be">Aucune notification pour le moment.</div>'}
+async function notifLoad(){
+  if(!me||!sb){$('bellW').hidden=true;return}
+  const r=await sb.from('notifications').select('id,title,body,link,created_at,read_at').order('created_at',{ascending:false}).limit(30);
+  if(r.error)return;NT=r.data||[];$('bellW').hidden=false;ntRender()}
+function bellOpen(o){$('bp').classList.toggle('on',o);$('bell').setAttribute('aria-expanded',String(o));if(o){notifLoad();menuOpen(false)}}
+$('bell').onclick=()=>bellOpen(!$('bp').classList.contains('on'));
+document.addEventListener('click',e=>{if(!e.target.closest('.bellw'))bellOpen(false)});
+$('bAll').onclick=async()=>{NT.forEach(x=>{if(!x.read_at)x.read_at=new Date().toISOString()});ntRender();await sb.rpc('notif_read')};
+$('bClr').onclick=async()=>{NT=NT.filter(x=>!x.read_at);ntRender();await sb.rpc('notif_clear')};
+$('bList').addEventListener('click',async e=>{
+  const b=e.target.closest('.bi');if(!b)return;const id=+b.dataset.id,x=NT.find(v=>v.id===id);
+  if(x&&!x.read_at){x.read_at=new Date().toISOString();ntRender();sb.rpc('notif_read',{p_id:id})}
+  const l=b.dataset.l;if(NLINK.includes(l)){bellOpen(false);show(l)}});
 async function pollSocial(){
   const i=await sb.from('matches').select('id,p1,ranked,game').eq('invited',me.id).eq('status','waiting').gt('created_at',new Date(Date.now()-9*60000).toISOString()).order('created_at',{ascending:false}).limit(1);
   const inv=i.data&&i.data[0];
@@ -1063,10 +1105,11 @@ async function pollSocial(){
     const m=(g.data||[]).find(x=>(x.p1===me.id?x.r1:x.r2)==null);if(m&&!busyOnline())startOnline(m,true);
   }
   const f=await sb.from('friendships').select('id',{count:'exact',head:true}).eq('addressee',me.id).eq('status','pending');
-  const n=f.count||0;$('frBadge').hidden=!n;$('frBadge').textContent=n}
+  const n=f.count||0;$('frBadge').hidden=!n;$('frBadge').textContent=n;
+  await notifLoad()}
 $('invY').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;const r=await sb.rpc('accept_invite',{p_id:id});if(r.error){$('mlMsg').textContent='Invitation expirée.';return}startOnline(r.data)};
 $('invN').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;await sb.rpc('cancel_match',{p_id:id})};
-function onlLogout(){stopTick();onlDetach();aonDetach();ronDetach();rmDetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;invShown=null}
+function onlLogout(){stopTick();onlDetach();aonDetach();ronDetach();rmDetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;$('bellW').hidden=true;NT=[];invShown=null}
 function onlLogin(){tickN=0;startTick();setTimeout(tick,400);setTimeout(rmResume,900)}
 
 /* --- menu d'un jeu --- */
@@ -1285,9 +1328,9 @@ function bfGuess(m){
   bfDraw(c);rcMsg('❌ Ce n’est pas '+m.name.full+'. Nouvel indice !')}
 function bfBuild(r,c){
   const gs=c.g==='gs';
-  $('rcStage').innerHTML=(gs?'<img id="rcImg" class="rcGs" alt="Personnage à deviner">':'<div class="btFrame"><img id="rcImg" alt="Détail du personnage à deviner"></div>')+'<div class="btStep" id="rcStep"></div><div id="rcTime"></div>'+(c.ctx.race?'<input id="rcIn" placeholder="Tape au moins 3 lettres…" autocomplete="off"><div id="rcSg"></div>':'');
+  $('rcStage').innerHTML=(gs?'<img id="rcImg" class="rcGs" alt="Personnage à deviner">':'<div class="btFrame"><img id="rcImg" alt="Détail du personnage à deviner"></div>')+'<div class="btStep" id="rcStep"></div><div id="rcTime"></div>'+(c.ctx.race?'<input id="rcIn" placeholder="Tape au moins 3 lettres…" autocomplete="off"><div id="rcSg"></div><button class="btn alt" id="rcSkip">🤷 Je ne sais pas</button>':'');
   const im=$('rcImg');im.style.transition='none';im.src=r.im;bfDraw(c);requestAnimationFrame(()=>requestAnimationFrame(()=>{im.style.transition=''}));
-  if(c.ctx.race){attach($('rcIn'),$('rcSg'),bfGuess);rcTimer(RG[c.g].lim,()=>{if(rcCur===c&&!c.over){bfFull(c);rcEnd(0,'⏱️ Temps écoulé. C’était '+r.n+'.',revOf(c.g,r))}})}}
+  if(c.ctx.race){$('rcSkip').onclick=()=>{if(rcCur===c&&!c.over){bfFull(c);rcEnd(0,'🤷 Pas trouvé. C’était '+r.n+'.',revOf(c.g,r))}};attach($('rcIn'),$('rcSg'),bfGuess);rcTimer(RG[c.g].lim,()=>{if(rcCur===c&&!c.over){bfFull(c);rcEnd(0,'⏱️ Temps écoulé. C’était '+r.n+'.',revOf(c.g,r))}})}}
 RD.bt=RD.gs=bfBuild;
 
 /* Plus ou moins : on clique sur celui qui a le plus de favoris */
@@ -1347,14 +1390,14 @@ function atRGuess(m){
   atStepText(c);rcMsg('❌ Ce n’est pas '+mt(m)+'. Extrait plus long !');rcPlayClip()}
 RD.at=async(r,c)=>{
   const race=c.ctx.race;
-  $('rcStage').innerHTML='<div class="atBox"><button class="btn" id="rcPlay" disabled>▶ Écouter l’extrait</button><div class="atBar"><i id="rcBar"></i></div><div class="btStep" id="rcStep"></div><label class="atVol">Volume <input type="range" id="rcVol" min="0" max="100"></label></div><div id="rcTime"></div>'+(race?'<input id="rcIn" placeholder="Titre de l’anime (3 lettres minimum)…" autocomplete="off"><div id="rcSg"></div>':'');
+  $('rcStage').innerHTML='<div class="atBox"><button class="btn" id="rcPlay" disabled>▶ Écouter l’extrait</button><div class="atBar"><i id="rcBar"></i></div><div class="btStep" id="rcStep"></div><label class="atVol">Volume <input type="range" id="rcVol" min="0" max="100"></label></div><div id="rcTime"></div>'+(race?'<input id="rcIn" placeholder="Titre de l’anime (3 lettres minimum)…" autocomplete="off"><div id="rcSg"></div><button class="btn alt" id="rcSkip">🤷 Je ne sais pas</button>':'');
   $('rcVol').value=store.get('atvol','60');$('rcVol').oninput=()=>{au.volume=+$('rcVol').value/100;store.set('atvol',$('rcVol').value)};
   $('rcPlay').onclick=()=>{if(c.over){au.volume=+$('rcVol').value/100;au.play().catch(()=>{})}else rcPlayClip()};
   rcMsg('Chargement de l’extrait…');
   try{
     const dur=await atLoadAudio(r.l);if(rcCur!==c)return;
     c.dur=dur;c.start=Math.max(0,Math.min(dur-45,dur*(.08+Math.random()*.22)));$('rcPlay').disabled=false;rcMsg('');atStepText(c);rcPlayClip();
-    if(race){attachMedia($('rcIn'),$('rcSg'),atRGuess);rcTimer(RG.at.lim,()=>{if(rcCur===c&&!c.over)atRFinish(c,0,'⏱️ Temps écoulé. C’était '+atName(r)+'.')})}}
+    if(race){$('rcSkip').onclick=()=>{if(rcCur===c&&!c.over&&c.dur)atRFinish(c,0,'🤷 Pas trouvé. C’était '+atName(r)+'.')};attachMedia($('rcIn'),$('rcSg'),atRGuess);rcTimer(RG.at.lim,()=>{if(rcCur===c&&!c.over)atRFinish(c,0,'⏱️ Temps écoulé. C’était '+atName(r)+'.')})}}
   catch(e){if(rcCur!==c)return;
     if(c.ctx.room){c.over=true;rcMsg('Extrait indisponible : manche passée.');rmRoundDone(0,'',true)}
     else{rcMsg('Extrait indisponible, on en cherche un autre…');lcSkip()}}};
