@@ -250,7 +250,7 @@ button.pc:disabled{cursor:default}
 <h2>Jouer à plusieurs</h2>
 <div class="games"><button class="gc m7" data-go="rm"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect width="200" height="140" fill="#313338"/><g fill="#eef3f9" opacity=".18"><circle cx="14" cy="20" r="2"/><circle cx="186" cy="30" r="2.5"/><circle cx="170" cy="12" r="1.5"/><circle cx="26" cy="60" r="1.5"/><circle cx="188" cy="64" r="1.5"/></g><rect x="52" y="8" width="96" height="22" rx="8" fill="#eef3f9" stroke="#111" stroke-width="3"/><text x="100" y="24" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="14" letter-spacing="3" fill="#111">K7Q2MX</text><path d="M100 30v6" stroke="#111" stroke-width="3" stroke-linecap="round"/><rect x="74" y="78" width="52" height="44" rx="5" fill="#9cc3f0" stroke="#111" stroke-width="3"/><rect x="22" y="94" width="50" height="28" rx="5" fill="#6b6f78" stroke="#111" stroke-width="3"/><rect x="128" y="102" width="50" height="20" rx="5" fill="#6b6f78" stroke="#111" stroke-width="3"/><text x="100" y="108" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="22" fill="#111">1</text><text x="47" y="114" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="16" fill="#111">2</text><text x="153" y="116" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="13" fill="#111">3</text><g stroke="#111" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M88 46l5 8 7-12 7 12 5-8-2 12H90z" fill="#facc15"/><circle cx="100" cy="66" r="13" fill="#fff"/><path d="M87 64q1-14 13-14t13 14q-7-6-13-4t-13 4z" fill="#e11d48"/><circle cx="95" cy="68" r="1.8" fill="#111" stroke="none"/><circle cx="105" cy="68" r="1.8" fill="#111" stroke="none"/><circle cx="47" cy="84" r="11" fill="#fff"/><path d="M36 82q1-12 11-12t11 12q-5-5-11-3t-11 3z" fill="#60a5fa"/><circle cx="43" cy="86" r="1.6" fill="#111" stroke="none"/><circle cx="51" cy="86" r="1.6" fill="#111" stroke="none"/><circle cx="153" cy="92" r="10" fill="#fff"/><path d="M143 90q1-11 10-11t10 11q-5-4-10-3t-10 3z" fill="#3ba55d"/><circle cx="149" cy="94" r="1.5" fill="#111" stroke="none"/><circle cx="157" cy="94" r="1.5" fill="#111" stroke="none"/></g></svg></span><span class="tx"><b>Salons et tournois</b><small>Crée un salon, partage le code : jusqu’à 12 joueurs, mêmes questions pour tous, classement en direct. Plusieurs épreuves à la suite = un tournoi.</small><span class="go">Jouer</span></span></button></div>
 <h2>Prochainement</h2>
-<div class="soon"><span>Tournois à élimination directe</span><span>Galerie d’arrière-plans de profil</span><span>Signalement des images</span></div>
+<div class="soon"><span>Signalement des images</span></div>
 </main>
 <main id="v-set" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
@@ -1532,7 +1532,7 @@ function rcEnter(){
     if(!ron.started||ron.waiting)rcOnRound();
     else if(ron.finished)rcFinish();
   }else if(rm&&rm.status==='playing'){
-    const g=rm.games[rm.ep];$('rcT').textContent=(rm.games.length>1?'Tournoi · épreuve '+(rm.ep+1)+' sur '+rm.games.length+' : ':'Salon : ')+GN[g];
+    const g=rm.games[rm.ep];$('rcT').textContent=(rm.mode==='elim'?'Élimination · épreuve '+(rm.ep+1)+' · '+rmAlive().length+' en lice : ':rm.games.length>1?'Tournoi · épreuve '+(rm.ep+1)+' sur '+rm.games.length+' : ':'Salon : ')+GN[g];
     $('rcSub').textContent='Salon '+rm.code+' · mêmes questions pour tous, classement en direct.';
     rmAct();rcHead();
     if(rm.finished)rmStand();else if(!rm.started||rm.waiting)rmOnRound();
@@ -1556,18 +1556,20 @@ function rmSay(t){$('rmMsg').textContent=t||''}
 function rmRows(){
   if(!rm)return[];
   return rm.players.map(p=>{
-    const live=(me&&p.id===me.id)?{e:rm.ep,score:rm.score,done:rm.finished}:p.prog;
-    const ok=rm.status==='playing'&&live&&live.e===rm.cur,ep=ok?(live.score||0):0;
-    return Object.assign({},p,{ep,done:!!(ok&&live.done),sum:(p.total||0)+ep})}).sort((a,b)=>b.sum-a.sum)}
+    const out=p.out_ep!=null,live=(me&&p.id===me.id)?{e:rm.ep,score:rm.score,done:rm.finished}:p.prog;
+    const ok=!out&&rm.status==='playing'&&live&&live.e===rm.cur,ep=ok?(live.score||0):0;
+    return Object.assign({},p,{out,ep,done:!!(ok&&live.done),sum:(p.total||0)+ep})}).sort((a,b)=>rm.mode==='elim'&&a.out!==b.out?(a.out?1:-1):rm.mode==='elim'&&a.out&&a.out_ep!==b.out_ep?b.out_ep-a.out_ep:b.sum-a.sum)}
+function rmAlive(){return rm.players.filter(p=>p.out_ep==null)}
 function rmBoard(final){
-  return rmRows().map((p,i)=>'<div class="fr-row"><span class="rk">'+(i+1)+'</span>'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===rm.host?' 👑':'')+(p.id===(me&&me.id)?' (toi)':'')+'</b><small>'+(final?(rm.games.length>1?'Total sur '+rm.games.length+' épreuves':'Score final'):'Épreuve : '+p.ep+' pt'+(p.ep>1?'s':'')+(p.done?' · terminé ✓':' · en cours…'))+'</small></div><b>'+p.sum+'</b></div>').join('')}
+  return rmRows().map((p,i)=>'<div class="fr-row"><span class="rk">'+(i+1)+'</span>'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===rm.host?' 👑':'')+(p.id===(me&&me.id)?' (toi)':'')+'</b><small>'+(p.out?'Éliminé à l’épreuve '+(p.out_ep+1)+' · '+p.sum+' pt'+(p.sum>1?'s':''):final?(rm.mode==='elim'?'Champion 🏆':rm.games.length>1?'Total sur '+rm.games.length+' épreuves':'Score final'):'Épreuve : '+p.ep+' pt'+(p.ep>1?'s':'')+(p.done?' · terminé ✓':' · en cours…'))+'</small></div><b>'+(p.out?'✕':p.sum)+'</b></div>').join('')}
 function rmGameList(){return rm.games.map(g=>GN[g]).join(' → ')}
+function rmMe(){return rm.players.find(p=>me&&p.id===me.id)||{}}
 
 /* --- connexion au salon --- */
 function rmDetach(){clearInterval(rmT);rmT=null;if(rm){clearTimeout(rm.nextT);if(rm.playing)clearInterval(rcTT)}rm=null;updateLive()}
 function rmAttach(v,silent){
   rmDetach();onlDetach();aonDetach();ronDetach();lc=null;
-  rm={id:v.id,ep:-1,rounds:[],k:0,score:0,time:0,players:[],games:v.games,status:v.status,cur:v.cur,finished:false,started:false,waiting:false,busy:false,prepEp:-1,advanced:false,nextT:0,polling:false,isHost:false};
+  rm={id:v.id,ep:-1,rounds:[],k:0,score:0,time:0,players:[],games:v.games,mode:v.mode||'cumul',spec:false,status:v.status,cur:v.cur,finished:false,started:false,waiting:false,busy:false,prepEp:-1,advanced:false,nextT:0,polling:false,isHost:false};
   rmApply(v);rmT=setInterval(rmTick,2000);
   if(!silent)show('rm');else{updateLive()}}
 async function rmResume(){
@@ -1589,26 +1591,26 @@ async function rmTick(){
 function rmApply(v){
   if(!rm||v.id!==rm.id)return;
   const oldStatus=rm.status,sigOld=rm.sig;
-  Object.assign(rm,{code:v.code,games:v.games,max:v.max,players:v.players||[],status:v.status,host:v.host,cur:v.cur,isHost:!!me&&v.host===me.id});
+  Object.assign(rm,{code:v.code,mode:v.mode||'cumul',games:v.games,max:v.max,players:v.players||[],status:v.status,host:v.host,cur:v.cur,isHost:!!me&&v.host===me.id});
   if(v.status==='closed'){rmNote='Le salon a été fermé par l’hôte.';const was=curView;rmDetach();rmView='home';if(was==='rc'||was==='rm')show('rm');return}
   if(v.status==='playing'){
     if(v.cur!==rm.ep){rmNewEp(v.cur);if(curView==='rm'||curView==='rc'){if(curView==='rc')rcEnter();else show('rc')}}
     const st=v.state;
     if(st&&st.e===v.cur&&Array.isArray(st.rounds)){const g=rm.games[v.cur],rs=st.rounds.filter(r=>okRR(g,r));if(rs.length>rm.rounds.length)rm.rounds=rs}
     if(rm.waiting&&rm.rounds[rm.k]&&curView==='rc')rmOnRound();
-    if(rm.isHost&&!rm.advanced&&rm.players.length&&rm.players.every(p=>p.prog&&p.prog.e===rm.cur&&p.prog.done)&&rm.finished){rm.advanced=true;setTimeout(()=>{if(rm&&rm.status==='playing')rmAdvance()},3500)}
+    if(rm.isHost&&!rm.advanced&&rm.players.length&&rmAlive().every(p=>p.prog&&p.prog.e===rm.cur&&p.prog.done)&&rm.finished){rm.advanced=true;setTimeout(()=>{if(rm&&rm.status==='playing')rmAdvance()},3500)}
     if(curView==='rc'){rcHead();if(rm.finished){rmStand();rmAct()}}
   }
   if(v.status==='finished'){
     clearTimeout(rm.nextT);clearInterval(rcTT);clearInterval(rmT);rmT=null;rm.playing=false;
     if(oldStatus!=='finished'&&(curView==='rc'||curView==='rm'))show('rm')}
-  rm.sig=v.status+'|'+v.cur+'|'+rm.players.map(p=>p.id+':'+p.total+':'+(p.prog?p.prog.e+'.'+p.prog.done:'')).join(',');
+  rm.sig=v.status+'|'+v.cur+'|'+rm.players.map(p=>p.id+':'+p.total+':'+p.out_ep+':'+(p.prog?p.prog.e+'.'+p.prog.done:'')).join(',');
   if(curView==='rm'&&rm.sig!==sigOld)rmRender();
   updateLive()}
 function rmNewEp(cur){
   clearTimeout(rm.nextT);clearInterval(rcTT);rcCur=null;
-  const mp=(rm.players.find(p=>p.id===me.id)||{}).prog,same=mp&&mp.e===cur;
-  Object.assign(rm,{ep:cur,rounds:[],k:same?mp.round:0,score:same?mp.score:0,time:same?mp.time:0,finished:!!(same&&mp.done),started:false,waiting:false,busy:false,advanced:false,prepEp:-1,playing:true});
+  const mm=rmMe(),spec=mm.out_ep!=null,mp=spec?null:mm.prog,same=mp&&mp.e===cur;
+  Object.assign(rm,{ep:cur,rounds:[],k:same?mp.round:0,score:same?mp.score:0,time:same?mp.time:0,finished:spec||!!(same&&mp.done),spec,started:false,waiting:false,busy:false,advanced:false,prepEp:-1,playing:true});
   $('rcStage').innerHTML='';$('rcRev').hidden=true;$('rcRes').hidden=true;rcMsg('');
   if(rm.isHost)rmHostPrep()}
 
@@ -1665,13 +1667,13 @@ function rmFinishEp(){
 function rmStand(){
   if(curView!=='rc')return;
   const last=rm.cur+1>=rm.games.length;
-  $('rcStage').innerHTML='<div class="btStep">Épreuve terminée : '+rm.score+' point'+(rm.score>1?'s':'')+'</div>'+rmBoard(false);
-  rcMsg(rm.isHost?'Quand tout le monde a fini, on passe à la suite automatiquement. Tu peux aussi forcer le passage.':'En attente des autres joueurs et de l’hôte…');
+  $('rcStage').innerHTML='<div class="btStep">'+(rm.spec?'Tu es éliminé : tu regardes la suite 👀':'Épreuve terminée : '+rm.score+' point'+(rm.score>1?'s':''))+'</div>'+rmBoard(false);
+  rcMsg(rm.mode==='elim'&&!rm.spec?'Le dernier de l’épreuve est éliminé. '+(rm.isHost?'La suite démarre automatiquement.':'En attente des autres joueurs…'):rm.isHost?'Quand tout le monde a fini, on passe à la suite automatiquement. Tu peux aussi forcer le passage.':'En attente des autres joueurs et de l’hôte…');
   $('rcRev').hidden=true}
 function rmAct(){
   const a=$('rcAct');if(!rm){return}
-  const last=rm.cur+1>=rm.games.length;
-  a.innerHTML=(rm.isHost&&rm.finished?'<button class="btn" data-rm="adv">'+(last?'Terminer le tournoi':'Épreuve suivante')+'</button>':'')+'<button class="btn alt" data-rm="leave">Quitter le salon</button>'}
+  const last=rm.cur+1>=rm.games.length||(rm.mode==='elim'&&rmAlive().length<=2);
+  a.innerHTML=(rm.isHost&&rm.finished?'<button class="btn" data-rm="adv">'+(last?'Terminer le tournoi':rm.mode==='elim'?'Éliminer le dernier et continuer':'Épreuve suivante')+'</button>':'')+'<button class="btn alt" data-rm="leave">Quitter le salon</button>'}
 async function rmAdvance(){
   if(!rm||!rm.isHost||rm.status!=='playing')return;
   const r=await sb.rpc('room_advance',{p_id:rm.id});
@@ -1694,21 +1696,22 @@ function rmRender(){
   if(!rm){
     if(rmView==='form'){
       const opt=(none)=>(none?'<option value="">— aucune —</option>':'')+RMG.map(g=>'<option value="'+g+'">'+GN[g]+'</option>').join('');
-      b.innerHTML='<p class="sub">Choisis les épreuves. Une seule épreuve = un salon. Plusieurs = un tournoi : les points de chaque épreuve s’additionnent.</p><div class="rmF">'+[1,2,3,4].map(i=>'<label for="rmG'+i+'">Épreuve '+i+(i===1?'':' (facultatif)')+'</label><select id="rmG'+i+'">'+opt(i>1)+'</select>').join('')+'<label for="rmMax">Nombre de joueurs maximum</label><select id="rmMax">'+Array.from({length:11},(_,i)=>'<option value="'+(i+2)+'"'+(i+2===8?' selected':'')+'>'+(i+2)+'</option>').join('')+'</select></div><div class="row"><button class="btn" data-rm="create">Créer le salon</button><button class="btn alt" data-rm="home">Retour</button></div>';
-      $('rmG1').value='at';return}
+      b.innerHTML='<p class="sub">Choisis les épreuves. Une seule épreuve = un salon. Plusieurs = un tournoi : les points de chaque épreuve s’additionnent.</p><div class="rmF">'+[1,2,3,4].map(i=>'<label for="rmG'+i+'">Épreuve '+i+(i===1?'':' (facultatif)')+'</label><select id="rmG'+i+'">'+opt(i>1)+'</select>').join('')+'<label for="rmMax">Nombre de joueurs maximum</label><select id="rmMax">'+Array.from({length:11},(_,i)=>'<option value="'+(i+2)+'"'+(i+2===8?' selected':'')+'>'+(i+2)+'</option>').join('')+'</select><label for="rmMode">Type de tournoi</label><select id="rmMode"><option value="cumul">Points cumulés (le meilleur total gagne)</option><option value="elim">Élimination (le dernier de chaque épreuve sort)</option></select><p class="hint" id="rmModeH"></p></div><div class="row"><button class="btn" data-rm="create">Créer le salon</button><button class="btn alt" data-rm="home">Retour</button></div>';
+      $('rmG1').value='at';
+      const mh=()=>{$('rmModeH').textContent=$('rmMode').value==='elim'?'Il y aura autant d’épreuves que de joueurs moins un, en reprenant tes épreuves en boucle. Il faut au moins 2 joueurs.':'Les points de chaque épreuve s’additionnent.'};$('rmMode').onchange=mh;mh();return}
     b.innerHTML='<div class="mlg"><button class="mlb" data-rm="form"><b>Créer un salon</b><small>Tu choisis les épreuves, tu partages le code, tes amis te rejoignent.</small></button></div><label for="rmCode" style="font-weight:700">Rejoindre avec un code</label><div class="row" style="margin-top:6px"><input id="rmCode" maxlength="6" placeholder="CODE" autocapitalize="characters" autocomplete="off"><button class="btn" data-rm="join">Rejoindre</button></div><p class="sub" style="margin-top:14px">Il faut un compte pour jouer en salon.</p>';
     const c=$('rmCode');if(c)c.addEventListener('keydown',e=>{if(e.key==='Enter')rmJoin()});return}
   if(rm.status==='lobby'){
     const n=rm.players.length;
-    b.innerHTML='<p class="sub">'+(rm.games.length>1?'Tournoi en '+rm.games.length+' épreuves':'Salon')+' : '+esc(rmGameList())+'</p><div class="rmCode" aria-label="Code du salon">'+esc(rm.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p><h2>Joueurs ('+n+' sur '+rm.max+')</h2>'+rmRows().map(p=>'<div class="fr-row">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===rm.host?' 👑':'')+'</b></div></div>').join('')+'<div class="row" style="margin-top:12px">'+(rm.isHost?'<button class="btn" data-rm="start"'+(n<2?' disabled':'')+'>'+(n<2?'Attends au moins un autre joueur':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-rm="leave">Quitter</button></div>';return}
+    b.innerHTML='<p class="sub">'+(rm.mode==='elim'?'Tournoi à élimination : à la fin de chaque épreuve, le dernier sort, jusqu’au champion. Épreuves (en boucle) : '+esc(rmGameList()):(rm.games.length>1?'Tournoi en '+rm.games.length+' épreuves':'Salon')+' : '+esc(rmGameList()))+'</p><div class="rmCode" aria-label="Code du salon">'+esc(rm.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p><h2>Joueurs ('+n+' sur '+rm.max+')</h2>'+rmRows().map(p=>'<div class="fr-row">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===rm.host?' 👑':'')+'</b></div></div>').join('')+'<div class="row" style="margin-top:12px">'+(rm.isHost?'<button class="btn" data-rm="start"'+(n<2?' disabled':'')+'>'+(n<2?'Attends au moins un autre joueur':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-rm="leave">Quitter</button></div>';return}
   if(rm.status==='playing'){
     b.innerHTML='<p class="sub">Une partie est en cours dans ce salon ('+esc(rmGameList())+').</p>'+rmBoard(false)+'<div class="row" style="margin-top:12px"><button class="btn" data-rm="resume">Reprendre la partie</button><button class="btn alt" data-rm="leave">Quitter</button></div>';return}
   if(rm.status==='finished'){
-    const rows=rmRows(),top=rows[0],tie=rows.length>1&&rows[1].sum===top.sum;
-    b.innerHTML='<h2 style="text-align:center">'+(tie?'🤝 Égalité en tête !':'🏆 '+esc(top.pseudo)+' gagne !')+'</h2>'+rmBoard(true)+'<div class="row" style="margin-top:12px"><button class="btn" data-rm="done">Terminer</button></div>'}}
+    const rows=rmRows(),top=rows[0],tie=rm.mode!=='elim'&&rows.length>1&&rows[1].sum===top.sum;
+    b.innerHTML='<h2 style="text-align:center">'+(tie?'🤝 Égalité en tête !':'🏆 '+esc(top.pseudo)+(rm.mode==='elim'?' est le champion !':' gagne !'))+'</h2>'+rmBoard(true)+'<div class="row" style="margin-top:12px"><button class="btn" data-rm="done">Terminer</button></div>'}}
 async function rmCreate(){
   const games=[1,2,3,4].map(i=>$('rmG'+i)&&$('rmG'+i).value).filter(Boolean),max=+$('rmMax').value;
-  rmSay('Création…');const r=await sb.rpc('room_create',{p_games:games,p_max:max});
+  rmSay('Création…');const r=await sb.rpc('room_create',{p_games:games,p_max:max,p_mode:$('rmMode').value});
   if(r.error){rmSay('Erreur : '+r.error.message);return}
   rmSay('');rmAttach(r.data)}
 async function rmJoin(){
