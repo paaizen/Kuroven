@@ -2126,9 +2126,9 @@ function ucOApply(v){
   if(!uo||!v||v.id!==uo.id)return;
   const old=uo.v;uo.v=v;uo.t0=Date.now();
   if(v.status==='closed'){ucNote='La partie a été fermée par l’hôte.';ucODetach();ucView='menu';if(curView==='uc')ucEnter();return}
-  if(v.status==='finished'&&(!old||old.status!=='finished')){clearInterval(uo.tm);uo.tm=null;ucOFetchReveal(v)}
+  if(v.status==='finished'&&(!old||old.status!=='finished'))ucOFetchReveal(v);
   if(v.me&&v.me.char&&(!uo.my||uo.my.id!==v.me.char)){const id=v.me.char;ucChar(id).then(c=>{if(uo&&uo.v&&uo.v.me&&uo.v.me.char===id){uo.my=c;if(curView==='uc')ucORender(true)}}).catch(()=>{})}
-  const sig=[v.status,v.phase,v.round,v.turn_uid,v.guess_by,v.result,v.players.map(p=>p.id+p.alive+p.voted+(p.role||'')).join(','),v.clues.length,v.log.length].join('|');
+  const sig=[v.status,v.phase,v.round,v.turn_uid,v.guess_by,v.result,v.players.map(p=>p.id+p.alive+p.voted+(p.role||'')).join(','),v.clues.length,v.log.length,v.pass,v.next?v.next.n+v.next.code:''].join('|');
   const changed=sig!==uo.sig;uo.sig=sig;
   if(curView==='uc'&&changed)ucORender();
   updateLive()}
@@ -2150,7 +2150,7 @@ function ucOJoinForm(){
 function ucOList(v,opts){
   const mine=me&&me.id,byU={};v.clues.forEach(c=>{(byU[c.u]=byU[c.u]||[]).push(c)});
   return v.players.map(p=>{
-    const cl=(byU[p.id]||[]).map(c=>'<span class="ucw">T'+c.r+' · '+esc(c.w)+'</span>').join('');
+    const cl=(byU[p.id]||[]).map(c=>'<span class="ucw">T'+c.r+(c.r===1&&c.p>0?'.'+c.p:'')+' · '+esc(c.w)+'</span>').join('');
     const cur=v.status==='playing'&&v.phase==='clue'&&v.turn_uid===p.id;
     return'<div class="fr-row'+(p.alive?'':' ucdead')+(cur?' uccur':'')+'">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===v.host?' 👑':'')+(p.id===mine?' (toi)':'')+'</b><small>'+
       (!p.alive?'Éliminé · '+UCR[p.role||'civil']:cur?'Parle en ce moment…':(v.phase==='vote'&&v.status==='playing'&&p.alive?(p.voted?'A voté ✓':'Vote en cours…'):''))+'</small>'+(cl?'<div class="ucwl">'+cl+'</div>':'')+'</div></div>'}).join('')}
@@ -2168,12 +2168,12 @@ function ucORender(keep){
       '<div class="row" style="margin-top:12px">'+(isMe(v.host)?'<button class="btn" data-uc="ostart"'+(n<3?' disabled':'')+'>'+(n<3?'Attends au moins 3 joueurs':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-uc="oinv">📨 Inviter des amis</button><button class="btn alt" data-uc="oleave">Quitter</button></div>'}
   else if(v.status==='playing'){
     const my=uo.my,alive=me_&&me_.alive,phase=v.phase;
-    h='<div class="btStep">Tour '+v.round+' · '+(phase==='clue'?'Les indices':phase==='vote'?'Le vote':'Mr White tente de deviner')+' <span id="ucT" class="ucT"></span></div>'+
+    h='<div class="btStep">Tour '+v.round+' · '+(phase==='clue'?'Les indices'+(v.passes>1?' ('+v.pass+'/'+v.passes+')':''):phase==='vote'?'Le vote':'Mr White tente de deviner')+' <span id="ucT" class="ucT"></span></div>'+
       '<p class="sub">'+(v.n_imp>1?v.n_imp+' undercover':'1 undercover')+(v.has_white?' et 1 Mr White':'')+' parmi vous.</p>'+
       '<div class="uc-card ucme">'+(me_.role==='white'?'<b>Tu es Mr White</b><p class="sub">Tu n’as pas de personnage : écoute les indices, bluffe, et si on t’élimine, devine le personnage des civils.</p>':'<small class="hint">Ton personnage (secret)</small>'+(uo.hide?'<button class="btn alt sm" data-uc="ohide">Afficher</button>':ucCard(my)+'<button class="btn alt sm" data-uc="ohide">Masquer</button>'))+'</div>';
     if(!alive)h+='<p class="sub"><b>Tu es éliminé.</b> Tu regardes la suite.</p>';
     if(phase==='clue'){
-      if(alive&&isMe(v.turn_uid))h+='<div class="uc-card"><b>C’est à toi !</b><p class="sub">Un seul mot ou une courte expression qui décrit ton personnage, sans le nommer.</p><input id="ucClue" maxlength="40" placeholder="Ton mot…" autocomplete="off"><button class="btn" data-uc="oclue">Envoyer</button></div>';
+      if(alive&&isMe(v.turn_uid))h+='<div class="uc-card"><b>C’est à toi !</b><p class="sub">Un seul mot ou une courte expression qui décrit ton personnage, sans le nommer.'+(v.passes>1?(v.pass<v.passes?' Chacun donne deux indices avant le vote : c’est le premier.':' C’est ton second indice, le vote suit.'):'')+'</p><input id="ucClue" maxlength="40" placeholder="Ton mot…" autocomplete="off"><button class="btn" data-uc="oclue">Envoyer</button></div>';
       else h+='<p class="sub">C’est au tour de <b>'+esc(ucOName(v.turn_uid))+'</b>.</p>'}
     else if(phase==='vote'){
       const nv=v.players.filter(p=>p.alive&&p.voted).length,na=v.players.filter(p=>p.alive).length;
@@ -2189,7 +2189,7 @@ function ucORender(keep){
       '<div class="ucpair"><div><div class="hint">Personnage des civils</div>'+ucCard(rv&&rv.civ,rv&&rv.civ&&rv.civ.ac?'<img class="uccov" src="'+esc(safeImg(rv.civ.ac))+'" alt="">':'')+'</div><div><div class="hint">Personnage des undercover</div>'+ucCard(rv&&rv.imp,rv&&rv.imp&&rv.imp.ac?'<img class="uccov" src="'+esc(safeImg(rv.imp.ac))+'" alt="">':'')+'</div></div>'+
       (rv&&rv.guess?'<p class="sub">Mr White avait proposé : <b>'+esc(rv.guess.n)+'</b></p>':'')+
       '<h2>Les rôles</h2>'+v.players.map(p=>'<div class="fr-row">'+avh(p)+'<div class="g"><b>'+esc(p.pseudo)+(p.id===(me&&me.id)?' (toi)':'')+'</b></div><span class="uc-role r-'+(p.role||'civil')+'">'+UCR[p.role||'civil']+'</span></div>').join('')+ucOLog(v)+
-      '<div class="row" style="margin-top:12px"><button class="btn" data-uc="odone">Terminer</button></div>'}
+      '<div class="row" style="margin-top:12px"><button class="btn" data-uc="orematch">'+(v.next?'🔁 Rejoindre la revanche ('+v.next.n+'/'+v.next.max+')':'🔁 Rejouer avec les mêmes joueurs')+'</button><button class="btn alt" data-uc="odone">Terminer</button></div>'}
   ucSet(h);
   if($('ucClue')){$('ucClue').value=dr||'';if(!keep)$('ucClue').focus()}
   if($('ucGuess'))attach($('ucGuess'),$('ucGSg'),c=>{uo.pick={id:c.id,n:c.name.full};ucORender(true)});
@@ -2217,6 +2217,8 @@ async function ucOAct(a,b){
       if(Date.now()-ucQ>4000){ucQ=Date.now();b.textContent='Confirmer : quitter la partie ?';return}
       ucQ=0;try{await sb.rpc('uc_leave',{p_id:id})}catch(e){}
       ucODetach();ucView='menu';ucEnter();break;
+    case 'orematch':{if(uo.busy)return;uo.busy=true;b.disabled=true;const r=await sb.rpc('uc_rematch',{p_id:id});if(!uo||uo.id!==id)return;uo.busy=false;b.disabled=false;
+      if(r.error){ucSay('Erreur : '+r.error.message);return}ucSay('');ucOAttach(r.data);break}
     case 'odone':ucODetach();ucView='menu';ucEnter();break}}
 async function ucOStart(){
   if(!uo||uo.starting)return;uo.starting=true;ucSay('Choix des personnages…');
@@ -2459,7 +2461,7 @@ function gcCtx(){
   if(curView==='at'&&aon)return{k:'match',r:aon.id};
   if(curView==='rc'){if(ron)return{k:'match',r:ron.id};if(rm)return{k:'room',r:rm.id}}
   if(curView==='rm'&&rm)return{k:'room',r:rm.id};
-  if(curView==='uc'&&uo&&uo.v&&uo.v.status!=='playing')return{k:'uc',r:uo.id};
+  if(curView==='uc'&&uo&&uo.v)return{k:'uc',r:uo.id};
   return null}
 function gcReset(){GC.chat=null;GC.msgs=[];GC.users={};GC.last=0;GC.open=false;GC.news=0;GC.ens=false;GC.retry=0;$('gcP').hidden=true;$('gcL').innerHTML='';$('gcMsg').textContent=''}
 function gcBadge(){const n=$('gcN'),mu=gcMuted();n.hidden=!(GC.news>0&&!GC.open&&!mu);n.textContent=GC.news>9?'9+':GC.news;$('gcI').textContent=mu?'🔕':'💬';$('gcM').textContent=mu?'🔔 Réactiver':'🔕 Couper'}
