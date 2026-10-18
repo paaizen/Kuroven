@@ -89,7 +89,7 @@ main#v-home{max-width:900px}
 .gc b{display:block;font-size:1.1rem}
 .gc small{display:block;color:var(--mut);margin-top:3px;line-height:1.3}
 .gc .go{display:inline-block;margin-top:10px;font-weight:800;font-size:.9rem;border-radius:999px;padding:5px 12px;color:#fff}
-.gc.m1 .go{background:#e11d48}.gc.m2 .go{background:#0d9488}.gc.m3 .go{background:#7c3aed}
+.gc.m7 .go{background:#d9731f}.gc.m1 .go{background:#e11d48}.gc.m2 .go{background:#0d9488}.gc.m3 .go{background:#7c3aed}
 .games{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
 @media(prefers-reduced-motion:reduce){.gc{transition:none}.gc:hover{transform:none}}
 /* Menu profil */
@@ -128,7 +128,7 @@ main#v-home{max-width:900px}
 #wGuest{margin-top:10px}
 #wMsg{font-weight:600;color:var(--mut);font-size:.88rem;margin:6px 0 0}
 #wAuth{text-align:left}#wAuth h2{margin:0 0 12px;font-size:1.15rem;text-align:center}#wAuth input{width:100%;margin:0 0 12px}
-#wMsg.err{color:#fb7185}#wMsg.ok{color:#6ee7a8}.av2 b{font-size:.85rem;line-height:1}
+.linkb{background:none;border:0;color:var(--ac);font:inherit;cursor:pointer;text-decoration:underline;margin:0 0 10px;padding:0;display:block}#wRec{text-align:left}#wRec h2{margin:0 0 12px;font-size:1.15rem;text-align:center}#wRec input{width:100%;margin:0 0 12px}#wMsg.err{color:#fb7185}#wMsg.ok{color:#6ee7a8}.av2 b{font-size:.85rem;line-height:1}
 
 /* En ligne */
 .btn.alt{background:var(--bg);color:var(--tx);border:2px solid var(--ac)}
@@ -212,6 +212,9 @@ select{padding:10px;border-radius:10px;border:2px solid var(--bd);background:var
 @media(max-width:420px){.opts{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.btFrame img{transition:none}}
 /* Jeux en duel et parties locales */
+.rmCode{font-size:2.4rem;font-weight:900;letter-spacing:.25em;text-align:center;color:var(--ac);background:var(--card);border:2px dashed var(--bd);border-radius:14px;padding:10px 0 10px .25em;margin:10px 0;user-select:all}
+.rmF{display:grid;gap:6px;margin:10px 0}.rmF label{font-weight:700;margin-top:6px}
+#rmCode{text-transform:uppercase;letter-spacing:.2em;text-align:center;max-width:180px}
 [hidden]{display:none!important}
 button.pc{font:inherit;color:var(--tx);cursor:pointer;display:block;width:100%}
 button.pc:hover:not(:disabled){border-color:var(--ac)}
@@ -243,8 +246,10 @@ button.pc:disabled{cursor:default}
 <button class="gc m5" data-go="ml" data-hub="dt"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs></defs><rect width="200" height="140" fill="#313338"/><rect x="10" y="8" width="62" height="17" rx="8.5" fill="#60a5fa"/><text x="41" y="20" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9.5" fill="#fff">Joueur 1</text><rect x="128" y="8" width="62" height="17" rx="8.5" fill="#fb7185"/><text x="159" y="20" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9.5" fill="#fff">Joueur 2</text><circle cx="100" cy="17" r="11" fill="#2b2d31" stroke="#9cc3f0" stroke-width="2.5"/><text x="100" y="21" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="11" fill="#dbdee1">12</text><rect x="20" y="36" width="160" height="8" rx="4" fill="#4a4d55"/><rect x="20" y="49" width="104" height="8" rx="4" fill="#4a4d55"/><rect x="10" y="68" width="86" height="28" rx="8" fill="#2b2d31" stroke="#4a4d55" stroke-width="2"/><circle cx="23" cy="82" r="7" fill="#1e1f22"/><text x="23" y="85.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9" fill="#dbdee1">A</text><rect x="36" y="78" width="38" height="7" rx="3.5" fill="#949ba4" opacity=".8"/><rect x="104" y="68" width="86" height="28" rx="8" fill="#2f6b45" stroke="#3ba55d" stroke-width="2"/><circle cx="117" cy="82" r="7" fill="#1e1f22"/><text x="117" y="85.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9" fill="#dbdee1">B</text><rect x="130" y="78" width="44" height="7" rx="3.5" fill="#c7f0d4" opacity=".8"/><rect x="10" y="102" width="86" height="28" rx="8" fill="#2b2d31" stroke="#4a4d55" stroke-width="2"/><circle cx="23" cy="116" r="7" fill="#1e1f22"/><text x="23" y="119.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9" fill="#dbdee1">C</text><rect x="36" y="112" width="38" height="7" rx="3.5" fill="#949ba4" opacity=".8"/><rect x="104" y="102" width="86" height="28" rx="8" fill="#2b2d31" stroke="#4a4d55" stroke-width="2"/><circle cx="117" cy="116" r="7" fill="#1e1f22"/><text x="117" y="119.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="9" fill="#dbdee1">D</text><rect x="130" y="112" width="44" height="7" rx="3.5" fill="#949ba4" opacity=".8"/></svg></span><span class="tx"><b>Duel de thèmes</b><small>Chacun choisit un anime, l’autre répond à un QCM dessus. À deux sur le même écran.</small><span class="go">Jouer</span></span></button>
 <button class="gc m6" data-go="ml" data-hub="at"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect width="200" height="140" fill="#313338"/><rect x="14" y="65" width="8" height="18" rx="4" fill="#eef3f9"/><rect x="28" y="57" width="8" height="34" rx="4" fill="#9cc3f0"/><rect x="42" y="48" width="8" height="52" rx="4" fill="#9cc3f0"/><rect x="56" y="59" width="8" height="30" rx="4" fill="#eef3f9"/><rect x="70" y="42" width="8" height="64" rx="4" fill="#9cc3f0"/><rect x="84" y="53" width="8" height="42" rx="4" fill="#9cc3f0"/><rect x="98" y="61" width="8" height="26" rx="4" fill="#eef3f9"/><rect x="112" y="45" width="8" height="58" rx="4" fill="#9cc3f0"/><rect x="126" y="56" width="8" height="36" rx="4" fill="#9cc3f0"/><rect x="140" y="63" width="8" height="22" rx="4" fill="#eef3f9"/><rect x="154" y="51" width="8" height="46" rx="4" fill="#9cc3f0"/><rect x="168" y="59" width="8" height="30" rx="4" fill="#9cc3f0"/><path d="M54 82a46 46 0 0 1 92 0" fill="none" stroke="#111" stroke-width="13" stroke-linecap="round"/><path d="M54 82a46 46 0 0 1 92 0" fill="none" stroke="#eef3f9" stroke-width="7" stroke-linecap="round"/><rect x="42" y="78" width="22" height="40" rx="10" fill="#111"/><rect x="45" y="81" width="16" height="34" rx="8" fill="#1f8fd1"/><rect x="136" y="78" width="22" height="40" rx="10" fill="#111"/><rect x="139" y="81" width="16" height="34" rx="8" fill="#1f8fd1"/><path d="M172 22v28a8 8 0 1 1-4-7V28l-20 5" fill="none" stroke="#111" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M172 22v28a8 8 0 1 1-4-7V28l-20 5" fill="none" stroke="#ffd400" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="tx"><b>Blind test audio</b><small>Reconnais l’anime à l’écoute d’un opening ou d’un ending. L’extrait s’allonge à chaque erreur.</small><span class="go">Jouer</span></span></button>
 </div>
+<h2>Jouer à plusieurs</h2>
+<div class="games"><button class="gc m7" data-go="rm"><span class="art"><svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="200" height="140" fill="#313338"/><rect x="74" y="62" width="52" height="58" rx="6" fill="#9cc3f0"/><rect x="18" y="82" width="52" height="38" rx="6" fill="#4a4d55"/><rect x="130" y="92" width="52" height="28" rx="6" fill="#4a4d55"/><circle cx="100" cy="42" r="14" fill="#eef3f9" stroke="#111" stroke-width="3"/><circle cx="44" cy="62" r="12" fill="#eef3f9" stroke="#111" stroke-width="3"/><circle cx="156" cy="72" r="12" fill="#eef3f9" stroke="#111" stroke-width="3"/><path d="M92 90h16M100 82v16" stroke="#111" stroke-width="4" stroke-linecap="round" opacity=".55"/><rect x="62" y="124" width="76" height="6" rx="3" fill="#eef3f9" opacity=".25"/></svg></span><span class="tx"><b>Salons et tournois</b><small>Crée un salon, partage le code : jusqu’à 12 joueurs, mêmes questions pour tous, classement en direct. Plusieurs épreuves à la suite = un tournoi.</small><span class="go">Jouer</span></span></button></div>
 <h2>Prochainement</h2>
-<div class="soon"><span>Salons et tournois</span><span>Connexion Google</span><span>Mot de passe oublié</span></div>
+<div class="soon"><span>Tournois à élimination directe</span><span>Galerie d’arrière-plans de profil</span><span>Signalement des images</span></div>
 </main>
 <main id="v-set" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
@@ -346,6 +351,12 @@ button.pc:disabled{cursor:default}
 <div class="row" id="rcAct" style="flex-wrap:wrap"></div>
 <div class="row"><button class="btn alt" id="rcClaim" hidden>Adversaire absent : réclamer la victoire</button></div>
 </main>
+<main id="v-rm" hidden>
+<button class="btn back" data-go="home">← Accueil</button>
+<h1>Salons et tournois</h1>
+<div id="rmBody"></div>
+<div class="msg" id="rmMsg"></div>
+</main>
 <main id="v-ml" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <h1 id="mlT">Morpion anime</h1>
@@ -400,6 +411,7 @@ button.pc:disabled{cursor:default}
 <div id="wMain">
 <button class="btn wb" id="wLogin">Se connecter</button>
 <button class="btn wb alt" id="wSign">Créer un compte</button>
+<button class="btn wb alt" id="wGoogle" type="button">Continuer avec Google</button>
 <div class="or">ou</div>
 <label for="wPseudo">Pseudo pour jouer en invité (facultatif)</label>
 <input id="wPseudo" maxlength="20" placeholder="Invité" autocomplete="off">
@@ -411,7 +423,14 @@ button.pc:disabled{cursor:default}
 <label for="aEm">Adresse e-mail</label><input id="aEm" type="email" autocomplete="email">
 <label for="aPw">Mot de passe (8 caractères minimum)</label><input id="aPw" type="password" autocomplete="current-password">
 <button class="btn wb" id="aGo" type="submit"></button>
+<button class="linkb" id="aForgot" type="button">Mot de passe oublié ?</button>
 <button class="btn wb alt" id="aBack" type="button">Retour</button>
+</form>
+<form id="wRec" hidden novalidate>
+<h2>Nouveau mot de passe</h2>
+<label for="rPw">Nouveau mot de passe (8 caractères minimum)</label><input id="rPw" type="password" autocomplete="new-password">
+<label for="rPw2">Répète-le</label><input id="rPw2" type="password" autocomplete="new-password">
+<button class="btn wb" id="rGo" type="submit">Enregistrer</button>
 </form>
 <div id="wMsg" role="status"></div></div></div>
 <div id="m"><div class="box"><p id="q"></p><input id="in" placeholder="Tape au moins 3 lettres…" autocomplete="off"><div id="sg"></div><div class="row" style="margin-top:8px"><button class="btn" id="cl">Annuler</button></div></div></div>
@@ -529,14 +548,14 @@ function menuOpen(o){pd.classList.toggle('on',o);pm.setAttribute('aria-expanded'
 pm.addEventListener('click',e=>{e.stopPropagation();menuOpen(!pd.classList.contains('on'))});
 document.addEventListener('click',e=>{if(!e.target.closest('.menu'))menuOpen(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')menuOpen(false)});
-function show(v){if(v==='rc'&&!ron&&!lc)v='ml';if(v==='fr'&&!me){openWelcome();return}if(v==='prof'&&!profId){openWelcome();return}
+function show(v){if(v==='rc'&&!ron&&!lc&&!(rm&&rm.status==='playing'))v='ml';if(v==='rm'&&!me){openWelcome();return}if(v==='fr'&&!me){openWelcome();return}if(v==='prof'&&!profId){openWelcome();return}
 menuOpen(false);if(v==='set')syncSeg();
 if(v!=='ttt'&&onl&&onl.done)onlDetach();
 if(v!=='rc'){try{au.pause()}catch(e){}if(ron&&ron.done)ronDetach();if(lc){lc=null;rcClear()}}
 curView=v;document.querySelectorAll('main').forEach(m=>m.hidden=m.id!=='v-'+v);
 if(v==='ttt'){if(!onl)start();else{draw();if(!over)timer()}}else{if(!onl)over=true;clearInterval(tm)}
 if(v!=='at'){atStop();if(aon&&aon.done)aonDetach()}else atEnter();if(v==='hl')hlStart();if(v==='gs')gsNext();clearInterval(dtTm);if(v==='bt')btNext();if(v==='dt')dtReset();
-if(v==='rc')rcEnter();if(v==='ml')renderMl();if(v==='prof')loadProfile(profId);if(v==='fr')loadFriends();if(v==='lb')loadLb();
+if(v==='rc')rcEnter();if(v==='rm')rmEnter();if(v==='ml')renderMl();if(v==='prof')loadProfile(profId);if(v==='fr')loadFriends();if(v==='lb')loadLb();
 updateLive();window.scrollTo(0,0)}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;if(b.dataset.hub)hubGame=b.dataset.hub;if(b.dataset.go==='prof'&&!b.dataset.user)profId=me?me.id:null;show(b.dataset.go)});
 document.addEventListener('error',e=>{const t=e.target;if(t.classList&&t.classList.contains('pi')){const f=document.createElement('div');f.className='fb';f.textContent=t.alt||'?';t.replaceWith(f)}},true);
@@ -614,7 +633,7 @@ const AT='https://api.animethemes.moe',ATINC='animethemes.song.artists,animethem
 const QAP='query($p:Int){Page(page:$p,perPage:50){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,format_in:[TV,MOVIE,OVA,ONA]){id title{romaji english} coverImage{large} seasonYear}}}';
 let atPool=[],atUsed=new Set(),atAns=null,atStage=0,atStart=0,atOver=false,atScore=0,atTm=null,atAf=0,atBusy=false,atN=0,atSolo=true,aon=null,atRT=null,atQT=0;
 const au=new Audio();au.preload='auto';
-let ron=null,lc=null,rcCur=null,rcTT=null,rcAf=0,rcAt=null;
+let ron=null,lc=null,rm=null,rmT=null,rmView='home',rmNote='',rcCur=null,rcTT=null,rcAf=0,rcAt=null;
 const nz=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 function atMsg(t){$('atMsg').textContent=t||''}
 function atStop(){clearTimeout(atTm);cancelAnimationFrame(atAf);try{au.pause()}catch(e){}$('atBar').style.width='0'}
@@ -820,8 +839,8 @@ function renderUser(){
   const av=document.querySelector('.av2');if(me)av.innerHTML=me.avatar?'<img alt="" src="'+esc(me.avatar)+'">':'<b>'+esc(n.charAt(0).toUpperCase())+'</b>';else av.innerHTML=AV0;
 }
 function wmsg(t,c){const m=$('wMsg');m.textContent=t||'';m.className=c||''}
-function authBack(){$('wAuth').hidden=true;$('wMain').hidden=false;wmsg('')}
-function authShow(mode){aMode=mode;$('wMain').hidden=true;$('wAuth').hidden=false;wmsg('');const su=mode==='signup';$('aT').textContent=su?'Créer un compte':'Se connecter';$('aPsW').hidden=!su;$('aGo').textContent=su?'Créer mon compte':'Me connecter';$('aPw').autocomplete=su?'new-password':'current-password';$('aEm').focus()}
+function authBack(){$('wAuth').hidden=true;$('wRec').hidden=true;$('wMain').hidden=false;wmsg('')}
+function authShow(mode){aMode=mode;$('wMain').hidden=true;$('wAuth').hidden=false;wmsg('');const su=mode==='signup';$('aT').textContent=su?'Créer un compte':'Se connecter';$('aPsW').hidden=!su;$('aForgot').hidden=su;$('aGo').textContent=su?'Créer mon compte':'Me connecter';$('aPw').autocomplete=su?'new-password':'current-password';$('aEm').focus()}
 let aMode='login';
 function openWelcome(){authBack();const n=store.get('name','');$('wPseudo').value=n==='Invité'?'':n;wl.hidden=false;$('wGuest').focus()}
 function enterGuest(){const n=$('wPseudo').value.trim().slice(0,20)||'Invité';store.set('name',n);store.set('mode','guest');wl.hidden=true;renderUser()}
@@ -834,6 +853,8 @@ function frErr(e){const m=(e&&e.message||'').toLowerCase();
   if(m.includes('invalid login'))return 'E-mail ou mot de passe incorrect.';
   if(m.includes('not confirmed'))return 'Confirme d’abord ton adresse : clique sur le lien reçu par e-mail.';
   if(m.includes('already registered'))return 'Cette adresse a déjà un compte. Utilise « Se connecter ».';
+  if(m.includes('provider is not enabled')||m.includes('unsupported provider'))return 'La connexion Google n’est pas encore activée sur ce site.';
+  if(m.includes('same password'))return 'Choisis un mot de passe différent de l’ancien.';
   if(m.includes('rate limit')||m.includes('too many'))return 'Trop de tentatives ou d’e-mails envoyés. Réessaie dans un moment.';
   if(m.includes('password'))return 'Mot de passe refusé : '+e.message;
   if(m.includes('failed to fetch')||m.includes('network'))return 'Impossible de joindre le serveur. Vérifie ta connexion.';
@@ -860,15 +881,40 @@ $('wAuth').addEventListener('submit',async ev=>{
   }catch(e){wmsg(frErr(e),'err')}
   finally{$('aGo').disabled=false}
 });
+$('wGoogle').onclick=async()=>{
+  if(!sb){wmsg('Le service de comptes n’a pas pu se charger (bloqueur de publicité ?).','err');return}
+  wmsg('Redirection vers Google…');
+  try{const r=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(r.error)throw r.error}
+  catch(e){wmsg(frErr(e),'err')}};
+$('aForgot').onclick=async()=>{
+  if(!sb){wmsg('Le service de comptes n’a pas pu se charger.','err');return}
+  const em=$('aEm').value.trim();
+  if(!/^\S+@\S+\.\S+$/.test(em)){wmsg('Écris d’abord ton adresse e-mail dans le champ ci-dessus, puis clique à nouveau sur « Mot de passe oublié ».','err');return}
+  wmsg('Envoi en cours…');
+  try{const r=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;
+    wmsg('Si un compte existe avec cette adresse, un e-mail avec un lien vient d’être envoyé. Pense à regarder tes spams.','ok')}
+  catch(e){wmsg(frErr(e),'err')}};
+let recov=false;
+function showRecovery(){recov=true;wl.hidden=false;$('wMain').hidden=true;$('wAuth').hidden=true;$('wRec').hidden=false;wmsg('Choisis ton nouveau mot de passe.');$('rPw').value=$('rPw2').value='';$('rPw').focus()}
+$('wRec').addEventListener('submit',async ev=>{
+  ev.preventDefault();const a=$('rPw').value,b=$('rPw2').value;
+  if(a.length<8){wmsg('Le mot de passe doit faire au moins 8 caractères.','err');return}
+  if(a!==b){wmsg('Les deux mots de passe ne sont pas identiques.','err');return}
+  $('rGo').disabled=true;wmsg('Un instant…');
+  try{const r=await sb.auth.updateUser({password:a});if(r.error)throw r.error;
+    wmsg('Mot de passe changé. Tu es connecté.','ok');try{history.replaceState(null,'',location.pathname)}catch(e){}
+    setTimeout(()=>{recov=false;wl.hidden=true;authBack()},1200)}
+  catch(e){wmsg(frErr(e),'err')}
+  finally{$('rGo').disabled=false}});
 async function loadMe(user){
   if(!user){me=null;renderUser();onlLogout();return}
   const r=await sb.from('profiles').select('pseudo,avatar_url').eq('id',user.id).maybeSingle();
   let ps=r.data&&r.data.pseudo;const want=user.user_metadata&&user.user_metadata.pseudo;
   if(r.data&&want&&want!==ps&&/^joueur_[0-9a-f]{8}$/.test(ps)){const u=await sb.from('profiles').update({pseudo:want}).eq('id',user.id);if(!u.error)ps=want}
   me={id:user.id,email:user.email,pseudo:ps||want||'Joueur',avatar:r.data&&r.data.avatar_url};
-  store.set('mode','account');wl.hidden=true;renderUser();onlLogin();
+  store.set('mode','account');if(!recov)wl.hidden=true;renderUser();onlLogin();
 }
-if(sb)sb.auth.onAuthStateChange((ev,sess)=>{setTimeout(()=>loadMe(sess&&sess.user),0)});
+if(sb)sb.auth.onAuthStateChange((ev,sess)=>{setTimeout(()=>{loadMe(sess&&sess.user);if(ev==='PASSWORD_RECOVERY')showRecovery()},0)});
 $('pdAuth').onclick=async()=>{menuOpen(false);if(me&&sb){await sb.auth.signOut();me=null;store.set('mode','guest');renderUser();onlLogout();if(curView==='prof'||curView==='fr')show('home')}else openWelcome()};
 $('pdSwitch').onclick=()=>{menuOpen(false);openWelcome()};
 /* ===== En ligne : Elo, parties, amis, profils ===== */
@@ -883,7 +929,7 @@ function avh(p){const u=p&&safeStore(p.avatar_url),d=p&&p.id?' data-user="'+esc(
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let tickT=null,tickN=0,invShown=null;
 const PN=()=>onl?onl.names:['Joueur 1','Joueur 2'];
-function busyOnline(){return(onl&&!onl.done)||(aon&&!aon.done)||(ron&&!ron.done)}
+function busyOnline(){return(onl&&!onl.done)||(aon&&!aon.done)||(ron&&!ron.done)||(rm&&(rm.status==='lobby'||rm.status==='playing'))}
 
 /* --- morpion en ligne : état d'une partie --- */
 function newState(){return{ri:pickN([...ROWS.keys()],3),ci:pickN([...COLS.keys()],3),b:Array(9).fill(null),used:[],turn:0,over:false,w:null,miss:0,seq:1,rs:null}}
@@ -933,12 +979,13 @@ function onlDetach(){if(onl&&onl.ch){try{sb.removeChannel(onl.ch)}catch(e){}}onl
 function updateLive(){let t='';
   if(onl&&!onl.done&&curView!=='ttt')t='⚔️ Morpion en cours contre '+onl.opp.pseudo+' — Reprendre';
   else if(aon&&!aon.done&&curView!=='at')t='🎧 Blind test en cours contre '+aon.opp.pseudo+' — Reprendre';
+  else if(rm&&(rm.status==='lobby'||rm.status==='playing')&&curView!=='rc'&&curView!=='rm')t='🏁 Salon '+rm.code+' en cours — Reprendre';
   else if(ron&&!ron.done&&curView!=='rc')t='🎮 '+GN[ron.g]+' en cours contre '+ron.opp.pseudo+' — Reprendre';
   $('live').hidden=!t;$('liveT').textContent=t}
 async function startOnline(m,silent){
   if(!sb||!me)return;wtHide();
   if(m.game==='at')return startAtOnline(m,silent);
-  if(RG[m.game])return startRaceOnline(m,silent);
+  if(RG[m.game]&&m.game!=='at')return startRaceOnline(m,silent);
   const mine=m.p1===me.id?0:1,oid=mine===0?m.p2:m.p1;
   const pr=await sb.from('profiles').select('id,pseudo,avatar_url').eq('id',oid).maybeSingle();
   const opp=pr.data||{id:oid,pseudo:'Adversaire'};
@@ -959,7 +1006,7 @@ function resign(){onl.rs=onl.me;over=true;clearInterval(tm);$('msg').textContent
   sb.rpc('submit_result',{p_id:onl.id,p_result:onl.me===0?'p2':'p1'}).then(x=>{if(x.data&&x.data.status!=='playing')endOnline(x.data)})}
 function syncNw(){$('nw').textContent=onl?((onl.done||over)?'Retour au menu':'Abandonner'):'Nouvelle grille'}
 $('claim').onclick=async()=>{if(!onl)return;const x=await sb.rpc('claim_win',{p_id:onl.id});if(x.data&&x.data.status!=='playing')endOnline(x.data);else $('msg').textContent='Pas encore possible : l’adversaire a encore un peu de temps.'};
-$('live').onclick=()=>show(onl&&!onl.done?'ttt':(ron&&!ron.done?'rc':'at'));
+$('live').onclick=()=>show(onl&&!onl.done?'ttt':(ron&&!ron.done?'rc':(rm&&rm.status==='playing'?'rc':(rm?'rm':'at'))));
 
 /* --- recherche d'adversaire (rapide, classée, ami) --- */
 function wtShow(m,t){wait=m;$('wtT').textContent=t;$('wt').hidden=false}
@@ -1015,8 +1062,8 @@ async function pollSocial(){
   const n=f.count||0;$('frBadge').hidden=!n;$('frBadge').textContent=n}
 $('invY').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;const r=await sb.rpc('accept_invite',{p_id:id});if(r.error){$('mlMsg').textContent='Invitation expirée.';return}startOnline(r.data)};
 $('invN').onclick=async()=>{const id=$('inv').dataset.id;$('inv').hidden=true;await sb.rpc('cancel_match',{p_id:id})};
-function onlLogout(){stopTick();onlDetach();aonDetach();ronDetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;invShown=null}
-function onlLogin(){tickN=0;startTick();setTimeout(tick,400)}
+function onlLogout(){stopTick();onlDetach();aonDetach();ronDetach();rmDetach();wtHide();$('inv').hidden=true;$('frBadge').hidden=true;invShown=null}
+function onlLogin(){tickN=0;startTick();setTimeout(tick,400);setTimeout(rmResume,900)}
 
 /* --- menu d'un jeu --- */
 const HUB={
@@ -1141,7 +1188,7 @@ async function loadLb(){
   if(r.error){c.innerHTML='<div class="hint">Erreur : '+esc(r.error.message)+'</div>';return}
   c.innerHTML=(r.data||[]).map((x,i)=>{const p=Object.assign({id:x.user_id},x.profiles||{});return'<div class="fr-row"><span class="rk">'+(i+1)+'</span>'+avh(p)+'<div class="g" data-user="'+esc(x.user_id)+'"><b>'+esc(p.pseudo)+'</b><small>'+rk(x.elo)+' · '+x.played+' parties</small></div><b>'+x.elo+'</b></div>'}).join('')||'<div class="hint">Personne n’est encore classé. Joue une partie classée pour ouvrir la marche.</div>'}
 /* ===== Autres jeux : duel en ligne (mêmes questions, meilleur score) et parties à deux sur le même écran ===== */
-const RG={bt:{len:10,lim:45,next:4300},gs:{len:10,lim:45,next:4300},hl:{len:10,lim:15,next:2600},dt:{len:5,lim:15,next:2300}};
+const RG={at:{len:10,lim:45,next:4300},bt:{len:10,lim:45,next:4300},gs:{len:10,lim:45,next:4300},hl:{len:10,lim:15,next:2600},dt:{len:5,lim:15,next:2300}};
 const MAXS={bt:3,gs:4},NLOC=10;
 const RD={};
 function rcMsg(t){$('rcMsg').textContent=t||''}
@@ -1155,6 +1202,7 @@ const okC=c=>!!c&&Number.isInteger(c.id)&&okS(c.n,120)&&!!safeImg(c.im);
 function okRR(g,r){
   if(!r||typeof r!=='object')return false;
   if(g==='bt'||g==='gs')return okC(r)&&(r.a==null||okS(r.a,200))&&(r.ac==null||r.ac===''||!!safeImg(r.ac));
+  if(g==='at')return okRound(r);
   if(g==='hl')return okC(r.a)&&okC(r.b)&&Number.isInteger(r.a.f)&&Number.isInteger(r.b.f);
   if(g==='dt')return Array.isArray(r.q)&&r.q.length===2&&r.q.every(q=>q&&okS(q.q,300)&&Array.isArray(q.o)&&q.o.length>=2&&q.o.length<=4&&q.o.every(o=>o&&okS(o.t,200)&&typeof o.ok==='boolean'));
   return false}
@@ -1199,7 +1247,7 @@ function revOf(g,r){
 function rcEnd(pts,txt,rev){
   const c=rcCur;if(!c||c.over)return;c.over=true;clearInterval(rcTT);
   if(rev)revFill('rc',rev);
-  if(c.ctx.race)ronRoundDone(pts,txt);else lcRoundEnd(pts,txt)}
+  if(c.ctx.room)rmRoundDone(pts,txt);else if(c.ctx.race)ronRoundDone(pts,txt);else lcRoundEnd(pts,txt)}
 
 /* blind test visuel et Qui est-ce ? */
 function bfDraw(c){
@@ -1266,13 +1314,28 @@ function rcPlayClip(){
   au.volume=+($('rcVol').value)/100;try{au.currentTime=c.start}catch(e){}
   const len=ATD[c.stage]*1000,t0=performance.now();
   au.play().then(()=>{const step=()=>{const k=Math.min(1,(performance.now()-t0)/len);const b=$('rcBar');if(b)b.style.width=(k*100)+'%';if(k<1&&!au.paused)rcAf=requestAnimationFrame(step)};step();rcAt=setTimeout(()=>{au.pause();const b=$('rcBar');if(b)b.style.width='100%'},len)}).catch(()=>rcMsg('Ton navigateur bloque le son : clique sur « Écouter l’extrait ».'))}
+const atName=r=>r.t[1]||r.t[0]||'?';
+function atStepText(c){const p=4-c.stage;rcStep('Indice '+(c.stage+1)+' sur 4 : '+ATD[c.stage]+' secondes'+(c.ctx.race?' ('+p+' point'+(p>1?'s':'')+')':''))}
+function atRFinish(c,pts,txt){try{au.volume=+($('rcVol').value)/100;au.play().catch(()=>{})}catch(e){}cancelAnimationFrame(rcAf);clearTimeout(rcAt);const b=$('rcBar');if(b)b.style.width='100%';rcEnd(pts,txt,revOf('at',c.r))}
+function atRGuess(m){
+  const c=rcCur;if(!c||c.over||c.g!=='at'||!c.dur)return;
+  if(m.id===c.r.id){atRFinish(c,4-c.stage,'🏆 Bravo, c’est '+atName(c.r)+' !');return}
+  c.stage++;
+  if(c.stage>3){c.stage=3;atRFinish(c,0,'❌ Perdu. C’était '+atName(c.r)+'.');return}
+  atStepText(c);rcMsg('❌ Ce n’est pas '+mt(m)+'. Extrait plus long !');rcPlayClip()}
 RD.at=async(r,c)=>{
-  $('rcStage').innerHTML='<div class="atBox"><button class="btn" id="rcPlay" disabled>▶ Écouter l’extrait</button><div class="atBar"><i id="rcBar"></i></div><div class="btStep" id="rcStep"></div><label class="atVol">Volume <input type="range" id="rcVol" min="0" max="100"></label></div>';
+  const race=c.ctx.race;
+  $('rcStage').innerHTML='<div class="atBox"><button class="btn" id="rcPlay" disabled>▶ Écouter l’extrait</button><div class="atBar"><i id="rcBar"></i></div><div class="btStep" id="rcStep"></div><label class="atVol">Volume <input type="range" id="rcVol" min="0" max="100"></label></div><div id="rcTime"></div>'+(race?'<input id="rcIn" placeholder="Titre de l’anime (3 lettres minimum)…" autocomplete="off"><div id="rcSg"></div>':'');
   $('rcVol').value=store.get('atvol','60');$('rcVol').oninput=()=>{au.volume=+$('rcVol').value/100;store.set('atvol',$('rcVol').value)};
   $('rcPlay').onclick=()=>{if(c.over){au.volume=+$('rcVol').value/100;au.play().catch(()=>{})}else rcPlayClip()};
   rcMsg('Chargement de l’extrait…');
-  try{const dur=await atLoadAudio(r.l);if(rcCur!==c)return;c.dur=dur;c.start=Math.max(0,Math.min(dur-45,dur*(.08+Math.random()*.22)));$('rcPlay').disabled=false;rcMsg('');lcStepText();rcPlayClip()}
-  catch(e){if(rcCur===c){rcMsg('Extrait indisponible, on en cherche un autre…');lcSkip()}}};
+  try{
+    const dur=await atLoadAudio(r.l);if(rcCur!==c)return;
+    c.dur=dur;c.start=Math.max(0,Math.min(dur-45,dur*(.08+Math.random()*.22)));$('rcPlay').disabled=false;rcMsg('');atStepText(c);rcPlayClip();
+    if(race){attachMedia($('rcIn'),$('rcSg'),atRGuess);rcTimer(RG.at.lim,()=>{if(rcCur===c&&!c.over)atRFinish(c,0,'⏱️ Temps écoulé. C’était '+atName(r)+'.')})}}
+  catch(e){if(rcCur!==c)return;
+    if(c.ctx.room){c.over=true;rcMsg('Extrait indisponible : manche passée.');rmRoundDone(0,'',true)}
+    else{rcMsg('Extrait indisponible, on en cherche un autre…');lcSkip()}}};
 
 /* ===== Duel en ligne ===== */
 function ronDetach(){if(ron){if(ron.ch){try{sb.removeChannel(ron.ch)}catch(e){}}clearTimeout(ron.nextT);clearInterval(rcTT)}ron=null;$('rcClaim').hidden=true;updateLive()}
@@ -1337,6 +1400,7 @@ async function pushRProg(done,resigned,x){
 function rcHead(){
   const h=$('rcHead');
   if(ron&&!ron.done){const L=RG[ron.g].len,op=ron.op||{round:0,score:0,done:false};h.textContent='Manche '+Math.min(ron.k+1,L)+' sur '+L+' · Toi '+ron.score+' pts · '+ron.opp.pseudo+' '+op.score+' pts (manche '+Math.min((op.round||0)+(op.done?0:1),L)+')'}
+  else if(rm&&rm.status==='playing'){const rows=rmRows(),pos=rows.findIndex(x=>x.id===me.id)+1;h.textContent=(rm.games.length>1?'Épreuve '+(rm.ep+1)+'/'+rm.games.length+' · ':'')+'Manche '+Math.min(rm.k+1,10)+' sur 10 · Toi '+rm.score+' pts · '+pos+'e sur '+rows.length}
   else if(lc&&!lc.over){h.textContent='Manche '+Math.min(lc.k+1,NLOC)+' sur '+NLOC+' · Joueur 1 : '+lc.sc[0]+' · Joueur 2 : '+lc.sc[1]}}
 function rcFinish(){
   if(!ron||(ron.finished&&ron.shown))return;ron.finished=true;ron.shown=true;clearInterval(rcTT);rcCur=null;
@@ -1390,9 +1454,7 @@ async function lcNext(){
   if(l.g==='hl'){l.phase='hl';await rcPreload([r.a.im,r.b.im]);if(lc!==l)return}
   rcDraw(l.g,r,{race:false,player:l.k%2});lcAct();lcStepText()}
 function lcSkip(){const l=lc;if(!l)return;l.tries++;if(l.tries>5){rcMsg('Impossible de charger un extrait.');$('rcAct').innerHTML='<button class="btn" data-lc="retry2">Réessayer</button>';l.tries=0;return}lcNext()}
-function lcStepText(){
-  const c=rcCur,l=lc;if(!c||!l||c.ctx.race||c.g!=='at')return;
-  const t='Indice '+(c.stage+1)+' sur 4 : '+ATD[c.stage]+' secondes';rcStep(t)}
+function lcStepText(){const c=rcCur;if(!c||c.g!=='at')return;atStepText(c)}
 function lcAct(){
   const l=lc,a=$('rcAct');if(!l){return}
   if(l.over)a.innerHTML='<button class="btn" data-lc="again">Rejouer</button><button class="btn alt" data-lc="menu">Retour au menu du jeu</button>';
@@ -1426,6 +1488,8 @@ function lcHint(){
 $('rcAct').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;const d=b.dataset;
   if(d.rc==='menu'){ronDetach();show('ml');return}
+  if(d.rm==='adv'){rmAdvance();return}
+  if(d.rm==='leave'){rmLeave(b);return}
   if(b.id==='rcQuit'){rcQuit();return}
   if(!lc||!d.lc)return;
   switch(d.lc){
@@ -1445,6 +1509,11 @@ function rcEnter(){
     rcHead();
     if(!ron.started||ron.waiting)rcOnRound();
     else if(ron.finished)rcFinish();
+  }else if(rm&&rm.status==='playing'){
+    const g=rm.games[rm.ep];$('rcT').textContent=(rm.games.length>1?'Tournoi · épreuve '+(rm.ep+1)+' sur '+rm.games.length+' : ':'Salon : ')+GN[g];
+    $('rcSub').textContent='Salon '+rm.code+' · mêmes questions pour tous, classement en direct.';
+    rmAct();rcHead();
+    if(rm.finished)rmStand();else if(!rm.started||rm.waiting)rmOnRound();
   }else if(lc){
     hubGame=lc.g;$('rcT').textContent=GN[lc.g];
     $('rcSub').textContent=lc.g==='hl'?'Deux joueurs sur le même écran, chacun son tour. Clique sur le personnage qui a le plus de favoris.':'Deux joueurs sur le même écran. Écoutez ou regardez, le premier qui trouve le dit à voix haute, puis révélez la réponse et donnez le point.';
@@ -1456,8 +1525,187 @@ function rcQuit(){
   clearInterval(rcTT);clearTimeout(ron.nextT);ron.sub=true;rcMsg('Tu as abandonné.');
   pushRProg(true,true);
   sb.rpc('submit_result',{p_id:ron.id,p_result:ron.me===0?'p2':'p1'}).then(x=>{if(x.data&&x.data.status!=='playing')endRace(x.data)})}
-$('rcBack').onclick=()=>{if(ron&&ron.done)ronDetach();show('ml')};
+$('rcBack').onclick=()=>{if(rm&&rm.status==='playing'){show('rm');return}if(ron&&ron.done)ronDetach();show('ml')};
 
+
+/* ===== Salons et tournois : un code, jusqu'à 12 joueurs, mêmes questions, classement en direct ===== */
+const RMG=['at','bt','gs','hl'];
+function rmSay(t){$('rmMsg').textContent=t||''}
+function rmRows(){
+  if(!rm)return[];
+  return rm.players.map(p=>{
+    const live=(me&&p.id===me.id)?{e:rm.ep,score:rm.score,done:rm.finished}:p.prog;
+    const ok=rm.status==='playing'&&live&&live.e===rm.cur,ep=ok?(live.score||0):0;
+    return Object.assign({},p,{ep,done:!!(ok&&live.done),sum:(p.total||0)+ep})}).sort((a,b)=>b.sum-a.sum)}
+function rmBoard(final){
+  return rmRows().map((p,i)=>'<div class="fr-row"><span class="rk">'+(i+1)+'</span>'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===rm.host?' 👑':'')+(p.id===(me&&me.id)?' (toi)':'')+'</b><small>'+(final?(rm.games.length>1?'Total sur '+rm.games.length+' épreuves':'Score final'):'Épreuve : '+p.ep+' pt'+(p.ep>1?'s':'')+(p.done?' · terminé ✓':' · en cours…'))+'</small></div><b>'+p.sum+'</b></div>').join('')}
+function rmGameList(){return rm.games.map(g=>GN[g]).join(' → ')}
+
+/* --- connexion au salon --- */
+function rmDetach(){clearInterval(rmT);rmT=null;if(rm){clearTimeout(rm.nextT);if(rm.playing)clearInterval(rcTT)}rm=null;updateLive()}
+function rmAttach(v,silent){
+  rmDetach();onlDetach();aonDetach();ronDetach();lc=null;
+  rm={id:v.id,ep:-1,rounds:[],k:0,score:0,time:0,players:[],games:v.games,status:v.status,cur:v.cur,finished:false,started:false,waiting:false,busy:false,prepEp:-1,advanced:false,nextT:0,polling:false,isHost:false};
+  rmApply(v);rmT=setInterval(rmTick,2000);
+  if(!silent)show('rm');else{updateLive()}}
+async function rmResume(){
+  if(rm||!me||!sb||busyOnline())return;
+  const r=await sb.rpc('room_mine');
+  if(r.data&&!rm&&!busyOnline())rmAttach(r.data,true)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&rm)rmTick()});
+async function rmTick(){
+  if(!rm||!sb||document.hidden||rm.polling)return;rm.polling=true;const id=rm.id;
+  try{
+    const r=await sb.rpc('room_get',{p_id:id});
+    if(!rm||rm.id!==id)return;
+    if(r.error){if(/introuvable/i.test(r.error.message||'')){rmNote='Tu n’es plus dans ce salon (il a été fermé ou tu en as été retiré).';const was=curView;rmDetach();rmView='home';if(was==='rc'||was==='rm')show('rm');else rmRender()}return}
+    rmApply(r.data)}
+  catch(e){}
+  finally{if(rm)rm.polling=false}}
+
+/* --- mise à jour de l'état --- */
+function rmApply(v){
+  if(!rm||v.id!==rm.id)return;
+  const oldStatus=rm.status,sigOld=rm.sig;
+  Object.assign(rm,{code:v.code,games:v.games,max:v.max,players:v.players||[],status:v.status,host:v.host,cur:v.cur,isHost:!!me&&v.host===me.id});
+  if(v.status==='closed'){rmNote='Le salon a été fermé par l’hôte.';const was=curView;rmDetach();rmView='home';if(was==='rc'||was==='rm')show('rm');return}
+  if(v.status==='playing'){
+    if(v.cur!==rm.ep){rmNewEp(v.cur);if(curView==='rm'||curView==='rc'){if(curView==='rc')rcEnter();else show('rc')}}
+    const st=v.state;
+    if(st&&st.e===v.cur&&Array.isArray(st.rounds)){const g=rm.games[v.cur],rs=st.rounds.filter(r=>okRR(g,r));if(rs.length>rm.rounds.length)rm.rounds=rs}
+    if(rm.waiting&&rm.rounds[rm.k]&&curView==='rc')rmOnRound();
+    if(rm.isHost&&!rm.advanced&&rm.players.length&&rm.players.every(p=>p.prog&&p.prog.e===rm.cur&&p.prog.done)&&rm.finished){rm.advanced=true;setTimeout(()=>{if(rm&&rm.status==='playing')rmAdvance()},3500)}
+    if(curView==='rc'){rcHead();if(rm.finished){rmStand();rmAct()}}
+  }
+  if(v.status==='finished'){
+    clearTimeout(rm.nextT);clearInterval(rcTT);clearInterval(rmT);rmT=null;rm.playing=false;
+    if(oldStatus!=='finished'&&(curView==='rc'||curView==='rm'))show('rm')}
+  rm.sig=v.status+'|'+v.cur+'|'+rm.players.map(p=>p.id+':'+p.total+':'+(p.prog?p.prog.e+'.'+p.prog.done:'')).join(',');
+  if(curView==='rm'&&rm.sig!==sigOld)rmRender();
+  updateLive()}
+function rmNewEp(cur){
+  clearTimeout(rm.nextT);clearInterval(rcTT);rcCur=null;
+  const mp=(rm.players.find(p=>p.id===me.id)||{}).prog,same=mp&&mp.e===cur;
+  Object.assign(rm,{ep:cur,rounds:[],k:same?mp.round:0,score:same?mp.score:0,time:same?mp.time:0,finished:!!(same&&mp.done),started:false,waiting:false,busy:false,advanced:false,prepEp:-1,playing:true});
+  $('rcStage').innerHTML='';$('rcRev').hidden=true;$('rcRes').hidden=true;rcMsg('');
+  if(rm.isHost)rmHostPrep()}
+
+/* --- préparation des manches par l'hôte --- */
+async function rmHostPrep(){
+  if(!rm||!rm.isHost||rm.prepEp===rm.ep)return;const ep=rm.ep,g=rm.games[ep];rm.prepEp=ep;let fails=0;
+  const live=()=>rm&&rm.ep===ep&&rm.status==='playing';
+  if(g==='at'){
+    const out=[];
+    while(live()&&out.length<10&&fails<14){
+      try{const t=await atTrack();out.push({id:t.a.id,t:[t.a.title.romaji||null,t.a.title.english||null],c:t.a.coverImage.large,y:t.a.seasonYear||null,s:t.th.slug,so:t.th.title,ar:t.th.artists,l:t.th.link})}
+      catch(e){fails++;await sleep(1500);continue}
+      if(!live())return;
+      const x=await sb.rpc('room_set_rounds',{p_id:rm.id,p_rounds:out});
+      if(x.error){out.pop();fails++;await sleep(1500);continue}
+      if(rm.rounds.length<out.length)rm.rounds=out.slice();
+      if(rm.waiting&&curView==='rc')rmOnRound()}}
+  else{
+    while(live()&&fails<8){
+      let rs=null;try{rs=await rcPrep(g)}catch(e){}
+      if(!live())return;
+      if(!rs||rs.length<10||!rs.every(r=>okRR(g,r))){fails++;await sleep(1500);continue}
+      const x=await sb.rpc('room_set_rounds',{p_id:rm.id,p_rounds:rs});
+      if(x.error){fails++;await sleep(1500);continue}
+      rm.rounds=rs;if(rm.waiting&&curView==='rc')rmOnRound();return}}
+  if(live()&&rm.rounds.length<10){rcMsg('Impossible de préparer cette épreuve (AniList ou AnimeThemes ne répond pas bien) : on passe à la suite.');setTimeout(()=>{if(live())rmAdvance()},2500)}}
+
+/* --- une manche --- */
+async function rmOnRound(){
+  if(!rm||rm.status!=='playing'||rm.busy||rm.finished)return;const ep=rm.ep,g=rm.games[ep];
+  if(rm.k>=10){rmFinishEp();return}
+  rm.started=true;
+  const r=rm.rounds[rm.k];
+  if(!r){
+    rm.waiting=true;rcHead();rcMsg('Préparation de la manche '+(rm.k+1)+'…');return}
+  rm.waiting=false;rm.busy=true;rcHead();rcMsg('Chargement…');const k=rm.k;
+  try{await rcPreload(g==='hl'?[r.a.im,r.b.im]:(g==='at'?[]:[r.im]))}catch(e){}
+  if(!rm||rm.ep!==ep||rm.k!==k){if(rm)rm.busy=false;return}
+  rm.busy=false;rm.rt0=Date.now();rcDraw(g,r,{race:true,room:true})}
+function rmRoundDone(pts,txt,skip){
+  if(!rm)return;const g=rm.games[rm.ep];
+  rm.score+=pts;rm.time+=Math.min(RG[g].lim,Math.round((Date.now()-(rm.rt0||Date.now()))/1000));rm.k++;
+  if(!skip)rcMsg(txt+(pts?' +'+pts+' point'+(pts>1?'s':''):''));
+  rmPush(rm.k>=10);rcHead();
+  clearTimeout(rm.nextT);const ep=rm.ep;
+  rm.nextT=setTimeout(()=>{if(!rm||rm.ep!==ep||rm.status!=='playing')return;if(rm.k>=10)rmFinishEp();else rmOnRound()},skip?800:RG[g].next)}
+async function rmPush(done){
+  if(!rm||!sb)return;const id=rm.id,p={e:rm.ep,round:rm.k,score:rm.score,time:rm.time,done:!!done};
+  const r=await sb.rpc('room_progress',{p_id:id,p_prog:p});
+  if(r.error&&rm&&rm.id===id){await sleep(1500);if(rm&&rm.id===id&&rm.ep===p.e)await sb.rpc('room_progress',{p_id:id,p_prog:p})}}
+function rmFinishEp(){
+  if(!rm||rm.finished)return;rm.finished=true;clearInterval(rcTT);rcCur=null;
+  rmPush(true);rmStand();rmAct();rcHead()}
+function rmStand(){
+  if(curView!=='rc')return;
+  const last=rm.cur+1>=rm.games.length;
+  $('rcStage').innerHTML='<div class="btStep">Épreuve terminée : '+rm.score+' point'+(rm.score>1?'s':'')+'</div>'+rmBoard(false);
+  rcMsg(rm.isHost?'Quand tout le monde a fini, on passe à la suite automatiquement. Tu peux aussi forcer le passage.':'En attente des autres joueurs et de l’hôte…');
+  $('rcRev').hidden=true}
+function rmAct(){
+  const a=$('rcAct');if(!rm){return}
+  const last=rm.cur+1>=rm.games.length;
+  a.innerHTML=(rm.isHost&&rm.finished?'<button class="btn" data-rm="adv">'+(last?'Terminer le tournoi':'Épreuve suivante')+'</button>':'')+'<button class="btn alt" data-rm="leave">Quitter le salon</button>'}
+async function rmAdvance(){
+  if(!rm||!rm.isHost||rm.status!=='playing')return;
+  const r=await sb.rpc('room_advance',{p_id:rm.id});
+  if(r.error){rm.advanced=false;rcMsg('Erreur : '+r.error.message);return}
+  rmApply(r.data)}
+let rmQ=0;
+async function rmLeave(btn){
+  if(!rm)return;
+  if(Date.now()-rmQ>4000){rmQ=Date.now();if(btn)btn.textContent='Confirmer : quitter le salon ?';return}
+  const id=rm.id;rmQ=0;try{await sb.rpc('room_leave',{p_id:id})}catch(e){}
+  rmDetach();rmView='home';rmNote='';show('rm')}
+
+/* --- écran des salons --- */
+async function rmEnter(){
+  rmSay(rmNote);rmNote='';
+  if(!rm&&me&&sb&&!busyOnline()){const r=await sb.rpc('room_mine');if(r.data&&!rm&&curView==='rm'){rmAttach(r.data,true);return}}
+  rmRender()}
+function rmRender(){
+  const b=$('rmBody');if(!b||curView!=='rm')return;
+  if(!rm){
+    if(rmView==='form'){
+      const opt=(none)=>(none?'<option value="">— aucune —</option>':'')+RMG.map(g=>'<option value="'+g+'">'+GN[g]+'</option>').join('');
+      b.innerHTML='<p class="sub">Choisis les épreuves. Une seule épreuve = un salon. Plusieurs = un tournoi : les points de chaque épreuve s’additionnent.</p><div class="rmF">'+[1,2,3,4].map(i=>'<label for="rmG'+i+'">Épreuve '+i+(i===1?'':' (facultatif)')+'</label><select id="rmG'+i+'">'+opt(i>1)+'</select>').join('')+'<label for="rmMax">Nombre de joueurs maximum</label><select id="rmMax">'+Array.from({length:11},(_,i)=>'<option value="'+(i+2)+'"'+(i+2===8?' selected':'')+'>'+(i+2)+'</option>').join('')+'</select></div><div class="row"><button class="btn" data-rm="create">Créer le salon</button><button class="btn alt" data-rm="home">Retour</button></div>';
+      $('rmG1').value='at';return}
+    b.innerHTML='<div class="mlg"><button class="mlb" data-rm="form"><b>Créer un salon</b><small>Tu choisis les épreuves, tu partages le code, tes amis te rejoignent.</small></button></div><label for="rmCode" style="font-weight:700">Rejoindre avec un code</label><div class="row" style="margin-top:6px"><input id="rmCode" maxlength="6" placeholder="CODE" autocapitalize="characters" autocomplete="off"><button class="btn" data-rm="join">Rejoindre</button></div><p class="sub" style="margin-top:14px">Il faut un compte pour jouer en salon.</p>';
+    const c=$('rmCode');if(c)c.addEventListener('keydown',e=>{if(e.key==='Enter')rmJoin()});return}
+  if(rm.status==='lobby'){
+    const n=rm.players.length;
+    b.innerHTML='<p class="sub">'+(rm.games.length>1?'Tournoi en '+rm.games.length+' épreuves':'Salon')+' : '+esc(rmGameList())+'</p><div class="rmCode" aria-label="Code du salon">'+esc(rm.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p><h2>Joueurs ('+n+' sur '+rm.max+')</h2>'+rmRows().map(p=>'<div class="fr-row">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===rm.host?' 👑':'')+'</b></div></div>').join('')+'<div class="row" style="margin-top:12px">'+(rm.isHost?'<button class="btn" data-rm="start"'+(n<2?' disabled':'')+'>'+(n<2?'Attends au moins un autre joueur':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-rm="leave">Quitter</button></div>';return}
+  if(rm.status==='playing'){
+    b.innerHTML='<p class="sub">Une partie est en cours dans ce salon ('+esc(rmGameList())+').</p>'+rmBoard(false)+'<div class="row" style="margin-top:12px"><button class="btn" data-rm="resume">Reprendre la partie</button><button class="btn alt" data-rm="leave">Quitter</button></div>';return}
+  if(rm.status==='finished'){
+    const rows=rmRows(),top=rows[0],tie=rows.length>1&&rows[1].sum===top.sum;
+    b.innerHTML='<h2 style="text-align:center">'+(tie?'🤝 Égalité en tête !':'🏆 '+esc(top.pseudo)+' gagne !')+'</h2>'+rmBoard(true)+'<div class="row" style="margin-top:12px"><button class="btn" data-rm="done">Terminer</button></div>'}}
+async function rmCreate(){
+  const games=[1,2,3,4].map(i=>$('rmG'+i)&&$('rmG'+i).value).filter(Boolean),max=+$('rmMax').value;
+  rmSay('Création…');const r=await sb.rpc('room_create',{p_games:games,p_max:max});
+  if(r.error){rmSay('Erreur : '+r.error.message);return}
+  rmSay('');rmAttach(r.data)}
+async function rmJoin(){
+  if(busyOnline()){rmSay('Termine ou quitte ta partie en cours d’abord.');return}
+  const code=($('rmCode').value||'').trim();if(code.length<4){rmSay('Écris le code du salon.');return}
+  rmSay('Connexion…');const r=await sb.rpc('room_join',{p_code:code});
+  if(r.error){rmSay(r.error.message);return}
+  rmSay('');rmAttach(r.data)}
+$('rmBody').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-rm]');if(!b||b.disabled)return;
+  switch(b.dataset.rm){
+    case 'form':if(busyOnline()){rmSay('Termine ou quitte ta partie en cours d’abord.');return}rmView='form';rmSay('');rmRender();break;
+    case 'home':rmView='home';rmRender();break;
+    case 'create':rmCreate();break;
+    case 'join':rmJoin();break;
+    case 'start':{b.disabled=true;const r=await sb.rpc('room_start',{p_id:rm.id});if(r.error){rmSay('Erreur : '+r.error.message);b.disabled=false}else{rmSay('');rmApply(r.data)}break}
+    case 'leave':rmLeave(b);break;
+    case 'resume':show('rc');break;
+    case 'done':rmDetach();rmView='home';rmRender();break}});
 renderUser();if(!store.get('mode',''))openWelcome();
 show('home');
 /* Portraits AniList dans les illustrations de l'accueil */
