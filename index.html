@@ -291,6 +291,8 @@ body.vieon #gcB{display:none!important}
 .vk .xsb{position:absolute;left:12px;right:12px;top:56px;height:22px;border-radius:11px;background:#fff;border:2.5px solid var(--k,#e07a2f);display:flex;align-items:center;justify-content:center;gap:4px;z-index:3}
 .vk .xsb span{font:900 8px Trebuchet MS,Arial,sans-serif;color:var(--k,#b85d14);letter-spacing:.5px;margin-right:3px;line-height:1}
 .vk .xsb svg{display:block}
+.vk .xw2{position:absolute;left:34px;right:34px;top:84px;height:152px;border-radius:14px;background:linear-gradient(180deg,#f4f7fc,#e4ebf6);box-shadow:inset 0 0 0 2px #d3d9e6}
+.vk .xw2 svg{width:100%;height:100%;display:block}
 .vk .xc{position:absolute;left:10px;right:10px;bottom:10px;height:50px;border:2px solid #17171f;border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-style:italic;font-weight:700;font-size:11px;line-height:1.2;text-transform:uppercase;padding:0 6px}
 .vk .xp{position:absolute;left:12px;top:226px;height:34px;white-space:nowrap;border:2px solid #17171f;border-radius:14px;background:#fff;display:flex;align-items:center;gap:5px;padding:0 9px;z-index:5;font-size:10px;font-weight:900;letter-spacing:1px}
 .vk .xp svg{height:26px;width:auto;display:block}.vk .xp .xpn{font-size:22px;font-weight:900;letter-spacing:0;margin-left:1px}
@@ -2833,10 +2835,10 @@ const vieSet=h=>{$('vieBody').innerHTML=h};
 const vieMap=a=>{const m={};a.forEach(c=>{m[c.id]=c});return m};
 async function vieCat(){
   if(VC)return VC;
-  try{const s=JSON.parse(sessionStorage.getItem('viecat5')||'null');if(Array.isArray(s)&&s.length>60){VC=vieMap(s);return VC}}catch(e){}
+  try{const s=JSON.parse(sessionStorage.getItem('viecat6')||'null');if(Array.isArray(s)&&s.length>60){VC=vieMap(s);return VC}}catch(e){}
   const r=await sb.from('vie_cards').select('*');
   if(r.error||!r.data||r.data.length<60)throw new Error('Impossible de charger les cartes');
-  try{sessionStorage.setItem('viecat5',JSON.stringify(r.data))}catch(e){}
+  try{sessionStorage.setItem('viecat6',JSON.stringify(r.data))}catch(e){}
   VC=vieMap(r.data);return VC}
 /* les dessins sont dans un fichier à part, chargé à la demande */
 let vieArtP=null;
@@ -2875,9 +2877,9 @@ const VCAP={
   study:'Une étude de plus. Impossible d’étudier quand on travaille.',
   flirt:'Flirt : on peut ensuite se marier.',marriage:'Flirt obligatoire avant le mariage.<br>Permet d’avoir des enfants.',
   adultery:'Permet de flirter même marié(e).',child:'Naissance : il faut être marié(e).',
-  accident:['Un adversaire passe son tour.','Assurance'],illness:['Un adversaire passe son tour.','Assurance · Médecin'],disaster:['Défausse les enfants des deux joueurs.','Assurance · Militaire'],
-  burnout:['Un salarié passe son tour.','Thérapie'],divorce:['Défausse le Mariage (et l’Adultère).','Protection juridique · Avocat'],tax:['Défausse son dernier salaire non retourné.','Assurance · Bandit'],
-  fire:['Défausse son Métier.','Protection juridique · Fonctionnaire'],repeat:['Défausse ses cartes Études.','Thérapie · Médecin'],prison:['Seulement sur un Bandit : il perd son métier et passe 3 tours.',''],casino:'Ouvre le casino : on peut miser un salaire de sa main.',
+  accident:['Un adversaire passe son tour.','Garagiste'],illness:['Un adversaire passe son tour.','Médecin'],disaster:['Défausse les enfants des deux joueurs.','Militaire'],
+  burnout:['Un salarié passe son tour.',''],divorce:['Défausse le Mariage (et l’Adultère).','Avocat'],tax:['Défausse son dernier salaire non retourné.','Bandit'],
+  fire:['Défausse son Métier.','Fonctionnaire'],repeat:['Défausse ses cartes Études.','Médecin'],prison:['Seulement sur un Bandit : il perd son métier et passe 3 tours.',''],casino:'Ouvre le casino : on peut miser un salaire de sa main.',
   law:'Bloque un Divorce ou un Licenciement.',ins:'Bloque Accident, Maladie, Catastrophe ou Impôts.',thera:'Bloque un Burn-out ou un Redoublement.',
   anniv:'Tu reçois un salaire de chaque adversaire.',rainbow:'Joue 3 cartes d’affilée, ou pioche-en 3.',chance:'Pioche 3 cartes, garde-en une, défausse les 2 autres.',
   star:'Choisis une carte de la défausse et joue-la.',inherit:'Reste posé : vaut 3 pour payer tes achats.',piston:'Pose le métier de ton choix (sans les études).',
@@ -2891,7 +2893,7 @@ const VCAP={
   ghost:'Regarde la main d’un adversaire.',witch:'Échange ta main avec celle d’un adversaire.',fairy:'Pioche 2 cartes.',genie:'Prends n’importe quelle carte de la défausse.',potion:'Pose le premier Flirt de la pioche.',
   wealth:'Les adversaires aisés perdent leur plus gros salaire.',strike:'Les adversaires qui travaillent passent leur tour.',election:'Les moins heureux piochent 2 cartes.',referendum:'Échange ton métier avec celui d’un adversaire.',revolution:'Les politiciens perdent leur métier.',
   lottery:'1 chance sur 3 de gagner un Héritage.',equalpay:'Pose le premier Salaire de la pioche.',party:'Pour un politicien : 2 sourires.',trophy:'Pour un métier féminin : 3 sourires.',blackcard:'Tes achats coûtent 1 de moins.',
-  legion:'Se pose directement. Un honneur, sauf pour les Bandits.',prize:'Pour les métiers d’excellence : salaires jusqu’au niveau 4.',gprof:'Pour les professeurs : remplace Professeur, salaires niveau 4.'};
+  legion:'Se pose directement. Un honneur, sauf pour les Bandits.',prize:'Pour journalistes, chercheurs et écrivains : salaires jusqu’au niveau 4.',gprof:'Pour les professeurs : remplace Professeur, salaires niveau 4.'};
 const JOBNOTE={bandit:'Ni licencié ni imposé',barman:'Flirts illimités',mech:'Insensible aux accidents',police:'Chasse Bandits et Gourous',soldier:'Protège des Catastrophes',guru:'Chassé par le Policier',medium:'Voit les 13 prochaines',teacher:'Fonctionnaire',writer:'Grand Prix possible',journalist:'Regarde une main',pharma:'Jamais malade',architect:'Maison gratuite',pilot:'Voyages gratuits',doctor:'Jamais malade',lawyer:'Insensible au divorce',researcher:'6 cartes en main',surgeon:'Jamais malade',astro:'Reprend la défausse',binman:'Fouille la défausse',hobo:'Ni licencié ni imposé',junk:'Défausse : jeu libre',sewer:'Anti-rats, anti-maladie',survivor:'Immunisé Apocalypse',zhunter:'Anti-zombies, anti-épidémie',wizard:'Anti-démon, vampire, loup',exorcist:'Anti-démon et vampire',mayor:'Mariage sans flirt',deputy:'Insensible aux impôts',minister:'Jamais licencié',president:'Quasi intouchable',banker:'Achats à −1',butler:'Anti-cambriolage'};
 const jobNote=c=>{const a=[];if(c.tags&&c.tags.indexOf('interim')>=0)a.push('Intérimaire');if(JOBNOTE[c.eff])a.push(JOBNOTE[c.eff]);return a.join(' · ')};
 const BAGS=['#2d9cdb','#e5584a','#2fb36f','#8e5bd6','#e8a33a'];
@@ -2913,14 +2915,16 @@ function vieCardHTML0(id){
   const c=VC[id];if(!c)return'';
   const V=typeof VIEART!=='undefined'?VIEART:null;
   const eff=c.eff||'',k=c.kind;
-  if(!V||!V.A[id]){return'<div class="vk" style="--k:'+(KCOL[k]||'#7a4aa8')+'"><div class="xn">'+esc(c.name)+'</div><div class="xa" style="display:flex;align-items:center;justify-content:center;font-size:70px;background:#fff">'+c.emoji+'</div><div class="xc">'+esc(c.info||'')+'</div></div>'}
+  if(!V||!(V.A[id]||(k==='study'&&V.A[1]))){return'<div class="vk" style="--k:'+(KCOL[k]||'#7a4aa8')+'"><div class="xn">'+esc(c.name)+'</div><div class="xa" style="display:flex;align-items:center;justify-content:center;font-size:70px;background:#fff">'+c.emoji+'</div><div class="xc">'+esc(c.info||'')+'</div></div>'}
   const smile=V.smileMan,xs='<div class="xs">'+smile.repeat(c.smiles||0)+'</div>';
   const round=i=>'<div class="xa"><svg viewBox="0 0 100 100">'+V.A[i]()+'</svg></div>';
   const heart=(i,dark)=>{const h='vh'+(++vieHid);return'<svg class="xh" viewBox="0 0 100 92"><defs><clipPath id="'+h+'"><path d="'+VHEART+'"/></clipPath></defs>'+(dark?'<path d="'+VHEART+'" fill="#ff3b5c" stroke="#ff3b5c" stroke-width="7"/><path d="'+VHEART+'" fill="#2a0a14" stroke="#8a1a30" stroke-width="5"/>':'<path d="'+VHEART+'" fill="#fff" stroke="#fff" stroke-width="7"/><path d="'+VHEART+'" fill="#ffd1dd" stroke="#e8b3c2" stroke-width="5"/>')+'<g clip-path="url(#'+h+')"><g transform="translate(-2 -2) scale(1.04)">'+V.A[i]()+'</g></g><path d="'+VHEART+'" fill="none" stroke="'+(dark?'#ff3b5c':'#d7a0b2')+'" stroke-width="1.4"/></svg>'};
   const price=n=>n?'<div class="xp">PRIX '+V.bundleRow(1)+'<span class="xpn">'+n+'</span></div>':'';
   const cap=t=>'<div class="xc">'+t+'</div>';
   const nm=(t,col)=>'<div class="xn'+(t.length>13?' l':'')+'"'+(col?' style="color:'+col+'"':'')+'>'+esc(t)+'</div>';
-  if(k==='study')return'<div class="vk" style="--k:'+KCOL.study+'">'+xs+nm('Études')+'<div class="xb"></div>'+round(1)+cap(VCAP.study)+'</div>';
+  if(k==='study'&&eff==='double'){const w=a=>'<g transform="translate(0,'+a+')">'+V.wreath('',{gold:true})+'</g>';
+    return'<div class="vk" style="--k:'+KCOL.study+'">'+xs+nm('Études')+'<div class="xr">DOUBLES</div><div class="xw2"><svg viewBox="0 4 100 180" preserveAspectRatio="xMidYMid meet">'+w(-2)+w(86)+'</svg></div>'+cap('Tu sautes une classe : 2 niveaux d’études d’un coup')+'</div>'}
+  if(k==='study')return'<div class="vk" style="--k:'+KCOL.study+'">'+xs+nm('Études')+'<div class="xb"></div>'+round(1)+cap(eff==='double'?'Compte pour 2 niveaux d’études : tu sautes une classe.':VCAP.study)+'</div>';
   if(k==='job'){
     const t=(c.need?c.need+' étude'+(c.need>1?'s':''):'Sans études')+' · salaire max '+c.lvl+(jobNote(c)?'<br>'+jobNote(c):'');
     return'<div class="vk" style="--k:'+KCOL.job+'">'+xs+nm(c.name)+vieSalStrip(c.lvl)+round(id)+'<div class="xl">'+V.laurelBadge(c.need)+'</div>'+cap(t)+'</div>'}
@@ -2953,11 +2957,11 @@ const vieBackW=s=>'<span class="vw" style="--s:'+s+'">'+vieBackHTML()+'</span>';
 
 /* --- règles expliquées (inspirées du jeu de cartes Smile Life, adaptées) --- */
 const VHOW={
-  study:['Pose-la devant toi pour faire des études. Plus un métier est qualifié, plus il demande d’études. Chaque étude rapporte 1 sourire.',['Impossible d’étudier une fois que tu as un métier.','Maximum 6 études.']],
+  study:['Pose-la devant toi pour faire des études. Plus un métier est qualifié, plus il demande d’études. Chaque étude rapporte 1 sourire. Une étude double compte pour 2 niveaux : tu sautes une classe.',['Impossible d’étudier une fois que tu as un métier.','Maximum 6 niveaux d’études.']],
   job:['Pose-la pour exercer ce métier. Il ouvre les salaires (jusqu’à son niveau), la maison et les voyages. Il rapporte 1 sourire ; plus il est qualifié, plus ses salaires peuvent être élevés.',['Il faut avoir posé assez d’études.','Un seul métier à la fois, sauf si le tien est intérimaire (tu le remplaces). Tu peux aussi démissionner pendant ton tour.']],
-  salary:['Pose-le pour gagner des sourires. Un salaire sert aussi à payer une maison ou un voyage : on le retourne, il garde ses sourires mais ne peut plus payer.',['Il faut un métier dont le niveau est au moins celui du salaire.']],
+  salary:['Pose-le pour gagner 1 sourire (quel que soit son niveau). Un salaire sert aussi à payer une maison ou un voyage : on le retourne, il garde ses sourires mais ne peut plus payer.',['Il faut un métier dont le niveau est au moins celui du salaire.']],
   flirt:['Une rencontre amoureuse. Tu peux en avoir jusqu’à 5 (autant que tu veux si tu es Barman), elles rapportent des sourires.',['Si tu es marié(e), il te faut une carte Adultère pour flirter.','Il faut au moins un flirt pour se marier.']],
-  marriage:['Marie-toi : 2 sourires, et tu peux désormais avoir des enfants. Attention, un Divorce peut te l’enlever.',['Il faut avoir un flirt.','Un seul mariage à la fois.']],
+  marriage:['Marie-toi : 3 sourires, et tu peux désormais avoir des enfants. Attention, un Divorce peut te l’enlever.',['Il faut avoir un flirt.','Un seul mariage à la fois.']],
   adultery:['Permet de flirter même marié(e). Défaussable à tout moment si tu veux te racheter une conduite.',['Il faut être marié(e).','Un seul adultère à la fois.']],
   child:['Un enfant : 2 sourires. Tu peux en avoir autant que tu veux, mais gare à la Catastrophe qui les défausse.',['Il faut être marié(e).']],
   house:['Achète ta maison : elle rapporte des sourires (le nombre est sur la carte). Tu la paies en retournant des salaires (sans rendu de monnaie). Si tu es marié(e), le prix est divisé par deux.',['Il faut un métier.','Une seule maison à la fois.','Il faut assez de salaires non retournés.']],
@@ -2969,16 +2973,16 @@ const VHOW={
   dist:['Une distinction : un honneur ou un avantage durable, souvent avec des sourires à la clé.',[]]
 };
 const VEFF={
-  accident:['Le joueur visé passe son prochain tour.',['Bloqué par : Assurance. Le Garagiste est immunisé.','Il ne sert à rien si le joueur passe déjà son tour.']],
-  illness:['Le joueur visé passe son prochain tour.',['Bloquée par : Assurance (ou Désinfectant). Médecin, Chirurgien, Pharmacien et Égoutier sont immunisés.']],
-  disaster:['Tous les enfants du joueur visé et les tiens sont défaussés.',['Bloquée par : Assurance. Un Militaire en jeu protège tout le monde. Il faut que le joueur visé ait au moins un enfant.']],
-  burnout:['Le joueur visé, s’il travaille, passe son prochain tour.',['Bloqué par : Thérapie (ou Sororité, Ange gardien).']],
-  divorce:['Le joueur visé perd son mariage (et son adultère). Ses enfants et ses flirts restent.',['Bloqué par : Protection juridique (ou Sororité, Ange gardien). L’Avocat est immunisé.']],
-  tax:['Le joueur visé perd son dernier salaire non retourné.',['Bloqués par : Assurance. Le Bandit, le Clochard, le Député et le Président ne sont jamais imposés.']],
+  accident:['Le joueur visé passe son prochain tour.',['Le Garagiste est immunisé.','Il ne sert à rien si le joueur passe déjà son tour.']],
+  illness:['Le joueur visé passe son prochain tour.',['Médecin, Chirurgien, Pharmacien et Égoutier sont immunisés.']],
+  disaster:['Tous les enfants du joueur visé et les tiens sont défaussés.',['Un Militaire en jeu protège tout le monde. Il faut que le joueur visé ait au moins un enfant.']],
+  burnout:['Le joueur visé, s’il travaille, passe son prochain tour.',[]],
+  divorce:['Le joueur visé perd son mariage (et son adultère). Ses enfants et ses flirts restent.',['L’Avocat est immunisé.']],
+  tax:['Le joueur visé perd son dernier salaire non retourné.',['Le Bandit, le Clochard, le Député et le Président ne sont jamais imposés.']],
   prison:['Envoie un Bandit en prison : son métier est défaussé et il passe ses 3 prochains tours.',['Ne se pose que sur un Bandit.']],
   casino:['Ouvre le casino pour toute la partie. À ton tour, tu peux miser un salaire de ta main (c’est ton action). Le premier joueur mise, un autre répond : si les deux salaires sont du même niveau, celui qui répond gagne les deux cartes, sinon c’est le premier.',['Il ne s’ouvre qu’une fois.','Un salaire misé et non gagné en fin de partie revient à celui qui l’a posé.']],
-  fire:['Le joueur visé perd son métier.',['Bloqué par : Protection juridique (ou Sororité, Ange gardien). Les fonctionnaires (Policier, Militaire, Professeurs), le Bandit, le Clochard, le Ministre et le Président sont immunisés.']],
-  repeat:['Le joueur visé perd toutes ses études.',['Bloqué par : Thérapie. Médecin et Chirurgien sont immunisés.']],
+  fire:['Le joueur visé perd son métier.',['Les fonctionnaires (Policier, Militaire, Professeurs), le Bandit, le Clochard, le Ministre et le Président sont immunisés.']],
+  repeat:['Le joueur visé perd toutes ses études.',['Médecin et Chirurgien sont immunisés.']],
   law:['Bloque un Divorce ou un Licenciement.',['Avec les extensions, elle bloque aussi : Loup-garou, Scandale, Détournement de fonds et Plafond de verre.']],ins:['Bloque un Accident, une Maladie, une Catastrophe ou des Impôts.',['Avec les extensions, elle bloque aussi : Rats, Squatteurs, Détournement de fonds, Cambriolage et Impôt sur la fortune.']],thera:['Bloque un Burn-out ou un Redoublement.',['Avec les extensions, elle bloque aussi : Démon et Vampire.']],
   anniv:['Chaque adversaire te donne un salaire (le plus faible qu’il a). Tu les poses devant toi.',[]],
   rainbow:['Choisis : jouer 3 cartes d’affilée, ou piocher 3 cartes. Elle reste posée devant toi (la Licorne aime ça).',[]],
@@ -2989,10 +2993,10 @@ const VEFF={
   troc:['Tu donnes une carte de ta main et tu reçois une carte tirée au hasard dans la main de l’adversaire visé.',['Il faut une autre carte en main et un adversaire qui en a.']],
   tsunami:['Toutes les cartes en main (les tiennes et celles des adversaires) sont mélangées et redistribuées, chacun garde le même nombre de cartes.',[]],
   vengeance:['Récupère un malus que tu as reçu (encore dans la défausse) : tu dois le renvoyer tout de suite à un autre joueur.',['Il faut avoir reçu un malus dans cette partie.']],
-  legion:['Se pose directement : 2 sourires.',['Impossible pour un Bandit.']],
-  prize:['Réservé aux Médecins, Chirurgiens, Chercheurs, Journalistes et Écrivains : 3 sourires, et tes salaires montent au niveau 4.',['Il faut avoir l’un de ces métiers.','Un seul Grand Prix.']],
+  legion:['Se pose directement : 3 sourires.',['Impossible pour un Bandit.']],
+  prize:['Réservé aux Journalistes, Chercheurs et Écrivains : 4 sourires, et tes salaires montent au niveau 4 tant que tu as l’un de ces métiers. Si tu perds ton métier, la carte reste et garde ses 4 sourires.',['Il faut avoir l’un de ces métiers.','Un seul Grand Prix.']],
   gprof:['Réservé aux Professeurs : il remplace ta carte Professeur, avec des salaires jusqu’au niveau 4 et 2 sourires.',['Il faut être Professeur.']],
-  unicorn:['Un animal gratuit : 1 sourire. Il vaut le double si tu as aussi posé Arc-en-ciel et Étoile filante.',[]],
+  unicorn:['Un animal gratuit : 3 sourires. Il en vaut 6 si tu as aussi posé Arc-en-ciel et Étoile filante.',[]],
   /* --- extension Trash --- */
   rats:['L’adversaire visé défausse 2 cartes de sa main, au hasard.',['Bloquée par : Désinfectant ou Assurance. L’Égoutier est immunisé.','Il faut que le joueur visé ait au moins une carte en main.']],
   mess:['La dernière carte posée devant l’adversaire retourne dans sa main : il devra la rejouer.',['Bloqué par : Désinfectant.','Il faut que le joueur visé ait au moins une carte posée.']],
@@ -3048,6 +3052,7 @@ function vieHow(c){const e=c.eff&&VEFF[c.eff],k=VHOW[c.kind]||['',[]];
   return{t,cond,extra}}
 /* --- tests de légalité côté site (le serveur vérifie la même chose) --- */
 const vieN=(b,k)=>b.filter(i=>VC[i]&&VC[i].kind===k).length;
+const vieStu=b=>b.reduce((n,i)=>n+(VC[i]&&VC[i].kind==='study'?(VC[i].eff==='double'?2:1):0),0);
 const vieNe=(b,e)=>b.filter(i=>VC[i]&&VC[i].eff===e).length;
 function vieJobC(b){for(const i of b){const c=VC[i];if(c&&(c.kind==='job'||c.eff==='gprof'))return c}return null}
 function viePayables(b,sp){const r=b.filter(i=>VC[i]&&(VC[i].kind==='salary'||VC[i].eff==='inherit'));(sp||[]).forEach(s=>{const k=r.indexOf(s);if(k>=0)r.splice(k,1)});return r}
@@ -3069,9 +3074,9 @@ function viePaySuggest(price,items){
 function vieWhy(c,v,mineP){
   const b=mineP.board||[],sp=mineP.spent||[],job=vieJobC(b),n=k=>vieN(b,k);
   switch(c.kind){
-    case'study':return job?'Tu ne peux plus étudier quand tu travailles.':n('study')>=6?'Tu as déjà 6 études (le maximum).':'';
-    case'job':return job&&!vieInterim(job)?'Tu as déjà un métier.':n('study')<c.need?'Il te faut '+c.need+' étude'+(c.need>1?'s':'')+' (tu en as '+n('study')+').':(c.eff==='bandit'||c.eff==='guru')&&vieAnyPolice(v)?'Un Policier est en jeu : impossible de poser ce métier.':'';
-    case'salary':return!job?'Il te faut un métier pour toucher un salaire.':Math.max(job.lvl,vieNe(b,'prize')?4:0)<c.lvl?'Ton métier ne permet pas ce niveau de salaire.':'';
+    case'study':return job?'Tu ne peux plus étudier quand tu travailles.':vieStu(b)>=6?'Tu as déjà 6 niveaux d’études (le maximum).':vieStu(b)+(c.eff==='double'?2:1)>6?'Une étude double dépasserait le maximum de 6 niveaux.':'';
+    case'job':return job&&!vieInterim(job)?'Tu as déjà un métier.':vieStu(b)<c.need?'Il te faut '+c.need+' étude'+(c.need>1?'s':'')+' (tu en as '+vieStu(b)+').':(c.eff==='bandit'||c.eff==='guru')&&vieAnyPolice(v)?'Un Policier est en jeu : impossible de poser ce métier.':'';
+    case'salary':return!job?'Il te faut un métier pour toucher un salaire.':Math.max(job.lvl,vieNe(b,'prize')&&['journalist','researcher','writer'].includes(job.eff)?4:0)<c.lvl?'Ton métier ne permet pas ce niveau de salaire.':'';
     case'flirt':return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':n('flirt')>=5&&!(job&&job.eff==='barman')?'Tu as déjà 5 flirts.':'';
     case'adultery':return!n('marriage')?'Il faut être marié(e) pour un adultère.':n('adultery')?'Tu as déjà un adultère.':'';
     case'marriage':return n('marriage')?'Tu es déjà marié(e).':!n('flirt')&&!(job&&job.eff==='mayor')?'Il te faut au moins un flirt pour te marier.':'';
@@ -3085,7 +3090,7 @@ function vieWhy(c,v,mineP){
       return''}
     case'shield':return b.some(i=>VC[i]&&VC[i].kind==='shield'&&VC[i].eff===c.eff)?'Tu as déjà cette protection.':'';
     case'dist':if(c.eff==='legion'&&job&&job.eff==='bandit')return'Impossible pour un Bandit.';
-      if(c.eff==='prize'){if(!(job&&['doctor','surgeon','researcher','journalist','writer'].includes(job.eff)))return'Réservé aux Médecins, Chirurgiens, Chercheurs, Journalistes et Écrivains.';if(vieNe(b,'prize'))return'Tu as déjà un Grand Prix.'}
+      if(c.eff==='prize'){if(!(job&&['journalist','researcher','writer'].includes(job.eff)))return'Réservé aux Journalistes, Chercheurs et Écrivains.';if(vieNe(b,'prize'))return'Tu as déjà un Grand Prix.'}
       if(c.eff==='gprof'&&!(job&&job.eff==='teacher'))return'Réservé aux Professeurs.';
       if(c.eff==='party'){if(!(job&&(job.tags||'').indexOf('politic')>=0))return'Réservé aux politiciens (Maire, Député, Ministre, Président).';if(vieNe(b,'party'))return'Tu as déjà un Parti politique.'}
       if(c.eff==='trophy'){if(!(job&&(job.tags||'').indexOf('fem')>=0))return'Réservé aux métiers féminins de l’extension Girl Power.';if(vieNe(b,'trophy'))return'Tu as déjà ce trophée.'}
@@ -3659,7 +3664,7 @@ async function vieGuide(){
   try{await vieCat();await vieArt()}catch(e){vieSet('<p class="hint">Impossible de charger les cartes.</p><div class="row"><button class="btn alt" data-vie="menu">Retour</button></div>');return}
   if(vieView!=='guide'||curView!=='vie')return;
   const hasP=vieHasPacks();if(!hasP)vieGPk='all';
-  const all=Object.values(VC).filter(c=>vieGPk==='all'||(c.pack||'base')===vieGPk).sort((a,b)=>vieByKind(a.id,b.id));
+  const all=Object.values(VC).filter(c=>c.qty>0&&(vieGPk==='all'||(c.pack||'base')===vieGPk)).sort((a,b)=>vieByKind(a.id,b.id));
   let h='<div class="vgd"><div class="row"><button class="btn alt sm" data-vie="'+(vo&&vo.v?'back':'menu')+'">← Retour</button></div><p class="sub">Touche une carte pour savoir exactement ce qu’elle fait et à quelles conditions on peut la jouer.</p>'+
     (hasP?'<div class="vopt vgpk">'+[['all','Tout'],['base','Jeu de base']].concat(VPACKS.map(p=>[p[0],p[1]+' '+p[2]])).map(x=>'<button class="btn alt sm'+(vieGPk===x[0]?' on':'')+'" data-vie="gpk" data-pk="'+x[0]+'">'+esc(x[1])+'</button>').join('')+'</div>':'')+(vieGPk!=='all'&&vieGPk!=='base'&&vieP(vieGPk)?'<div class="fam" style="border-color:'+vieP(vieGPk)[3]+'"><h2 style="margin-top:0">'+vieP(vieGPk)[1]+' Extension '+esc(vieP(vieGPk)[2])+'</h2><p>'+esc(vieP(vieGPk)[4])+' <b>'+vieCnt(vieGPk)+' cartes</b> s’ajoutent à la pioche quand l’hôte coche cette extension.</p></div>':'')+
     '<div class="fam"><h2 style="margin-top:0">Comment on joue</h2><p><b>But :</b> avoir le plus de sourires 😊 à la fin. <b>Un tour :</b> piocher une carte (ou prendre la dernière de la défausse, qu’il faut alors jouer), puis jouer une carte ou en défausser une. Tu gardes 5 cartes en main. <b>Fin :</b> quand la pioche est vide, on finit le tour de table, puis on compte les sourires. <b>Extensions :</b> avant de lancer la partie, l’hôte peut ajouter des paquets de cartes (Trash, Apocalypse, Fantastique, Politique, Vie de luxe, Girl Power). Chaque carte d’extension porte une petite pastille de couleur.</p></div>';
