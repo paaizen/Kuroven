@@ -409,6 +409,7 @@ body.vieon #gcB{display:none!important}
 /* ===== Ma Vie : animations, ciblage, casino ===== */
 #vieFx{position:fixed;inset:0;pointer-events:none;z-index:1200;overflow:hidden}
 .vfly{position:absolute;filter:drop-shadow(0 10px 14px #000a);z-index:2;will-change:transform}
+.vring{position:absolute;width:40px;height:40px;border:4px solid #ffffffd9;border-radius:50%;pointer-events:none}
 .vtoast{position:absolute;transform:translate(-50%,-50%);font-weight:900;font-size:1.05rem;background:#17171fee;color:#fff;border:2px solid #ffd84a;border-radius:14px;padding:5px 12px;white-space:nowrap;animation:vtoast 1.6s ease forwards;z-index:3;box-shadow:0 4px 14px #0008}
 @keyframes vtoast{0%{opacity:0;transform:translate(-50%,-10%) scale(.6)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}78%{opacity:1;transform:translate(-50%,-60%) scale(1)}100%{opacity:0;transform:translate(-50%,-130%) scale(1)}}
 .vop.hit,.vmine.hit{animation:vhit .8s}
@@ -2835,10 +2836,10 @@ const vieSet=h=>{$('vieBody').innerHTML=h};
 const vieMap=a=>{const m={};a.forEach(c=>{m[c.id]=c});return m};
 async function vieCat(){
   if(VC)return VC;
-  try{const s=JSON.parse(sessionStorage.getItem('viecat6')||'null');if(Array.isArray(s)&&s.length>60){VC=vieMap(s);return VC}}catch(e){}
+  try{const s=JSON.parse(sessionStorage.getItem('viecat7')||'null');if(Array.isArray(s)&&s.length>60){VC=vieMap(s);return VC}}catch(e){}
   const r=await sb.from('vie_cards').select('*');
   if(r.error||!r.data||r.data.length<60)throw new Error('Impossible de charger les cartes');
-  try{sessionStorage.setItem('viecat6',JSON.stringify(r.data))}catch(e){}
+  try{sessionStorage.setItem('viecat7',JSON.stringify(r.data))}catch(e){}
   VC=vieMap(r.data);return VC}
 /* les dessins sont dans un fichier à part, chargé à la demande */
 let vieArtP=null;
@@ -2863,7 +2864,7 @@ const viePkSet=a=>store.set('viepk',a.join(','));
 function viePackPick(sel,lock){
   return'<div class="vpks">'+VPACKS.map(p=>{const on=sel.includes(p[0]);return'<button type="button" class="vpk'+(on?' on':'')+'" style="--pc:'+p[3]+'" data-vie="pk" data-pk="'+p[0]+'" aria-pressed="'+on+'"'+(lock?' disabled':'')+'><span class="e">'+p[1]+'</span><span class="t"><b>'+p[2]+'</b><small>'+esc(p[4])+'</small><small class="n">+ '+vieCnt(p[0])+' cartes</small></span><span class="ck">'+(on?'✓':'')+'</span></button>'}).join('')+'</div>'}
 const viePackChips=sel=>sel.length?sel.map(k=>{const p=vieP(k);return p?'<span class="vpkc" style="--pc:'+p[3]+'">'+p[1]+' '+p[2]+'</span>':''}).join(''):'<span class="hint">Jeu de base seulement</span>';
-const vieLenT={short:'Courte (10 tours chacun)',normal:'Normale (16 tours chacun)',long:'Longue (26 tours chacun)'};
+const vieLenT={short:'Courte (environ 25 tours chacun)',normal:'Normale (environ 40 tours chacun)',long:'Longue (60 tours chacun, ou tout le paquet)'};
 const VIEK=['study','job','salary','flirt','marriage','adultery','child','house','trip','luxe','pet','dist','shield','special','malus'];
 const VIELAB={study:'Études',job:'Métier',salary:'Salaire',flirt:'Flirt',marriage:'Mariage',adultery:'Adultère',child:'Enfant',house:'Maison',trip:'Voyage',luxe:'Luxe',pet:'Animal',dist:'Distinction',shield:'Protection',special:'Carte spéciale',malus:'Malus'};
 const vieByKind=(a,b)=>VIEK.indexOf(VC[a].kind)-VIEK.indexOf(VC[b].kind)||(VC[a].kind==='job'?VC[a].need-VC[b].need||VC[a].lvl-VC[b].lvl:0)||a-b;
@@ -2878,7 +2879,7 @@ const VCAP={
   flirt:'Flirt : on peut ensuite se marier.',marriage:'Flirt obligatoire avant le mariage.<br>Permet d’avoir des enfants.',
   adultery:'Permet de flirter même marié(e).',child:'Naissance : il faut être marié(e).',
   accident:['Un adversaire passe son tour.','Garagiste'],illness:['Un adversaire passe son tour.','Médecin'],disaster:['Défausse les enfants des deux joueurs.','Militaire'],
-  burnout:['Un salarié passe son tour.',''],divorce:['Défausse le Mariage (et l’Adultère).','Avocat'],tax:['Défausse son dernier salaire non retourné.','Bandit'],
+  burnout:['Un salarié passe son tour.',''],divorce:['Défausse le Mariage (et l’Adultère, avec les enfants).','Avocat'],tax:['Défausse son dernier salaire non retourné.','Bandit'],
   fire:['Défausse son Métier.','Fonctionnaire'],repeat:['Défausse ses cartes Études.','Médecin'],prison:['Seulement sur un Bandit : il perd son métier et passe 3 tours.',''],casino:'Ouvre le casino : on peut miser un salaire de sa main.',
   law:'Bloque un Divorce ou un Licenciement.',ins:'Bloque Accident, Maladie, Catastrophe ou Impôts.',thera:'Bloque un Burn-out ou un Redoublement.',
   anniv:'Tu reçois un salaire de chaque adversaire.',rainbow:'Joue 3 cartes d’affilée, ou pioche-en 3.',chance:'Pioche 3 cartes, garde-en une, défausse les 2 autres.',
@@ -2958,11 +2959,11 @@ const vieBackW=s=>'<span class="vw" style="--s:'+s+'">'+vieBackHTML()+'</span>';
 /* --- règles expliquées (inspirées du jeu de cartes Smile Life, adaptées) --- */
 const VHOW={
   study:['Pose-la devant toi pour faire des études. Plus un métier est qualifié, plus il demande d’études. Chaque étude rapporte 1 sourire. Une étude double compte pour 2 niveaux : tu sautes une classe.',['Impossible d’étudier une fois que tu as un métier.','Maximum 6 niveaux d’études.']],
-  job:['Pose-la pour exercer ce métier. Il ouvre les salaires (jusqu’à son niveau), la maison et les voyages. Il rapporte 1 sourire ; plus il est qualifié, plus ses salaires peuvent être élevés.',['Il faut avoir posé assez d’études.','Un seul métier à la fois, sauf si le tien est intérimaire (tu le remplaces). Tu peux aussi démissionner pendant ton tour.']],
+  job:['Pose-la pour exercer ce métier. Il ouvre les salaires (jusqu’à son niveau), la maison et les voyages. Il rapporte 2 sourires ; plus il est qualifié, plus ses salaires peuvent être élevés.',['Il faut avoir posé assez d’études.','Un seul métier à la fois, sauf si le tien est intérimaire (tu le remplaces). Tu peux aussi démissionner pendant ton tour.']],
   salary:['Pose-le pour gagner 1 sourire (quel que soit son niveau). Un salaire sert aussi à payer une maison ou un voyage : on le retourne, il garde ses sourires mais ne peut plus payer.',['Il faut un métier dont le niveau est au moins celui du salaire.']],
   flirt:['Une rencontre amoureuse. Tu peux en avoir jusqu’à 5 (autant que tu veux si tu es Barman), elles rapportent des sourires.',['Si tu es marié(e), il te faut une carte Adultère pour flirter.','Il faut au moins un flirt pour se marier.']],
   marriage:['Marie-toi : 3 sourires, et tu peux désormais avoir des enfants. Attention, un Divorce peut te l’enlever.',['Il faut avoir un flirt.','Un seul mariage à la fois.']],
-  adultery:['Permet de flirter même marié(e). Défaussable à tout moment si tu veux te racheter une conduite.',['Il faut être marié(e).','Un seul adultère à la fois.']],
+  adultery:['Permet de flirter même marié(e). Il rapporte 1 sourire. Défaussable à tout moment si tu veux te racheter une conduite.',['Il faut être marié(e).','Un seul adultère à la fois.','Danger : un Divorce reçu te fait perdre le mariage, l’adultère et tous tes enfants.']],
   child:['Un enfant : 2 sourires. Tu peux en avoir autant que tu veux, mais gare à la Catastrophe qui les défausse.',['Il faut être marié(e).']],
   house:['Achète ta maison : elle rapporte des sourires (le nombre est sur la carte). Tu la paies en retournant des salaires (sans rendu de monnaie). Si tu es marié(e), le prix est divisé par deux.',['Il faut un métier.','Une seule maison à la fois.','Il faut assez de salaires non retournés.']],
   trip:['Pars en voyage pour gagner des sourires. Tu le paies en retournant des salaires, sauf si tu es Pilote de ligne : pour lui les voyages sont gratuits.',['Il faut un métier.','Il faut assez de salaires non retournés (sauf Pilote).']],
@@ -2977,7 +2978,7 @@ const VEFF={
   illness:['Le joueur visé passe son prochain tour.',['Médecin, Chirurgien, Pharmacien et Égoutier sont immunisés.']],
   disaster:['Tous les enfants du joueur visé et les tiens sont défaussés.',['Un Militaire en jeu protège tout le monde. Il faut que le joueur visé ait au moins un enfant.']],
   burnout:['Le joueur visé, s’il travaille, passe son prochain tour.',[]],
-  divorce:['Le joueur visé perd son mariage (et son adultère). Ses enfants et ses flirts restent.',['L’Avocat est immunisé.']],
+  divorce:['Le joueur visé perd son mariage. S’il a un adultère, il perd aussi l’adultère et tous ses enfants. Ses flirts restent.',['L’Avocat est immunisé.']],
   tax:['Le joueur visé perd son dernier salaire non retourné.',['Le Bandit, le Clochard, le Député et le Président ne sont jamais imposés.']],
   prison:['Envoie un Bandit en prison : son métier est défaussé et il passe ses 3 prochains tours.',['Ne se pose que sur un Bandit.']],
   casino:['Ouvre le casino pour toute la partie. À ton tour, tu peux miser un salaire de ta main (c’est ton action). Le premier joueur mise, un autre répond : si les deux salaires sont du même niveau, celui qui répond gagne les deux cartes, sinon c’est le premier.',['Il ne s’ouvre qu’une fois.','Un salaire misé et non gagné en fin de partie revient à celui qui l’a posé.']],
@@ -3218,6 +3219,8 @@ function vieFly(id,from,to,o,cb){
     d.style.transform='translate('+(to.x-from.x)+'px,'+(to.y-from.y)+'px) scale('+(o.end||.8)+') rotate('+(o.rot||0)+'deg)'}));
   setTimeout(()=>{if(cb)cb();d.style.opacity='0';setTimeout(()=>d.remove(),260)},dur)}
 function vieToast(pt,txt,cls){if(!pt)return;const t=document.createElement('div');t.className='vtoast'+(cls?' '+cls:'');t.style.left=pt.x+'px';t.style.top=pt.y+'px';t.textContent=txt;vieFxL().appendChild(t);setTimeout(()=>t.remove(),cls?2400:1600)}
+function vieRing(pt){if(!pt)return;const r=document.createElement('div');r.className='vring';r.style.left=(pt.x-20)+'px';r.style.top=(pt.y-20)+'px';vieFxL().appendChild(r);
+  r.animate([{transform:'scale(.6)',opacity:1},{transform:'scale(4.2)',opacity:0}],{duration:650,easing:'ease-out'}).onfinish=()=>r.remove()}
 function vieFxCls(el,cls,ms){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),ms||900)}
 const VMALIC={accident:'🚑',illness:'🤒',disaster:'🌪️',burnout:'🥵',divorce:'💔',tax:'💸',fire:'🔥',prison:'⛓️',repeat:'📚',rats:'🐀',mess:'🧺',squat:'🏚️',demon:'😈',vampire:'🧛',wolf:'🐺',embezzle:'💰',scandal:'📰',ceiling:'🪟',burglary:'🦹',
   meteor:'☄️',flood:'🌊',pandemic:'🦠',zombie:'🧟',famine:'🍽️',war:'⚔️',doom:'🌍',wealth:'💸',strike:'✊',election:'🗳️',revolution:'🚩',dump:'🗑️'};
@@ -3240,7 +3243,7 @@ const vieRvIdle=async()=>{let g=0;while((vieRvEl||vieRvQ.length)&&g++<60)await s
 async function vieFxRun(e){
   const c=VC&&VC[e.c],mid=me&&me.id;
   const mine=!!c&&vieAnimOn()&&((e.a==='malus'&&e.t===mid)||(e.a==='event'&&e.u!==mid&&((e.h||[]).includes(mid)||(e.b||[]).includes(mid))));
-  if(c&&!mine&&(e.a==='play'||e.a==='malus'||e.a==='event')&&vieDeskCls()&&vieAnMode()!=='off'){
+  if(c&&!mine&&(e.a==='play'||e.a==='malus'||e.a==='event'||e.a==='discard')&&vieDeskCls()&&vieAnMode()!=='off'){
     await vieAnnounce(e,vieAnMode()==='fast'||vieFxQ.length>0);
     if(curView!=='vie'||!vo)return;
     vieFxOne(e,{skipFly:true});
@@ -3293,7 +3296,8 @@ function vieFxOne(e,opt){
       if(rvm){const hit=(e.h||[]).includes(mid);setTimeout(()=>vieReveal({c:e.c,by:e.u,blk:!hit,ev:true,done:()=>{const p=pnl(mid);vieFxCls(p,hit?'hit':'blk',900);vieToast(vieFxPt(p),hit?ic:'🛡️ Bloqué !')}}),500)}});
   }else if(e.a==='discard'&&c){
     let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}if(opt&&opt.skipFly)from=null;
-    vieFly(e.c,from,disc(),{s:.46,end:.7,rot:Math.random()*16-8});
+    if(opt&&opt.skipFly){vieRing(disc());const ps=document.querySelector('.vmid .vpile:last-child .vstack');if(ps&&ps.animate)ps.animate([{transform:'scale(1)'},{transform:'scale(.95)'},{transform:'scale(1)'}],{duration:320})}
+    else vieFly(e.c,from,disc(),{s:.46,end:.7,rot:Math.random()*16-8});
   }else if(e.a==='take'&&c){
     vieFly(e.c,disc(),out(e.u),{s:.46,end:.7});
   }else if(e.a==='quit'&&c){
@@ -3307,7 +3311,7 @@ function vieFxOne(e,opt){
   else if(e.a==='timeout'){vieToast(out(e.u),'⏱️ trop lent')}}
 
 /* --- malus reçu : la carte s'affiche en grand (style Choc) --- */
-const VRVT={accident:'Tu passes ton prochain tour.',illness:'Tu passes ton prochain tour.',burnout:'Tu passes ton prochain tour.',divorce:'Tu perds ton mariage (et ton adultère).',tax:'Ton dernier salaire non retourné est défaussé.',fire:'Tu perds ton métier.',prison:'Ton métier est défaussé et tu passes 3 tours.'};
+const VRVT={accident:'Tu passes ton prochain tour.',illness:'Tu passes ton prochain tour.',burnout:'Tu passes ton prochain tour.',divorce:'Tu perds ton mariage (et, si tu as un adultère, tes enfants aussi).',tax:'Ton dernier salaire non retourné est défaussé.',fire:'Tu perds ton métier.',prison:'Ton métier est défaussé et tu passes 3 tours.'};
 const vieAnimOn=()=>store.get('vieanim','on')!=='off';
 let vieRvQ=[],vieRvEl=null,vieRvT=null;
 function vieReveal(o){vieRvQ.push(o);if(!vieRvEl)vieRvNext()}
@@ -3379,20 +3383,20 @@ function vieSmUp(uid,n){
   if(el){el.textContent=vo.hold[uid];vieFxCls(el,'vbump',600);vieToast(vieFxPt(el),'+'+n+' 😊','pts')}
   if(vo.hold[uid]>=real)delete vo.hold[uid]}
 /* annonce d'une carte posée : elle apparaît au milieu de la table, puis rejoint sa destination */
-const VAN={study:['#5aa2ff','ÉTUDES',['📚']],job:['#ffd84a','NOUVEAU MÉTIER',['⭐','💼']],salary:['#5ad27a','SALAIRE',['🪙','🪙']],flirt:['#ff6fa0','FLIRT',['💘']],marriage:['#ff6fa0','MARIAGE',['💍','💖','💖']],
+const VAN={discard:['#e5333b','DÉFAUSSÉ',[]],study:['#5aa2ff','ÉTUDES',['📚']],job:['#ffd84a','NOUVEAU MÉTIER',['⭐','💼']],salary:['#5ad27a','SALAIRE',['🪙','🪙']],flirt:['#ff6fa0','FLIRT',['💘']],marriage:['#ff6fa0','MARIAGE',['💍','💖','💖']],
   adultery:['#d946ef','ADULTÈRE',['😏']],child:['#ff9ec7','ENFANT',['👶']],house:['#c98a4b','MAISON',['🏠']],trip:['#38bdf8','VOYAGE',['✈️']],luxe:['#e9c76a','LUXE',['💎']],pet:['#ff9a3d','ANIMAL',['🐾','🐾']],
   dist:['#fbbf24','DISTINCTION',['🏅']],special:['#a78bfa','CARTE SPÉCIALE',['✨','✨']],shield:['#2dd4bf','PROTECTION',['🛡️']],malus:['#ff5a4d','MALUS',['💥']],event:['#fb923c','ÉVÉNEMENT',['⚠️']]};
 async function vieAnnounce(e,fast){
   const c=VC[e.c],mid=me&&me.id,B=$('vieBody'),L=vieFxL(),dim=$('vieDim');if(!B||!c)return;
-  const R=B.getBoundingClientRect(),un=vieUn(),k=e.a==='malus'?'malus':e.a==='event'?'event':c.kind,A=VAN[k]||VAN.special;
+  const R=B.getBoundingClientRect(),un=vieUn(),k=e.a==='malus'?'malus':e.a==='event'?'event':e.a==='discard'?'discard':c.kind,A=VAN[k]||VAN.special;
   const sEl=u=>document.querySelector(u===mid?'.vmine':'.vop[data-pid="'+u+'"]');
   const ff=vo.fxFrom;vo.fxFrom=null;
   let from=(e.u===mid?(ff||vieFxPt('#vieHand')):null)||vieFxPt(sEl(e.u))||{x:R.left+R.width/2,y:R.top+R.height*.8};
-  const toDisc=e.a==='event'||(e.a==='play'&&c.kind==='special'&&!['rainbow','star','inherit'].includes(c.eff));
+  const toDisc=e.a==='event'||e.a==='discard'||(e.a==='play'&&c.kind==='special'&&!['rainbow','star','inherit'].includes(c.eff));
   let to=e.a==='malus'?vieFxPt(sEl(e.t)):toDisc?vieFxPt('.vmid .vpile:last-child .vstack'):(vieFxPt(e.u===mid?'.vmine .vbd':'.vop[data-pid="'+e.u+'"] .vbd')||vieFxPt(sEl(e.u)));
   if(!to)to=from;
   const w=13*un,h=w*316/220,cx=R.left+R.width/2,cy=R.top+R.height*.36,me_=e.u===mid;
-  const who=me_?'Tu':vieName(e.u),verb=e.a==='malus'?(me_?'envoies à ':'envoie à ')+(e.t===mid?'toi':vieName(e.t)):(e.a==='event'||(c.kind==='special'))?(me_?'joues':'joue'):(me_?'poses':'pose');
+  const who=me_?'Tu':vieName(e.u),verb=e.a==='discard'?(me_?'défausses':'défausse'):e.a==='malus'?(me_?'envoies à ':'envoie à ')+(e.t===mid?'toi':vieName(e.t)):(e.a==='event'||(c.kind==='special'))?(me_?'joues':'joue'):(me_?'poses':'pose');
   const pc=document.createElement('div');pc.className='vpc';
   pc.style.cssText='--ac:'+A[0]+';left:'+(cx-w/2)+'px;top:'+(cy-h/2)+'px;width:'+w+'px';
   pc.innerHTML='<div class="rib">'+A[1]+'</div><div class="face" style="border-radius:'+(18*w/220).toFixed(1)+'px;width:'+w+'px;height:'+h.toFixed(1)+'px">'+vieW(e.c,w/220,'tabindex="-1"')+'</div><div class="cap"><small>'+esc(who)+' '+esc(verb)+'</small><b>'+esc(vieClean(c.name))+'</b></div>';
@@ -3404,7 +3408,9 @@ async function vieAnnounce(e,fast){
     if(!fast)A[2].forEach((m,i)=>{const sp=document.createElement('span');sp.className='vemo';sp.textContent=m;sp.style.left=(cx+(i-(A[2].length-1)/2)*w*.5-w*.1)+'px';sp.style.top=(cy-h*.1)+'px';sp.style.setProperty('--dx',((Math.random()-.5)*w*.5)+'px');sp.style.animationDelay=(i*.12)+'s';L.appendChild(sp);setTimeout(()=>sp.remove(),1500)});
     await sleep(fast?260:850);
     const tx=to.x-cx,ty=to.y-cy;
-    const ex=pc.animate([{transform:'none',opacity:1},{transform:'translate('+tx+'px,'+ty+'px) scale(.3) rotate(6deg)',opacity:.9,offset:.85},{transform:'translate('+tx+'px,'+ty+'px) scale(.25)',opacity:0}],{duration:fast?260:440,easing:'cubic-bezier(.5,0,.75,.4)',fill:'forwards'});
+    const arc=e.a==='discard';
+    const ex=pc.animate(arc?[{transform:'none',opacity:1,offset:0},{transform:'translate('+tx*.5+'px,'+(ty*.5-h*.7)+'px) scale(.62) rotate(-16deg)',opacity:1,offset:.45},{transform:'translate('+tx+'px,'+ty+'px) scale(.3) rotate(9deg)',opacity:.95,offset:.85},{transform:'translate('+tx+'px,'+ty+'px) scale(.26) rotate(5deg)',opacity:0,offset:1}]
+      :[{transform:'none',opacity:1},{transform:'translate('+tx+'px,'+ty+'px) scale(.3) rotate(6deg)',opacity:.9,offset:.85},{transform:'translate('+tx+'px,'+ty+'px) scale(.25)',opacity:0}],{duration:arc?(fast?320:660):(fast?260:440),easing:arc?'cubic-bezier(.3,.7,.3,1)':'cubic-bezier(.5,0,.75,.4)',fill:'forwards'});
     if(!vieFxQ.length&&dim)dim.style.opacity='0';
     await ex.finished}
   catch(x){}
