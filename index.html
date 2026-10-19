@@ -469,6 +469,159 @@ body.vdrag,body.vdrag *{cursor:grabbing!important;user-select:none;-webkit-user-
 @keyframes vrvrise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.vrv *,.vrv-in,.vhand .vw.nope{animation:none!important}}
 
+/* ===== Ma Vie sur grand écran : la table « autour de la table » ===== */
+@property --p{syntax:'<percentage>';inherits:false;initial-value:100%}
+body.vdesk{--vu:calc(var(--un,9)*1px)}
+body.vdesk main#v-vie{max-width:none;padding:8px 12px 0}
+body.vdesk main#v-vie>.back,body.vdesk main#v-vie>h1{display:none}
+body.vdesk #vieBody{position:relative;overflow:hidden;overflow:clip;border-radius:16px;min-height:480px}
+body.vdesk #vieMsg{position:fixed;left:50%;top:70px;translate:-50% 0;margin:0;z-index:90;min-height:0;background:#000d;color:#fff;padding:4px 14px;border-radius:12px}
+body.vdesk #vieMsg:empty{display:none}
+body.vdesk .vsc{position:absolute;inset:0;padding:0;border-radius:0;background:radial-gradient(ellipse at 50% 38%,var(--room1),var(--room2) 78%)}
+body.vdesk .vtab{position:absolute;inset:0;display:block;min-height:0;border:0;border-radius:0;background:none;box-shadow:none;padding:0}
+body.vdesk .vtab:before{inset:auto;left:3.5%;right:3.5%;top:5%;height:73%;border-radius:50%;border:calc(var(--vu)*1.1) solid var(--edge);background:radial-gradient(circle,#ffffff10 1.5px,transparent 2px) 0 0/26px 26px,radial-gradient(ellipse at 50% 45%,var(--felt1) 0%,var(--felt2) 55%,var(--felt3) 100%);box-shadow:inset 0 0 calc(var(--vu)*5) #0007,0 calc(var(--vu)*1) calc(var(--vu)*3) #000a,0 0 calc(var(--vu)*2.5) var(--glow)}
+body.vdesk .vtab>*{position:absolute}
+body.vdesk .vopps{display:contents}
+/* les joueurs */
+body.vdesk .vop{position:absolute;left:var(--sx);top:var(--sy);translate:-50% -50%;width:calc(var(--vu)*19);max-width:none;min-width:0;flex:none;margin:0;padding:calc(var(--vu)*.8);background:#0000005e;border:calc(var(--vu)*.22) solid #ffffff22;border-radius:calc(var(--vu)*1.3);cursor:pointer;transition:border-color .15s,box-shadow .15s,background .15s;z-index:2}
+body.vdesk .vop.s5{width:calc(var(--vu)*16)}
+body.vdesk .vop:hover{border-color:#ffffff77;background:#00000085}
+body.vdesk .vop.cur{border-color:#ffd84a;background:#00000070;box-shadow:0 0 0 calc(var(--vu)*.3) #ffd84a55,0 0 calc(var(--vu)*3) #ffd84a55}
+body.vdesk .vop.aim{border-color:#ff5a4d;background:#ff5a4d33}
+body.vdesk .vop:not(.aim):not(.no):not(.gone):hover:after{content:"👆 Voir ses cartes";position:absolute;left:0;right:0;bottom:calc(var(--vu)*-2.3);text-align:center;color:#ffd84a;font-weight:800;font-size:max(10px,calc(var(--vu)*1));text-shadow:0 1px 3px #000;pointer-events:none}
+body.vdesk .vop .vh1{gap:calc(var(--vu)*.7);justify-content:center}
+body.vdesk .vop .vh1 .g{flex:0 1 auto}
+body.vdesk .vop .vh1 b{font-size:max(11px,calc(var(--vu)*1.3))}
+body.vdesk .vop .vh1 small{font-size:max(10px,calc(var(--vu)*1.1));background:#0006;border-radius:999px;padding:0 .6em;align-self:flex-start;white-space:nowrap;color:#ffd84a}
+body.vdesk .ring{--rc:#ffd84a;border-radius:50%;background:#ffffff26;padding:calc(var(--vu)*.35);flex:none;display:inline-flex}
+body.vdesk .ring.on{--p:100%;background:conic-gradient(var(--rc) var(--p),#ffffff26 0);transition:--p 1s linear}
+body.vdesk .ring.low{--rc:#ff5a4d}
+body.vdesk .ring .avi{width:calc(var(--vu)*3.4);height:calc(var(--vu)*3.4);font-size:calc(var(--vu)*1.8);border:0}
+body.vdesk .ring.talk{animation:vtalk .5s}
+@keyframes vtalk{30%{transform:scale(1.18) rotate(-6deg)}60%{transform:scale(.96) rotate(4deg)}}
+body.vdesk .vop .vbacks{margin:calc(var(--vu)*.6) 0 0;height:calc(var(--vu)*3.4);justify-content:center}
+body.vdesk .vop .vbacks .vw{--s:calc(var(--un,9)*2.5/220)!important;margin-left:calc(var(--vu)*-1.5)}
+body.vdesk .vop .vbacks .vw:first-child{margin-left:0}
+body.vdesk .vop .vbacks em{font-size:max(10px,calc(var(--vu)*1));margin-left:calc(var(--vu)*.6)}
+body.vdesk .vop .vbd{justify-content:center;flex-wrap:nowrap;gap:calc(var(--vu)*.3);margin-top:calc(var(--vu)*.6);min-height:calc(var(--vu)*5.4)}
+body.vdesk .vop .vgrp,body.vdesk .vop .vgrp .vw{--s:calc(var(--un,9)*3.7/220)!important}
+body.vdesk .vbd .vgrp{flex:none}
+body.vdesk .vbd .vmore{align-self:center;margin-left:calc(var(--vu)*.4);font-size:max(10px,calc(var(--vu)*1));font-weight:900;background:#ffd84a;color:#17171f;border-radius:999px;padding:0 .5em;flex:none}
+body.vdesk .vop .vaim{font-size:max(10px,calc(var(--vu)*1));margin:calc(var(--vu)*.4) 0 0}
+/* le centre : piles */
+body.vdesk .vmid{left:0;right:0;top:42%;translate:0 -50%;min-height:0;padding:0;gap:calc(var(--vu)*3.5);flex-wrap:nowrap;z-index:1}
+body.vdesk .vmid .vstack .vw{--s:calc(var(--un,9)*7.6/220)!important}
+body.vdesk .vmid .vpl{font-size:max(10px,calc(var(--vu)*1))}
+body.vdesk .vmid .vgo{font-size:max(10px,calc(var(--vu)*.95))}
+body.vdesk .vevt{max-width:calc(var(--vu)*18);font-size:max(12px,calc(var(--vu)*1.3))}
+body.vdesk .vevt small{font-size:max(10px,calc(var(--vu)*1))}
+body.vdesk .vcas{font-size:max(10px,calc(var(--vu)*1));margin-top:calc(var(--vu)*.5);padding:calc(var(--vu)*.3) calc(var(--vu)*.8)}
+body.vdesk .vpkl{margin-top:calc(var(--vu)*.4)}
+/* ma zone */
+body.vdesk .vmine{left:50%;top:66%;translate:-50% 0;margin:0;display:flex;align-items:center;gap:calc(var(--vu)*1.8);padding:calc(var(--vu)*.5) calc(var(--vu)*1);border:calc(var(--vu)*.22) solid transparent;border-radius:calc(var(--vu)*1.3);z-index:2}
+body.vdesk .vmine.cur{border-color:#ffd84a55;background:#0000003a}
+body.vdesk .vme{text-align:center;display:flex;flex-direction:column;align-items:center;gap:calc(var(--vu)*.2);flex:none}
+body.vdesk .vme .score{font-weight:900;font-size:calc(var(--vu)*2.6);line-height:1;display:inline-block;text-shadow:0 2px 6px #000a}
+body.vdesk .vme .vlab{font-size:max(10px,calc(var(--vu)*1));margin:0;white-space:nowrap}
+body.vdesk .vmine .vbd{flex-wrap:nowrap;width:calc(var(--vu)*58);min-height:calc(var(--vu)*8.3);margin:0;gap:calc(var(--vu)*.4);justify-content:flex-start}
+body.vdesk .vmine .vgrp,body.vdesk .vmine .vgrp .vw{--s:calc(var(--un,9)*5.8/220)!important}
+.vbump{animation:vbump .55s}
+@keyframes vbump{40%{transform:scale(1.5)}}
+[data-sm]{display:inline-block}
+/* ma main */
+body.vdesk .vhandw{position:absolute;left:0;right:0;bottom:calc(var(--vu)*-2.2);margin:0;z-index:6}
+body.vdesk .vhand{padding:calc(var(--vu)*1.4) 12px 0}
+body.vdesk .vhand .vw{--s:calc(var(--un,9)*9.5/220)!important}
+body.vdesk .vhand .vw:hover{transform:translateY(calc(var(--y,0px) - var(--vu)*3.2)) rotate(var(--r,0deg))}
+/* consignes, tour, outils, journal */
+body.vdesk .vbanner{left:50%;top:60.5%;translate:-50% 0;margin:0;max-width:calc(var(--vu)*96);width:max-content;padding:calc(var(--vu)*.5) calc(var(--vu)*1.4);font-size:max(11px,calc(var(--vu)*1.15));border-radius:calc(var(--vu)*1);background:#0b1812e8;color:#fff;border-color:#ffffff33;z-index:4;position:absolute}
+body.vdesk .vbanner.vaimb{border-color:#ff5a4d;gap:calc(var(--vu)*1)}
+body.vdesk .vbanner .vheld .vw{--s:calc(var(--un,9)*3.6/220)!important}
+body.vdesk .vdraw{position:absolute;left:50%;top:49.5%;translate:-50% 0;margin:0;flex-direction:column;align-items:center;gap:calc(var(--vu)*.5);z-index:4}
+body.vdesk .vtools .btn{font-size:max(11px,calc(var(--vu)*1.1));padding:calc(var(--vu)*.45) calc(var(--vu)*1.2)}
+body.vdesk .vutil{position:absolute;right:1.2%;bottom:1.5%;margin:0;flex-direction:column;align-items:flex-end;gap:calc(var(--vu)*.5);z-index:7}
+body.vdesk .vutil .btn{font-size:max(10px,calc(var(--vu)*1));padding:calc(var(--vu)*.35) calc(var(--vu)*.9)}
+body.vdesk .vturn{position:absolute;left:1.2%;top:2%;margin:0;z-index:5;gap:calc(var(--vu)*.8);flex-wrap:nowrap}
+body.vdesk .vturn .pill2{font-size:max(11px,calc(var(--vu)*1.2));padding:calc(var(--vu)*.4) calc(var(--vu)*1.2)}
+body.vdesk .vturn .vtm{display:none}
+body.vdesk .vturn .ucT{margin:0;color:#fff;font-size:max(11px,calc(var(--vu)*1.1));text-shadow:0 1px 3px #000}
+body.vdesk .vlogs{position:absolute;right:1.2%;top:53%;width:calc(var(--vu)*19);max-height:calc(var(--vu)*15);overflow:hidden;margin:0;padding:calc(var(--vu)*.4) calc(var(--vu)*.8);background:#0a1410b8;border:1px solid #ffffff22;border-radius:calc(var(--vu)*1);font-size:max(10px,calc(var(--vu)*.95));z-index:3;color:#e8efe9}
+body.vdesk .vlg{font-size:inherit;border-bottom-color:#ffffff1a}
+/* chat flottant */
+body.vdesk #vieChatW{position:fixed;left:12px;bottom:12px;width:min(320px,26vw);margin:0;z-index:60;border-radius:14px;background:#0d1a13f2;border:1px solid #ffffff2e;color:#fff}
+body.vdesk #vieChL{display:none}
+body.vdesk #vieChatW.open #vieChL{display:flex;max-height:min(220px,28vh)}
+body.vdesk #vieChatW .vch{border-bottom-color:#ffffff22}
+.vchb{display:flex;gap:6px}.vcht{display:none}body.vdesk .vcht{display:inline-flex}
+/* qui commence */
+.vstart{position:absolute;translate:-50% -50%;text-align:center;color:#fff;background:#0b1812ee;border:calc(var(--vu,9px)*.3) solid #ffd84a;border-radius:calc(var(--vu,9px)*2);padding:calc(var(--vu,9px)*1.2) calc(var(--vu,9px)*3);box-shadow:0 0 calc(var(--vu,9px)*5) #ffd84a88;animation:vstin .5s cubic-bezier(.2,1.5,.4,1) both,vstout .4s ease 2.9s forwards;z-index:7}
+.vstart small{display:block;letter-spacing:.2em;text-transform:uppercase;font-weight:900;color:#ffd84a;font-size:calc(var(--vu,9px)*1.1)}
+.vstart .vst-w{display:flex;align-items:center;gap:calc(var(--vu,9px)*1.2);justify-content:center;margin-top:calc(var(--vu,9px)*.5)}
+.vstart .avi{width:calc(var(--vu,9px)*4.2);height:calc(var(--vu,9px)*4.2);font-size:calc(var(--vu,9px)*2)}
+.vstart b{font-size:calc(var(--vu,9px)*2.6);font-weight:900;white-space:nowrap}
+.vstart span{display:block;margin-top:calc(var(--vu,9px)*.6);font-size:calc(var(--vu,9px)*1.2);font-weight:700;color:#ffe9a0}
+.vbadge{position:absolute;translate:-50% -50%;background:#17171fee;color:#fff;border:calc(var(--vu,9px)*.25) solid #ffffff88;border-radius:999px;padding:calc(var(--vu,9px)*.3) calc(var(--vu,9px)*1.1);font-weight:900;font-size:calc(var(--vu,9px)*1.6);white-space:nowrap;box-shadow:0 4px 14px #0008;z-index:6;animation:vbadin .5s cubic-bezier(.2,1.7,.4,1) both,vbadout .4s ease 4.6s forwards}
+.vbadge.win{border-color:#ffd84a;background:#4a3b00f2;color:#ffe9a0}
+@keyframes vbadin{from{opacity:0;scale:.2}}
+@keyframes vbadout{to{opacity:0}}
+@keyframes vstin{from{opacity:0;scale:.3}}
+@keyframes vstout{to{opacity:0;scale:.9}}
+body.vdesk .vop.vspin,body.vdesk .vmine.vspin{border-color:#fff;background:#ffffff33;box-shadow:0 0 calc(var(--vu)*2) #fffa}
+body.vdesk .vop.vwin,body.vdesk .vmine.vwin{animation:vwin 1.1s ease 2}
+@keyframes vwin{40%{transform:scale(1.06);box-shadow:0 0 0 calc(var(--vu)*.4) #ffd84a,0 0 calc(var(--vu)*4) #ffd84a}}
+/* distribution */
+body.vdeal .vhandw,body.vdeal .vop .vbacks{opacity:0}
+body.vdesk .vhandw,body.vdesk .vop .vbacks{transition:opacity .4s}
+/* annonce d'une carte posée */
+#vieDim{position:absolute;background:#000;opacity:0;pointer-events:none;transition:opacity .3s;z-index:1}
+.vpc{position:absolute;display:flex;flex-direction:column;align-items:center;gap:calc(var(--vu,9px)*.8);will-change:transform;z-index:4}
+.vpc .face{position:relative;overflow:hidden;box-shadow:0 0 0 calc(var(--vu,9px)*.35) var(--ac),0 calc(var(--vu,9px)*1.2) calc(var(--vu,9px)*2.4) #000b,0 0 calc(var(--vu,9px)*4) var(--ac)}
+.vpc .face .vw{display:block}
+.vpc .face:after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,#ffffff66 50%,transparent 65%);transform:translateX(-120%);animation:vshine .9s ease .5s forwards}
+@keyframes vshine{to{transform:translateX(120%)}}
+.vpc .rib{position:absolute;left:50%;top:calc(var(--vu,9px)*-1.6);translate:-50% 0;background:var(--ac);color:#1a1708;font-weight:900;letter-spacing:.14em;font-size:calc(var(--vu,9px)*1);padding:calc(var(--vu,9px)*.25) calc(var(--vu,9px)*1.4);border-radius:999px;white-space:nowrap;z-index:2;animation:vribin .35s cubic-bezier(.2,1.5,.4,1) .35s both}
+@keyframes vribin{from{opacity:0;scale:.5}}
+.vpc .cap{text-align:center;color:#fff;text-shadow:0 1px 6px #000;animation:vcapin .35s ease .3s both;white-space:nowrap}
+.vpc .cap small{display:block;font-size:calc(var(--vu,9px)*1.1);letter-spacing:.12em;text-transform:uppercase;font-weight:800;opacity:.9}
+.vpc .cap b{display:block;font-size:calc(var(--vu,9px)*2.2);font-weight:900;line-height:1.1}
+@keyframes vcapin{from{opacity:0;transform:translateY(calc(var(--vu,9px)*1))}}
+.vemo{position:absolute;font-size:calc(var(--vu,9px)*2.2);animation:vemo 1.3s ease-out forwards;pointer-events:none;z-index:5}
+@keyframes vemo{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx),calc(var(--vu,9px)*-8)) scale(1.1)}}
+/* bulles de chat */
+.vbub{position:absolute;max-width:calc(var(--vu,9px)*22);padding:calc(var(--vu,9px)*.6) calc(var(--vu,9px)*1.2);background:#fff;color:#16161d;border-radius:calc(var(--vu,9px)*1.4);font-weight:700;font-size:max(12px,calc(var(--vu,9px)*1.3));line-height:1.25;box-shadow:0 6px 18px #000a;z-index:6;word-break:break-word;transform-origin:var(--tx,50%) var(--ty,100%);animation:vbubin .5s cubic-bezier(.2,1.7,.4,1) both,vbubout .4s ease var(--hold,4.2s) forwards}
+.vbub small{display:block;font-weight:900;font-size:.72em;color:#2b6cb0;letter-spacing:.03em}
+.vbub:after{content:"";position:absolute;left:var(--tx,50%);width:0;height:0;border:calc(var(--vu,9px)*.8) solid transparent;margin-left:calc(var(--vu,9px)*-.8)}
+.vbub.up:after{top:100%;border-top-color:#fff;margin-top:-1px}
+.vbub.dn:after{bottom:100%;border-bottom-color:#fff;margin-bottom:-1px}
+.vbub.emo1{font-size:calc(var(--vu,9px)*3);padding:calc(var(--vu,9px)*.4) calc(var(--vu,9px)*1)}
+@keyframes vbubin{from{opacity:0;transform:translateY(10px) scale(.2) rotate(-6deg)}60%{transform:scale(1.1) rotate(1deg)}to{opacity:1;transform:none}}
+@keyframes vbubout{to{opacity:0;transform:translateY(-10px) scale(.9)}}
+/* visionneur des cartes d'un joueur */
+.vzb.vview{max-width:min(1200px,96vw);background:#10241a;border-color:#ffd84a;color:#fff}
+.vview .vvh{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-right:90px}
+.vview .vvh .avi{width:52px;height:52px;font-size:1.4rem}
+.vview .vvh b{font-size:1.25rem;display:block}.vview .vvh small{color:#ffd84a;font-weight:800;font-size:.95rem}
+.vview .vvg{display:flex;flex-wrap:wrap;gap:18px 30px;align-items:flex-start}
+.vview .vvf h4{margin:0 0 6px;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:#ffd84a;font-weight:900}
+.vview .vbd{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.vview .vgrp,.vview .vgrp .vw{--s:calc(var(--un,9)*10/220)!important}
+.vview .vbd .vw:hover{transform:translateY(-4px)}
+.vview .hint{color:#ffffffbb;margin:12px 0 0}
+/* podium de fin */
+.vpod{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin:16px auto 18px;min-height:260px}
+.vpd{display:flex;flex-direction:column;align-items:center;gap:6px;width:clamp(92px,18vw,150px)}
+.vpd .avi{width:56px;height:56px;font-size:1.5rem;border:3px solid #ffd84a}
+.vpd .nm{font-weight:900;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vpd .bl{width:100%;border-radius:12px 12px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px;font-weight:900;background:#2b3d51;color:#fff;transform-origin:bottom;animation:vrise 1s cubic-bezier(.2,1.3,.4,1) both}
+.vpd.r1 .bl{height:130px;background:linear-gradient(#e0b100,#8a6a00);animation-delay:.5s}
+.vpd.r2 .bl{height:92px;background:linear-gradient(#cfd6de,#7d8793);animation-delay:.25s}
+.vpd.r3 .bl{height:66px;background:linear-gradient(#d08a4b,#7a4a1f)}
+.vpd .bl span{font-size:1.6rem;line-height:1}.vpd .bl small{font-size:.85rem}
+@keyframes vrise{from{transform:scaleY(0)}}
+.vconf{position:absolute;top:-20px;width:9px;height:14px;animation:vconf 3s ease-in forwards;pointer-events:none;z-index:6}
+@keyframes vconf{to{transform:translate(var(--dx),110vh) rotate(720deg);opacity:.9}}
+@media (prefers-reduced-motion:reduce){body.vdesk .ring.talk,.vbub,.vpc .face:after,.vemo,.vpd .bl,.vconf{animation:none!important}}
+
 @media(max-width:700px){.vsc{padding:6px;border-radius:14px}.vtab{border-radius:28px;padding:10px 8px}.vtab:before{border-radius:24px}.vop{flex:1 1 140px;min-width:140px}.vmid{gap:16px}.vevt{max-width:100%}}
 .vblk{color:#22c55e;font-weight:700}
 
@@ -589,6 +742,7 @@ main#v-uc,main#v-rc{max-width:720px}
 <div class="set"><h2>Ma Vie : dos des cartes</h2><p>La couleur du dos des cartes que tu vois sur la table.</p><div class="vsw" id="viePrefBack"></div></div>
 <div class="set"><h2>Ma Vie : décor de la table</h2><p>Le tapis et l’ambiance autour de la table.</p><div class="vsw" id="viePrefTable"></div></div>
 <div class="set"><h2>Ma Vie : animation des malus</h2><p>Quand un joueur te joue un malus, sa carte frappe l’écran en grand.</p><div class="vsw" id="viePrefAnim"></div><div class="row" style="margin-top:8px"><button type="button" class="btn alt sm" id="viePrefAnimGo">▶ Voir l’animation</button><button type="button" class="btn alt sm" id="viePrefAnimBk">▶ Version « bloqué »</button></div></div>
+<div class="set"><h2>Ma Vie : annonce des cartes posées</h2><p>Sur grand écran (ordinateur), chaque carte posée par un joueur s’affiche au milieu de la table pour que tout le monde la voie. Choisis la durée.</p><div class="vsw" id="viePrefAnn"></div></div>
 <div class="set"><h2>Compte</h2><p>Ton pseudo, ta photo, tes amis et ton historique sont dans le menu en haut à droite (« Mon profil »).</p></div>
 </main>
 <main id="v-at" hidden>
@@ -702,7 +856,7 @@ main#v-uc,main#v-rc{max-width:720px}
 <div id="vieBody"></div>
 <div class="vz" id="vieZ" hidden></div>
 <div class="msg" id="vieMsg"></div>
-<div class="vchat" id="vieChatW" hidden><div class="vch"><span>💬 Chat de la partie</span><button class="btn alt sm" type="button" id="vieChM">🔕 Couper</button></div><div id="vieChL" role="log" aria-live="polite"></div><div class="msI"><input id="vieChIn" maxlength="500" placeholder="Dis quelque chose à la table…" autocomplete="off"><button class="btn sm" id="vieChS" type="button">Envoyer</button></div></div>
+<div class="vchat" id="vieChatW" hidden><div class="vch"><span>💬 Chat de la partie</span><span class="vchb"><button class="btn alt sm vcht" type="button" id="vieChT" aria-label="Afficher ou cacher l’historique du chat">▴</button><button class="btn alt sm" type="button" id="vieChM">🔕 Couper</button></span></div><div id="vieChL" role="log" aria-live="polite"></div><div class="msI"><input id="vieChIn" maxlength="500" placeholder="Dis quelque chose à la table…" autocomplete="off"><button class="btn sm" id="vieChS" type="button">Envoyer</button></div></div>
 </main>
 <main id="v-ml" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
@@ -903,7 +1057,7 @@ function menuOpen(o){pd.classList.toggle('on',o);pm.setAttribute('aria-expanded'
 pm.addEventListener('click',e=>{e.stopPropagation();menuOpen(!pd.classList.contains('on'))});
 document.addEventListener('click',e=>{if(!e.target.closest('.menu'))menuOpen(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')menuOpen(false)});
-function show(v){document.body.classList.toggle('vieon',v==='vie'&&!!(vo&&vo.v&&vo.v.status==='playing'));if(v==='rc'&&!ron&&!lc&&!(rm&&rm.status==='playing'))v='ml';if(v==='rm'&&!me){openWelcome();return}if(v==='fr'&&!me){openWelcome();return}if(v==='msg'&&!me){openWelcome();return}if(v==='prof'&&!profId){openWelcome();return}
+function show(v){document.body.classList.toggle('vieon',v==='vie'&&!!(vo&&vo.v&&vo.v.status==='playing'));if(v!=='vie')document.body.classList.remove('vdesk');if(v==='rc'&&!ron&&!lc&&!(rm&&rm.status==='playing'))v='ml';if(v==='rm'&&!me){openWelcome();return}if(v==='fr'&&!me){openWelcome();return}if(v==='msg'&&!me){openWelcome();return}if(v==='prof'&&!profId){openWelcome();return}
 menuOpen(false);if(v==='set')syncSeg();
 if(v!=='ttt'&&onl&&onl.done)onlDetach();
 if(v!=='rc'){try{au.pause()}catch(e){}if(ron&&ron.done)ronDetach();if(lc){lc=null;rcClear()}}
@@ -2973,7 +3127,7 @@ function vieTargetWhy(c,p){
     case'referendum':return vieJobC(b)?'':'sans métier';
   }return''}
 /* --- état et réseau --- */
-function vieDetach(){if(vo){clearInterval(vo.tm);clearInterval(vo.tk)}vo=null;document.body.classList.remove('vieon');$('vieChatW').hidden=true;vieOv();updateLive()}
+function vieDetach(){if(vo){clearInterval(vo.tm);clearInterval(vo.tk)}vo=null;document.body.classList.remove('vieon','vdesk','vdeal');$('vieChatW').hidden=true;vieOv();updateLive()}
 function vieAttach(v,silent){
   vieDetach();
   vo={id:v.id,v:null,t0:Date.now(),polling:false,busy:false,det:null,disc:false,sig:'',tm:setInterval(vieTick,2000),tk:setInterval(vieClock,1000)};
@@ -3004,12 +3158,15 @@ function vieApply(v){
     JSON.stringify(v.packs||[]),v.players.map(p=>p.id+':'+p.board.join('.')+'/'+p.spent.join('.')+p.skips+p.gone+p.hand_n+p.smiles).join('|'),v.next?v.next.n+v.next.code:''].join('#');
   const changed=sig!==vo.sig;vo.sig=sig;
   if(vo.det&&vo.det.mode==='hand'&&!mine.includes(vo.det.id))vo.det=null;
-  if(curView==='vie'&&changed){vieRender();try{vieFx(v)}catch(e){}}
+  if(old&&old.status==='lobby'&&v.status==='playing')vo.deal=1;
+  if(v.status==='finished'&&v.next&&v.next.code&&!vo.follow&&me){vo.follow=1;const gid=vo.id;sb.rpc('vie_join',{p_code:v.next.code}).then(r=>{if(vo&&vo.id===gid&&!r.error&&r.data&&curView==='vie')vieAttach(r.data)}).catch(()=>{})}
+  if(curView==='vie'&&changed){try{vieHoldPrep(v,old)}catch(e){}vieRender();try{vieFx(v)}catch(e){}}
   updateLive()}
 function vieClock(){
   const e=$('vieT'),b=$('vieTb');if(!vo||!vo.v||vo.v.status!=='playing')return;
   const l=Math.max(0,(vo.v.left||0)-Math.floor((Date.now()-vo.t0)/1000));
-  if(e)e.textContent='⏱️ '+l+' s';if(b)b.style.width=Math.min(100,l/60*100)+'%'}
+  if(e)e.textContent='⏱️ '+l+' s';if(b)b.style.width=Math.min(100,l/60*100)+'%';
+  document.querySelectorAll('body.vdesk .ring.on').forEach(r=>{r.style.setProperty('--p',Math.min(100,l/60*100).toFixed(1)+'%');r.classList.toggle('low',l<=10)})}
 function vieLine(e){
   const nm=u=>'<b>'+esc(vieName(u))+'</b>',cn=i=>VC[i]?'<b>'+esc(vieClean(VC[i].name))+'</b>':'une carte';
   if(e.a==='play')return nm(e.u)+' pose '+cn(e.c)+(e.t?' sur '+nm(e.t):'')+(e.f&&VC[e.c]&&VC[e.c].eff==='lottery'?' — 🎉 il gagne un Héritage !':e.f?' et pose '+cn(e.f):VC[e.c]&&VC[e.c].eff==='lottery'?' — pas de chance cette fois':'');
@@ -3026,6 +3183,7 @@ function vieLine(e){
   if(e.a==='discard')return nm(e.u)+' défausse '+cn(e.c);
   if(e.a==='take')return nm(e.u)+' prend '+cn(e.c)+' dans la défausse';
   if(e.a==='chance')return nm(e.u)+' garde une carte de sa Chance';
+  if(e.a==='start')return nm(e.u)+' commence ('+(e.t?'égalité à ':'')+e.s+' 😊 dans la main de départ)';
   if(e.a==='skip')return nm(e.u)+' passe son tour';
   if(e.a==='timeout')return nm(e.u)+' a mis trop de temps'+(e.c?' (défausse '+cn(e.c)+')':'');
   if(e.a==='quit')return nm(e.u)+' démissionne de son métier ('+cn(e.c)+')';
@@ -3038,7 +3196,7 @@ function vieLine(e){
 
 /* --- animations : les cartes volent vers leur destination --- */
 const vieReduced=()=>{try{return window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
-function vieFxL(){let l=$('vieFx');if(!l){l=document.createElement('div');l.id='vieFx';document.body.appendChild(l)}return l}
+function vieFxL(){let l=$('vieFx');if(!l){l=document.createElement('div');l.id='vieFx';l.innerHTML='<div id="vieDim"></div>';document.body.appendChild(l)}return l}
 function vieFxPt(sel){const el=typeof sel==='string'?document.querySelector(sel):sel;if(!el||!el.getBoundingClientRect)return null;const r=el.getBoundingClientRect();if(!r.width&&!r.height)return null;return{x:r.left+r.width/2,y:r.top+r.height/2}}
 function vieFly(id,from,to,o,cb){
   o=o||{};if(!from||!to){if(cb)cb();return}
@@ -3053,13 +3211,34 @@ function vieFxCls(el,cls,ms){if(!el)return;el.classList.remove(cls);void el.offs
 const VMALIC={accident:'🚑',illness:'🤒',disaster:'🌪️',burnout:'🥵',divorce:'💔',tax:'💸',fire:'🔥',prison:'⛓️',repeat:'📚',rats:'🐀',mess:'🧺',squat:'🏚️',demon:'😈',vampire:'🧛',wolf:'🐺',embezzle:'💰',scandal:'📰',ceiling:'🪟',burglary:'🦹',
   meteor:'☄️',flood:'🌊',pandemic:'🦠',zombie:'🧟',famine:'🍽️',war:'⚔️',doom:'🌍',wealth:'💸',strike:'✊',election:'🗳️',revolution:'🚩',dump:'🗑️'};
 const VSPIC={ghost:'👻',witch:'🧙',referendum:'🔁',fairy:'🧚',genie:'🧞',potion:'💘',lottery:'🎟️',equalpay:'⚖️',recycle:'♻️',rummage:'🔍',party:'🎉',trophy:'🏆',blackcard:'💳'};
+let vieFxQ=[],vieFxBusy=false;
 function vieFx(v){
   if(!vo)return;const L=v.log||[];let mx=0;L.forEach(e=>{if((e.n||0)>mx)mx=e.n});
   if(vo.fxN==null){vo.fxN=mx;return}
   const ev=L.filter(e=>(e.n||0)>vo.fxN);vo.fxN=Math.max(vo.fxN,mx);
-  if(!ev.length||document.hidden||curView!=='vie'||vieReduced())return;
-  ev.slice(-6).forEach((e,i)=>setTimeout(()=>{try{vieFxOne(e)}catch(x){}},i*800))}
-function vieFxOne(e){
+  if(!ev.length||document.hidden||curView!=='vie'||vieReduced()){if(!vieFxBusy)vieHoldEnd();return}
+  ev.slice(-6).forEach(e=>vieFxQ.push(e));if(!vieFxBusy)vieFxPump()}
+async function vieFxPump(){
+  vieFxBusy=true;
+  try{while(vieFxQ.length){
+    const e=vieFxQ.shift();
+    if(curView!=='vie'||!vo||!VC){vieFxQ.length=0;break}
+    try{await Promise.race([vieFxRun(e),sleep(9000)])}catch(x){}}}
+  finally{vieFxBusy=false;const d=$('vieDim');if(d)d.style.opacity=0;vieHoldEnd()}}
+const vieRvIdle=async()=>{let g=0;while((vieRvEl||vieRvQ.length)&&g++<60)await sleep(150)};
+async function vieFxRun(e){
+  const c=VC&&VC[e.c],mid=me&&me.id;
+  const mine=!!c&&vieAnimOn()&&((e.a==='malus'&&e.t===mid)||(e.a==='event'&&e.u!==mid&&((e.h||[]).includes(mid)||(e.b||[]).includes(mid))));
+  if(c&&!mine&&(e.a==='play'||e.a==='malus'||e.a==='event')&&vieDeskCls()&&vieAnMode()!=='off'){
+    await vieAnnounce(e,vieAnMode()==='fast'||vieFxQ.length>0);
+    if(curView!=='vie'||!vo)return;
+    vieFxOne(e,{skipFly:true});
+    if(e.a==='play'&&c.smiles>0)vieSmUp(e.u,c.smiles);
+    await sleep(vieAnMode()==='fast'||vieFxQ.length?150:350);return}
+  vieFxOne(e);
+  if(mine){await sleep(e.a==='event'?800:200);await vieRvIdle();await sleep(200);return}
+  await sleep(e.a==='play'||e.a==='malus'||e.a==='event'?750:500)}
+function vieFxOne(e,opt){
   if(curView!=='vie'||!vo||!VC)return;
   const mid=me&&me.id,pnl=u=>document.querySelector(u===mid?'.vmine':'.vop[data-pid="'+u+'"]');
   const out=u=>u===mid?(vieFxPt('#vieHand')||vieFxPt('.vmine')):vieFxPt(pnl(u)),
@@ -3068,7 +3247,7 @@ function vieFxOne(e){
   const c=VC[e.c];
   if(e.a==='play'&&c){
     const toDisc=c.kind==='special'&&!['rainbow','star','inherit'].includes(c.eff);
-    let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}
+    let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}if(opt&&opt.skipFly)from=null;
     const to=toDisc?disc():into(e.u);
     vieFly(e.c,from,to,{s:.5,end:toDisc?.7:.55,rot:toDisc?(Math.random()*20-10):0},()=>{
       if(!toDisc)vieFxCls(pnl(e.u),'pop',700);
@@ -3088,13 +3267,13 @@ function vieFxOne(e){
       vieFxCls(tp,e.b?'blk':'hit',900);vieToast(to,e.b?'🛡️ Bloqué !':(VMALIC[c.eff]||'💥'));
       const dp=disc();if(dp)setTimeout(()=>vieFly(e.c,to,dp,{s:.4,end:.6,dur:500}),250)}});
   }else if(e.a==='malus'&&c){
-    let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}
+    let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}if(opt&&opt.skipFly)from=null;
     const tp=pnl(e.t),to=vieFxPt(tp);
     vieFly(e.c,from,to,{s:.5,end:.55,dur:700,rot:e.b?0:-8},()=>{
       vieFxCls(tp,e.b?'blk':'hit',900);vieToast(to,e.b?'🛡️ Bloqué !':(VMALIC[c.eff]||'💥'));
       const dp=disc();if(dp)setTimeout(()=>vieFly(e.c,to,dp,{s:.4,end:.6,dur:500}),250)});
   }else if(e.a==='event'&&c){
-    let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}
+    let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}if(opt&&opt.skipFly)from=null;
     const ic=VMALIC[c.eff]||'💥',rvm=vieAnimOn()&&e.u!==mid&&((e.h||[]).includes(mid)||(e.b||[]).includes(mid)),skip=u=>rvm&&u===mid;
     vieFly(e.c,from,disc(),{s:.55,end:.8,dur:700,rot:Math.random()*16-8},()=>{
       vieToast(disc(),ic+' '+vieClean(c.name));
@@ -3102,7 +3281,7 @@ function vieFxOne(e){
       (e.b||[]).forEach((u,i)=>{if(skip(u))return;setTimeout(()=>{const p=pnl(u);vieFxCls(p,'blk',900);vieToast(vieFxPt(p),'🛡️ Bloqué !')},250+i*120)});
       if(rvm){const hit=(e.h||[]).includes(mid);setTimeout(()=>vieReveal({c:e.c,by:e.u,blk:!hit,ev:true,done:()=>{const p=pnl(mid);vieFxCls(p,hit?'hit':'blk',900);vieToast(vieFxPt(p),hit?ic:'🛡️ Bloqué !')}}),500)}});
   }else if(e.a==='discard'&&c){
-    let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}
+    let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}if(opt&&opt.skipFly)from=null;
     vieFly(e.c,from,disc(),{s:.46,end:.7,rot:Math.random()*16-8});
   }else if(e.a==='take'&&c){
     vieFly(e.c,disc(),out(e.u),{s:.46,end:.7});
@@ -3143,6 +3322,164 @@ async function vieRvTest(blk){
   const dv=Object.values(VC).find(c=>c.kind==='malus'&&c.eff==='divorce')||Object.values(VC).find(c=>c.kind==='malus');if(!dv)return;
   vieReveal({c:dv.id,byName:'Alice',blk:!!blk,test:true})}
 
+
+/* --- Ma Vie sur grand écran : la table « autour de la table » --- */
+const vieDesk=()=>window.innerWidth>=1000&&window.innerHeight>=520;
+let vieDeskS=null;
+function vieDeskCls(){const on=curView==='vie'&&!!(vo&&vo.v&&vo.v.status==='playing')&&vieDesk();document.body.classList.toggle('vdesk',on);return on}
+function vieUn(){return parseFloat(document.documentElement.style.getPropertyValue('--un'))||9}
+function vieDeskSync(){
+  if(!vieDeskCls())return;
+  const b=$('vieBody');b.style.height='';
+  const top=b.getBoundingClientRect().top+window.scrollY,H=Math.max(480,window.innerHeight-top-10),W=b.clientWidth;
+  b.style.height=H+'px';
+  document.documentElement.style.setProperty('--un',(Math.min(W,1.6*H)/100).toFixed(3));
+  vieDeskFit()}
+/* les cartes posées d'un joueur se resserrent pour tenir dans la place disponible */
+function vieDeskFit(){
+  const un=vieUn();
+  document.querySelectorAll('body.vdesk .vop .vbd, body.vdesk .vmine .vbd').forEach(bd=>{
+    bd.querySelectorAll('.vmore').forEach(x=>x.remove());
+    const gs=[...bd.children].filter(g=>g.classList.contains('vgrp'));
+    gs.forEach(g=>{g.style.marginLeft='';g.style.display=''});
+    if(gs.length<2)return;
+    const W=bd.closest('.vmine')?58*un:bd.clientWidth,ws=gs.map(g=>g.offsetWidth),tot=ws.reduce((a,b)=>a+b,0),avg=tot/gs.length,gap=3;
+    if(tot+gap*(gs.length-1)<=W)return;
+    const vis=Math.max(1,Math.min(gs.length,Math.floor((W-avg*1.2)/(avg*.42))+1));
+    const shown=gs.slice(0,vis),sw=shown.reduce((a,g)=>a+g.offsetWidth,0),o=vis>1?Math.max(0,(sw-W+(gs.length>vis?avg*.9:0))/(vis-1)):0;
+    shown.forEach((g,i)=>{if(i)g.style.marginLeft=(-o).toFixed(1)+'px'});
+    if(gs.length>vis){gs.slice(vis).forEach(g=>{g.style.display='none'});const m=document.createElement('span');m.className='vmore';m.textContent='+'+(gs.length-vis);bd.appendChild(m)}})}
+function vieSeat(k,j){const th=(180-(j+1)*180/(k+1))*Math.PI/180;return[50+43*Math.cos(th),47-34*Math.sin(th)]}
+const vieSmShown=p=>(vo&&vo.hold&&vo.hold[p.id]!=null)?vo.hold[p.id]:p.smiles;
+const vieAnMode=()=>{const m=store.get('vieann','full');return m==='fast'||m==='off'?m:'full'};
+/* sourires : le compteur monte quand la carte annoncée arrive à destination */
+function vieHoldPrep(v,old){
+  if(!vo||vo.fxN==null||!old||!VC||!vieDesk()||vieAnMode()==='off'||vieReduced()||document.hidden)return;
+  const ev=(v.log||[]).filter(e=>(e.n||0)>vo.fxN&&e.a==='play'&&VC[e.c]&&VC[e.c].smiles>0);
+  if(!ev.length)return;
+  vo.hold=vo.hold||{};
+  ev.forEach(e=>{if(vo.hold[e.u]==null){const p=old.players.find(x=>x.id===e.u);if(p)vo.hold[e.u]=p.smiles}})}
+function vieHoldEnd(){if(vo&&vo.hold){vo.hold=null;if(curView==='vie'&&vo.v)vieRender()}}
+function vieSmUp(uid,n){
+  if(!vo||!vo.hold||vo.hold[uid]==null)return;
+  const p=vo.v.players.find(x=>x.id===uid),real=p?p.smiles:vo.hold[uid]+n;
+  vo.hold[uid]=Math.min(real,vo.hold[uid]+n);
+  const root=document.querySelector(uid===(me&&me.id)?'.vmine':'.vop[data-pid="'+uid+'"]'),el=root&&root.querySelector('[data-sm]');
+  if(el){el.textContent=vo.hold[uid];vieFxCls(el,'vbump',600);vieToast(vieFxPt(el),'+'+n+' 😊','pts')}
+  if(vo.hold[uid]>=real)delete vo.hold[uid]}
+/* annonce d'une carte posée : elle apparaît au milieu de la table, puis rejoint sa destination */
+const VAN={study:['#5aa2ff','ÉTUDES',['📚']],job:['#ffd84a','NOUVEAU MÉTIER',['⭐','💼']],salary:['#5ad27a','SALAIRE',['🪙','🪙']],flirt:['#ff6fa0','FLIRT',['💘']],marriage:['#ff6fa0','MARIAGE',['💍','💖','💖']],
+  adultery:['#d946ef','ADULTÈRE',['😏']],child:['#ff9ec7','ENFANT',['👶']],house:['#c98a4b','MAISON',['🏠']],trip:['#38bdf8','VOYAGE',['✈️']],luxe:['#e9c76a','LUXE',['💎']],pet:['#ff9a3d','ANIMAL',['🐾','🐾']],
+  dist:['#fbbf24','DISTINCTION',['🏅']],special:['#a78bfa','CARTE SPÉCIALE',['✨','✨']],shield:['#2dd4bf','PROTECTION',['🛡️']],malus:['#ff5a4d','MALUS',['💥']],event:['#fb923c','ÉVÉNEMENT',['⚠️']]};
+async function vieAnnounce(e,fast){
+  const c=VC[e.c],mid=me&&me.id,B=$('vieBody'),L=vieFxL(),dim=$('vieDim');if(!B||!c)return;
+  const R=B.getBoundingClientRect(),un=vieUn(),k=e.a==='malus'?'malus':e.a==='event'?'event':c.kind,A=VAN[k]||VAN.special;
+  const sEl=u=>document.querySelector(u===mid?'.vmine':'.vop[data-pid="'+u+'"]');
+  const ff=vo.fxFrom;vo.fxFrom=null;
+  let from=(e.u===mid?(ff||vieFxPt('#vieHand')):null)||vieFxPt(sEl(e.u))||{x:R.left+R.width/2,y:R.top+R.height*.8};
+  const toDisc=e.a==='event'||(e.a==='play'&&c.kind==='special'&&!['rainbow','star','inherit'].includes(c.eff));
+  let to=e.a==='malus'?vieFxPt(sEl(e.t)):toDisc?vieFxPt('.vmid .vpile:last-child .vstack'):(vieFxPt(e.u===mid?'.vmine .vbd':'.vop[data-pid="'+e.u+'"] .vbd')||vieFxPt(sEl(e.u)));
+  if(!to)to=from;
+  const w=13*un,h=w*316/220,cx=R.left+R.width/2,cy=R.top+R.height*.36,me_=e.u===mid;
+  const who=me_?'Tu':vieName(e.u),verb=e.a==='malus'?(me_?'envoies à ':'envoie à ')+(e.t===mid?'toi':vieName(e.t)):(e.a==='event'||(c.kind==='special'))?(me_?'joues':'joue'):(me_?'poses':'pose');
+  const pc=document.createElement('div');pc.className='vpc';
+  pc.style.cssText='--ac:'+A[0]+';left:'+(cx-w/2)+'px;top:'+(cy-h/2)+'px;width:'+w+'px';
+  pc.innerHTML='<div class="rib">'+A[1]+'</div><div class="face" style="border-radius:'+(18*w/220).toFixed(1)+'px;width:'+w+'px;height:'+h.toFixed(1)+'px">'+vieW(e.c,w/220,'tabindex="-1"')+'</div><div class="cap"><small>'+esc(who)+' '+esc(verb)+'</small><b>'+esc(vieClean(c.name))+'</b></div>';
+  L.appendChild(pc);
+  if(dim){Object.assign(dim.style,{left:R.left+'px',top:R.top+'px',width:R.width+'px',height:R.height+'px'});dim.style.opacity=fast?'.18':'.3'}
+  const dx=from.x-cx,dy=from.y-cy;
+  try{
+    await pc.animate([{transform:'translate('+dx+'px,'+dy+'px) scale(.3) rotate(-10deg)',opacity:0},{opacity:1,offset:.3},{transform:'none',opacity:1}],{duration:fast?340:560,easing:'cubic-bezier(.22,.8,.25,1)',fill:'both'}).finished;
+    if(!fast)A[2].forEach((m,i)=>{const sp=document.createElement('span');sp.className='vemo';sp.textContent=m;sp.style.left=(cx+(i-(A[2].length-1)/2)*w*.5-w*.1)+'px';sp.style.top=(cy-h*.1)+'px';sp.style.setProperty('--dx',((Math.random()-.5)*w*.5)+'px');sp.style.animationDelay=(i*.12)+'s';L.appendChild(sp);setTimeout(()=>sp.remove(),1500)});
+    await sleep(fast?260:850);
+    const tx=to.x-cx,ty=to.y-cy;
+    const ex=pc.animate([{transform:'none',opacity:1},{transform:'translate('+tx+'px,'+ty+'px) scale(.3) rotate(6deg)',opacity:.9,offset:.85},{transform:'translate('+tx+'px,'+ty+'px) scale(.25)',opacity:0}],{duration:fast?260:440,easing:'cubic-bezier(.5,0,.75,.4)',fill:'forwards'});
+    if(!vieFxQ.length&&dim)dim.style.opacity='0';
+    await ex.finished}
+  catch(x){}
+  pc.remove()}
+/* visionneur : toutes les cartes posées d'un joueur, rangées par famille */
+const VVFAM=[['study','Études'],['job','Métier'],['salary','Argent'],['love','Amour et famille'],['house','Maisons'],['trip','Voyages'],['luxe','Luxe'],['pet','Animaux'],['dist','Distinctions'],['other','Autres cartes']];
+function vieFamOf(c){const k=c.kind;
+  if(k==='study'||k==='job'||k==='salary'||k==='house'||k==='trip'||k==='luxe'||k==='pet'||k==='dist')return k;
+  if(k==='flirt'||k==='marriage'||k==='adultery'||k==='child')return'love';
+  if(c.eff==='inherit')return'salary';
+  return'other'}
+function vieViewHTML(v,uid){
+  const p=v.players.find(x=>x.id===uid);if(!p)return'';
+  const sp=(p.spent||[]).slice(),g={},gs={};
+  (p.board||[]).forEach(i=>{const c=VC[i];if(!c)return;const f=vieFamOf(c);(g[f]=g[f]||[]).push(i)});
+  sp.forEach(i=>{const c=VC[i];if(!c)return;const f=vieFamOf(c);(gs[f]=gs[f]||[]).push(i)});
+  const n=(p.board||[]).filter(i=>VC[i]).length,isMe=uid===(me&&me.id);
+  return'<div class="vzb vview"><button class="btn alt sm vzx" data-vie="closeview">✕ Fermer</button><div class="vvh">'+avh(p)+'<div><b>'+(isMe?'Tes cartes posées':'Les cartes de '+esc(p.pseudo))+'</b><small>😊 '+vieSmShown(p)+' sourire'+(vieSmShown(p)>1?'s':'')+' · '+n+' carte'+(n>1?'s':'')+' posée'+(n>1?'s':'')+'</small></div></div>'+
+    (n?'<div class="vvg">'+VVFAM.filter(f=>g[f[0]]).map(f=>'<div class="vvf"><h4>'+f[1]+'</h4><div class="vbd">'+vieBoard(g[f[0]],gs[f[0]]||[],.4)+'</div></div>').join('')+'</div><p class="hint">👆 Touche une carte pour savoir ce qu’elle fait (son effet, son rôle, ses conditions).</p>':'<p class="hint">Rien de posé pour l’instant.</p>')+'</div>'}
+function vieViewAnim(uid){
+  const z=$('vieZ'),from=vieFxPt(document.querySelector('.vop[data-pid="'+uid+'"]'));if(!z||!from||vieReduced()||vieAnMode()==='off')return;
+  z.querySelectorAll('.vview .vgrp').forEach((el,k)=>{const r=el.getBoundingClientRect(),dx=from.x-(r.left+r.width/2),dy=from.y-(r.top+r.height/2);
+    el.animate([{transform:'translate('+dx+'px,'+dy+'px) scale(.3) rotate(-18deg)',opacity:0},{transform:'none',opacity:1}],{duration:520,delay:80+Math.min(k,12)*70,easing:'cubic-bezier(.2,.8,.25,1)',fill:'backwards'})})}
+/* bulles de message au-dessus de la photo de profil */
+function vieBubble(uid,txt){
+  if(!vieDeskCls()||!txt||typeof gcMuted==='function'&&gcMuted())return;
+  const mine=uid===(me&&me.id),seat=document.querySelector(mine?'.vmine':'.vop[data-pid="'+uid+'"]'),ring=seat&&seat.querySelector('.ring'),B=$('vieBody');if(!ring||!B)return;
+  const L=vieFxL(),R=B.getBoundingClientRect(),sr=seat.getBoundingClientRect(),rr=ring.getBoundingClientRect(),p=vo.v.players.find(x=>x.id===uid);
+  const old=L.querySelector('.vbub[data-u="'+uid+'"]');if(old)old.remove();
+  const t=txt.length>110?txt.slice(0,108)+'…':txt,emo=/^[\p{Extended_Pictographic}\s️‍]{1,12}$/u.test(t);
+  const b=document.createElement('div'),below=!mine&&(sr.top+sr.height/2-R.top)<R.height*.3;
+  b.className='vbub '+(below?'dn':'up')+(emo?' emo1':'');b.dataset.u=uid;
+  b.innerHTML=(emo?'':'<small>'+esc(mine?'Toi':(p?p.pseudo:'?'))+'</small>')+esc(t);
+  b.style.visibility='hidden';L.appendChild(b);
+  const bw=b.offsetWidth,bh=b.offsetHeight,ax=mine?rr.left+rr.width/2:sr.left+sr.width/2;
+  let x=ax-bw/2;x=Math.max(R.left+8,Math.min(R.right-bw-8,x));
+  const y=below?sr.bottom+14:(mine?rr.top-bh-14:sr.top-bh-14);
+  b.style.left=x+'px';b.style.top=Math.max(R.top+4,y)+'px';
+  b.style.setProperty('--tx',(ax-x)+'px');b.style.setProperty('--ty',below?'0%':'100%');
+  b.style.setProperty('--hold',(Math.min(7,3.6+t.length/40))+'s');b.style.visibility='';
+  vieFxCls(ring,'talk',600);
+  setTimeout(()=>b.remove(),Math.min(7,3.6+t.length/40)*1000+700)}
+/* distribution des cartes au début de la partie */
+function vieDeal(){
+  if(!vieDeskCls()||vieAnMode()==='off'||vieReduced()||!vo||!vo.v)return;
+  const dk=vieFxPt('.vmid .vpile:first-child .vstack');if(!dk)return;
+  const tg=[...document.querySelectorAll('.vop:not(.gone) .vbacks')].map(el=>vieFxPt(el)).filter(Boolean),hp=vieFxPt('#vieHand');if(hp)tg.push(hp);
+  if(!tg.length)return;
+  document.body.classList.add('vdeal');
+  const L=vieFxL(),un=vieUn(),w=5*un,h=w*316/220,step=vieAnMode()==='fast'?40:75;let k=0;
+  for(let r=0;r<5;r++)tg.forEach(t=>{
+    const d=document.createElement('div');d.className='vfly';d.style.cssText='width:'+w+'px;height:'+h+'px;left:'+(dk.x-w/2)+'px;top:'+(dk.y-h/2)+'px;opacity:0';d.innerHTML=vieBackW(w/220);L.appendChild(d);
+    const a=d.animate([{opacity:1,transform:'translate(0,0) rotate(-12deg) scale(1)'},{opacity:1,transform:'translate('+(t.x-dk.x)+'px,'+(t.y-dk.y)+'px) rotate('+(Math.random()*24-12)+'deg) scale(.45)',offset:.85},{opacity:0,transform:'translate('+(t.x-dk.x)+'px,'+(t.y-dk.y)+'px) scale(.45)'}],{duration:620,delay:k*step,easing:'cubic-bezier(.22,.8,.25,1)',fill:'backwards'});
+    a.onfinish=()=>d.remove();k++});
+  const st=vo.v.turn_uid;
+  setTimeout(()=>{document.body.classList.remove('vdeal');setTimeout(()=>{try{vieStartAnim(st)}catch(e){}},250)},k*step+560)}
+/* qui commence : chaque joueur montre les sourires de sa main de départ, le plus haut score commence */
+function vieStartAnim(uid){
+  if(!vieDeskCls()||vieAnMode()==='off'||vieReduced()||!vo||!vo.v||vo.v.status!=='playing')return;
+  const se=(vo.v.log||[]).find(e=>e.a==='start'),sc=se&&se.sc&&se.sc.length?se.sc:null;if(se)uid=se.u;
+  const els=[...document.querySelectorAll('.vop[data-pid]:not(.gone)')];const mi=document.querySelector('.vmine');if(mi)els.push(mi);
+  const n=els.length,tg=els.findIndex(e=>e.dataset.pid===uid);if(tg<0||n<2)return;
+  const L=vieFxL();let t=0,prev=null;
+  if(sc){
+    sc.slice().reverse().forEach((x,i)=>{const el=els.find(e=>e.dataset.pid===x.u);if(!el)return;const r=el.getBoundingClientRect(),d=document.createElement('div');
+      d.className='vbadge'+(x.u===uid?' win':'');d.style.left=(r.left+r.width/2)+'px';d.style.top=(el.classList.contains('vmine')?r.top:r.bottom)+'px';d.style.animationDelay=(i*.28)+'s';
+      d.innerHTML='✋ '+x.s+' 😊';L.appendChild(d);setTimeout(()=>d.remove(),i*280+5200)});
+    t=sc.length*280+700}
+  else{const steps=n*2+tg+1;for(let i=0;i<steps;i++){const el=els[i%n];t+=90+Math.pow(i/steps,2)*280;
+    setTimeout(()=>{if(prev)prev.classList.remove('vspin');el.classList.add('vspin');prev=el},t)}}
+  setTimeout(()=>{if(prev)prev.classList.remove('vspin');const el=els[tg];if(el)vieFxCls(el,'vwin',2200);
+    const p=vo&&vo.v&&vo.v.players.find(x=>x.id===uid),me_=uid===(me&&me.id),B=$('vieBody');if(!p||!B)return;
+    const R=B.getBoundingClientRect(),d=document.createElement('div');d.className='vstart';d.style.left=(R.left+R.width/2)+'px';d.style.top=(R.top+R.height*.4)+'px';
+    d.innerHTML='<small>🎲 Qui commence ?</small><div class="vst-w">'+avh(p)+'<b>'+(me_?'À toi de commencer !':esc(p.pseudo)+' commence !')+'</b></div>'+
+      (se?'<span>'+(se.t?'Égalité à '+se.s+' 😊 dans la main de départ : tirage au sort.':'🏆 Le plus de sourires dans sa main de départ : '+se.s+' 😊')+'</span>':'');
+    L.appendChild(d);setTimeout(()=>d.remove(),3400)},t+250)}
+
+/* fin de partie : podium + confettis */
+function viePodium(sc){
+  if(!sc||!sc.length)return'';
+  const top=sc.slice(0,3),ord=top.length===3?[1,0,2]:top.length===2?[1,0]:[0],med=['🥇','🥈','🥉'];
+  return'<div class="vpod">'+ord.map(i=>{const s=top[i],p=(vo&&vo.v&&vo.v.players.find(x=>x.id===s.u))||{id:s.u,pseudo:'?'};
+    return'<div class="vpd r'+(i+1)+'">'+avh(p)+'<div class="nm">'+esc(p.pseudo||'?')+'</div><div class="bl"><span>'+med[i]+'</span><small>😊 '+s.s+'</small></div></div>'}).join('')+'</div>'}
+function vieConfetti(){
+  const L=vieFxL(),cs=['#ffd84a','#ff5a4d','#5aa2ff','#8fe3a0','#fff','#ff6fa0'];
+  for(let i=0;i<90;i++){const c=document.createElement('i');c.className='vconf';c.style.left=(Math.random()*100)+'%';c.style.background=cs[i%cs.length];c.style.setProperty('--dx',(Math.random()*240-120)+'px');c.style.animationDelay=(Math.random()*.9)+'s';c.style.animationDuration=(2.4+Math.random()*1.4)+'s';L.appendChild(c);setTimeout(()=>c.remove(),5200)}}
 /* --- affichage --- */
 const vieMob=()=>window.innerWidth<700;
 function vieBoard(board,spent,s){
@@ -3152,11 +3489,12 @@ function vieBoard(board,spent,s){
   const grp=(id,n,cls)=>{if(!n)return'';const shown=Math.min(n,3);let g='<div class="vgrp" style="--s:'+s+'">';for(let k=0;k<shown;k++)g+=vieW(id,s,'data-z="'+id+'"',cls);return g+(n>1?'<span class="vx">×'+n+'</span>':'')+'</div>'};
   ids.forEach(id=>{h+=grp(id,u[id]||0,'')+grp(id,sp[id]||0,'spent')});
   return h}
-function vieOpp(p,v,aimC){
+function vieOpp(p,v,aimC,si,sn){
   const bs=vieMob()?.12:.14,nb=Math.min(p.hand_n,8);let cls='',att='',lab='';
   if(aimC&&!p.gone){const w=vieTargetWhy(aimC,p),pr=aimC.kind==='malus'&&(vieShieldOf(aimC,p)||vieImmune(vieJobC(p.board),aimC.eff,v));
     if(w){cls=' no';lab='<div class="vaim">'+esc(w)+'</div>'}else{cls=' aim';att=' data-aim="'+esc(p.id)+'"';lab='<div class="vaim">'+(pr?'🛡️ Protégé : sera bloqué':'🎯 Viser ce joueur')+'</div>'}}
-  return'<div class="vop'+(p.id===v.turn_uid?' cur':'')+(p.gone?' gone':'')+cls+'" data-pid="'+esc(p.id)+'"'+att+'><div class="vh1">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===v.host?' 👑':'')+'</b><small>'+(p.gone?'A quitté la partie':'😊 '+p.smiles+(p.skips>0?' · 💤'+(p.skips>1?'×'+p.skips:''):''))+'</small></div></div>'+lab+
+  const dk=si!=null;let sty='';if(dk){const ps=vieSeat(sn,si);sty=' style="--sx:'+ps[0].toFixed(2)+'%;--sy:'+ps[1].toFixed(2)+'%"';if(sn>=5)cls+=' s5'}
+  return'<div class="vop'+(p.id===v.turn_uid?' cur':'')+(p.gone?' gone':'')+cls+'" data-pid="'+esc(p.id)+'"'+att+sty+'><div class="vh1">'+(dk?'<span class="ring'+(p.id===v.turn_uid&&v.status==='playing'?' on':'')+'" data-ru="'+esc(p.id)+'">'+avh(p)+'</span>':avh(p))+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===v.host?' 👑':'')+'</b><small>'+(p.gone?'A quitté la partie':'😊 <span data-sm>'+vieSmShown(p)+'</span>'+(p.skips>0?' · 💤'+(p.skips>1?'×'+p.skips:''):''))+'</small></div></div>'+lab+
     (p.gone?'':'<div class="vbacks" style="--s:'+bs+'">'+Array.from({length:nb},()=>vieBackW(bs)).join('')+'<em>'+p.hand_n+' carte'+(p.hand_n>1?'s':'')+'</em></div><div class="vbd">'+vieBoard(p.board,p.spent,vieMob()?.22:.27)+'</div>')+'</div>'}
 function vieStack(back,n,top,cls,attr,s){
   const l=Math.min(n,3);let h='<button type="button" class="vstack '+cls+'" '+attr+'>';
@@ -3168,6 +3506,7 @@ function vieRender(){
   vo.dirty=false;
   const v=vo.v,isMe=vieIsMe;let h='';
   document.body.classList.toggle('vieon',v.status==='playing');
+  const dk=vieDeskCls();
   $('vieChatW').hidden=!(v.status==='playing');
   $('vieBody').parentNode.querySelector('h1').textContent='Ma Vie';
   if(v.status==='lobby'){
@@ -3183,34 +3522,38 @@ function vieRender(){
     const mjob=vieJobC(mineP.board),aimC=vo.tg&&myTurn&&v.phase==='play'&&hand.includes(vo.tg.id)&&!(forced&&forced!==vo.tg.id)?VC[vo.tg.id]:null;
     if(!aimC)vo.tg=null;
     const deckTop='<span class="vw" style="--s:'+(mob?.42:.5)+'">'+vieBackHTML()+'</span>';
+    let opps=v.players.filter(p=>p.id!==(me&&me.id));
+    if(dk){const mi=v.players.findIndex(p=>p.id===(me&&me.id));if(mi>=0)opps=v.players.slice(mi+1).concat(v.players.slice(0,mi))}
     h='<div class="vsc th-'+vieTable()+'"><div class="vtab">'+
-      '<div class="vopps">'+v.players.filter(p=>p.id!==(me&&me.id)).map(p=>vieOpp(p,v,aimC)).join('')+'</div>'+
+      '<div class="vopps">'+opps.map((p,i)=>vieOpp(p,v,aimC,dk?i:null,opps.length)).join('')+'</div>'+
       '<div class="vmid"><div class="vpile"><button type="button" class="vstack'+(draw&&v.deck_n?' can':'')+'" '+(draw&&v.deck_n?'data-vie="take" data-src="deck"':'')+' aria-label="Pioche">'+deckTop+'</button><span class="vpl">Pioche · '+v.deck_n+'</span>'+(draw&&v.deck_n?'<em class="vgo">👆 Touche ou glisse</em>':'')+'</div>'+
       '<div class="vevt">'+(ev||'La partie commence !')+(v.last_round?'<br><small>⚠️ Pioche vide : dernier tour de table.</small>':'')+(v.packs&&v.packs.length?'<div class="vpkl">'+viePackChips(v.packs)+'</div>':'')+(v.casino?'<div class="vcas">🎰 Casino ouvert'+(v.bet_u?' · <b>'+esc(vieName(v.bet_u))+'</b> a misé : mise un salaire pour tenter de le battre !':' · mise un salaire de ta main')+'</div>':'')+'</div>'+
       '<div class="vpile"><button type="button" class="vstack'+(draw&&topId?' can':'')+'" '+(draw&&topId?'data-vie="take" data-src="discard"':topId?'data-z="'+topId+'"':'')+' aria-label="Défausse">'+(topId?vieW(topId,mob?.42:.5,'tabindex="-1"'):'<span class="vw" style="--s:'+(mob?.42:.5)+';opacity:.3"><span class="vbk" style="--vback:#0004"></span></span>')+'</button><span class="vpl">Défausse · '+dl.length+'</span>'+(draw&&topId?'<em class="vgo">👆 Touche ou glisse</em>':'')+'</div></div>'+
-      '<div class="vmine" data-pid="'+esc(me&&me.id||'')+'"><div class="vlab">Ta vie · 😊 '+mineP.smiles+(mineP.skips>0?' · 💤 tu passes '+(mineP.skips>1?mineP.skips+' tours':'ton prochain tour'):'')+'</div><div class="vbd">'+vieBoard(mineP.board,mineP.spent,mob?.27:.3)+'</div></div></div></div>'+
+      '<div class="vmine'+(dk&&myTurn?' cur':'')+'" data-pid="'+esc(me&&me.id||'')+'">'+(dk?'<div class="vme"><span class="ring'+(myTurn?' on':'')+'" data-ru="'+esc(me&&me.id||'')+'">'+avh(mineP)+'</span><div class="score" aria-label="Tes sourires">😊 <span data-sm>'+vieSmShown(mineP)+'</span></div><div class="vlab">Ta vie'+(mineP.skips>0?' · 💤 tu passes '+(mineP.skips>1?mineP.skips+' tours':'ton prochain tour'):'')+'</div></div>':'<div class="vlab">Ta vie · 😊 '+mineP.smiles+(mineP.skips>0?' · 💤 tu passes '+(mineP.skips>1?mineP.skips+' tours':'ton prochain tour'):'')+'</div>')+'<div class="vbd">'+vieBoard(mineP.board,mineP.spent,mob?.27:.3)+'</div></div></div></div>'+
       '<div class="vturn">'+(myTurn?'<span class="pill2 me">🎴 À toi de jouer</span>':'<span class="pill2 w">Tour de '+esc(cp?cp.pseudo:'?')+'</span>')+'<span class="vtm"><i id="vieTb"></i></span><span id="vieT" class="ucT"></span></div>';
     if(myTurn){
       let msg='';
-      if(v.phase==='draw')msg='👆 Touche ou glisse la pioche vers ta main, ou prends la dernière carte de la défausse (tu devras alors la jouer).';
+      if(v.phase==='draw')msg=dk?'👆 Touche ou glisse la pioche vers ta main (ou prends la défausse : tu devras la jouer).':'👆 Touche ou glisse la pioche vers ta main, ou prends la dernière carte de la défausse (tu devras alors la jouer).';
       else if(v.phase==='pick')msg=v.me&&v.me.pending&&v.me.pending.t==='star'?'🌠 Choisis une carte dans la défausse.':v.me&&v.me.pending&&v.me.pending.t==='peek'?'👀 Regarde bien, puis valide.':v.me&&v.me.pending&&v.me.pending.t==='dig'?'🗑️ Choisis une carte dans la défausse.':'🍀 Choisis une carte à garder.';
       else if(forced)msg='Tu as pris <b>'+esc(VC[forced]?vieClean(VC[forced].name):'')+'</b> : joue cette carte (ou défausse-la si tu ne peux pas).';
       else if(v.extra>0)msg='🌈 Arc-en-ciel : encore '+(v.extra+1)+' carte'+(v.extra>0?'s':'')+' à jouer.';
       else msg='Touche une carte pour la lire, ou glisse-la : sur la table pour la jouer, sur la défausse pour la jeter.';
       h+=aimC?'<div class="vbanner vaimb"><span class="vheld" id="vieHeld">'+vieW(aimC.id,.4,'tabindex="-1"')+'</span><div><b>🎯 Choisis le joueur visé</b><br><small>Touche un joueur sur la table</small></div><button class="btn alt sm" data-vie="aimx">Annuler</button></div>':'<div class="vbanner">'+msg+'</div>';
-      if(draw)h+='<div class="vtools"><button class="btn" data-vie="take" data-src="deck"'+(v.deck_n?'':' disabled')+'>🂠 Piocher</button><button class="btn alt" data-vie="take" data-src="discard"'+(topId?'':' disabled')+'>♻️ Prendre la défausse</button></div>'}
+      if(draw)h+='<div class="vtools vdraw"><button class="btn" data-vie="take" data-src="deck"'+(v.deck_n?'':' disabled')+'>🂠 Piocher</button><button class="btn alt" data-vie="take" data-src="discard"'+(topId?'':' disabled')+'>♻️ Prendre la défausse</button></div>'}
     const canP=myTurn&&v.phase==='play';
     h+='<div class="vhandw"><div class="vhand" id="vieHand">'+hand.map((c,i)=>{const n=hand.length,m=n>1?i-(n-1)/2:0,dim=myTurn&&forced&&forced!==c,why=canP&&!dim&&VC[c]?vieCantPlay(VC[c],v,mineP):'';
         return vieW(c,hs,'data-h="'+c+'" data-i="'+i+'"'+(why?' title="🚫 '+esc(why)+'"':''),(dim?'dim':'')+(why?' no':''),'--r:'+(m*3.2).toFixed(1)+'deg;--y:'+(m*m*1.4).toFixed(1)+'px;z-index:'+(i+1))}).join('')+'</div></div>'+
       (hand.length?'':'<p class="vhint">Tu n’as plus de carte en main.</p>')+
-      '<div class="vtools">'+(myTurn&&v.phase==='play'&&!forced&&mjob?'<button class="btn alt sm" data-vie="quit">🚪 Démissionner'+(vieInterim(mjob)?' (le tour continue)':'')+'</button>':'')+'<button class="btn alt sm" data-vie="disc">📂 Voir la défausse</button><button class="btn alt sm" data-vie="guide">📖 Guide des cartes</button><button class="btn alt sm" data-vie="leave">Quitter la partie</button></div>'+
+      '<div class="vtools vutil">'+(myTurn&&v.phase==='play'&&!forced&&mjob?'<button class="btn alt sm" data-vie="quit">🚪 Démissionner'+(vieInterim(mjob)?' (le tour continue)':'')+'</button>':'')+'<button class="btn alt sm" data-vie="disc">📂 Voir la défausse</button><button class="btn alt sm" data-vie="guide">📖 Guide des cartes</button><button class="btn alt sm" data-vie="leave">Quitter la partie</button></div>'+
       '<div class="vlogs">'+(v.log.slice().reverse().slice(0,8).map(e=>{const t=vieLine(e);return t?'<div class="vlg">'+t+'</div>':''}).join('')||'<span class="hint">La partie commence.</span>')+'</div>'}
   else if(v.status==='finished'){
     const sc=(v.result&&v.result.scores)||[],win=(v.result&&v.result.winners)||[],me_=me&&me.id;
-    h='<h2 style="text-align:center">'+(win.length===1?(win[0]===me_?'🏆 Tu gagnes !':'🏆 '+esc(vieName(win[0]))+' gagne !'):'🤝 Égalité : '+win.map(u=>esc(vieName(u))).join(', '))+'</h2><div class="vsc th-'+vieTable()+'"><div class="vtab">'+
+    h='<h2 style="text-align:center">'+(win.length===1?(win[0]===me_?'🏆 Tu gagnes !':'🏆 '+esc(vieName(win[0]))+' gagne !'):'🤝 Égalité : '+win.map(u=>esc(vieName(u))).join(', '))+'</h2>'+viePodium(sc)+'<div class="vsc th-'+vieTable()+'"><div class="vtab">'+
       sc.map((s,i)=>{const p=v.players.find(x=>x.id===s.u)||{};return'<div class="vop'+(win.includes(s.u)?' cur':'')+'" style="max-width:none"><div class="vh1"><span class="rk">'+(i+1)+'</span>'+avh(p)+'<div class="g" data-user="'+esc(s.u)+'"><b>'+esc(p.pseudo||'?')+(s.u===me_?' (toi)':'')+'</b></div><b>😊 '+s.s+'</b></div><div class="vbd">'+vieBoard(p.board,p.spent,.27)+'</div></div>'}).join('')+'</div></div>'+
-      '<div class="row" style="margin-top:12px"><button class="btn" data-vie="rematch">'+(v.next?'🔁 Rejoindre la revanche ('+v.next.n+'/'+v.next.max+')':'🔁 Rejouer avec les mêmes joueurs')+'</button><button class="btn alt" data-vie="done">Terminer</button></div>'}
-  vieSet(h);vieClock();vieFan();vieOv();vieChatSync()}
+      '<p class="hint" style="text-align:center;margin-top:10px">'+(v.next?'🔁 Une nouvelle partie est prête : tu y es ramené automatiquement…':'Quand quelqu’un relance, tous les joueurs encore là sont ramenés dans la nouvelle partie, sans ré-inviter personne.')+'</p><div class="row" style="margin-top:12px"><button class="btn" data-vie="rematch">'+(v.next?'🔁 Rejoindre la nouvelle partie ('+v.next.n+'/'+v.next.max+')':'🔁 Nouvelle partie avec les mêmes joueurs')+'</button><button class="btn alt" data-vie="done">Terminer</button></div>'}
+  vieSet(h);if(dk)vieDeskSync();vieClock();vieFan();vieOv();vieChatSync();
+  if(dk&&vo.deal){vo.deal=0;setTimeout(vieDeal,120)}
+  if(v.status==='finished'&&vo.conf!==vo.id){vo.conf=vo.id;if(vieAnMode()!=='off'&&!vieReduced())setTimeout(vieConfetti,500)}}
 function viePackSection(v){
   if(!vieHasPacks())return'';
   const sel=v.packs||[],host=vieIsMe(v.host);
@@ -3219,10 +3562,10 @@ function vieList(v){
   return v.players.map(p=>'<div class="fr-row">'+avh(p)+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===v.host?' 👑':'')+(p.id===(me&&me.id)?' (toi)':'')+'</b></div></div>').join('')}
 function vieFan(){
   const h=$('vieHand');if(!h)return;const cs=h.children,n=cs.length;if(n<2)return;
-  const cw=cs[0].offsetWidth,W=h.clientWidth-60,step=Math.min(cw+8,Math.max(26,(W-cw)/(n-1)));
+  const cw=cs[0].offsetWidth,W=h.clientWidth-60,step=Math.min(document.body.classList.contains('vdesk')?cw*.68:cw+8,Math.max(26,(W-cw)/(n-1)));
   h.style.setProperty('--ov',(cw-step).toFixed(1)+'px')}
 let vieMobS=null;
-window.addEventListener('resize',()=>{if(curView!=='vie')return;const m=vieMob();if(vieMobS!==null&&m!==vieMobS&&vo&&vo.v)vieRender();vieMobS=m;vieFan()});
+window.addEventListener('resize',()=>{if(curView!=='vie')return;const m=vieMob(),d=vieDesk();if(vieMobS!==null&&m!==vieMobS&&vo&&vo.v)vieRender();else if(vieDeskS!==null&&d!==vieDeskS&&vo&&vo.v)vieRender();else if(vo&&vo.v&&vo.v.status==='playing'){vieDeskSync();vieFan()}vieMobS=m;vieDeskS=d;vieFan()});
 /* --- chat en bas de la table --- */
 function vieChatSync(){
   const w=$('vieChatW');if(!w||w.hidden||!vo||!vo.v||vo.v.status!=='playing')return;
@@ -3234,15 +3577,18 @@ function vieOv(){
   const z=$('vieZ');if(!z)return;
   if(!vo||!vo.v||!VC||curView!=='vie'){z.hidden=true;z.innerHTML='';return}
   const v=vo.v,myTurn=vieIsMe(v.turn_uid),pend=v.me&&v.me.pending;let h='';
+  if(v.status!=='playing')vo.view=null;
   if(v.status==='playing'&&myTurn&&v.phase==='pick'&&pend){
     if(pend.t==='peek'){const J=!!pend.w;h='<div class="vzb"><h3>'+(J?(pend.k==='ghost'?'👻 La main de ':'🎤 La main de ')+esc(vieName(pend.w)):'🔮 Les '+pend.c.length+' prochaines cartes de la pioche')+'</h3><p class="sub">'+(J?'Seul toi la vois. Retiens bien !':'Dans l’ordre : la première sera piochée en premier. Seul toi les vois.')+'</p><div class="vgrid">'+(pend.c.length?pend.c.map(i=>vieW(i,vieMob()?.36:.4,'tabindex="-1"')).join(''):'<span class="hint">Aucune carte.</span>')+'</div><div class="vopt" style="margin-top:12px"><button class="btn" data-vie="ack">J’ai vu, continuer</button></div></div>'}
     else if(pend.t==='dig'){const d=(v.discard||[]).slice().reverse();h='<div class="vzb"><h3>🗑️ Prends une carte de la défausse</h3><p class="sub">Elle ira dans ta main : tu n’es pas obligé de la jouer.</p><div class="vgrid">'+d.map(i=>vieW(i,.45,'data-dg="'+i+'"')).join('')+'</div></div>'}
     else if(pend.t==='chance')h='<div class="vzb"><h3>🍀 Chance : garde une carte</h3><p class="sub">Les 2 autres seront défaussées.</p><div class="vgrid">'+pend.c.map(i=>vieW(i,vieMob()?.7:.9,'data-pk="'+i+'"')).join('')+'</div></div>';
     else{const d=(v.discard||[]).slice().reverse();h='<div class="vzb"><h3>🌠 Prends une carte de la défausse</h3><p class="sub">Tu devras la jouer tout de suite.</p><div class="vgrid">'+d.map(i=>vieW(i,.45,'data-st="'+i+'"')).join('')+'</div></div>'}}
   else if(vo.det)h=vieDetailHTML(vo.det,v,myTurn);
+  else if(vo.view)h=vieViewHTML(v,vo.view);
   else if(vo.disc){const d=(v.discard||[]).slice().reverse();h='<div class="vzb"><button class="btn alt sm vzx" data-vie="closeall">✕ Fermer</button><h3>♻️ La défausse ('+d.length+')</h3><p class="sub">La carte du dessus est la première. Touche une carte pour la lire.</p><div class="vgrid">'+(d.map(i=>vieW(i,.45,'data-z="'+i+'"')).join('')||'<span class="hint">Vide.</span>')+'</div></div>'}
   if(!h){z.hidden=true;z.innerHTML='';return}
-  const sy=z.scrollTop;z.innerHTML=h;z.hidden=false;z.scrollTop=sy}
+  const sy=z.scrollTop;z.innerHTML=h;z.hidden=false;z.scrollTop=sy;
+  if(vo.view&&vo.viewAnim&&!vo.det){vo.viewAnim=false;try{vieViewAnim(vo.view)}catch(e){}}}
 const needAim=c=>c.kind==='malus'||(c.kind==='job'&&c.eff==='journalist')||(c.kind==='special'&&['ghost','witch','referendum'].includes(c.eff));
 const aimHint=c=>c.kind==='malus'?'Pose la carte, puis touche le joueur visé sur la table.':c.eff==='witch'?'Pose la carte, puis touche le joueur avec qui échanger ta main.':c.eff==='referendum'?'Pose la carte, puis touche le joueur avec qui échanger ton métier.':'Pose la carte, puis touche le joueur dont tu veux voir la main.';
 function vieDetailHTML(d,v,myTurn){
@@ -3280,7 +3626,7 @@ function vieDetailHTML(d,v,myTurn){
       else act=(why?'<div class="vwhy">🚫 '+esc(why)+'</div>':'')+'<div class="vopt"><button class="btn" data-vie="play"'+(why?' disabled':'')+'>'+(c.kind==='special'?'Jouer':'Poser')+'</button>'+(c.kind==='salary'&&v.casino&&v.bet_u!==(me&&me.id)?'<button class="btn alt" data-vie="bet">🎰 Miser au casino</button>':'')+dis+'</div>'+(c.kind==='salary'&&v.casino&&v.bet_u===(me&&me.id)?'<p class="hint">🎰 Tu as déjà misé : attends qu’un autre joueur mise.</p>':'')}}
   const sc=mob?.9:1.15;
   return'<div class="vzb"><button class="btn alt sm vzx" data-vie="closedet">✕ Fermer</button><div class="vdet"><div>'+vieW(d.id,sc,'tabindex="-1"')+'</div><div class="vcol"><span class="kind">'+esc((VIELAB[c.kind]||'').toUpperCase())+'</span>'+(c.pack&&c.pack!=='base'&&vieP(c.pack)?' <span class="vpkc" style="--pc:'+vieP(c.pack)[3]+'">'+vieP(c.pack)[1]+' '+vieP(c.pack)[2]+'</span>':'')+'<h3>'+c.emoji+' '+esc(vieClean(c.name))+'</h3>'+
-    '<div class="rule"><b>CE QUE FAIT CETTE CARTE</b>'+esc(how.t)+(how.extra?'<br>'+esc(how.extra):'')+'</div>'+(how.cond.length?'<div class="rule"><b>CONDITIONS</b>'+how.cond.map(x=>'• '+esc(x)).join('<br>')+'</div>':'')+
+    '<div class="rule"><b>'+(c.kind==='job'?'SON RÔLE':'CE QUE FAIT CETTE CARTE')+'</b>'+esc(how.t)+(how.extra?'<br>'+esc(how.extra):'')+'</div>'+(how.cond.length?'<div class="rule"><b>CONDITIONS</b>'+how.cond.map(x=>'• '+esc(x)).join('<br>')+'</div>':'')+
     (c.smiles?'<p>😊 <b>'+c.smiles+'</b> sourire'+(c.smiles>1?'s':'')+(c.eff==='unicorn'?' (×2 avec Arc-en-ciel + Étoile filante)':'')+'</p>':'')+
     (act?'<div class="vact2" style="display:flex;flex-direction:column;gap:8px">'+act+'</div>':'')+'</div></div></div>'}
 
@@ -3317,7 +3663,7 @@ async function vieGuide(){
   vieSet(h+'</div>')}
 async function vieEnter(){
   vieSay(vieNote);vieNote='';
-  vieMobS=vieMob();
+  vieMobS=vieMob();vieDeskS=vieDesk();
   if(me){try{await vieCat()}catch(e){vieSay('Erreur : '+e.message);if(!VC)return}vieArt()}
   if(!vo&&me&&sb&&!busyOnline()){const r=await sb.rpc('vie_mine');if(r.data&&!vo&&curView==='vie'){vieAttach(r.data,true);return}}
   vieRender2()}
@@ -3372,7 +3718,8 @@ async function vieAct(a,b){
     case'bet':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;done(await sb.rpc('vie_bet',{p_id:id,p_card:d.id}));break}
     case'quit':{if(vo.busy)return;if(Date.now()-vieQ>4000){vieQ=Date.now();b.textContent='Confirmer : démissionner ?';return}vieQ=0;vo.busy=true;done(await sb.rpc('vie_quit',{p_id:id}));break}
     case'closedet':vo.det=null;vieOv();break;
-    case'closeall':vo.det=null;vo.disc=false;vieOv();break;
+    case'closeview':vo.view=null;vo.det=null;vieOv();break;
+    case'closeall':vo.det=null;vo.disc=false;vo.view=null;vieOv();break;
     case'disc':vo.disc=true;vo.det=null;vieOv();break;
     case'inv':msPickInvite('vie',id);break;
     case'leave':
@@ -3391,13 +3738,16 @@ function vieCloseZ(){vieDetView=null;if(vo&&vo.v&&!vo.guide){vo.det=null;vieOv()
 $('vieBody').addEventListener('click',e=>{
   const am=e.target.closest('[data-aim]');
   if(am&&vo&&vo.tg){vieAct('aimgo',{dataset:{t:am.dataset.aim}});return}
+  const op=e.target.closest('.vop[data-pid]');
+  if(op&&document.body.classList.contains('vdesk')&&vo&&vo.v&&VC&&!vo.tg){vo.view=op.dataset.pid;vo.viewAnim=true;vo.det=null;vo.disc=false;vieOv();return}
+  if(op&&document.body.classList.contains('vdesk')&&vo&&vo.tg)return;
   const z=e.target.closest('[data-z]'),hd=e.target.closest('[data-h]');
   if(z&&VC){vieOpenZ(+z.dataset.z);return}
   if(hd&&vo&&vo.v&&VC){const was=!!vo.tg;vo.tg=null;vo.det={mode:'hand',id:+hd.dataset.h,pay:null,aux:null,t:null};vo.disc=false;if(was)vieRender();else vieOv();return}
   const b=e.target.closest('[data-vie]');if(!b||b.disabled)return;vieAct(b.dataset.vie,b)});
 $('vieZ').addEventListener('click',e=>{
   const t=e.target;
-  if(t===$('vieZ')){if(vo&&vo.v&&vo.v.status==='playing'&&vo.v.phase==='pick'&&vieIsMe(vo.v.turn_uid))return;if(vo&&vo.det)vo.det=null;else if(vo&&vo.disc)vo.disc=false;vieCloseZ();vieOv();return}
+  if(t===$('vieZ')){if(vo&&vo.v&&vo.v.status==='playing'&&vo.v.phase==='pick'&&vieIsMe(vo.v.turn_uid))return;if(vo&&vo.det)vo.det=null;else if(vo&&vo.disc)vo.disc=false;else if(vo&&vo.view)vo.view=null;vieCloseZ();vieOv();return}
   const pk=t.closest('[data-pk]');if(pk&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_chance',{p_id:id,p_card:+pk.dataset.pk}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
   const dg=t.closest('[data-dg]');if(dg&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_dig',{p_id:id,p_card:+dg.dataset.dg}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
   const st=t.closest('[data-st]');if(st&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_star',{p_id:id,p_card:+st.dataset.st}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
@@ -3406,7 +3756,7 @@ $('vieZ').addEventListener('click',e=>{
   const ax=t.closest('[data-ax]');if(ax&&vo&&vo.det){vo.det.aux=+ax.dataset.ax;vo.det.ai=ax.dataset.ai!=null?+ax.dataset.ai:null;vieOv();return}
   const dv=t.closest('[data-dv]');if(dv&&vo&&vo.det){vo.det.t=dv.dataset.v;vieOv();return}
   const b=t.closest('[data-vie]');if(!b||b.disabled)return;
-  if(b.dataset.vie==='closedet'||b.dataset.vie==='closeall'){if(vo&&vo.v&&!vo.guide){vieAct(b.dataset.vie,b)}else vieCloseZ();return}
+  if(b.dataset.vie==='closedet'||b.dataset.vie==='closeall'||b.dataset.vie==='closeview'){if(vo&&vo.v&&!vo.guide){vieAct(b.dataset.vie,b)}else vieCloseZ();return}
   vieAct(b.dataset.vie,b)});
 $('vieBody').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id==='vieCode'){const b=document.querySelector('[data-vie=join2]');if(b)vieAct('join2',b)}});
@@ -3554,8 +3904,13 @@ document.addEventListener('click',e=>{
 viePrefs();
 function viePrefAnimDraw(){const a=$('viePrefAnim');if(!a)return;const on=vieAnimOn();
   a.innerHTML='<button type="button" data-an="on" aria-pressed="'+on+'">Activée (défaut)</button><button type="button" data-an="off" aria-pressed="'+!on+'">Désactivée</button>'}
+function viePrefAnnDraw(){const a=$('viePrefAnn');if(!a)return;const m=vieAnMode();
+  a.innerHTML=[['full','Complète (défaut)'],['fast','Courte'],['off','Aucune']].map(x=>'<button type="button" data-an2="'+x[0]+'" aria-pressed="'+(m===x[0])+'">'+x[1]+'</button>').join('')}
+viePrefAnnDraw();
 viePrefAnimDraw();
 document.addEventListener('click',e=>{
+  const a2=e.target.closest('#viePrefAnn [data-an2]');
+  if(a2){store.set('vieann',a2.dataset.an2);viePrefAnnDraw();return}
   const a=e.target.closest('#viePrefAnim [data-an]');
   if(a){store.set('vieanim',a.dataset.an);viePrefAnimDraw();return}
   if(e.target.closest('#viePrefAnimGo')){vieRvTest(false);return}
@@ -3596,6 +3951,7 @@ async function gcFetch(init){
   const r=await sb.rpc('chat_fetch',{p_chat:id,p_after:GC.last});if(key!==GC.key||r.error)return;
   Object.assign(GC.users,r.data.users);
   const add=r.data.msgs.filter(m=>!GC.msgs.some(x=>x.id===m.id));add.forEach(m=>GC.msgs.push(m));
+  if(!init&&GC.ctx&&GC.ctx.k==='vie'&&typeof vieBubble==='function')add.forEach(m=>{if(m.k==='text'&&!(me&&m.u===me.id))vieBubble(m.u,m.b)});
   if(add.length)GC.last=Math.max(GC.last,...add.map(m=>m.id));
   if(GC.open||init)GC.news=0;
   if(add.length&&GC.open)gcRender();gcBadge()}
@@ -3613,10 +3969,12 @@ async function gcSend(text){
   if(!GC.chat||GC.busy||gcMuted())return;const t=(text||'').trim();if(!t)return;GC.busy=true;
   try{const r=await sb.rpc('chat_send',{p_chat:GC.chat,p_body:t});
     if(r.error){$('gcMsg').textContent=r.error.message;return}
-    $('gcMsg').textContent='';if(!GC.msgs.some(x=>x.id===r.data.id))GC.msgs.push(r.data);GC.last=Math.max(GC.last,r.data.id);gcRender(true)}
+    $('gcMsg').textContent='';if(!GC.msgs.some(x=>x.id===r.data.id))GC.msgs.push(r.data);GC.last=Math.max(GC.last,r.data.id);gcRender(true);
+    if(GC.ctx&&GC.ctx.k==='vie'&&me&&typeof vieBubble==='function')vieBubble(me.id,t)}
   finally{GC.busy=false}}
 $('gcB').onclick=gcToggle;
 $('vieChM').onclick=()=>$('gcM').click();
+$('vieChT').onclick=()=>{const w=$('vieChatW'),o=w.classList.toggle('open');$('vieChT').textContent=o?'▾':'▴';if(o){gcRender(true);const l=$('vieChL');l.scrollTop=l.scrollHeight}};
 $('gcX').onclick=()=>{if(GC.open)gcToggle()};
 $('gcM').onclick=()=>{store.set('gcmute',gcMuted()?'0':'1');gcBadge();gcRender(true);if(!gcMuted()&&GC.chat)gcFetch(false)};
 $('gcS').onclick=async()=>{const i=$('gcIn'),t=i.value;if(!t.trim())return;await gcSend(t);i.value=''};
