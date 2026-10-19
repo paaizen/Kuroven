@@ -616,7 +616,42 @@ body.vdesk .vhandw,body.vdesk .vop .vbacks{transition:opacity .4s}
 /* podium de fin */
 .vpod{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin:16px auto 18px;min-height:260px}
 .vpd{display:flex;flex-direction:column;align-items:center;gap:6px;width:clamp(92px,18vw,150px)}
-.vpd .avi{width:56px;height:56px;font-size:1.5rem;border:3px solid #ffd84a}
+.vpd .avi{width:70px;height:70px;font-size:1.9rem;border:3px solid #ffd84a}
+.vpd.r1 .avi{width:clamp(96px,22vw,128px);height:clamp(96px,22vw,128px);font-size:3rem;border-width:5px;box-shadow:0 0 0 6px #ffd84a33,0 0 34px #ffd84a88}
+.vpd.r2 .avi{width:84px;height:84px;font-size:2.2rem;border-color:#cfd6de}
+.vpd.r3 .avi{border-color:#d08a4b}
+.vpav{position:relative;display:flex;justify-content:center}
+.vpd.r1 .vpav .cr{position:absolute;top:-26px;font-size:1.8rem;line-height:1;animation:vcrown .7s cubic-bezier(.2,1.3,.4,1) 1.3s both}
+@keyframes vcrown{from{transform:translateY(-30px) scale(.4);opacity:0}to{transform:none;opacity:1}}
+.vpd .ps{font-weight:800;font-variant-numeric:tabular-nums;color:#ffd84a;margin-top:-2px}
+.vpd.r1{margin-top:28px}
+.vst{margin:6px auto 14px;max-width:560px;background:rgba(0,0,0,.35);border:2px solid #ffffff22;border-radius:16px;padding:12px 14px;color:#fff;display:flex;flex-direction:column;gap:10px}
+.vst .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.vst h3{margin:0;font-size:1.05rem}
+.vst .tb{display:flex;gap:6px}
+.vst .tb button{border:2px solid #ffffff33;background:none;color:#fff;border-radius:999px;padding:3px 12px;font-weight:800;font-size:.85rem;cursor:pointer}
+.vst .tb button[aria-selected="true"]{border-color:#ffd84a;color:#ffd84a}
+.vsl{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;gap:12px}
+.vsl::-webkit-scrollbar{display:none}
+.vsl>div{flex:0 0 100%;scroll-snap-align:start;min-width:0;display:flex;flex-direction:column;gap:10px}
+.vsd{display:flex;gap:7px;justify-content:center}
+.vsd i{width:8px;height:8px;border-radius:50%;background:#ffffff33}.vsd i.on{background:#ffd84a}
+.vst table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.vst th,.vst td{padding:7px 6px;text-align:center;border-bottom:1px solid #ffffff22}
+.vst th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.vst th:first-child,.vst td:first-child{text-align:left;font-weight:800}
+.vst td.hi{color:#ffd84a;font-weight:900}
+.vst .aw{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.vst .aw div{background:#ffffff14;border-radius:10px;padding:7px 10px;display:flex;flex-direction:column}
+.vst .aw small{font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;opacity:.75;font-weight:800}
+.vst .lg{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;opacity:.85}
+.vst .lg span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--c);margin-right:5px}
+.vst .rw{display:grid;grid-template-columns:56px 1fr;gap:8px;align-items:center;margin-bottom:8px}
+.vst .rw b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vst .bl2{display:grid;grid-template-columns:70px 1fr 22px;gap:6px;align-items:center;font-size:.8rem;opacity:.95;margin:2px 0}
+.vst .bl2 i{display:block;height:11px;border-radius:6px;background:var(--c);width:var(--w);min-width:4px}
+.vst .bl2 em{font-style:normal;font-weight:900;text-align:right}
+.vst .nt{font-size:.74rem;opacity:.7;text-align:center}
 .vpd .nm{font-weight:900;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vpd .bl{width:100%;border-radius:12px 12px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px;font-weight:900;background:#2b3d51;color:#fff;transform-origin:bottom;animation:vrise 1s cubic-bezier(.2,1.3,.4,1) both}
 .vpd.r1 .bl{height:130px;background:linear-gradient(#e0b100,#8a6a00);animation-delay:.5s}
@@ -3209,7 +3244,7 @@ function vieLine(e){
 /* --- animations : les cartes volent vers leur destination --- */
 const vieReduced=()=>{try{return window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
 function vieFxL(){let l=$('vieFx');if(!l){l=document.createElement('div');l.id='vieFx';l.innerHTML='<div id="vieDim"></div>';document.body.appendChild(l)}return l}
-function vieFxPt(sel){const el=typeof sel==='string'?document.querySelector(sel):sel;if(!el||!el.getBoundingClientRect)return null;const r=el.getBoundingClientRect();if(!r.width&&!r.height)return null;return{x:r.left+r.width/2,y:r.top+r.height/2}}
+function vieFxPt(sel){const el=typeof sel==='string'?document.querySelector(sel):sel;if(!el||!el.getBoundingClientRect)return null;let r=el.getBoundingClientRect();if(!r.width&&!r.height){const k=el.firstElementChild||(el.parentElement&&el.parentElement.querySelector('.vw'));if(k)r=k.getBoundingClientRect()}if(!r.width&&!r.height)return null;return{x:r.left+r.width/2,y:r.top+r.height/2}}
 function vieFly(id,from,to,o,cb){
   o=o||{};if(!from||!to){if(cb)cb();return}
   const L=vieFxL(),sc=o.s||.46,w=220*sc,h=316*sc,dur=o.dur||650,d=document.createElement('div');
@@ -3221,6 +3256,14 @@ function vieFly(id,from,to,o,cb){
 function vieToast(pt,txt,cls){if(!pt)return;const t=document.createElement('div');t.className='vtoast'+(cls?' '+cls:'');t.style.left=pt.x+'px';t.style.top=pt.y+'px';t.textContent=txt;vieFxL().appendChild(t);setTimeout(()=>t.remove(),cls?2400:1600)}
 function vieRing(pt){if(!pt)return;const r=document.createElement('div');r.className='vring';r.style.left=(pt.x-20)+'px';r.style.top=(pt.y-20)+'px';vieFxL().appendChild(r);
   r.animate([{transform:'scale(.6)',opacity:1},{transform:'scale(4.2)',opacity:0}],{duration:650,easing:'ease-out'}).onfinish=()=>r.remove()}
+function vieCasReveal(e,to,cb){
+  const L=vieFxL(),cp=vieFxPt('.vcas')||vieFxPt('.vmid');if(!cp||!to||vieReduced()){if(cb)cb();return}
+  const w=110,h=158,mk=(id,dx)=>{const d=document.createElement('div');d.className='vfly';d.style.cssText='width:'+w+'px;height:'+h+'px;left:'+(cp.x+dx-w/2)+'px;top:'+(cp.y-h/2-34)+'px;z-index:5';d.innerHTML=vieW(id,.5,'tabindex="-1"');L.appendChild(d);
+    d.animate([{transform:'scale(.3)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:380,easing:'cubic-bezier(.2,.8,.25,1)',fill:'both'});return d};
+  const a=mk(e.f,-w*.6),b=mk(e.c,w*.6);
+  setTimeout(()=>{[a,b].forEach((d,i)=>{const r=d.getBoundingClientRect(),dx=to.x-(r.left+r.width/2),dy=to.y-(r.top+r.height/2);
+    d.animate([{transform:'none',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale(.35)',opacity:.9}],{duration:600,delay:i*120,easing:'cubic-bezier(.5,0,.75,.4)',fill:'forwards'})});
+    setTimeout(()=>{a.remove();b.remove();if(cb)cb()},900)},1300)}
 function vieFxCls(el,cls,ms){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),ms||900)}
 const VMALIC={accident:'🚑',illness:'🤒',disaster:'🌪️',burnout:'🥵',divorce:'💔',tax:'💸',fire:'🔥',prison:'⛓️',repeat:'📚',rats:'🐀',mess:'🧺',squat:'🏚️',demon:'😈',vampire:'🧛',wolf:'🐺',embezzle:'💰',scandal:'📰',ceiling:'🪟',burglary:'🦹',
   meteor:'☄️',flood:'🌊',pandemic:'🦠',zombie:'🧟',famine:'🍽️',war:'⚔️',doom:'🌍',wealth:'💸',strike:'✊',election:'🗳️',revolution:'🚩',dump:'🗑️'};
@@ -3299,13 +3342,16 @@ function vieFxOne(e,opt){
     if(opt&&opt.skipFly){vieRing(disc());const ps=document.querySelector('.vmid .vpile:last-child .vstack');if(ps&&ps.animate)ps.animate([{transform:'scale(1)'},{transform:'scale(.95)'},{transform:'scale(1)'}],{duration:320})}
     else vieFly(e.c,from,disc(),{s:.46,end:.7,rot:Math.random()*16-8});
   }else if(e.a==='take'&&c){
-    vieFly(e.c,disc(),out(e.u),{s:.46,end:.7});
+    if(e.u===mid&&vo.tookNow){vo.tookNow=0;return}
+    vieRing(disc());vieFly(e.c,disc(),out(e.u),{s:.5,end:.8,dur:560,rot:-6});
   }else if(e.a==='quit'&&c){
     vieFly(e.c,into(e.u),disc(),{s:.46,end:.7});vieToast(out(e.u),'🚪 Démission');
   }else if(e.a==='bet'){
-    vieFly(null,out(e.u),vieFxPt('.vcas')||disc(),{s:.34,end:.6,dur:550},()=>vieToast(vieFxPt('.vcas')||disc(),'🎰 Mise !'));
+    if(e.u===mid&&vo.betNow){vo.betNow=0;return}
+    vieFly(null,out(e.u),vieFxPt('.vcas')||disc(),{s:.42,end:.7,dur:650,rot:-8},()=>vieToast(vieFxPt('.vcas')||disc(),'🎰 Mise !'));
   }else if(e.a==='win'){
-    const w=pnl(e.w);vieToast(vieFxPt('.vcas')||vieFxPt(w),'🎰 '+vieName(e.w)+' gagne !');vieFly(null,vieFxPt('.vcas')||disc(),into(e.w),{s:.34,end:.6,dur:650},()=>vieFxCls(w,'pop',800));
+    const w=pnl(e.w),to=into(e.w);vieToast(vieFxPt('.vcas')||vieFxPt(w),'🎰 Les salaires sont retournés…');
+    vieCasReveal(e,to,()=>{vieToast(to,'🎰 '+vieName(e.w)+' gagne !');vieFxCls(w,'pop',800)});
   }else if(e.a==='chance'){vieToast(out(e.u),'🍀')}
   else if(e.a==='skip'){vieToast(out(e.u),'💤 passe son tour')}
   else if(e.a==='timeout'){vieToast(out(e.u),'⏱️ trop lent')}}
@@ -3365,7 +3411,7 @@ function vieDeskFit(){
     shown.forEach((g,i)=>{if(i)g.style.marginLeft=(-o).toFixed(1)+'px'});
     if(gs.length>vis){gs.slice(vis).forEach(g=>{g.style.display='none'});const m=document.createElement('span');m.className='vmore';m.textContent='+'+(gs.length-vis);bd.appendChild(m)}})}
 function vieSeat(k,j){const th=(180-(j+1)*180/(k+1))*Math.PI/180;return[50+43*Math.cos(th),47-34*Math.sin(th)]}
-const vieSmShown=p=>(vo&&vo.hold&&vo.hold[p.id]!=null)?vo.hold[p.id]:p.smiles;
+const vieSmShown=p=>(vo&&vo.hold&&vo.hold[p.id]!=null)?vo.hold[p.id]:(p.smiles==null?'?':p.smiles);
 const vieAnMode=()=>{const m=store.get('vieann','full');return m==='fast'||m==='off'?m:'full'};
 /* sourires : le compteur monte quand la carte annoncée arrive à destination */
 function vieHoldPrep(v,old){
@@ -3493,7 +3539,21 @@ function viePodium(sc){
   if(!sc||!sc.length)return'';
   const top=sc.slice(0,3),ord=top.length===3?[1,0,2]:top.length===2?[1,0]:[0],med=['🥇','🥈','🥉'];
   return'<div class="vpod">'+ord.map(i=>{const s=top[i],p=(vo&&vo.v&&vo.v.players.find(x=>x.id===s.u))||{id:s.u,pseudo:'?'};
-    return'<div class="vpd r'+(i+1)+'">'+avh(p)+'<div class="nm">'+esc(p.pseudo||'?')+'</div><div class="bl"><span>'+med[i]+'</span><small>😊 '+s.s+'</small></div></div>'}).join('')+'</div>'}
+    return'<div class="vpd r'+(i+1)+'"><div class="vpav">'+(i===0?'<span class="cr" aria-hidden="true">👑</span>':'')+avh(p)+'</div><div class="nm">'+esc(p.pseudo||'?')+'</div><div class="ps">😊 '+s.s+'</div><div class="bl"><span>'+med[i]+'</span></div></div>'}).join('')+'</div>'}
+function vieStatsHTML(v,sc){
+  const st=v.stats||{},rows=sc.map(s=>{const p=v.players.find(x=>x.id===s.u)||{},m=st[s.u]||{};return{n:p.pseudo||'?',r:m.r||0,d:m.d||0,b:m.b||0}});
+  if(!rows.length)return'';
+  const hi=k=>Math.max(...rows.map(y=>y[k])),mx=Math.max(1,...rows.flatMap(x=>[x.r,x.d,x.b])),nm=k=>rows.filter(x=>x[k]===hi(k)).map(x=>esc(x.n)).join(' et ');
+  const tab='<table><thead><tr><th>Joueur</th><th>Reçus</th><th>Donnés</th><th>Bloqués</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+esc(x.n)+'</td>'+['r','d','b'].map(k=>'<td'+(hi(k)>0&&x[k]===hi(k)?' class="hi"':'')+'>'+x[k]+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+  const aw=hi('d')+hi('r')+hi('b')>0?'<div class="aw"><div><small>Le plus méchant</small><b>'+nm('d')+' · '+hi('d')+'</b></div><div><small>Le plus visé</small><b>'+nm('r')+' · '+hi('r')+'</b></div><div><small>Le plus protégé</small><b>'+nm('b')+' · '+hi('b')+'</b></div></div>':'';
+  const bar=(l,n,c)=>'<div class="bl2"><span>'+l+'</span><i style="--c:'+c+';--w:'+(n/mx*100)+'%"></i><em>'+n+'</em></div>';
+  const bars='<div class="lg"><span style="--c:#ff6b5e">Reçus</span><span style="--c:#ffd84a">Donnés</span><span style="--c:#5ad27a">Bloqués</span></div>'+rows.map(x=>'<div class="rw"><b>'+esc(x.n)+'</b><div>'+bar('Reçus',x.r,'#ff6b5e')+bar('Donnés',x.d,'#ffd84a')+bar('Bloqués',x.b,'#5ad27a')+'</div></div>').join('');
+  return'<div class="vst"><div class="hd"><h3>📊 Stats de la partie</h3><div class="tb" role="tablist"><button type="button" role="tab" data-vie="stab" data-i="0" aria-selected="true">Tableau</button><button type="button" role="tab" data-vie="stab" data-i="1" aria-selected="false">Barres</button></div></div>'+
+    '<div class="vsl"><div>'+tab+aw+'</div><div>'+bars+'</div></div><div class="vsd"><i class="on"></i><i></i></div><p class="nt">Malus : reçus, donnés, et bloqués (annulés par un métier immunisé). Glisse pour changer de vue.</p></div>'}
+function vieStatsInit(){
+  const sl=document.querySelector('.vst .vsl');if(!sl||sl._i)return;sl._i=1;
+  const mark=i=>{document.querySelectorAll('.vst .tb button').forEach((b,k)=>b.setAttribute('aria-selected',k===i));document.querySelectorAll('.vst .vsd i').forEach((d,k)=>d.classList.toggle('on',k===i))};
+  sl.addEventListener('scroll',()=>mark(Math.round(sl.scrollLeft/Math.max(1,sl.clientWidth))),{passive:true})}
 function vieConfetti(){
   const L=vieFxL(),cs=['#ffd84a','#ff5a4d','#5aa2ff','#8fe3a0','#fff','#ff6fa0'];
   for(let i=0;i<90;i++){const c=document.createElement('i');c.className='vconf';c.style.left=(Math.random()*100)+'%';c.style.background=cs[i%cs.length];c.style.setProperty('--dx',(Math.random()*240-120)+'px');c.style.animationDelay=(Math.random()*.9)+'s';c.style.animationDuration=(2.4+Math.random()*1.4)+'s';L.appendChild(c);setTimeout(()=>c.remove(),5200)}}
@@ -3528,7 +3588,7 @@ function vieRender(){
   $('vieBody').parentNode.querySelector('h1').textContent='Ma Vie';
   if(v.status==='lobby'){
     const n=v.players.length;
-    h='<p class="sub">Ma Vie · '+n+' sur '+v.max+' joueurs · '+esc(vieLenT[v.len]||'')+'</p><div class="rmCode" aria-label="Code de la partie">'+esc(v.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p>'+vieList(v)+viePackSection(v)+
+    h='<p class="sub">Ma Vie · '+n+' sur '+v.max+' joueurs · '+esc(vieLenT[v.len]||'')+(v.show_smiles===false?' · sourires cachés':'')+'</p><div class="rmCode" aria-label="Code de la partie">'+esc(v.code)+'</div><p class="sub">Partage ce code : tes amis le tapent dans « Rejoindre avec un code ».</p>'+vieList(v)+viePackSection(v)+
       '<div class="row" style="margin-top:12px">'+(isMe(v.host)?'<button class="btn" data-vie="start"'+(n<2?' disabled':'')+'>'+(n<2?'Attends au moins un autre joueur':'Lancer la partie')+'</button>':'<span class="hint">En attente du lancement par l’hôte…</span>')+'<button class="btn alt" data-vie="inv">📨 Inviter des amis</button><button class="btn alt" data-vie="leave">Quitter</button></div>'+
       '<div class="row"><button class="btn alt sm" data-vie="guide">📖 Guide des cartes</button><button class="btn alt sm" data-go="set">🎨 Préférences</button></div>'}
   else if(v.status==='playing'){
@@ -3565,10 +3625,10 @@ function vieRender(){
       '<div class="vlogs">'+(v.log.slice().reverse().slice(0,8).map(e=>{const t=vieLine(e);return t?'<div class="vlg">'+t+'</div>':''}).join('')||'<span class="hint">La partie commence.</span>')+'</div>'}
   else if(v.status==='finished'){
     const sc=(v.result&&v.result.scores)||[],win=(v.result&&v.result.winners)||[],me_=me&&me.id;
-    h='<h2 style="text-align:center">'+(win.length===1?(win[0]===me_?'🏆 Tu gagnes !':'🏆 '+esc(vieName(win[0]))+' gagne !'):'🤝 Égalité : '+win.map(u=>esc(vieName(u))).join(', '))+'</h2>'+viePodium(sc)+'<div class="vsc th-'+vieTable()+'"><div class="vtab">'+
+    h='<h2 style="text-align:center">'+(win.length===1?(win[0]===me_?'🏆 Tu gagnes !':'🏆 '+esc(vieName(win[0]))+' gagne !'):'🤝 Égalité : '+win.map(u=>esc(vieName(u))).join(', '))+'</h2>'+viePodium(sc)+vieStatsHTML(v,sc)+'<div class="vsc th-'+vieTable()+'"><div class="vtab">'+
       sc.map((s,i)=>{const p=v.players.find(x=>x.id===s.u)||{};return'<div class="vop'+(win.includes(s.u)?' cur':'')+'" style="max-width:none"><div class="vh1"><span class="rk">'+(i+1)+'</span>'+avh(p)+'<div class="g" data-user="'+esc(s.u)+'"><b>'+esc(p.pseudo||'?')+(s.u===me_?' (toi)':'')+'</b></div><b>😊 '+s.s+'</b></div><div class="vbd">'+vieBoard(p.board,p.spent,.27)+'</div></div>'}).join('')+'</div></div>'+
       '<p class="hint" style="text-align:center;margin-top:10px">'+(v.next?'🔁 Une nouvelle partie est prête : tu y es ramené automatiquement…':'Quand quelqu’un relance, tous les joueurs encore là sont ramenés dans la nouvelle partie, sans ré-inviter personne.')+'</p><div class="row" style="margin-top:12px"><button class="btn" data-vie="rematch">'+(v.next?'🔁 Rejoindre la nouvelle partie ('+v.next.n+'/'+v.next.max+')':'🔁 Nouvelle partie avec les mêmes joueurs')+'</button><button class="btn alt" data-vie="done">Terminer</button></div>'}
-  vieSet(h);if(dk)vieDeskSync();vieClock();vieFan();vieOv();vieChatSync();
+  vieSet(h);if(v.status==='finished')vieStatsInit();if(dk)vieDeskSync();vieClock();vieFan();vieOv();vieChatSync();
   if(dk&&vo.deal){vo.deal=0;setTimeout(vieDeal,120)}
   if(v.status==='finished'&&vo.conf!==vo.id){vo.conf=vo.id;if(vieAnMode()!=='off'&&!vieReduced())setTimeout(vieConfetti,500)}}
 function viePackSection(v){
@@ -3655,7 +3715,7 @@ function vieMenu(){
   artBanners()}
 function vieForm(){
   vieView='create';
-  vieSet('<p class="sub">Choisis la taille et la durée de la partie. Tes amis la rejoignent avec le code.</p><div class="rmF"><label for="vieMax">Nombre de joueurs maximum</label><select id="vieMax">'+[2,3,4,5,6].map(n=>'<option value="'+n+'"'+(n===4?' selected':'')+'>'+n+'</option>').join('')+'</select><label for="vieLen">Durée</label><select id="vieLen">'+Object.keys(vieLenT).map(k=>'<option value="'+k+'"'+(k==='normal'?' selected':'')+'>'+esc(vieLenT[k])+'</option>').join('')+'</select></div>'+(vieHasPacks()?'<h2 style="margin:14px 0 2px">🧩 Extensions</h2><p class="hint" style="margin:0">Ajoute des cartes en plus du jeu de base. Tu pourras encore changer ça au salon, avant de lancer.</p>'+viePackPick(viePkGet(),false):'')+'<div class="row"><button class="btn" data-vie="create2">Créer la partie</button><button class="btn alt" data-vie="menu">Retour</button></div>')}
+  vieSet('<p class="sub">Choisis la taille et la durée de la partie. Tes amis la rejoignent avec le code.</p><div class="rmF"><label for="vieMax">Nombre de joueurs maximum</label><select id="vieMax">'+[2,3,4,5,6].map(n=>'<option value="'+n+'"'+(n===4?' selected':'')+'>'+n+'</option>').join('')+'</select><label for="vieLen">Durée</label><select id="vieLen">'+Object.keys(vieLenT).map(k=>'<option value="'+k+'"'+(k==='normal'?' selected':'')+'>'+esc(vieLenT[k])+'</option>').join('')+'</select></div><div class="rmF"><label for="vieSm">Sourires des joueurs</label><select id="vieSm"><option value="1" selected>Visibles pendant la partie</option><option value="0">Cachés jusqu’à la fin (suspense)</option></select></div>'+(vieHasPacks()?'<h2 style="margin:14px 0 2px">🧩 Extensions</h2><p class="hint" style="margin:0">Ajoute des cartes en plus du jeu de base. Tu pourras encore changer ça au salon, avant de lancer.</p>'+viePackPick(viePkGet(),false):'')+'<div class="row"><button class="btn" data-vie="create2">Créer la partie</button><button class="btn alt" data-vie="menu">Retour</button></div>')}
 function vieJoinForm(){
   vieView='join';
   vieSet('<p class="sub">Tape le code de la partie.</p><div class="row"><input id="vieCode" maxlength="8" placeholder="Code" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase"><button class="btn" data-vie="join2">Rejoindre</button></div><div class="row"><button class="btn alt" data-vie="menu">Retour</button></div>');
@@ -3698,7 +3758,7 @@ async function vieAct(a,b){
   if(a==='back'){vieView='menu';if(vo)vo.guide=false;vieRender2();return}
   if(a==='create'||a==='join'){if(!me){openWelcome();return}if(busyOnline()){vieSay('Termine ou quitte ta partie en cours d’abord.');return}vieSay('');a==='create'?vieForm():vieJoinForm();return}
   if(a==='create2'){
-    vieSay('Création…');const pk=vieHasPacks()?viePkGet():[],args={p_max:+$('vieMax').value,p_len:$('vieLen').value};if(pk.length)args.p_packs=pk;
+    vieSay('Création…');const pk=vieHasPacks()?viePkGet():[],args={p_max:+$('vieMax').value,p_len:$('vieLen').value,p_smiles:$('vieSm')?$('vieSm').value==='1':true};if(pk.length)args.p_packs=pk;
     const r=await sb.rpc('vie_create',args);
     if(r.error){vieSay('Erreur : '+r.error.message);return}vieSay('');vieAttach(r.data);return}
   if(a==='gpk'){vieGPk=b.dataset.pk;vieGuide();return}
@@ -3720,19 +3780,22 @@ async function vieAct(a,b){
   const id=vo.id,done=r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.det=null;vo.disc=false;vo.sig='';vieApply(r.data)};
   switch(a){
     case'start':b.disabled=true;vieSay('Distribution des cartes…');{const r=await sb.rpc('vie_start',{p_id:id});if(!vo||vo.id!==id)return;if(r.error){vieSay('Erreur : '+r.error.message);b.disabled=false}else{vieSay('');vieApply(r.data)}}break;
-    case'take':{if(vo.busy)return;vo.busy=true;if(b.dataset.src==='deck'&&!vieReduced())vieFly(null,vieFxPt('.vmid .vpile:first-child .vstack'),vieFxPt('#vieHand')||vieFxPt('.vmine'),{s:.4,end:.7,dur:480});done(await sb.rpc('vie_take',{p_id:id,p_src:b.dataset.src}));break}
+    case'take':{if(vo.busy)return;vo.busy=true;if(b.dataset.src==='deck'&&!vieReduced())vieFly(null,vieFxPt('.vmid .vpile:first-child .vstack'),vieFxPt('#vieHand')||vieFxPt('.vmine'),{s:.4,end:.7,dur:480});
+      else if(b.dataset.src==='discard'&&!vieReduced()){const dl=(vo.v&&vo.v.discard)||[],tp=dl[dl.length-1];if(tp!=null&&VC[tp]){vo.tookNow=1;vieRing(vieFxPt('.vmid .vpile:last-child .vstack'));vieFly(tp,vieFxPt('.vmid .vpile:last-child .vstack'),vieFxPt('#vieHand')||vieFxPt('.vmine'),{s:.5,end:.8,dur:560,rot:-6})}}done(await sb.rpc('vie_take',{p_id:id,p_src:b.dataset.src}));break}
     case'play':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;
       const c=VC[d.id],mineP=vo.v.players.find(p=>p.id===(me&&me.id))||{board:[],spent:[]};
       let pay=null;if(c&&(c.kind==='house'||c.kind==='trip'||c.kind==='luxe')&&d.pay&&d.pay.length){const av=viePayables(mineP.board,mineP.spent);pay=d.pay.map(i=>av[i])}
       const aux=b.dataset.aux?+b.dataset.aux:(d.aux||null);
       done(await sb.rpc('vie_play',{p_id:id,p_card:d.id,p_target:b.dataset.t||d.t||null,p_aux:aux,p_pay:pay}));break}
+    case'stab':{const sl=document.querySelector('.vst .vsl');if(sl)sl.scrollTo({left:(+b.dataset.i)*sl.clientWidth,behavior:vieReduced()?'auto':'smooth'});break}
     case'discard':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;done(await sb.rpc('vie_discard',{p_id:id,p_card:d.id}));break}
     case'aim':{const d=vo.det;if(!d)return;vo.tg={id:d.id};vo.det=null;vieRender();const t=document.querySelector('.vsc');if(t&&t.scrollIntoView)t.scrollIntoView({behavior:'smooth',block:'start'});break}
     case'aimx':vo.tg=null;vieRender();break;
     case'aimgo':{const tg=vo.tg;if(!tg||vo.busy)return;vo.busy=true;vo.tg=null;vo.fxFrom=vieFxPt($('vieHeld'));
       done(await sb.rpc('vie_play',{p_id:id,p_card:tg.id,p_target:b.dataset.t,p_aux:null,p_pay:null}));break}
     case'ack':{if(vo.busy)return;vo.busy=true;b.disabled=true;done(await sb.rpc('vie_ack',{p_id:id}));break}
-    case'bet':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;done(await sb.rpc('vie_bet',{p_id:id,p_card:d.id}));break}
+    case'bet':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;
+      if(!vieReduced()&&VC[d.id]){vo.betNow=1;vieFly(d.id,vo.fxFrom||vieFxPt('#vieHand')||vieFxPt('.vmine'),vieFxPt('.vcas')||vieFxPt('.vmid'),{s:.5,end:.7,dur:650,rot:-8},()=>vieToast(vieFxPt('.vcas'),'🎰 Mise !'))}done(await sb.rpc('vie_bet',{p_id:id,p_card:d.id}));break}
     case'quit':{if(vo.busy)return;if(Date.now()-vieQ>4000){vieQ=Date.now();b.textContent='Confirmer : démissionner ?';return}vieQ=0;vo.busy=true;done(await sb.rpc('vie_quit',{p_id:id}));break}
     case'closedet':vo.det=null;vieOv();break;
     case'closeview':vo.view=null;vo.det=null;vieOv();break;
