@@ -288,6 +288,9 @@ body.vieon #gcB{display:none!important}
 .vk .xsal{position:absolute;left:10px;right:10px;top:74px;bottom:70px}.vk .xsal svg{width:100%;height:100%;display:block}
 .vk .xl{position:absolute;left:5px;top:72px;width:40px;height:40px;z-index:2}.vk .xl svg{width:100%;height:100%;display:block}
 .vk .xbd{position:absolute;right:7px;top:74px;width:46px;height:43px;z-index:2}.vk .xbd svg{width:100%;height:100%;display:block}
+.vk .xsb{position:absolute;left:12px;right:12px;top:56px;height:22px;border-radius:11px;background:#fff;border:2.5px solid var(--k,#e07a2f);display:flex;align-items:center;justify-content:center;gap:4px;z-index:3}
+.vk .xsb span{font:900 8px Trebuchet MS,Arial,sans-serif;color:var(--k,#b85d14);letter-spacing:.5px;margin-right:3px;line-height:1}
+.vk .xsb svg{display:block}
 .vk .xc{position:absolute;left:10px;right:10px;bottom:10px;height:50px;border:2px solid #17171f;border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-style:italic;font-weight:700;font-size:11px;line-height:1.2;text-transform:uppercase;padding:0 6px}
 .vk .xp{position:absolute;left:12px;top:226px;height:34px;white-space:nowrap;border:2px solid #17171f;border-radius:14px;background:#fff;display:flex;align-items:center;gap:5px;padding:0 9px;z-index:5;font-size:10px;font-weight:900;letter-spacing:1px}
 .vk .xp svg{height:26px;width:auto;display:block}.vk .xp .xpn{font-size:22px;font-weight:900;letter-spacing:0;margin-left:1px}
@@ -2830,10 +2833,10 @@ const vieSet=h=>{$('vieBody').innerHTML=h};
 const vieMap=a=>{const m={};a.forEach(c=>{m[c.id]=c});return m};
 async function vieCat(){
   if(VC)return VC;
-  try{const s=JSON.parse(sessionStorage.getItem('viecat4')||'null');if(Array.isArray(s)&&s.length>60){VC=vieMap(s);return VC}}catch(e){}
+  try{const s=JSON.parse(sessionStorage.getItem('viecat5')||'null');if(Array.isArray(s)&&s.length>60){VC=vieMap(s);return VC}}catch(e){}
   const r=await sb.from('vie_cards').select('*');
   if(r.error||!r.data||r.data.length<60)throw new Error('Impossible de charger les cartes');
-  try{sessionStorage.setItem('viecat4',JSON.stringify(r.data))}catch(e){}
+  try{sessionStorage.setItem('viecat5',JSON.stringify(r.data))}catch(e){}
   VC=vieMap(r.data);return VC}
 /* les dessins sont dans un fichier à part, chargé à la demande */
 let vieArtP=null;
@@ -2877,7 +2880,7 @@ const VCAP={
   fire:['Défausse son Métier.','Protection juridique · Fonctionnaire'],repeat:['Défausse ses cartes Études.','Thérapie · Médecin'],prison:['Seulement sur un Bandit : il perd son métier et passe 3 tours.',''],casino:'Ouvre le casino : on peut miser un salaire de sa main.',
   law:'Bloque un Divorce ou un Licenciement.',ins:'Bloque Accident, Maladie, Catastrophe ou Impôts.',thera:'Bloque un Burn-out ou un Redoublement.',
   anniv:'Tu reçois un salaire de chaque adversaire.',rainbow:'Joue 3 cartes d’affilée, ou pioche-en 3.',chance:'Pioche 3 cartes, garde-en une, défausse les 2 autres.',
-  star:'Choisis une carte de la défausse et joue-la.',inherit:'Reste posé : vaut 4 pour payer tes achats.',piston:'Pose le métier de ton choix (sans les études).',
+  star:'Choisis une carte de la défausse et joue-la.',inherit:'Reste posé : vaut 3 pour payer tes achats.',piston:'Pose le métier de ton choix (sans les études).',
   troc:'Échange une carte de ta main contre une carte d’un adversaire.',tsunami:'Toutes les mains sont mélangées et redistribuées.',vengeance:'Renvoie un malus que tu as reçu sur un autre joueur.',
   clean:'Bloque Rats, Bazar, Squatteurs ou Maladie.',angel:'Bloque n’importe quel malus. Pas l’Apocalypse.',bunker:'Arrête une carte Apocalypse.',sister:'Bloque Divorce, Licenciement, Burn-out ou Plafond.',
   rats:['Défausse 2 cartes de sa main.','Désinfectant · Assurance · Égoutier'],mess:['Sa dernière carte posée retourne en main.','Désinfectant'],squat:['Défausse sa maison.','Désinfectant · Assurance'],
@@ -2903,6 +2906,9 @@ function vieCardHTML(id){
   if(!c||!c.pack||c.pack==='base'||c.eff==='unicorn')return h;
   const p=vieP(c.pack);if(!p||h.slice(-6)!=='</div>')return h;
   return h.slice(0,-6)+'<div class="xk" style="--pc:'+p[3]+'">'+p[1]+'</div></div>'}
+/* bandeau des salaires : 4 billets numérotés, allumés jusqu'au niveau du métier */
+function vieSalUnit(n,on){return'<svg viewBox="0 0 40 26" width="30" height="19"><rect x="1.5" y="1.5" width="37" height="23" rx="4" fill="'+(on?'#34b565':'#e4e7ec')+'" stroke="'+(on?'#1d7a40':'#b4bac6')+'" stroke-width="2"'+(on?'':' stroke-dasharray="3 2.5"')+'/>'+(on?'<rect x="5" y="5" width="30" height="16" rx="2.5" fill="none" stroke="#bff0cf" stroke-width="1" opacity=".8"/><rect x="16.5" y="1.5" width="7" height="23" fill="#f6d65a" stroke="#c9a21f" stroke-width="1"/>':'')+'<text x="20" y="19" text-anchor="middle" font-family="Trebuchet MS,Arial" font-weight="900" font-size="'+(on?17:15)+'" fill="'+(on?'#fff':'#9aa1ae')+'"'+(on?' stroke="#14582d" stroke-width="2.4" paint-order="stroke"':'')+'>'+n+'</text></svg>'}
+function vieSalStrip(l){let u='';for(let i=1;i<=4;i++)u+=vieSalUnit(i,i<=l);return'<div class="xsb" title="Salaires jusqu’au niveau '+l+'"><span>SALAIRE</span>'+u+'</div>'}
 function vieCardHTML0(id){
   const c=VC[id];if(!c)return'';
   const V=typeof VIEART!=='undefined'?VIEART:null;
@@ -2917,7 +2923,7 @@ function vieCardHTML0(id){
   if(k==='study')return'<div class="vk" style="--k:'+KCOL.study+'">'+xs+nm('Études')+'<div class="xb"></div>'+round(1)+cap(VCAP.study)+'</div>';
   if(k==='job'){
     const t=(c.need?c.need+' étude'+(c.need>1?'s':''):'Sans études')+' · salaire max '+c.lvl+(jobNote(c)?'<br>'+jobNote(c):'');
-    return'<div class="vk" style="--k:'+KCOL.job+'">'+xs+nm(c.name)+'<div class="xb"></div>'+round(id)+'<div class="xl">'+V.laurelBadge(c.need)+'</div><div class="xbd">'+V.bundles(c.lvl)+'</div>'+cap(t)+'</div>'}
+    return'<div class="vk" style="--k:'+KCOL.job+'">'+xs+nm(c.name)+vieSalStrip(c.lvl)+round(id)+'<div class="xl">'+V.laurelBadge(c.need)+'</div>'+cap(t)+'</div>'}
   if(k==='salary')return'<div class="vk" style="--k:'+KCOL.salary+'">'+xs+nm('Salaire niv. '+c.lvl)+'<div class="xb"></div><div class="xsal"><svg viewBox="0 0 100 100">'+V.A[id]()+'</svg></div>'+cap('À poser avec un métier de niveau '+c.lvl+' ou plus.')+'</div>';
   if(k==='flirt')return'<div class="vk" style="--k:'+KCOL.flirt+'">'+xs+nm(c.name)+'<div class="xb"></div>'+heart(id)+cap(VCAP.flirt)+'</div>';
   if(k==='marriage')return'<div class="vk" style="--k:#c93a73;--cbg:#fff0f5">'+xs+nm('Mariage')+'<div class="xr">'+esc(vieClean(c.name).toUpperCase())+'</div>'+heart(id)+cap(VCAP.marriage)+'</div>';
@@ -2948,7 +2954,7 @@ const vieBackW=s=>'<span class="vw" style="--s:'+s+'">'+vieBackHTML()+'</span>';
 /* --- règles expliquées (inspirées du jeu de cartes Smile Life, adaptées) --- */
 const VHOW={
   study:['Pose-la devant toi pour faire des études. Plus un métier est qualifié, plus il demande d’études. Chaque étude rapporte 1 sourire.',['Impossible d’étudier une fois que tu as un métier.','Maximum 6 études.']],
-  job:['Pose-la pour exercer ce métier. Il ouvre les salaires (jusqu’à son niveau), la maison et les voyages. Plus il est qualifié, plus il rapporte de sourires.',['Il faut avoir posé assez d’études.','Un seul métier à la fois, sauf si le tien est intérimaire (tu le remplaces). Tu peux aussi démissionner pendant ton tour.']],
+  job:['Pose-la pour exercer ce métier. Il ouvre les salaires (jusqu’à son niveau), la maison et les voyages. Il rapporte 1 sourire ; plus il est qualifié, plus ses salaires peuvent être élevés.',['Il faut avoir posé assez d’études.','Un seul métier à la fois, sauf si le tien est intérimaire (tu le remplaces). Tu peux aussi démissionner pendant ton tour.']],
   salary:['Pose-le pour gagner des sourires. Un salaire sert aussi à payer une maison ou un voyage : on le retourne, il garde ses sourires mais ne peut plus payer.',['Il faut un métier dont le niveau est au moins celui du salaire.']],
   flirt:['Une rencontre amoureuse. Tu peux en avoir jusqu’à 5 (autant que tu veux si tu es Barman), elles rapportent des sourires.',['Si tu es marié(e), il te faut une carte Adultère pour flirter.','Il faut au moins un flirt pour se marier.']],
   marriage:['Marie-toi : 2 sourires, et tu peux désormais avoir des enfants. Attention, un Divorce peut te l’enlever.',['Il faut avoir un flirt.','Un seul mariage à la fois.']],
@@ -2978,14 +2984,14 @@ const VEFF={
   rainbow:['Choisis : jouer 3 cartes d’affilée, ou piocher 3 cartes. Elle reste posée devant toi (la Licorne aime ça).',[]],
   chance:['Pioche 3 cartes : garde-en une dans ta main, défausse les 2 autres.',[]],
   star:['Choisis une carte dans la défausse : tu la prends et tu dois la jouer tout de suite. Elle reste posée devant toi (la Licorne aime ça).',['Il faut qu’il y ait une carte dans la défausse.']],
-  inherit:['Une grosse somme : elle reste devant toi et vaut 4 pour payer ta maison ou tes voyages. Elle ne rapporte aucun sourire.',[]],
+  inherit:['Une grosse somme : elle reste devant toi et vaut 3 pour payer ta maison ou tes voyages. Elle ne rapporte aucun sourire.',[]],
   piston:['Pose directement le métier de ton choix pris dans ta main, sans les études.',['Il faut avoir une carte Métier en main et ne pas travailler déjà.']],
   troc:['Tu donnes une carte de ta main et tu reçois une carte tirée au hasard dans la main de l’adversaire visé.',['Il faut une autre carte en main et un adversaire qui en a.']],
   tsunami:['Toutes les cartes en main (les tiennes et celles des adversaires) sont mélangées et redistribuées, chacun garde le même nombre de cartes.',[]],
   vengeance:['Récupère un malus que tu as reçu (encore dans la défausse) : tu dois le renvoyer tout de suite à un autre joueur.',['Il faut avoir reçu un malus dans cette partie.']],
   legion:['Se pose directement : 2 sourires.',['Impossible pour un Bandit.']],
   prize:['Réservé aux Médecins, Chirurgiens, Chercheurs, Journalistes et Écrivains : 3 sourires, et tes salaires montent au niveau 4.',['Il faut avoir l’un de ces métiers.','Un seul Grand Prix.']],
-  gprof:['Réservé aux Professeurs : il remplace ta carte Professeur, avec des salaires jusqu’au niveau 4 et 4 sourires.',['Il faut être Professeur.']],
+  gprof:['Réservé aux Professeurs : il remplace ta carte Professeur, avec des salaires jusqu’au niveau 4 et 2 sourires.',['Il faut être Professeur.']],
   unicorn:['Un animal gratuit : 1 sourire. Il vaut le double si tu as aussi posé Arc-en-ciel et Étoile filante.',[]],
   /* --- extension Trash --- */
   rats:['L’adversaire visé défausse 2 cartes de sa main, au hasard.',['Bloquée par : Désinfectant ou Assurance. L’Égoutier est immunisé.','Il faut que le joueur visé ait au moins une carte en main.']],
@@ -3027,7 +3033,7 @@ const VEFF={
   /* --- extension Vie de luxe --- */
   luxhouse:['Une maison de luxe : elle se cumule avec une maison normale.',['Il faut un métier.','Un seul Penthouse.','Il faut assez de salaires non retournés.']],
   burglary:['Tu voles une carte Luxe au hasard à l’adversaire et tu la poses devant toi.',['Bloqué par : Assurance. Le Majordome est immunisé.','Il faut que le joueur visé ait une carte Luxe.']],
-  lottery:['1 chance sur 3 de recevoir un Héritage (il reste devant toi et vaut 4 pour payer).',[]],
+  lottery:['1 chance sur 3 de recevoir un Héritage (il reste devant toi et vaut 3 pour payer).',[]],
   blackcard:['Elle reste posée devant toi : tous tes achats (maison, voyage, luxe) coûtent 1 de moins.',['Il faut un métier.','Une seule Carte Black.']],
   /* --- extension Girl Power --- */
   sister:['Bloque un Divorce, un Licenciement, un Burn-out ou un Plafond de verre.',['La carte est consommée.']],
