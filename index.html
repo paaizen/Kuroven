@@ -275,6 +275,20 @@ select{padding:10px;border-radius:10px;border:2px solid var(--bd);background:var
 main#v-vie{max-width:1180px}
 body.vieon #gcB{display:none!important}
 /* --- cartes de Ma Vie (dessins 220x316 réduits par --s) --- */
+/* --- Extension Trash : cadres, effets permanents, argent sale, très spéciales --- */
+.vk.tr .xr{left:24px;right:24px;font-size:12.5px}
+.vk.tr .xa{z-index:1;left:33px;top:80px;width:150px;height:150px;box-shadow:0 0 0 5px var(--ring,#d3d5da),0 0 0 7px #fff;background:#fff}
+.vk.tr .xc{font-size:10.5px}
+.vk.tr .xbd{right:3px;top:76px;z-index:0}
+.vk.tr .perm{position:absolute;left:0;right:0;top:230px;height:20px;font-weight:900;font-size:10.5px;letter-spacing:1.4px;line-height:20px;color:#fff;z-index:3;border-block:2px solid #17171f;text-shadow:0 1px 2px #0008}
+.vk.tr.bad .perm{background:repeating-linear-gradient(-45deg,#d9322b 0 10px,#8f1c19 10px 20px)}
+.vk.tr.good .perm{background:repeating-linear-gradient(-45deg,#2f78d8 0 10px,#1a4b94 10px 20px)}
+.vk.tr.end .perm{background:repeating-linear-gradient(-45deg,#c79514 0 10px,#8c6608 10px 20px)}
+.vk.tr.goodend .perm{background:repeating-linear-gradient(-45deg,#2f78d8 0 10px,#c79514 10px 20px)}
+.vk.tr.bad{box-shadow:0 0 0 4px #d9322b99,0 5px 12px #0006}.vk.tr.good,.vk.tr.goodend{box-shadow:0 0 0 4px #2f78d899,0 5px 12px #0006}.vk.tr.end{box-shadow:0 0 0 4px #c7951499,0 5px 12px #0006}
+.vk.tr.dirty{--cbg:#1b1b1f;color:#f1f1f1;border-color:#000}.vk.tr.dirty .xn{color:#f1f1f1}.vk.tr.dirty .xc{background:#2a2a30;color:#f1f1f1;border-color:#555}
+.vk.tr.tres{--cbg:#fff9e6;border-color:#8c6608;box-shadow:0 0 0 4px #e8b93acc,0 5px 12px #0006}
+
 .vw{position:relative;flex:none;width:calc(220px*var(--s,.5));height:calc(316px*var(--s,.5));padding:0;border:0;background:none;color:inherit;font:inherit;display:block;text-align:left}
 .vw>.vk,.vw>.vbk{position:absolute;left:0;top:0;transform:scale(var(--s,.5));transform-origin:0 0}
 .vk{width:220px;height:316px;border-radius:18px;background:var(--cbg,#fff);border:5px solid #17171f;box-sizing:border-box;position:relative;box-shadow:0 5px 12px #0006;color:#17171f;overflow:hidden;font-family:'Trebuchet MS',Arial,sans-serif;text-align:center;line-height:normal}
@@ -2871,21 +2885,21 @@ const vieSet=h=>{$('vieBody').innerHTML=h};
 const vieMap=a=>{const m={};a.forEach(c=>{m[c.id]=c});return m};
 async function vieCat(){
   if(VC)return VC;
-  try{const s=JSON.parse(sessionStorage.getItem('viecat7')||'null');if(Array.isArray(s)&&s.length>60){VC=vieMap(s);return VC}}catch(e){}
+  try{const s=JSON.parse(sessionStorage.getItem('viecat8')||'null');if(Array.isArray(s)&&s.length>60){VC=vieMap(s);return VC}}catch(e){}
   const r=await sb.from('vie_cards').select('*');
   if(r.error||!r.data||r.data.length<60)throw new Error('Impossible de charger les cartes');
-  try{sessionStorage.setItem('viecat7',JSON.stringify(r.data))}catch(e){}
+  try{sessionStorage.setItem('viecat8',JSON.stringify(r.data))}catch(e){}
   VC=vieMap(r.data);return VC}
 /* les dessins sont dans un fichier à part, chargé à la demande */
 let vieArtP=null;
 function vieArt(){
   if(typeof VIEART!=='undefined')return Promise.resolve(true);
   if(vieArtP)return vieArtP;
-  vieArtP=new Promise(ok=>{const s=document.createElement('script');s.src='vie-art.js?v=3';s.onload=()=>ok(typeof VIEART!=='undefined');s.onerror=()=>{vieArtP=null;ok(false)};document.head.appendChild(s)});
+  vieArtP=new Promise(ok=>{const s=document.createElement('script');s.src='vie-art.js?v=4';s.onload=()=>ok(typeof VIEART!=='undefined');s.onerror=()=>{vieArtP=null;ok(false)};document.head.appendChild(s)});
   return vieArtP}
 /* extensions (paquets de cartes en plus) */
 const VPACKS=[
-  ['trash','🗑️','Trash','#5f7a4a','Éboueurs, rats, décharges : la vie dans les poubelles.'],
+  ['trash','🗑️','Trash','#5f7a4a','Drogues, argent sale, bourreaux et mines : l’extension pour adultes.','soon'],
   ['apoc','☄️','Apocalypse','#c0562a','Météorite, zombies, guerre : des catastrophes qui frappent toute la table.'],
   ['fantasy','🧙','Fantastique','#7a4aa8','Anges, démons, vampires, sorcières et dragons.'],
   ['politic','🏛️','Politique','#2a4fb3','Maire, Président, élections, grèves et scandales.'],
@@ -2894,14 +2908,14 @@ const VPACKS=[
 const vieHasPacks=()=>!!VC&&Object.values(VC).some(c=>c.pack&&c.pack!=='base');
 const vieCnt=k=>Object.values(VC||{}).filter(c=>(c.pack||'base')===k).reduce((a,c)=>a+(c.qty||1),0);
 const vieP=k=>VPACKS.find(p=>p[0]===k);
-const viePkGet=()=>store.get('viepk','').split(',').filter(k=>VPACKS.some(p=>p[0]===k));
+const viePkGet=()=>store.get('viepk','').split(',').filter(k=>VPACKS.some(p=>p[0]===k&&!p[5]));
 const viePkSet=a=>store.set('viepk',a.join(','));
 function viePackPick(sel,lock){
-  return'<div class="vpks">'+VPACKS.map(p=>{const on=sel.includes(p[0]);return'<button type="button" class="vpk'+(on?' on':'')+'" style="--pc:'+p[3]+'" data-vie="pk" data-pk="'+p[0]+'" aria-pressed="'+on+'"'+(lock?' disabled':'')+'><span class="e">'+p[1]+'</span><span class="t"><b>'+p[2]+'</b><small>'+esc(p[4])+'</small><small class="n">+ '+vieCnt(p[0])+' cartes</small></span><span class="ck">'+(on?'✓':'')+'</span></button>'}).join('')+'</div>'}
+  return'<div class="vpks">'+VPACKS.map(p=>{const on=sel.includes(p[0]);return'<button type="button" class="vpk'+(on?' on':'')+'" style="--pc:'+p[3]+'" data-vie="pk" data-pk="'+p[0]+'" aria-pressed="'+on+'"'+(lock||p[5]?' disabled':'')+'><span class="e">'+p[1]+'</span><span class="t"><b>'+p[2]+'</b><small>'+esc(p[4])+'</small><small class="n">'+(p[5]?'Bientôt : en cours de préparation':'+ '+vieCnt(p[0])+' cartes')+'</small></span><span class="ck">'+(on?'✓':'')+'</span></button>'}).join('')+'</div>'}
 const viePackChips=sel=>sel.length?sel.map(k=>{const p=vieP(k);return p?'<span class="vpkc" style="--pc:'+p[3]+'">'+p[1]+' '+p[2]+'</span>':''}).join(''):'<span class="hint">Jeu de base seulement</span>';
 const vieLenT={short:'Courte (environ 25 tours chacun)',normal:'Normale (environ 40 tours chacun)',long:'Longue (60 tours chacun, ou tout le paquet)'};
-const VIEK=['study','job','salary','flirt','marriage','adultery','child','house','trip','luxe','pet','dist','shield','special','malus'];
-const VIELAB={study:'Études',job:'Métier',salary:'Salaire',flirt:'Flirt',marriage:'Mariage',adultery:'Adultère',child:'Enfant',house:'Maison',trip:'Voyage',luxe:'Luxe',pet:'Animal',dist:'Distinction',shield:'Protection',special:'Carte spéciale',malus:'Malus'};
+const VIEK=['study','job','salary','dirty','flirt','marriage','adultery','child','house','trip','luxe','acq','pet','dist','shield','special','malus'];
+const VIELAB={study:'Études',job:'Métier',salary:'Salaire',dirty:'Argent sale',acq:'Acquisition',flirt:'Flirt',marriage:'Mariage',adultery:'Adultère',child:'Enfant',house:'Maison',trip:'Voyage',luxe:'Luxe',pet:'Animal',dist:'Distinction',shield:'Protection',special:'Carte spéciale',malus:'Malus'};
 const vieByKind=(a,b)=>VIEK.indexOf(VC[a].kind)-VIEK.indexOf(VC[b].kind)||(VC[a].kind==='job'?VC[a].need-VC[b].need||VC[a].lvl-VC[b].lvl:0)||a-b;
 /* préférences (dos des cartes, décor de la table) */
 const VIEBACKS=[['rouge','Rouge','#d9322b'],['bleu','Bleu roi','#1f5fbf'],['violet','Violet','#6a3fb5'],['vert','Vert','#1f8a5c'],['noir','Noir','#23262d'],['orange','Orange','#f06a2a']];
@@ -2930,12 +2944,12 @@ const VCAP={
   wealth:'Les adversaires aisés perdent leur plus gros salaire.',strike:'Les adversaires qui travaillent passent leur tour.',election:'Les moins heureux piochent 2 cartes.',referendum:'Échange ton métier avec celui d’un adversaire.',revolution:'Les politiciens perdent leur métier.',
   lottery:'1 chance sur 3 de gagner un Héritage.',equalpay:'Pose le premier Salaire de la pioche.',party:'Pour un politicien : 2 sourires.',trophy:'Pour un métier féminin : 3 sourires.',blackcard:'Tes achats coûtent 1 de moins.',
   legion:'Se pose directement. Un honneur, sauf pour les Bandits.',prize:'Pour journalistes, chercheurs et écrivains : salaires jusqu’au niveau 4.',gprof:'Pour les professeurs : remplace Professeur, salaires niveau 4.'};
-const JOBNOTE={bandit:'Ni licencié ni imposé',barman:'Flirts illimités',mech:'Insensible aux accidents',police:'Chasse Bandits et Gourous',soldier:'Protège des Catastrophes',guru:'Chassé par le Policier',medium:'Voit les 13 prochaines',teacher:'Fonctionnaire',writer:'Grand Prix possible',journalist:'Regarde une main',pharma:'Jamais malade',architect:'Maison gratuite',pilot:'Voyages gratuits',doctor:'Jamais malade',lawyer:'Insensible au divorce',researcher:'6 cartes en main',surgeon:'Jamais malade',astro:'Reprend la défausse',binman:'Fouille la défausse',hobo:'Ni licencié ni imposé',junk:'Défausse : jeu libre',sewer:'Anti-rats, anti-maladie',survivor:'Immunisé Apocalypse',zhunter:'Anti-zombies, anti-épidémie',wizard:'Anti-démon, vampire, loup',exorcist:'Anti-démon et vampire',mayor:'Mariage sans flirt',deputy:'Insensible aux impôts',minister:'Jamais licencié',president:'Quasi intouchable',banker:'Achats à −1',butler:'Anti-cambriolage'};
+const JOBNOTE={executioner:'1 victime par tour',pornstar:'Joue la Sextape',dealer:'Drogues sans payer',stripper:'Démission sans perdre de tour',priest:'Pas de mariage',pimp:'Maison close ½ prix',bandit:'Ni licencié ni imposé',barman:'Flirts illimités',mech:'Insensible aux accidents',police:'Chasse Bandits et Gourous',soldier:'Protège des Catastrophes',guru:'Chassé par le Policier',medium:'Voit les 13 prochaines',teacher:'Fonctionnaire',writer:'Grand Prix possible',journalist:'Regarde une main',pharma:'Jamais malade',architect:'Maison gratuite',pilot:'Voyages gratuits',doctor:'Jamais malade',lawyer:'Insensible au divorce',researcher:'6 cartes en main',surgeon:'Jamais malade',astro:'Reprend la défausse',binman:'Fouille la défausse',hobo:'Ni licencié ni imposé',junk:'Défausse : jeu libre',sewer:'Anti-rats, anti-maladie',survivor:'Immunisé Apocalypse',zhunter:'Anti-zombies, anti-épidémie',wizard:'Anti-démon, vampire, loup',exorcist:'Anti-démon et vampire',mayor:'Mariage sans flirt',deputy:'Insensible aux impôts',minister:'Jamais licencié',president:'Quasi intouchable',banker:'Achats à −1',butler:'Anti-cambriolage'};
 const jobNote=c=>{const a=[];if(c.tags&&c.tags.indexOf('interim')>=0)a.push('Intérimaire');if(JOBNOTE[c.eff])a.push(JOBNOTE[c.eff]);return a.join(' · ')};
 const BAGS=['#2d9cdb','#e5584a','#2fb36f','#8e5bd6','#e8a33a'];
 const GIRLS=[84,85,86,87,89];
 const PETBG={150:['#ffe9c7','#f6c987'],151:['#dff0ff','#a9d3f5'],152:['#ffe3ee','#f7b9d0'],153:['#fff6c4','#f6dd7a'],154:['#efe0ff','#c9a8f5'],330:['#e8e8ef','#b9b9c9'],331:['#dff3ff','#a6d4f0'],413:['#ffe6c4','#e3a86a'],414:['#ffe9d0','#e8b67e'],520:['#e8ffd9','#a8dc92'],521:['#fff0c4','#ffb070'],840:['#f3ecff','#d5c6f0'],841:['#e3f4d6','#b9dba0']};
-const KCOL={study:'#2f6fb8',job:'#e07a2f',salary:'#2f9e57',flirt:'#e44f82',marriage:'#c93a73',cb:'#2f7fd1',cg:'#e86a9a',house:'#8a5a2b',trip:'#1f9fd6',luxe:'#b9801a',pet:'#c98a3a',malus:'#b3262f',shield:'#2c4b8a'};
+const KCOL={dirty:'#c8202a',acq:'#7a4fc2',study:'#2f6fb8',job:'#e07a2f',salary:'#2f9e57',flirt:'#e44f82',marriage:'#c93a73',cb:'#2f7fd1',cg:'#e86a9a',house:'#8a5a2b',trip:'#1f9fd6',luxe:'#b9801a',pet:'#c98a3a',malus:'#b3262f',shield:'#2c4b8a'};
 const vieClean=n=>n.replace(/^(Enfant|Voyage|Mariage|Adultère)\s*:\s*/,'');
 let vieHid=0;
 const VHEART='M50 88 C14 62 3 44 3 28 C3 12 15 4 28 4 C38 4 46 10 50 18 C54 10 62 4 72 4 C85 4 97 12 97 28 C97 44 86 62 50 88Z';
@@ -2951,13 +2965,29 @@ function vieCardHTML0(id){
   const c=VC[id];if(!c)return'';
   const V=typeof VIEART!=='undefined'?VIEART:null;
   const eff=c.eff||'',k=c.kind;
-  if(!V||!(V.A[id]||(k==='study'&&V.A[1]))){return'<div class="vk" style="--k:'+(KCOL[k]||'#7a4aa8')+'"><div class="xn">'+esc(c.name)+'</div><div class="xa" style="display:flex;align-items:center;justify-content:center;font-size:70px;background:#fff">'+c.emoji+'</div><div class="xc">'+esc(c.info||'')+'</div></div>'}
+  if(!V||!(V.A[id]||(V.T&&V.T[id])||(k==='study'&&V.A[1]))){return'<div class="vk" style="--k:'+(KCOL[k]||'#7a4aa8')+'"><div class="xn">'+esc(c.name)+'</div><div class="xa" style="display:flex;align-items:center;justify-content:center;font-size:70px;background:#fff">'+c.emoji+'</div><div class="xc">'+esc(c.info||'')+'</div></div>'}
   const smile=V.smileMan,xs='<div class="xs">'+smile.repeat(c.smiles||0)+'</div>';
   const round=i=>'<div class="xa"><svg viewBox="0 0 100 100">'+V.A[i]()+'</svg></div>';
   const heart=(i,dark)=>{const h='vh'+(++vieHid);return'<svg class="xh" viewBox="0 0 100 92"><defs><clipPath id="'+h+'"><path d="'+VHEART+'"/></clipPath></defs>'+(dark?'<path d="'+VHEART+'" fill="#ff3b5c" stroke="#ff3b5c" stroke-width="7"/><path d="'+VHEART+'" fill="#2a0a14" stroke="#8a1a30" stroke-width="5"/>':'<path d="'+VHEART+'" fill="#fff" stroke="#fff" stroke-width="7"/><path d="'+VHEART+'" fill="#ffd1dd" stroke="#e8b3c2" stroke-width="5"/>')+'<g clip-path="url(#'+h+')"><g transform="translate(-2 -2) scale(1.04)">'+V.A[i]()+'</g></g><path d="'+VHEART+'" fill="none" stroke="'+(dark?'#ff3b5c':'#d7a0b2')+'" stroke-width="1.4"/></svg>'};
   const price=n=>n?'<div class="xp">PRIX '+V.bundleRow(1)+'<span class="xpn">'+n+'</span></div>':'';
   const cap=t=>'<div class="xc">'+t+'</div>';
   const nm=(t,col)=>'<div class="xn'+(t.length>13?' l':'')+'"'+(col?' style="color:'+col+'"':'')+'>'+esc(t)+'</div>';
+  /* cartes de l'extension Trash (numéros 900 et plus) : mêmes cadres que la galerie validée */
+  if(id>=900&&id<1000&&V.T&&V.T[id]){
+    const T=V.T[id],pm=T.p,PL={bad:'EFFET PERMANENT',good:'EFFET PERMANENT',end:'COMPTE À LA FIN',goodend:'PERMANENT · COMPTE À LA FIN'};
+    const perm=pm?'<div class="perm">'+PL[pm]+'</div>':'',tc=T.cap;
+    const bundles=n=>{let g='';for(let i=0;i<n;i++){const x=14+(i%2)*6,y=78-i*17;g+='<g transform="translate('+x+' '+y+')"><rect width="72" height="22" rx="3" fill="#0b0b0c" stroke="#555" stroke-width="1.5"/><rect x="26" width="20" height="22" fill="#c8202a"/><circle cx="36" cy="11" r="6" fill="#f1d36a"/><text x="36" y="14.5" text-anchor="middle" font-size="9" font-weight="900" font-family="Arial" fill="#0b0b0c">€</text><path d="M4 4h14M4 9h10M54 4h14M58 9h10" stroke="#777" stroke-width="1.4" stroke-linecap="round"/></g>'}return'<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">'+g+'</svg>'};
+    if(T.c==='job'){const it=(c.tags||'').indexOf('interim')>=0;
+      return'<div class="vk tr" style="--k:#e07a2f">'+xs+nm(c.name)+vieSalStrip(c.lvl)+round(id)+'<div class="xl">'+V.laurelBadge(c.need)+'</div>'+(it?'<div class="xbd"><svg viewBox="0 0 46 43"><text x="25" y="14.5" text-anchor="middle" font-family="Trebuchet MS,Arial" font-weight="900" font-size="7.2" fill="#17171f" letter-spacing=".2">INTÉRIM</text><circle cx="29" cy="28" r="9" fill="#fff" stroke="#17171f" stroke-width="2"/><path d="M29 22 V28 L33.5 30.5" fill="none" stroke="#17171f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>':'')+cap((it?'Intérimaire · ':'')+tc)+'</div>'}
+    if(T.c==='flirt')return'<div class="vk tr" style="--k:#e44f82">'+xs+nm(c.name)+'<div class="xb"></div>'+heart(id)+cap(tc)+'</div>';
+    if(T.c==='mar')return'<div class="vk tr" style="--k:#c93a73;--cbg:#fff0f5">'+xs+nm('Mariage')+'<div class="xr">FORCÉ</div>'+heart(id)+cap(tc)+'</div>';
+    if(T.c==='child')return'<div class="vk tr" style="--k:#2f7fd1;--cbg:#dcebff">'+xs+nm('Enfant')+'<div class="xr">'+esc(c.name)+'</div>'+round(id)+cap(tc)+'</div>';
+    if(T.c==='dirty')return'<div class="vk tr dirty" style="--k:#c8202a">'+xs+'<div class="xn l">Argent sale niv. '+c.lvl+'</div><div class="xb"></div><div class="xsal">'+bundles(c.lvl)+'</div>'+cap(tc)+'</div>';
+    if(T.c==='acq')return'<div class="vk tr" style="--k:#7a4fc2;--ring:#d9c6f2">'+xs+nm(c.name)+'<div class="xr">ACQUISITION</div>'+round(id)+price(c.price)+'<div class="xc" style="height:46px">'+tc+'</div></div>';
+    if(T.c==='mal')return'<div class="vk tr'+(pm?' '+pm:'')+'" style="--k:#d9322b;--ring:#f4b9bd">'+nm(c.name,'#c0262f')+'<div class="xr">MALUS</div>'+round(id)+perm+'<div class="xc" style="border-color:#d9322b;color:#c0262f">'+tc+'</div></div>';
+    if(T.c==='spe')return'<div class="vk tr'+(pm?' '+pm:'')+'" style="--k:#7a4aa8;--ring:#d9c6f2">'+nm(c.name,'#7a4aa8')+'<div class="xr">SPÉCIALE</div>'+round(id)+perm+cap(tc)+'</div>';
+    if(T.c==='tres')return'<div class="vk tr tres" style="--k:#b98a12;--ring:#f2d98a">'+nm(c.name,'#8c6608')+'<div class="xr">TRÈS SPÉCIALE</div>'+round(id)+cap(tc)+'</div>';
+  }
   if(k==='study'&&eff==='double'){const w=a=>'<g transform="translate(0,'+a+')">'+V.wreath('',{gold:true})+'</g>';
     return'<div class="vk" style="--k:'+KCOL.study+'">'+xs+nm('Études')+'<div class="xr">DOUBLES</div><div class="xw2"><svg viewBox="0 4 100 180" preserveAspectRatio="xMidYMid meet">'+w(-2)+w(86)+'</svg></div>'+cap('Tu sautes une classe : 2 niveaux d’études d’un coup')+'</div>'}
   if(k==='study')return'<div class="vk" style="--k:'+KCOL.study+'">'+xs+nm('Études')+'<div class="xb"></div>'+round(1)+cap(eff==='double'?'Compte pour 2 niveaux d’études : tu sautes une classe.':VCAP.study)+'</div>';
@@ -3006,7 +3036,9 @@ const VHOW={
   luxe:['Un objet de luxe : il rapporte des sourires. Tu le paies en retournant des salaires, comme un voyage (sans rendu de monnaie).',['Il faut un métier.','Il faut assez de salaires non retournés.','Un Cambriolage peut te le voler.']],
   shield:['Pose-la devant toi. Quand un adversaire t’envoie le malus qu’elle arrête, la protection le bloque, puis les deux cartes sont défaussées.',['Une seule protection de chaque sorte devant toi.']],
   malus:['Envoie-le à un adversaire pour lui compliquer la vie. Si une protection ou un métier le bloque, il n’a aucun effet.',['Il faut viser un adversaire concerné par l’effet.']],
-  dist:['Une distinction : un honneur ou un avantage durable, souvent avec des sourires à la clé.',[]]
+  dist:['Une distinction : un honneur ou un avantage durable, souvent avec des sourires à la clé.',[]],
+  dirty:['De l’argent sale : il se pose sans métier, rapporte 1 sourire et paie comme un salaire normal. Tout l’argent peut payer toutes les acquisitions.',['Se pose sans métier.']],
+  acq:['Une acquisition (drogue, maison close, tourisme sexuel…) : tu la paies avec n’importe quel argent, salaire ou argent sale, sans rendu de monnaie, et elle rapporte des sourires.',['Il faut payer le prix (sauf drogues avec un Dealer).']]
 };
 const VEFF={
   accident:['Le joueur visé passe son prochain tour.',['Le Garagiste est immunisé.','Il ne sert à rien si le joueur passe déjà son tour.']],
@@ -3079,7 +3111,38 @@ const VEFF={
   sister:['Bloque un Divorce, un Licenciement, un Burn-out ou un Plafond de verre.',['La carte est consommée.']],
   ceiling:['L’adversaire perd son salaire le plus fort non retourné.',['Bloqué par : Sororité ou Protection juridique.','Il faut que le joueur visé ait un salaire non retourné.']],
   equalpay:['Le premier Salaire de la pioche est posé devant toi, sans passer par ta main.',['Il faut un métier qui permet ce niveau de salaire.']],
-  trophy:['Une distinction réservée aux métiers féminins de l’extension Girl Power : 3 sourires.',['Il faut un métier féminin de l’extension.','Un seul trophée.']]
+  trophy:['Une distinction réservée aux métiers féminins de l’extension Girl Power : 3 sourires.',['Il faut un métier féminin de l’extension.','Un seul trophée.']],
+  /* --- extension Trash --- */
+  cannabis:["Prix : 1. Rapporte 1 sourire. Pas de risque d'overdose. Un seul Cannabis à la fois.", ["Prix : 1"]],
+  cocaine:["Prix : 2. Chaque dose rapporte 1 sourire. Expose à la carte Overdose.", ["Prix : 2"]],
+  heroin:["Prix : 2. Chaque dose rapporte 1 sourire. Expose à la carte Overdose.", ["Prix : 2"]],
+  brothel:["Prix : 10 minimum (5 pour un Proxénète). Rapporte 1 sourire. Tes flirts se cumulent sans limite.", ["Prix : 10"]],
+  sextour:["Prix : 3, comme un voyage. Rapporte 2 sourires.", ["Prix : 3"]],
+  amputation:["Effet permanent. Le joueur visé ne peut plus prendre de carte dans la défausse, sauf avec Étoile filante ou Astronaute.", []],
+  exhibition:["Effet permanent. Le joueur visé montre chaque carte qu'il pioche, jusqu'à la fin de la partie.", []],
+  earlyend:["Le joueur visé perd son dernier enfant : il est mis hors jeu (impossible à défausser ou récupérer, sauf Exhumation).", []],
+  hemorrhage:["Chaque tour, le joueur visé doit jouer ou défausser la carte piochée, sans piocher ni prendre la défausse, jusqu'à ce que sa main soit vide. Puis il repioche sa main.", []],
+  herpes:["Le joueur visé défausse son dernier flirt, même marié. Un flirt identique posé ensuite par lui ou par les autres est aussi défaussé.", []],
+  mine:["Posée sur un joueur : le premier qui la pioche défausse sa main et repioche. Impossible à renvoyer avec Vengeance.", []],
+  overdose:["Le joueur visé passe autant de tours que de cartes Héroïne ou Cocaïne posées devant lui.", []],
+  voodoo:["Le joueur visé subit 2 malus pris dans la main de tous les joueurs, dans l'ordre de jeu. Les malus identiques se cumulent. Ceux qui les ont donnés repiochent leur main.", []],
+  hostage:["Tu prends un joueur en otage et tu choisis qui paie la rançon : il donne tous les salaires de sa main (encaissés sans condition). 1 ou 2 : l'otage passe 2 tours. 3 ou 4 : 1 tour. 5 et plus : libre. Personne ne peut payer : 3 tours. À 2 joueurs, l'otage paie sa propre rançon.", []],
+  sterile:["Effet permanent. Le joueur visé ne peut plus avoir d'enfant, sauf s'il est Prêtre, ou avec Kidnapping ou Exhumation.", []],
+  condom:["Effet permanent, posé sur toi. Chaque fois que tu poses un flirt, tu peux poser un enfant de ta main juste après, même sans mariage (un seul par flirt). Annulée par la Stérilité.", []],
+  swing:["Tu regardes la main de chaque joueur, puis tu échanges la tienne avec celle d'un joueur. Si les mains n'ont pas la même taille, chacun garde le même nombre de cartes.", []],
+  exhume:["Tu reprends une carte mise hors jeu (Fin précoce, Bourreau, Mine, etc.) et tu la joues sans condition.", []],
+  kidnap:["Tu prends l'enfant d'un autre joueur et tu le poses chez toi, sans condition.", []],
+  orgy:["Tu poses tous les flirts de ta main et ceux des mains des autres, sans condition ni limite. Chacun repioche sa main. Ces flirts sont protégés, comptés à part de la limite de 5, et ne peuvent plus être pris.", []],
+  polygamy:["Effet permanent. Tu peux avoir deux mariages en même temps, même sans être marié. Un divorce subi n'en enlève qu'un. Un divorce volontaire retire les deux et fait passer un tour.", []],
+  promo:["Effet permanent. +1 niveau de salaire tant que tu travailles. Il faut un métier ; la carte reste inactive si tu démissionnes ou es licencié.", []],
+  sado:["Compte à la fin de la partie : +3 sourires si tu as le plus de malus (égalité valable).", []],
+  traffic:["Chaque joueur regarde la main de son voisin de gauche et lui prend une carte de son choix. Une carte prise ne peut pas être reprise.", []],
+  zoophile:["Effet permanent. À la fin de la partie, tous tes animaux valent double.", []],
+  hunt:["Tous les animaux posés (les tiens et cette carte) sont mélangés face cachée puis retournés un par un. Chaque animal révélé est mis hors jeu, jusqu'à ce que la carte Chasse sorte et arrête la pioche. Les animaux épargnés retournent chez leur propriétaire.", []],
+  capitalist:["Chacun pose tous les salaires de sa main. Celui qui en a le plus remporte tout. Égalité : chacun refait sa main et tout va à la défausse.", []],
+  communist:["Tous les salaires posés (argent sale compris, sauf l'argent investi) sont rassemblés, mélangés et redistribués à tous, en commençant par toi.", []],
+  roulette:["Six cartes (dont la Roulette) sont mélangées et étalées face cachée. La partie s'arrête jusqu'à ce qu'elle soit trouvée. Chacun choisit une carte à son tour, les autres sont défaussées. Qui tire la Roulette donne la carte de son choix et continue avec une carte de moins ; les autres refont leur main.", []],
+  sextape:["Réservée à l'Acteur porno. Scandale : le joueur visé perd son mariage s'il en a un, sinon son dernier flirt.", []]
 };
 function vieHow(c){const e=c.eff&&VEFF[c.eff],k=VHOW[c.kind]||['',[]];
   const t=e?e[0]:k[0],cond=(e?e[1]:[]).concat(c.eff==='luxhouse'?[]:(k[1]||[]));
@@ -3723,8 +3786,8 @@ function vieJoinForm(){
 const VGINTRO={special:'Des cartes à effet : elles ne rapportent pas de sourires mais changent le cours de la partie. Elles ne restent pas toutes devant toi (Arc-en-ciel, Étoile filante et Héritage oui). Touche une carte pour son effet précis.'};
 let vieGPk='all';
 const VGFAM=[
-  ['Ta vie : études et métier','study','job'],['L’argent','salary'],['L’amour et la famille','flirt','marriage','adultery','child'],
-  ['Les maisons','house'],['Les voyages','trip'],['Le luxe','luxe'],['Les animaux','pet'],['Les distinctions','dist'],['Les cartes spéciales','special'],['Les protections','shield'],['Les malus','malus']];
+  ['Ta vie : études et métier','study','job'],['L’argent','salary','dirty'],['L’amour et la famille','flirt','marriage','adultery','child'],
+  ['Les maisons','house'],['Les voyages','trip'],['Le luxe','luxe'],['Les acquisitions','acq'],['Les animaux','pet'],['Les distinctions','dist'],['Les cartes spéciales','special'],['Les protections','shield'],['Les malus','malus']];
 async function vieGuide(){
   vieView='guide';vieSet('<p class="hint">Chargement des cartes…</p>');
   try{await vieCat();await vieArt()}catch(e){vieSet('<p class="hint">Impossible de charger les cartes.</p><div class="row"><button class="btn alt" data-vie="menu">Retour</button></div>');return}
