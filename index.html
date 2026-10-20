@@ -802,7 +802,7 @@ main#v-uc,main#v-rc{max-width:720px}
 <div class="set"><h2>Ma Vie : dos des cartes</h2><p>La couleur du dos des cartes que tu vois sur la table.</p><div class="vsw" id="viePrefBack"></div></div>
 <div class="set"><h2>Ma Vie : décor de la table</h2><p>Le tapis et l’ambiance autour de la table.</p><div class="vsw" id="viePrefTable"></div></div>
 <div class="set"><h2>Ma Vie : animation des malus</h2><p>Quand un joueur te joue un malus, sa carte frappe l’écran en grand.</p><div class="vsw" id="viePrefAnim"></div><div class="row" style="margin-top:8px"><button type="button" class="btn alt sm" id="viePrefAnimGo">▶ Voir l’animation</button><button type="button" class="btn alt sm" id="viePrefAnimBk">▶ Version « bloqué »</button></div></div>
-<div class="set"><h2>Ma Vie : annonce des cartes posées</h2><p>Sur grand écran (ordinateur), chaque carte posée par un joueur s’affiche au milieu de la table pour que tout le monde la voie. Choisis la durée.</p><div class="vsw" id="viePrefAnn"></div></div>
+<div class="set"><h2>Ma Vie : annonce des cartes posées</h2><p>Sur grand écran (ordinateur), chaque carte posée par un joueur s’affiche au milieu de la table pour que tout le monde la voie, et les cartes de l’extension Trash rejouent une petite animation (touche-la pour la passer). Choisis la durée.</p><div class="vsw" id="viePrefAnn"></div></div>
 <div class="set"><h2>Compte</h2><p>Ton pseudo, ta photo, tes amis et ton historique sont dans le menu en haut à droite (« Mon profil »).</p></div>
 </main>
 <main id="v-at" hidden>
@@ -3262,7 +3262,7 @@ function vieTargetWhy(c,p){
     case'overdose':return p.skip?'passe déjà son tour':(vieNe(b,'heroin')+vieNe(b,'cocaine'))?'':'sans drogue dure';
   }return''}
 /* --- état et réseau --- */
-function vieDetach(){if(vo){clearInterval(vo.tm);clearInterval(vo.tk)}vo=null;document.body.classList.remove('vieon','vdesk','vdeal');$('vieChatW').hidden=true;vieOv();updateLive()}
+function vieDetach(){try{if(window.VSCN)VSCN.stop()}catch(x){}if(vo){clearInterval(vo.tm);clearInterval(vo.tk)}vo=null;document.body.classList.remove('vieon','vdesk','vdeal');$('vieChatW').hidden=true;vieOv();updateLive()}
 function vieAttach(v,silent){
   vieDetach();
   vo={id:v.id,v:null,t0:Date.now(),polling:false,busy:false,det:null,disc:false,sig:'',tm:setInterval(vieTick,2000),tk:setInterval(vieClock,1000)};
@@ -3382,10 +3382,104 @@ async function vieFxPump(){
   try{while(vieFxQ.length){
     const e=vieFxQ.shift();
     if(curView!=='vie'||!vo||!VC){vieFxQ.length=0;break}
-    try{await Promise.race([vieFxRun(e),sleep(9000)])}catch(x){}}}
+    try{await Promise.race([vieFxRun(e),sleep(40000)])}catch(x){}}}
   finally{vieFxBusy=false;const d=$('vieDim');if(d)d.style.opacity=0;vieHoldEnd()}}
 const vieRvIdle=async()=>{let g=0;while((vieRvEl||vieRvQ.length)&&g++<60)await sleep(150)};
-async function vieFxRun(e){
+/* --- scènes animées de l'extension Trash (fichier à part, chargé à la demande) --- */
+let vieScnP=null;
+function vieScn(){
+  if(typeof VSCN!=='undefined')return Promise.resolve(true);
+  if(vieScnP)return vieScnP;
+  vieScnP=new Promise(ok=>{const s=document.createElement('script');s.src='vie-scenes.js?v=2';s.onload=()=>ok(typeof VSCN!=='undefined');s.onerror=()=>{vieScnP=null;ok(false)};document.head.appendChild(s)});
+  return vieScnP}
+const VSC_PLAY={orgy:'partouze',traffic:'trafic',forced:'marifor',sextape:'sextape',promo:'promo',brothel:'maison',sextour:'tourisme',cannabis:'drogue',cocaine:'drogue',heroin:'drogue',tsunami:'tsunami',vengeance:'veng',condom:'capote',polygamy:'poly',zoophile:'zoo',sado:'sado',kidnap:'enl'};
+const VSC_MAL={earlyend:'fin',hemorrhage:'hemo',herpes:'herpes',overdose:'over',exhibition:'exhib',amputation:'ampu',sterile:'ster',hostage:'enl'};
+const VSC_ACT={swing:'echang',exhume:'exhum',exec:'bourreau',cap:'capit',com:'commu',hunt:'chasse',mine:'mine',vdoo:'vaudou',ransom:'otage',rou:'roul'};
+const VSC_BIG={capit:1,commu:1,chasse:1,mine:1,vaudou:1};
+function vieScnPlan(e){
+  const c=VC&&VC[e.c];let k=null;
+  if(e.a==='play'&&c)k=VSC_PLAY[c.eff];
+  else if(e.a==='malus'&&c&&!e.b)k=VSC_MAL[c.eff];
+  else if(VSC_ACT[e.a])k=VSC_ACT[e.a];
+  if(!k)return null;
+  if(k==='capit'&&!e.tie&&!e.w)return null;
+  if(k==='commu'&&!(e.n>0))return null;
+  const o={k,big:!!VSC_BIG[k],u:e.u,t:e.t||null,unk:k==='marifor',e};
+  if(k==='capit')o.c2=e.w||null;
+  if(k==='enl')o.mode=c&&c.eff==='hostage'?'otage':'kidnap';
+  if(k==='otage')o.cm=[e.t,e.p||e.t,e.u,e.u];
+  if(k==='roul')o.cm=[null,null,null,e.u];
+  if(k==='mine'){const ps=((vo&&vo.v&&vo.v.players)||[]).filter(p=>!p.gone&&p.id!==e.u);o.c2=e.u;o.u=ps.length?ps[0].id:e.u}
+  return o}
+const vieEven=(t,c)=>{const r=[];let rem=t;for(let i=0;i<c;i++){const v=Math.round(rem/(c-i));r.push(v);rem-=v}return r};
+function vieScnData(p,cast){
+  const e=p.e,col=cast.col||{};
+  if(p.k==='otage')return{arg:{n:Math.max(0,e.n|0)}};
+  if(p.k==='enl')return{arg:{mode:p.mode}};
+  if(p.k==='roul')return{arg:{hit:!!e.h}};
+  if(p.k==='vaudou'){
+    const ids=(e.cs||[]).slice(0,15),PL=((vo&&vo.v&&vo.v.players)||[]).filter(q=>!q.gone);
+    const present=[0,1,2,3].filter(c=>Object.keys(col).some(u=>col[u]===c));
+    const OK=[['Études','📚'],['Salaire','💵'],['Flirt','💕'],['Maison','🏠'],['Voyage','✈️'],['Animal','🐶']];
+    const hands=[0,1,2,3].map(()=>[]);
+    ids.forEach((id,i)=>{const c=present.length?present[i%present.length]:i%4,cd=VC[id];if(hands[c].length<5)hands[c].push({n:vieClean(cd?cd.name:'Malus').slice(0,11),e:(cd&&cd.emoji)||'☠️',t:'subit '+vieClean(cd?cd.name:'un malus'),m:true})});
+    hands.forEach((h,c)=>{if(present.includes(c)||h.length)while(h.length<5){const o=OK[Math.floor(Math.random()*OK.length)];h.splice(Math.floor(Math.random()*(h.length+1)),0,{n:o[0],e:o[1],m:false})}});
+    return{arg:{hands}}}
+  if(p.k==='capit'){
+    const t=[0,0,0,0];(e.t||[]).forEach(x=>{const c=col[x[0]];if(c!=null)t[c]=x[1]});
+    return{data:{G:{cards:t.map(v=>v>0?vieEven(v,Math.min(3,Math.max(1,Math.ceil(v/4)))):[]),t,mx:Math.max(...t)}},arg:!!e.tie}}
+  if(p.k==='commu'){
+    const r=e.r||[],n=e.n||0,ord=r.map(x=>x[0]).filter(u=>col[u]!=null),bef={},aft={};
+    r.forEach(x=>{bef[x[0]]=x[1];aft[x[0]]=x[2]});
+    const cnt={};let tot=0;ord.forEach(u=>{cnt[u]=bef[u]>0?Math.max(1,Math.ceil(bef[u]/4)):0;tot+=cnt[u]});
+    const goal=ord.length===r.length?n:tot;
+    while(tot<goal){let b=null;ord.forEach(u=>{if(cnt[u]<bef[u]&&(b===null||bef[u]-cnt[u]>bef[b]-cnt[b]))b=u});if(b===null)break;cnt[b]++;tot++}
+    while(tot>goal){let b=null;ord.forEach(u=>{if(bef[u]>0&&cnt[u]>Math.max(1,Math.ceil(bef[u]/4))&&(b===null||cnt[u]>cnt[b]))b=u});if(b===null)break;cnt[b]--;tot--}
+    const G=[[],[],[],[]];
+    ord.forEach(u=>{G[col[u]]=vieEven(bef[u],cnt[u]).map(v=>({t:Math.random()<.35?'d':'s',v}))});
+    const L=ord.length||1,lists=ord.map((u,j)=>vieEven(aft[u]||0,Math.floor((tot-j+L-1)/L)));
+    const pool=[];for(let i=0;i<tot;i++){const j=i%L,v=lists[j].shift();pool.push({t:Math.random()<.35?'d':'s',v:v==null?1:v})}
+    return{data:{G,pool,order:ord.map(u=>col[u])}}}
+  if(p.k==='chasse'){
+    const d=e.d||[],sp=e.s||0,pets=[];
+    ((vo&&vo.v&&vo.v.players)||[]).forEach(q=>(q.board||[]).forEach(i=>{if(VC[i]&&VC[i].kind==='pet')pets.push([q.id,i])}));
+    const sparedL=pets.slice(0,sp);while(sparedL.length<sp)sparedL.push([e.u,null]);
+    const an=d.concat(sparedL),PAL=['#d6a53a','#e56aa0','#4fa3e0','#6fc28a','#b07cff','#ff8a5c'],OWN=[];
+    const byCol=[];Object.keys(col).forEach(u=>{byCol[col[u]]=u});
+    const nameOf=u=>{const q=((vo&&vo.v&&vo.v.players)||[]).find(x=>x.id===u);return q?String(q.pseudo||'?').charAt(0).toUpperCase():'?'};
+    for(let i=0;i<4;i++)OWN.push([byCol[i]?nameOf(byCol[i]):'·',PAL[i]]);
+    const extra={};const oi=u=>{if(col[u]!=null)return col[u];if(extra[u]==null){extra[u]=OWN.length;OWN.push([nameOf(u),PAL[OWN.length%PAL.length]])}return extra[u]};
+    const AN=an.map(a=>a[1]&&VC[a[1]]?[VC[a[1]].emoji||'🐾',vieClean(VC[a[1]].name).slice(0,8)]:['🐾','Animal']);
+    const OWNER=an.map(a=>oi(a[0])),dead=d.length;
+    return{data:{AN,OWN,OWNER,p:dead,fin:an.map((a,i)=>i<dead?i:i+1).concat([dead])}}}
+  return{}}
+function vieScnAv(p){
+  if(!p)return'<span class="vsxav ph">·</span>';
+  const u=safeStore(p.avatar_url);
+  return u?'<img class="vsxav" alt="" src="'+esc(u)+'">':'<span class="vsxav">'+esc(String(p.pseudo||'?').charAt(0).toUpperCase())+'</span>'}
+const vieScnNm=p=>p?esc(String(p.pseudo||'?').slice(0,11)):'···';
+function vieScnCast(o){
+  if(o.cm){const ps0=((vo&&vo.v&&vo.v.players)||[]),by0=id=>ps0.find(p=>p.id===id);
+    const cs=o.cm.map(u=>{const p=u?by0(u):null;return{n:vieScnNm(p),a:vieScnAv(p)}});
+    cs.col={};o.cm.forEach((u,i)=>{if(u&&cs.col[u]==null)cs.col[u]=i});return cs}
+  const v=vo&&vo.v;if(!v)return null;
+  const ps=v.players.filter(p=>!p.gone),by=id=>ps.find(p=>p.id===id);
+  const ai=Math.max(0,ps.findIndex(p=>p.id===o.u)),order=ps.slice(ai+1).concat(ps.slice(0,ai));
+  const act=by(o.u)||null,want=o.c2||o.t,tg=want&&want!==o.u&&by(want)?by(want):(order[0]||null);
+  const others=order.filter(p=>!tg||p.id!==tg.id);
+  const C=p=>({n:vieScnNm(p),a:vieScnAv(p)});
+  const cast=[C(others[1]||null),C(others[0]||null),C(tg),C(act)];
+  cast.col={};[others[1],others[0],tg,act].forEach((p,i)=>{if(p)cast.col[p.id]=i});
+  if(o.unk)cast[2]={n:'Inconnu(e)',a:'<span class="vsxav ph">?</span>'};
+  return cast}
+async function vieScnPlay(p){
+  const mode=vieAnMode();if(mode==='off'||vieReduced()||document.hidden)return;
+  if(!(await vieScn()))return;
+  const cast=vieScnCast(p);if(!cast||curView!=='vie'||!vo)return;
+  let dd={};try{dd=vieScnData(p,cast)||{}}catch(x){}
+  try{await VSCN.play(p.k,{cast,speed:mode==='fast'?.55:1,big:p.big,data:dd.data,arg:dd.arg,fr:p.k})}catch(x){}}
+async function vieFxRun(e){await vieFxRun0(e);const p=vieScnPlan(e);if(p&&curView==='vie'&&vo&&VC)await vieScnPlay(p)}
+async function vieFxRun0(e){
   const c=VC&&VC[e.c],mid=me&&me.id;
   const mine=!!c&&vieAnimOn()&&((e.a==='malus'&&e.t===mid)||(e.a==='event'&&e.u!==mid&&((e.h||[]).includes(mid)||(e.b||[]).includes(mid))));
   if(c&&!mine&&(e.a==='play'||e.a==='malus'||e.a==='event'||e.a==='discard')&&vieDeskCls()&&vieAnMode()!=='off'){
