@@ -360,6 +360,11 @@ body.vieon #gcB{display:none!important}
 .vbd .vw{transition:transform .12s}
 .vgrp{position:relative;display:flex}
 .vgrp .vw+.vw{margin-left:calc(-220px*var(--s,.3)*.78)}
+.vro{background:none;border:0;padding:0;cursor:pointer;border-radius:10px}
+.vro:hover{filter:brightness(1.15)}
+.vro.used{opacity:.15;pointer-events:none}
+.vgrp .vpr{position:absolute;left:-3px;top:-4px;z-index:5;font-size:.85rem;filter:drop-shadow(0 1px 1px #000);pointer-events:none}
+.vsw{margin:10px 0;padding:8px;border-radius:12px;background:#ffffff14;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .vgrp .vx{position:absolute;right:-3px;top:-4px;z-index:5;background:#ffd84a;color:#17171f;font-weight:900;font-size:.7rem;border-radius:9px;padding:0 5px;border:1.5px solid #17171f;pointer-events:none}
 .vw.spent{filter:grayscale(.85) brightness(.75)}.vw.spent:after{content:"retourné";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-20deg);font-size:.62rem;font-weight:900;background:#000b;color:#fff;border-radius:6px;padding:1px 5px;white-space:nowrap}
 .vmid{display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap;padding:6px 0;min-height:150px}
@@ -2895,7 +2900,7 @@ let vieArtP=null;
 function vieArt(){
   if(typeof VIEART!=='undefined')return Promise.resolve(true);
   if(vieArtP)return vieArtP;
-  vieArtP=new Promise(ok=>{const s=document.createElement('script');s.src='vie-art.js?v=4';s.onload=()=>ok(typeof VIEART!=='undefined');s.onerror=()=>{vieArtP=null;ok(false)};document.head.appendChild(s)});
+  vieArtP=new Promise(ok=>{const s=document.createElement('script');s.src='vie-art.js?v=5';s.onload=()=>ok(typeof VIEART!=='undefined');s.onerror=()=>{vieArtP=null;ok(false)};document.head.appendChild(s)});
   return vieArtP}
 /* extensions (paquets de cartes en plus) */
 const VPACKS=[
@@ -3125,7 +3130,7 @@ const VEFF={
   herpes:["Le joueur visé défausse son dernier flirt, même marié. Un flirt identique posé ensuite par lui ou par les autres est aussi défaussé.", []],
   mine:["Tu la glisses, cachée, dans la pioche. Le premier joueur qui la pioche (toi compris) défausse sa main et repioche. Elle est ensuite hors jeu : impossible à renvoyer avec Vengeance.", []],
   overdose:["Le joueur visé passe autant de tours que de cartes Héroïne ou Cocaïne posées devant lui.", []],
-  voodoo:["Le joueur visé subit 2 malus pris dans la main de tous les joueurs, dans l'ordre de jeu. Les malus identiques se cumulent. Ceux qui les ont donnés repiochent leur main.", []],
+  voodoo:["Le joueur visé subit tous les malus qu'il peut recevoir, pris dans les mains de tous les joueurs (la sienne comprise). Les malus identiques se cumulent ; ceux qu'il ne peut pas recevoir restent en main. Ceux qui ont donné des malus repiochent autant de cartes.", []],
   hostage:["Tu prends un joueur en otage et tu choisis qui paie la rançon : il donne tous les salaires de sa main (encaissés sans condition). 1 ou 2 : l'otage passe 2 tours. 3 ou 4 : 1 tour. 5 et plus : libre. Personne ne peut payer : 3 tours. À 2 joueurs, l'otage paie sa propre rançon.", []],
   sterile:["Effet permanent. Le joueur visé ne peut plus avoir d'enfant, sauf s'il est Prêtre, ou avec Kidnapping ou Exhumation.", []],
   condom:["Effet permanent, posé sur toi. Chaque fois que tu poses un flirt, tu peux poser un enfant de ta main juste après, même sans mariage (un seul par flirt). Annulée par la Stérilité.", []],
@@ -3138,10 +3143,10 @@ const VEFF={
   sado:["Compte à la fin de la partie : +3 sourires si tu as le plus de malus (égalité valable).", []],
   traffic:["Chaque joueur regarde la main de son voisin de gauche et lui prend une carte de son choix. Une carte prise ne peut pas être reprise.", []],
   zoophile:["Effet permanent. À la fin de la partie, tous tes animaux valent double.", []],
-  hunt:["Tous les animaux posés (les tiens et cette carte) sont mélangés face cachée puis retournés un par un. Chaque animal révélé est mis hors jeu, jusqu'à ce que la carte Chasse sorte et arrête la pioche. Les animaux épargnés retournent chez leur propriétaire.", []],
-  capitalist:["Chacun pose tous les salaires de sa main. Celui qui en a le plus remporte tout. Égalité : chacun refait sa main et tout va à la défausse.", []],
-  communist:["Tous les salaires posés (argent sale compris, sauf l'argent investi) sont rassemblés, mélangés et redistribués à tous, en commençant par toi.", []],
-  roulette:["Six cartes (dont la Roulette) sont mélangées et étalées face cachée. La partie s'arrête jusqu'à ce qu'elle soit trouvée. Chacun choisit une carte à son tour, les autres sont défaussées. Qui tire la Roulette donne la carte de son choix et continue avec une carte de moins ; les autres refont leur main.", []],
+  hunt:["Tous les animaux posés devant les joueurs (les tiens aussi) sont mélangés face cachée avec cette carte, puis retournés un par un. Chaque animal révélé part hors jeu, jusqu’à ce que la carte Chasse sorte. Les animaux restants sont épargnés. Il faut au moins un animal posé.", []],
+  capitalist:["Chacun pose tous les salaires de sa main (l’argent sale ne compte pas). Celui qui en a le plus au total remporte tout. Égalité au sommet : tous les salaires posés vont à la défausse, et chacun défausse sa main pour en repiocher autant. Personne n’a de salaire : rien ne se passe.", []],
+  communist:["Tous les salaires posés devant les joueurs (argent sale compris, mais pas l’argent déjà investi, retourné) sont rassemblés, mélangés et redistribués un par un à tous les joueurs, en commençant par toi. Ils s’encaissent sans condition.", []],
+  roulette:["La partie s’arrête. Six cartes face cachée : 5 cartes de la pioche et la Roulette. À tour de rôle, en commençant par toi, chacun en choisit une ; une carte vide part à la défausse. Qui tire la Roulette défausse une carte de son choix et continue avec une carte de moins ; tous les autres défaussent leur main et en repiochent autant.", []],
   sextape:["Réservée à l'Acteur porno. Scandale : le joueur visé perd son mariage s'il en a un, sinon son dernier flirt.", []]
 };
 function vieHow(c){const e=c.eff&&VEFF[c.eff],k=VHOW[c.kind]||['',[]];
@@ -3178,7 +3183,7 @@ function vieWhy(c,v,mineP){
     case'study':return job?'Tu ne peux plus étudier quand tu travailles.':vieStu(b)>=6?'Tu as déjà 6 niveaux d’études (le maximum).':vieStu(b)+(c.eff==='double'?2:1)>6?'Une étude double dépasserait le maximum de 6 niveaux.':'';
     case'job':return job&&!vieInterim(job)?'Tu as déjà un métier.':vieStu(b)<c.need?'Il te faut '+c.need+' étude'+(c.need>1?'s':'')+' (tu en as '+vieStu(b)+').':(c.eff==='bandit'||c.eff==='guru')&&vieAnyPolice(v)?'Un Policier est en jeu : impossible de poser ce métier.':'';
     case'salary':return!job?'Il te faut un métier pour toucher un salaire.':Math.min(4,Math.max(job.lvl,vieNe(b,'prize')&&['journalist','researcher','writer'].includes(job.eff)?4:0)+(vieNe(b,'promo')?1:0))<c.lvl?'Ton métier ne permet pas ce niveau de salaire.':'';
-    case'flirt':return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':n('flirt')>=5&&!(job&&job.eff==='barman')&&!vieNe(b,'brothel')?'Tu as déjà 5 flirts.':'';
+    case'flirt':return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':vieFreeN(b,mineP.prot,'flirt')>=5&&!(job&&job.eff==='barman')&&!vieNe(b,'brothel')?'Tu as déjà 5 flirts.':'';
     case'adultery':return!n('marriage')?'Il faut être marié(e) pour un adultère.':n('adultery')?'Tu as déjà un adultère.':'';
     case'marriage':return n('marriage')>=(vieNe(b,'polygamy')?2:1)?'Tu es déjà marié(e).':job&&job.eff==='priest'?'Un Prêtre ne peut pas se marier.':!n('flirt')&&!(job&&job.eff==='mayor')&&c.eff!=='forced'?'Il te faut au moins un flirt pour te marier.':'';
     case'child':return vieNe(b,'sterile')&&!(job&&job.eff==='priest')?'Tu es stérile : tu ne peux plus avoir d’enfant.':!n('marriage')&&!(job&&job.eff==='priest')&&v.cond!==1?'Il faut être marié(e) pour avoir un enfant.':'';
@@ -3201,6 +3206,12 @@ function vieWhy(c,v,mineP){
       return'';
     case'special':
       if(['condom','polygamy','promo','sado','zoophile'].includes(c.eff)){if(vieNe(b,c.eff))return'Tu as déjà cette carte.';if(c.eff==='promo'&&!job)return'Il te faut un métier pour la Promotion canapé.';return''}
+      if(c.eff==='swing'){const hand=(v.me&&v.me.hand)||[];return hand.length<2?'Il te faut une autre carte en main à échanger.':!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&p.hand_n>0)?'Personne n’a de carte en main.':''}
+      if(c.eff==='exhume')return(v.out||[]).some(i=>vieExhOk(i,v))?'':'Aucune carte hors jeu ne peut être exhumée.';
+      if(c.eff==='kidnap')return!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&vieN(p.board,'child')>0)?'Personne n’a d’enfant à enlever.':'';
+      if(c.eff==='sextape'){const j=vieJobC(b);return!j||j.eff!=='pornstar'?'Réservée à l’Acteur porno.':!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&(vieN(p.board,'marriage')||vieFreeN(p.board,p.prot,'flirt')))?'Personne n’a de mariage ni de flirt à exposer.':''}
+      if(c.eff==='hunt')return!v.players.some(p=>!p.gone&&p.board.some(i=>VC[i]&&VC[i].kind==='pet'))?'Aucun animal posé : la chasse n’a pas de gibier.':'';
+      if(c.eff==='traffic')return!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&p.hand_n>0)?'Personne n’a de carte en main.':'';
       if(c.eff==='chance'&&!v.deck_n)return'La pioche est vide.';
       if(c.eff==='star'&&!(v.discard||[]).length)return'La défausse est vide.';
       if(c.eff==='casino')return v.casino?'Le casino est déjà ouvert.':'';
@@ -3208,7 +3219,7 @@ function vieWhy(c,v,mineP){
       if(c.eff==='recycle')return(v.discard||[]).length<3?'Il faut au moins 3 cartes dans la défausse.':'';
       if(c.eff==='ghost')return!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&p.hand_n>0)?'Personne n’a de carte en main.':'';
       if(c.eff==='referendum')return!job?'Il faut avoir un métier pour un Référendum.':!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&vieJobC(p.board))?'Personne d’autre n’a de métier.':'';
-      if(c.eff==='potion')return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':n('flirt')>=5&&!(job&&job.eff==='barman')&&!vieNe(b,'brothel')?'Tu as déjà 5 flirts.':'';
+      if(c.eff==='potion')return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':vieFreeN(b,mineP.prot,'flirt')>=5&&!(job&&job.eff==='barman')&&!vieNe(b,'brothel')?'Tu as déjà 5 flirts.':'';
       if(c.eff==='equalpay')return!job?'Il te faut un métier pour toucher un salaire.':'';
       if(c.eff==='piston'){const hand=(v.me&&v.me.hand)||[];return job&&!vieInterim(job)?'Tu as déjà un métier.':!hand.some(i=>VC[i]&&VC[i].kind==='job')?'Il te faut une carte Métier en main.':''}
       if(c.eff==='troc'){const hand=(v.me&&v.me.hand)||[];return hand.length<2?'Il te faut une autre carte à échanger.':!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&p.hand_n>0)?'Personne n’a de carte en main.':''}
@@ -3220,6 +3231,8 @@ const VAPOC=['meteor','flood','pandemic','zombie','famine','war'];
 const VBLK={law:['divorce','fire','wolf','scandal','embezzle','ceiling'],ins:['accident','illness','disaster','tax','rats','squat','embezzle','burglary','wealth'],thera:['burnout','repeat','demon','vampire'],clean:['rats','mess','squat','illness'],sister:['divorce','fire','burnout','ceiling'],bunker:VAPOC};
 const vieBlocks=(sh,e)=>sh==='angel'?!VAPOC.concat(['wealth','strike']).includes(e):(VBLK[sh]||[]).includes(e);
 function vieShieldOf(c,p){return p.board.find(i=>VC[i]&&VC[i].kind==='shield'&&vieBlocks(VC[i].eff,c.eff))}
+const vieFreeN=(b,pr,k)=>b.filter(i=>VC[i]&&VC[i].kind===k&&!(pr||[]).includes(i)).length;
+function vieExhOk(i,v){const c=VC[i];if(!c)return false;if(c.kind==='child'||c.kind==='pet')return true;if(c.kind==='malus')return c.eff==='mine'||(c.eff==='earlyend'&&v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&vieN(p.board,'child')>0));return false}
 function vieTargetWhy(c,p){
   const b=p.board,n=k=>vieN(b,k);
   switch(c.eff){
@@ -3235,7 +3248,7 @@ function vieTargetWhy(c,p){
     case'mess':return b.length?'':'rien devant lui';
     case'squat':return n('house')?'':'sans maison';
     case'demon':return b.some(i=>VC[i]&&VC[i].kind!=='shield')?'':'rien à défausser';
-    case'wolf':return n('flirt')?'':'sans flirt';
+    case'wolf':return vieFreeN(b,p.prot,'flirt')?'':'sans flirt (ou protégés)';
     case'embezzle':case'ceiling':return viePayables(b,p.spent).some(i=>VC[i].kind==='salary')?'':'sans salaire';
     case'scandal':{const j=vieJobC(b);return j&&(j.tags||'').indexOf('politic')>=0?'':'pas un politicien'}
     case'burglary':return n('luxe')?'':'sans carte Luxe';
@@ -3243,7 +3256,9 @@ function vieTargetWhy(c,p){
     case'sterile':case'amputation':case'exhibition':return vieNe(b,c.eff)?'subit déjà cet effet':'';
     case'earlyend':return n('child')?'':'sans enfant';
     case'hemorrhage':return p.bleed?'saigne déjà':p.hand_n?'':'sans carte en main';
-    case'herpes':return n('flirt')?'':'sans flirt';
+    case'herpes':return vieFreeN(b,p.prot,'flirt')?'':'sans flirt (ou protégés)';
+    case'kidnap':return n('child')?'':'sans enfant';
+    case'sextape':return n('marriage')||vieFreeN(b,p.prot,'flirt')?'':'sans mariage ni flirt (ou protégés)';
     case'overdose':return p.skip?'passe déjà son tour':(vieNe(b,'heroin')+vieNe(b,'cocaine'))?'':'sans drogue dure';
   }return''}
 /* --- état et réseau --- */
@@ -3287,9 +3302,10 @@ function vieClock(){
   const l=Math.max(0,(vo.v.left||0)-Math.floor((Date.now()-vo.t0)/1000));
   if(e)e.textContent='⏱️ '+l+' s';if(b)b.style.width=Math.min(100,l/60*100)+'%';
   document.querySelectorAll('body.vdesk .ring.on').forEach(r=>{r.style.setProperty('--p',Math.min(100,l/60*100).toFixed(1)+'%');r.classList.toggle('low',l<=10)})}
+function vieWait(v){const k=v.pick;if(!k)return'';return k.t==='traffic'?'🫀 Trafic d’organes : <b>'+esc(vieName(k.who))+'</b> choisit une carte dans la main de son voisin…':k.t==='ransom'?'🔫 Prise d’otages : <b>'+esc(vieName(v.turn_uid))+'</b> choisit qui paie la rançon…':k.t==='roulette'?'🔫 Roulette russe : <b>'+esc(vieName(k.who))+'</b> tire une carte ('+(k.left||'?')+' restante'+(k.left>1?'s':'')+')…':k.t==='rdrop'?'🔫 Roulette russe : <b>'+esc(vieName(k.who))+'</b> a tiré la Roulette et doit se défausser d’une carte.':''}
 function vieLine(e){
   const nm=u=>'<b>'+esc(vieName(u))+'</b>',cn=i=>VC[i]?'<b>'+esc(vieClean(VC[i].name))+'</b>':'une carte';
-  if(e.a==='play')return nm(e.u)+' pose '+cn(e.c)+(e.t?' sur '+nm(e.t):'')+(e.f&&VC[e.c]&&VC[e.c].eff==='lottery'?' — 🎉 il gagne un Héritage !':e.f?' et pose '+cn(e.f):VC[e.c]&&VC[e.c].eff==='lottery'?' — pas de chance cette fois':'');
+  if(e.a==='play')return nm(e.u)+' pose '+cn(e.c)+(e.t?' sur '+nm(e.t):'')+(e.nf?' — '+e.nf+' flirt'+(e.nf>1?'s':'')+' posé'+(e.nf>1?'s':'')+' et protégé'+(e.nf>1?'s':''):'')+(e.f&&VC[e.c]&&VC[e.c].eff==='lottery'?' — 🎉 il gagne un Héritage !':e.f?' et pose '+cn(e.f):VC[e.c]&&VC[e.c].eff==='lottery'?' — pas de chance cette fois':'');
   if(e.a==='event'){const c=VC[e.c],ef=c&&c.eff,hs=e.h||[],bs=e.b||[],nms=a=>a.map(nm).join(', ');
     let t=nm(e.u)+' joue '+cn(e.c);
     if(ef==='doom')t+=' — les 10 prochaines cartes de la pioche sont défaussées';
@@ -3299,7 +3315,7 @@ function vieLine(e){
     else t+=hs.length?' — touche '+nms(hs):' — personne n’est touché';
     if(bs.length)t+=' <span class="vblk">(protégé : '+bs.map(u=>esc(vieName(u))).join(', ')+')</span>';
     return t}
-  if(e.a==='malus')return nm(e.u)+' envoie '+cn(e.c)+' à '+nm(e.t)+(e.b?' — <span class="vblk">bloqué'+(e.s?' par '+cn(e.s):e.i?' par son métier':'')+'</span>':'');
+  if(e.a==='malus')return nm(e.u)+' envoie '+cn(e.c)+' à '+nm(e.t)+(e.rp?' — 🔫 rançon payée par '+nm(e.rp)+' : '+(e.rn||0)+' salaire'+(e.rn>1?'s':'')+' encaissé'+(e.rn>1?'s':''):'')+(e.b?' — <span class="vblk">bloqué'+(e.s?' par '+cn(e.s):e.i?' par son métier':'')+'</span>':'');
   if(e.a==='discard')return nm(e.u)+' défausse '+cn(e.c);
   if(e.a==='take')return nm(e.u)+' prend '+cn(e.c)+' dans la défausse';
   if(e.a==='chance')return nm(e.u)+' garde une carte de sa Chance';
@@ -3311,6 +3327,17 @@ function vieLine(e){
   if(e.a==='win')return nm(e.w)+' remporte la mise du casino 🎰';
   if(e.a==='afk')return nm(e.u)+' est retiré de la partie (inactif)';
   if(e.a==='leave')return nm(e.u)+' a quitté la partie';
+  if(e.a==='exhume')return nm(e.u)+' exhume '+cn(e.c)+' ⚰️';
+  if(e.a==='swing')return nm(e.u)+' échange sa main avec '+nm(e.t)+' 🔀';
+  if(e.a==='vdoo')return nm(e.u)+' plante sa poupée vaudou dans '+nm(e.t)+' 🪆 — '+(e.cs||[]).map(cn).join(', ');
+  if(e.a==='ransom')return nm(e.u)+' exige la rançon de '+nm(e.p)+' pour libérer '+nm(e.t)+' : '+(e.n||0)+' salaire'+(e.n>1?'s':'')+' 🔫';
+  if(e.a==='traffic')return nm(e.u)+' vole '+(me&&(e.u===me.id||e.t===me.id)?cn(e.c):'une carte')+' dans la main de '+nm(e.t)+' 🫀';
+  if(e.a==='exec')return nm(e.u)+' 🪓 exécute '+cn(e.c)+' de '+nm(e.t);
+  if(e.a==='cap'){const ts=(e.t||[]).map(x=>nm(x[0])+' '+x[1]).join(' · ');return'🏦 '+nm(e.u)+' lance l’Extorsion capitaliste ('+ts+') — '+(e.tie?'égalité : tout à la défausse, chacun refait sa main':e.w?nm(e.w)+' remporte '+e.n+' salaire'+(e.n>1?'s':''):'aucun salaire posé')}
+  if(e.a==='com')return'☭ '+nm(e.u)+' lance l’Extorsion communiste : '+(e.n||0)+' salaire'+(e.n>1?'s':'')+' rassemblé'+(e.n>1?'s':'')+' et redistribué'+(e.n>1?'s':'')+' ('+(e.r||[]).map(x=>nm(x[0])+' '+x[1]+'→'+x[2]).join(' · ')+')';
+  if(e.a==='hunt'){const d=e.d||[];return'🏹 '+nm(e.u)+' ouvre la chasse : '+(d.length?d.map(x=>cn(x[1])+' ('+nm(x[0])+')').join(', ')+' hors jeu':'aucun animal touché')+' — '+(e.s||0)+' épargné'+(e.s>1?'s':'')}
+  if(e.a==='rou')return e.h?'🔫 '+nm(e.u)+' tire la carte '+(e.s+1)+' : 💥 <b>LA ROULETTE !</b>':nm(e.u)+' tire la carte '+(e.s+1)+' : vide'+(e.c?' ('+cn(e.c)+' défaussée)':'');
+  if(e.a==='rdrop')return nm(e.u)+' défausse '+cn(e.c)+' (Roulette)';
   if(e.a==='show')return nm(e.u)+' montre sa pioche (Exhibition) : '+(e.cs||[]).map(cn).join(', ');
   if(e.a==='mine')return'💥 '+nm(e.u)+' a pioché la '+cn(e.c)+' : sa main explose !';
   return''}
@@ -3634,11 +3661,11 @@ function vieConfetti(){
   for(let i=0;i<90;i++){const c=document.createElement('i');c.className='vconf';c.style.left=(Math.random()*100)+'%';c.style.background=cs[i%cs.length];c.style.setProperty('--dx',(Math.random()*240-120)+'px');c.style.animationDelay=(Math.random()*.9)+'s';c.style.animationDuration=(2.4+Math.random()*1.4)+'s';L.appendChild(c);setTimeout(()=>c.remove(),5200)}}
 /* --- affichage --- */
 const vieMob=()=>window.innerWidth<700;
-function vieBoard(board,spent,s){
+function vieBoard(board,spent,s,prot){
   if(!board||!board.length)return'<span class="hint" style="color:#ffffffaa">Rien pour l’instant</span>';
   const u={},sp={};board.forEach(i=>{u[i]=(u[i]||0)+1});(spent||[]).forEach(i=>{if(u[i]){u[i]--;sp[i]=(sp[i]||0)+1}});
   const ids=Object.keys(board.reduce((m,i)=>(m[i]=1,m),{})).map(Number).filter(i=>VC[i]).sort(vieByKind);let h='';
-  const grp=(id,n,cls)=>{if(!n)return'';const shown=Math.min(n,3);let g='<div class="vgrp" style="--s:'+s+'">';for(let k=0;k<shown;k++)g+=vieW(id,s,'data-z="'+id+'"',cls);return g+(n>1?'<span class="vx">×'+n+'</span>':'')+'</div>'};
+  const grp=(id,n,cls)=>{if(!n)return'';const shown=Math.min(n,3);let g='<div class="vgrp" style="--s:'+s+'">';for(let k=0;k<shown;k++)g+=vieW(id,s,'data-z="'+id+'"',cls);return g+(prot&&prot.includes(id)?'<span class="vpr" title="Flirt protégé">🛡️</span>':'')+(n>1?'<span class="vx">×'+n+'</span>':'')+'</div>'};
   ids.forEach(id=>{h+=grp(id,u[id]||0,'')+grp(id,sp[id]||0,'spent')});
   return h}
 function vieOpp(p,v,aimC,si,sn){
@@ -3647,7 +3674,7 @@ function vieOpp(p,v,aimC,si,sn){
     if(w){cls=' no';lab='<div class="vaim">'+esc(w)+'</div>'}else{cls=' aim';att=' data-aim="'+esc(p.id)+'"';lab='<div class="vaim">'+(pr?'🛡️ Protégé : sera bloqué':'🎯 Viser ce joueur')+'</div>'}}
   const dk=si!=null;let sty='';if(dk){const ps=vieSeat(sn,si);sty=' style="--sx:'+ps[0].toFixed(2)+'%;--sy:'+ps[1].toFixed(2)+'%"';if(sn>=5)cls+=' s5'}
   return'<div class="vop'+(p.id===v.turn_uid?' cur':'')+(p.gone?' gone':'')+cls+'" data-pid="'+esc(p.id)+'"'+att+sty+'><div class="vh1">'+(dk?'<span class="ring'+(p.id===v.turn_uid&&v.status==='playing'?' on':'')+'" data-ru="'+esc(p.id)+'">'+avh(p)+'</span>':avh(p))+'<div class="g" data-user="'+esc(p.id)+'"><b>'+esc(p.pseudo)+(p.id===v.host?' 👑':'')+'</b><small>'+(p.gone?'A quitté la partie':'😊 <span data-sm>'+vieSmShown(p)+'</span>'+(p.skips>0?' · 💤'+(p.skips>1?'×'+p.skips:''):''))+'</small></div></div>'+lab+
-    (p.gone?'':'<div class="vbacks" style="--s:'+bs+'">'+Array.from({length:nb},()=>vieBackW(bs)).join('')+'<em>'+p.hand_n+' carte'+(p.hand_n>1?'s':'')+'</em></div><div class="vbd">'+vieBoard(p.board,p.spent,vieMob()?.22:.27)+'</div>')+'</div>'}
+    (p.gone?'':'<div class="vbacks" style="--s:'+bs+'">'+Array.from({length:nb},()=>vieBackW(bs)).join('')+'<em>'+p.hand_n+' carte'+(p.hand_n>1?'s':'')+'</em></div><div class="vbd">'+vieBoard(p.board,p.spent,vieMob()?.22:.27,p.prot)+'</div>')+'</div>'}
 function vieStack(back,n,top,cls,attr,s){
   const l=Math.min(n,3);let h='<button type="button" class="vstack '+cls+'" '+attr+'>';
   if(top)h+=top;else h+=(n?'':'<span class="vw" style="--s:'+s+';opacity:.35">'+vieBackHTML()+'</span>');
@@ -3681,12 +3708,12 @@ function vieRender(){
       '<div class="vmid"><div class="vpile"><button type="button" class="vstack'+(draw&&v.deck_n?' can':'')+'" '+(draw&&v.deck_n?'data-vie="take" data-src="deck"':'')+' aria-label="Pioche">'+deckTop+'</button><span class="vpl">Pioche · '+v.deck_n+'</span>'+(draw&&v.deck_n?'<em class="vgo">👆 Touche ou glisse</em>':'')+'</div>'+
       '<div class="vevt">'+(ev||'La partie commence !')+(v.last_round?'<br><small>⚠️ Pioche vide : dernier tour de table.</small>':'')+(v.packs&&v.packs.length?'<div class="vpkl">'+viePackChips(v.packs)+'</div>':'')+(v.casino?'<div class="vcas">🎰 Casino ouvert'+(v.bet_u?' · <b>'+esc(vieName(v.bet_u))+'</b> a misé : mise un salaire pour tenter de le battre !':' · mise un salaire de ta main')+'</div>':'')+'</div>'+
       '<div class="vpile"><button type="button" class="vstack'+(draw&&topId&&!amp?' can':'')+'" '+(draw&&topId&&!amp?'data-vie="take" data-src="discard"':topId?'data-z="'+topId+'"':'')+' aria-label="Défausse">'+(topId?vieW(topId,mob?.42:.5,'tabindex="-1"'):'<span class="vw" style="--s:'+(mob?.42:.5)+';opacity:.3"><span class="vbk" style="--vback:#0004"></span></span>')+'</button><span class="vpl">Défausse · '+dl.length+'</span>'+(draw&&topId?'<em class="vgo">👆 Touche ou glisse</em>':'')+'</div></div>'+
-      '<div class="vmine'+(dk&&myTurn?' cur':'')+'" data-pid="'+esc(me&&me.id||'')+'">'+(dk?'<div class="vme"><span class="ring'+(myTurn?' on':'')+'" data-ru="'+esc(me&&me.id||'')+'">'+avh(mineP)+'</span><div class="score" aria-label="Tes sourires">😊 <span data-sm>'+vieSmShown(mineP)+'</span></div><div class="vlab">Ta vie'+(mineP.skips>0?' · 💤 tu passes '+(mineP.skips>1?mineP.skips+' tours':'ton prochain tour'):'')+'</div></div>':'<div class="vlab">Ta vie · 😊 '+mineP.smiles+(mineP.skips>0?' · 💤 tu passes '+(mineP.skips>1?mineP.skips+' tours':'ton prochain tour'):'')+'</div>')+'<div class="vbd">'+vieBoard(mineP.board,mineP.spent,mob?.27:.3)+'</div></div></div></div>'+
+      '<div class="vmine'+(dk&&myTurn?' cur':'')+'" data-pid="'+esc(me&&me.id||'')+'">'+(dk?'<div class="vme"><span class="ring'+(myTurn?' on':'')+'" data-ru="'+esc(me&&me.id||'')+'">'+avh(mineP)+'</span><div class="score" aria-label="Tes sourires">😊 <span data-sm>'+vieSmShown(mineP)+'</span></div><div class="vlab">Ta vie'+(mineP.skips>0?' · 💤 tu passes '+(mineP.skips>1?mineP.skips+' tours':'ton prochain tour'):'')+'</div></div>':'<div class="vlab">Ta vie · 😊 '+mineP.smiles+(mineP.skips>0?' · 💤 tu passes '+(mineP.skips>1?mineP.skips+' tours':'ton prochain tour'):'')+'</div>')+'<div class="vbd">'+vieBoard(mineP.board,mineP.spent,mob?.27:.3,mineP.prot)+'</div></div></div></div>'+
       '<div class="vturn">'+(myTurn?'<span class="pill2 me">🎴 À toi de jouer</span>':'<span class="pill2 w">Tour de '+esc(cp?cp.pseudo:'?')+'</span>')+'<span class="vtm"><i id="vieTb"></i></span><span id="vieT" class="ucT"></span></div>';
     if(myTurn){
       let msg='';
       if(v.phase==='draw')msg=dk?'👆 Touche ou glisse la pioche vers ta main (ou prends la défausse : tu devras la jouer).':'👆 Touche ou glisse la pioche vers ta main, ou prends la dernière carte de la défausse (tu devras alors la jouer).';
-      else if(v.phase==='pick')msg=v.me&&v.me.pending&&v.me.pending.t==='star'?'🌠 Choisis une carte dans la défausse.':v.me&&v.me.pending&&v.me.pending.t==='peek'?'👀 Regarde bien, puis valide.':v.me&&v.me.pending&&v.me.pending.t==='dig'?'🗑️ Choisis une carte dans la défausse.':'🍀 Choisis une carte à garder.';
+      else if(v.phase==='pick')msg=v.me&&v.me.pending&&v.me.pending.t==='star'?'🌠 Choisis une carte dans la défausse.':v.me&&v.me.pending&&v.me.pending.t==='peek'?'👀 Regarde bien, puis valide.':v.me&&v.me.pending&&v.me.pending.t==='dig'?'🗑️ Choisis une carte dans la défausse.':v.me&&v.me.pending&&v.me.pending.t==='swing'?'🔀 Regarde les mains, puis choisis avec qui échanger.':v.me&&v.me.pending&&v.me.pending.t==='out'?'⚰️ Choisis une carte hors jeu à reprendre.':v.me&&v.me.pending&&v.me.pending.t==='ransom'?'🔫 Choisis qui paie la rançon.':v.me&&v.me.pending&&v.me.pending.t==='roulette'?'🔫 Roulette russe : choisis une carte face cachée.':v.me&&v.me.pending&&v.me.pending.t==='rdrop'?'🔫 Tu as tiré la Roulette : défausse une carte.':v.pick&&['traffic','roulette','rdrop'].includes(v.pick.t)?vieWait(v):'🍀 Choisis une carte à garder.';
       else if(v.cond===1)msg='🎈 Capote trouée : pose un enfant de ta main, ou termine ton tour.';
       else if(mineP.bleed&&!forced)msg='🩸 Hémorragie : joue ou défausse une carte (tu ne pioches pas) jusqu’à avoir la main vide.';
       else if(forced)msg='Tu as pris <b>'+esc(VC[forced]?vieClean(VC[forced].name):'')+'</b> : joue cette carte (ou défausse-la si tu ne peux pas).';
@@ -3696,16 +3723,17 @@ function vieRender(){
       h+=aimC?'<div class="vbanner vaimb"><span class="vheld" id="vieHeld">'+vieW(aimC.id,.4,'tabindex="-1"')+'</span><div><b>🎯 Choisis le joueur visé</b><br><small>Touche un joueur sur la table</small></div><button class="btn alt sm" data-vie="aimx">Annuler</button></div>':'<div class="vbanner">'+msg+'</div>';
       if(v.cond===1)h+='<div class="vtools vdraw"><button class="btn alt" data-vie="pass">Terminer mon tour (sans enfant)</button></div>';
       if(draw)h+='<div class="vtools vdraw"><button class="btn" data-vie="take" data-src="deck"'+(v.deck_n?'':' disabled')+'>🂠 Piocher</button><button class="btn alt" data-vie="take" data-src="discard"'+(topId&&!amp?'':' disabled')+'>♻️ Prendre la défausse</button></div>'}
+    if(!myTurn&&v.phase==='pick'&&!(v.me&&v.me.pending)){const w=vieWait(v);if(w)h+='<div class="vbanner">'+w+'</div>'}
     const canP=myTurn&&v.phase==='play';
     h+='<div class="vhandw"><div class="vhand" id="vieHand">'+hand.map((c,i)=>{const n=hand.length,m=n>1?i-(n-1)/2:0,dim=myTurn&&forced&&forced!==c,why=canP&&!dim&&VC[c]?vieCantPlay(VC[c],v,mineP):'';
         return vieW(c,hs,'data-h="'+c+'" data-i="'+i+'"'+(why?' title="🚫 '+esc(why)+'"':''),(dim?'dim':'')+(why?' no':''),'--r:'+(m*3.2).toFixed(1)+'deg;--y:'+(m*m*1.4).toFixed(1)+'px;z-index:'+(i+1))}).join('')+'</div></div>'+
       (hand.length?'':'<p class="vhint">Tu n’as plus de carte en main.</p>')+
-      '<div class="vtools vutil">'+(myTurn&&(v.phase==='play'||v.phase==='draw')&&!forced&&mjob?'<button class="btn alt sm" data-vie="quit">🚪 Démissionner'+(vieInterim(mjob)?' (gratuit, le tour continue)':(v.phase==='draw'?' (à la place de piocher)':' (fin du tour)'))+'</button>':'')+'<button class="btn alt sm" data-vie="disc">📂 Voir la défausse</button><button class="btn alt sm" data-vie="guide">📖 Guide des cartes</button><button class="btn alt sm" data-vie="leave">Quitter la partie</button></div>'+
+      '<div class="vtools vutil">'+(myTurn&&(v.phase==='play'||v.phase==='draw')&&!forced&&mjob&&mjob.eff==='executioner'&&!v.xdone?'<button class="btn sm" data-vie="exec">🪓 Exécuter un enfant ou un animal</button>':'')+(myTurn&&(v.phase==='play'||v.phase==='draw')&&!forced&&mjob?'<button class="btn alt sm" data-vie="quit">🚪 Démissionner'+(vieInterim(mjob)?' (gratuit, le tour continue)':(v.phase==='draw'?' (à la place de piocher)':' (fin du tour)'))+'</button>':'')+'<button class="btn alt sm" data-vie="disc">📂 Voir la défausse</button><button class="btn alt sm" data-vie="guide">📖 Guide des cartes</button><button class="btn alt sm" data-vie="leave">Quitter la partie</button></div>'+
       '<div class="vlogs">'+(v.log.slice().reverse().slice(0,8).map(e=>{const t=vieLine(e);return t?'<div class="vlg">'+t+'</div>':''}).join('')||'<span class="hint">La partie commence.</span>')+'</div>'}
   else if(v.status==='finished'){
     const sc=(v.result&&v.result.scores)||[],win=(v.result&&v.result.winners)||[],me_=me&&me.id;
     h='<h2 style="text-align:center">'+(win.length===1?(win[0]===me_?'🏆 Tu gagnes !':'🏆 '+esc(vieName(win[0]))+' gagne !'):'🤝 Égalité : '+win.map(u=>esc(vieName(u))).join(', '))+'</h2>'+viePodium(sc)+vieStatsHTML(v,sc)+'<div class="vsc th-'+vieTable()+'"><div class="vtab">'+
-      sc.map((s,i)=>{const p=v.players.find(x=>x.id===s.u)||{};return'<div class="vop'+(win.includes(s.u)?' cur':'')+'" style="max-width:none"><div class="vh1"><span class="rk">'+(i+1)+'</span>'+avh(p)+'<div class="g" data-user="'+esc(s.u)+'"><b>'+esc(p.pseudo||'?')+(s.u===me_?' (toi)':'')+'</b></div><b>😊 '+s.s+'</b></div><div class="vbd">'+vieBoard(p.board,p.spent,.27)+'</div></div>'}).join('')+'</div></div>'+
+      sc.map((s,i)=>{const p=v.players.find(x=>x.id===s.u)||{};return'<div class="vop'+(win.includes(s.u)?' cur':'')+'" style="max-width:none"><div class="vh1"><span class="rk">'+(i+1)+'</span>'+avh(p)+'<div class="g" data-user="'+esc(s.u)+'"><b>'+esc(p.pseudo||'?')+(s.u===me_?' (toi)':'')+'</b></div><b>😊 '+s.s+'</b></div><div class="vbd">'+vieBoard(p.board,p.spent,.27,p.prot)+'</div></div>'}).join('')+'</div></div>'+
       '<p class="hint" style="text-align:center;margin-top:10px">'+(v.next?'🔁 Une nouvelle partie est prête : tu y es ramené automatiquement…':'Quand quelqu’un relance, tous les joueurs encore là sont ramenés dans la nouvelle partie, sans ré-inviter personne.')+'</p><div class="row" style="margin-top:12px"><button class="btn" data-vie="rematch">'+(v.next?'🔁 Rejoindre la nouvelle partie ('+v.next.n+'/'+v.next.max+')':'🔁 Nouvelle partie avec les mêmes joueurs')+'</button><button class="btn alt" data-vie="done">Terminer</button></div>'}
   vieSet(h);if(v.status==='finished')vieStatsInit();if(dk)vieDeskSync();vieClock();vieFan();vieOv();vieChatSync();
   if(dk&&vo.deal){vo.deal=0;setTimeout(vieDeal,120)}
@@ -3734,19 +3762,27 @@ function vieOv(){
   if(!vo||!vo.v||!VC||curView!=='vie'){z.hidden=true;z.innerHTML='';return}
   const v=vo.v,myTurn=vieIsMe(v.turn_uid),pend=v.me&&v.me.pending;let h='';
   if(v.status!=='playing')vo.view=null;
-  if(v.status==='playing'&&myTurn&&v.phase==='pick'&&pend){
+  if(vo.exec&&!(v.status==='playing'&&myTurn&&!v.xdone&&(v.phase==='play'||v.phase==='draw')))vo.exec=false;
+  if(v.status==='playing'&&v.phase==='pick'&&pend&&(myTurn||['traffic','roulette','rdrop'].includes(pend.t))){
     if(pend.t==='peek'){const J=!!pend.w;h='<div class="vzb"><h3>'+(J?(pend.k==='ghost'?'👻 La main de ':'🎤 La main de ')+esc(vieName(pend.w)):'🔮 Les '+pend.c.length+' prochaines cartes de la pioche')+'</h3><p class="sub">'+(J?'Seul toi la vois. Retiens bien !':'Dans l’ordre : la première sera piochée en premier. Seul toi les vois.')+'</p><div class="vgrid">'+(pend.c.length?pend.c.map(i=>vieW(i,vieMob()?.36:.4,'tabindex="-1"')).join(''):'<span class="hint">Aucune carte.</span>')+'</div><div class="vopt" style="margin-top:12px"><button class="btn" data-vie="ack">J’ai vu, continuer</button></div></div>'}
+    else if(pend.t==='swing'){const hs=pend.h||{};h='<div class="vzb"><h3>🔀 Échangisme : regarde les mains, puis choisis</h3><p class="sub">Tu échanges ta main avec celle d’un joueur. Si les tailles diffèrent, chacun garde le même nombre de cartes (l’excédent est défaussé, le manque est repioché).</p>'+Object.keys(hs).map(u=>'<div class="vsw"><b>'+esc(vieName(u))+'</b><div class="vgrid">'+hs[u].map(i=>vieW(i,.4,'tabindex="-1"')).join('')+'</div>'+(hs[u].length?'<button class="btn" data-sw="'+esc(u)+'">Échanger avec '+esc(vieName(u))+'</button>':'<small class="hint">Main vide</small>')+'</div>').join('')+'<p class="sub">Ta main : '+(pend.m||[]).length+' carte'+((pend.m||[]).length>1?'s':'')+'</p></div>'}
+    else if(pend.t==='out'){const d=(v.out||[]).filter(i=>vieExhOk(i,v));h='<div class="vzb"><h3>⚰️ Exhumation : reprends une carte hors jeu</h3><p class="sub">Un enfant ou un animal se pose chez toi sans condition. La Mine ou la Fin précoce vont dans ta main et tu dois les jouer tout de suite.</p><div class="vgrid">'+d.map(i=>vieW(i,.45,'data-ex="'+i+'"')).join('')+'</div></div>'}
+    else if(pend.t==='ransom'){h='<div class="vzb"><h3>🔫 Prise d’otages : qui paie la rançon ?</h3><p class="sub">Le joueur choisi te donne tous les salaires de sa main (tu les poses chez toi sans condition) et il repioche. Plus il y a de salaires, plus vite l’otage est libéré : 1-2 salaires = 2 tours ratés, 3-4 = 1 tour, 5 ou plus = libre ; aucun salaire = 3 tours.</p>'+(pend.c||[]).map(u=>{const p=v.players.find(x=>x.id===u);return'<div class="vsw"><b>'+esc(vieName(u))+'</b> <small class="hint">'+(p?p.hand_n:0)+' carte'+(p&&p.hand_n>1?'s':'')+' en main</small><div class="vopt"><button class="btn" data-rn="'+esc(u)+'">Il paie la rançon</button></div></div>'}).join('')+'</div>'}
+    else if(pend.t==='traffic'){const lk=pend.lock||[],ok=(pend.c||[]).filter(i=>!lk.includes(i));h='<div class="vzb"><h3>🫀 Trafic d’organes : prends une carte à '+esc(vieName(pend.src))+'</h3><p class="sub">Sa main est à toi, choisis la carte à voler. Les cartes grisées viennent d’être volées par un autre joueur : elles sont verrouillées. Si tu hésites trop, une carte est prise au hasard.</p><div class="vgrid">'+(pend.c||[]).map(i=>lk.includes(i)?vieW(i,vieMob()?.36:.4,'tabindex="-1"','dim'):vieW(i,vieMob()?.36:.4,'data-tf="'+i+'"')).join('')+'</div>'+(ok.length?'':'<p class="sub">Rien à prendre.</p>')+'</div>'}
+    else if(pend.t==='roulette'){const us=pend.used||[],n=pend.n||6;h='<div class="vzb"><h3>🔫 Roulette russe : choisis une carte</h3><p class="sub">'+n+' cartes face cachée, dont la Roulette. Une carte vide part à la défausse. Si tu tires la Roulette, tu défausses une carte de ton choix et tous les autres refont leur main. Il en reste '+(n-us.length)+'. Au bout de 60 s, une carte est choisie au hasard.</p><div class="vgrid">'+Array.from({length:n},(_,k)=>'<button type="button" class="vro'+(us.includes(k)?' used':'')+'" data-ro="'+k+'" aria-label="Carte '+(k+1)+'"><span class="vw" style="--s:'+(vieMob()?.36:.42)+'">'+vieBackHTML()+'</span></button>').join('')+'</div></div>'}
+    else if(pend.t==='rdrop'){const hd=(v.me&&v.me.hand)||[];h='<div class="vzb"><h3>🔫 Tu as tiré la Roulette !</h3><p class="sub">Défausse une carte de ton choix. Les autres joueurs refont leur main.</p><div class="vgrid">'+hd.map(i=>vieW(i,vieMob()?.36:.42,'data-rd="'+i+'"')).join('')+'</div></div>'}
     else if(pend.t==='dig'){const d=(v.discard||[]).slice().reverse();h='<div class="vzb"><h3>🗑️ Prends une carte de la défausse</h3><p class="sub">Elle ira dans ta main : tu n’es pas obligé de la jouer.</p><div class="vgrid">'+d.map(i=>vieW(i,.45,'data-dg="'+i+'"')).join('')+'</div></div>'}
     else if(pend.t==='chance')h='<div class="vzb"><h3>🍀 Chance : garde une carte</h3><p class="sub">Les 2 autres seront défaussées.</p><div class="vgrid">'+pend.c.map(i=>vieW(i,vieMob()?.7:.9,'data-pk="'+i+'"')).join('')+'</div></div>';
     else{const d=(v.discard||[]).slice().reverse();h='<div class="vzb"><h3>🌠 Prends une carte de la défausse</h3><p class="sub">Tu devras la jouer tout de suite.</p><div class="vgrid">'+d.map(i=>vieW(i,.45,'data-st="'+i+'"')).join('')+'</div></div>'}}
   else if(vo.det)h=vieDetailHTML(vo.det,v,myTurn);
+  else if(vo.exec&&myTurn&&!v.xdone){const sel=vo.xsel||'';h='<div class="vzb"><button class="btn alt sm vzx" data-vie="closeall">✕ Fermer</button><h3>🪓 Exécuter une victime</h3><p class="sub">Un enfant ou un animal posé chez n’importe quel joueur part hors jeu. Une seule victime par tour.</p>'+v.players.filter(p=>!p.gone).map(p=>{const vs=p.board.filter(i=>VC[i]&&(VC[i].kind==='child'||VC[i].kind==='pet'));return vs.length?'<div class="vsw"><b>'+esc(vieName(p.id))+(p.id===(me&&me.id)?' (toi)':'')+'</b><div class="vgrid">'+vs.map(i=>vieW(i,vieMob()?.36:.4,'data-xc="'+esc(p.id)+'|'+i+'"',sel===p.id+'|'+i?'on':'')).join('')+'</div></div>':''}).join('')+(sel?'<div class="vopt" style="margin-top:10px"><button class="btn" data-xgo="'+esc(sel)+'">🪓 Exécuter '+esc(VC[+sel.split('|')[1]]?vieClean(VC[+sel.split('|')[1]].name):'')+' de '+esc(vieName(sel.split('|')[0]))+'</button></div>':'<p class="sub">Touche la victime, puis confirme.</p>')+'</div>'}
   else if(vo.view)h=vieViewHTML(v,vo.view);
   else if(vo.disc){const d=(v.discard||[]).slice().reverse();h='<div class="vzb"><button class="btn alt sm vzx" data-vie="closeall">✕ Fermer</button><h3>♻️ La défausse ('+d.length+')</h3><p class="sub">La carte du dessus est la première. Touche une carte pour la lire.</p><div class="vgrid">'+(d.map(i=>vieW(i,.45,'data-z="'+i+'"')).join('')||'<span class="hint">Vide.</span>')+'</div></div>'}
   if(!h){z.hidden=true;z.innerHTML='';return}
   const sy=z.scrollTop;z.innerHTML=h;z.hidden=false;z.scrollTop=sy;
   if(vo.view&&vo.viewAnim&&!vo.det){vo.viewAnim=false;try{vieViewAnim(vo.view)}catch(e){}}}
-const needAim=c=>(c.kind==='malus'&&c.eff!=='mine')||(c.kind==='job'&&c.eff==='journalist')||(c.kind==='special'&&['ghost','witch','referendum'].includes(c.eff));
-const aimHint=c=>c.kind==='malus'?'Pose la carte, puis touche le joueur visé sur la table.':c.eff==='witch'?'Pose la carte, puis touche le joueur avec qui échanger ta main.':c.eff==='referendum'?'Pose la carte, puis touche le joueur avec qui échanger ton métier.':'Pose la carte, puis touche le joueur dont tu veux voir la main.';
+const needAim=c=>(c.kind==='malus'&&c.eff!=='mine')||(c.kind==='job'&&c.eff==='journalist')||(c.kind==='special'&&['ghost','witch','referendum','kidnap','sextape'].includes(c.eff));
+const aimHint=c=>c.kind==='malus'?'Pose la carte, puis touche le joueur visé sur la table.':c.eff==='witch'?'Pose la carte, puis touche le joueur avec qui échanger ta main.':c.eff==='referendum'?'Pose la carte, puis touche le joueur avec qui échanger ton métier.':c.eff==='kidnap'?'Pose la carte, puis touche le joueur à qui prendre un enfant.':c.eff==='sextape'?'Pose la carte, puis touche le joueur dont tu exposes le mariage ou un flirt.':'Pose la carte, puis touche le joueur dont tu veux voir la main.';
 function vieDetailHTML(d,v,myTurn){
   const c=VC[d.id];if(!c)return'';
   const how=vieHow(c),mineP=v.players.find(p=>p.id===(me&&me.id))||{board:[],spent:[],smiles:0},mob=vieMob();
@@ -3879,7 +3915,8 @@ async function vieAct(a,b){
     case'quit':{if(vo.busy)return;if(Date.now()-vieQ>4000){vieQ=Date.now();b.textContent='Confirmer : démissionner ?';return}vieQ=0;vo.busy=true;done(await sb.rpc('vie_quit',{p_id:id}));break}
     case'closedet':vo.det=null;vieOv();break;
     case'closeview':vo.view=null;vo.det=null;vieOv();break;
-    case'closeall':vo.det=null;vo.disc=false;vo.view=null;vieOv();break;
+    case'closeall':vo.det=null;vo.disc=false;vo.view=null;vo.exec=false;vo.xsel=null;vieOv();break;
+    case'exec':vo.exec=true;vo.xsel=null;vo.det=null;vieOv();break;
     case'disc':vo.disc=true;vo.det=null;vieOv();break;
     case'inv':msPickInvite('vie',id);break;
     case'leave':
@@ -3907,9 +3944,17 @@ $('vieBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-vie]');if(!b||b.disabled)return;vieAct(b.dataset.vie,b)});
 $('vieZ').addEventListener('click',e=>{
   const t=e.target;
-  if(t===$('vieZ')){if(vo&&vo.v&&vo.v.status==='playing'&&vo.v.phase==='pick'&&vieIsMe(vo.v.turn_uid))return;if(vo&&vo.det)vo.det=null;else if(vo&&vo.disc)vo.disc=false;else if(vo&&vo.view)vo.view=null;vieCloseZ();vieOv();return}
+  if(t===$('vieZ')){if(vo&&vo.v&&vo.v.status==='playing'&&vo.v.phase==='pick'&&(vieIsMe(vo.v.turn_uid)||(vo.v.me&&vo.v.me.pending)))return;if(vo&&vo.det)vo.det=null;else if(vo&&vo.exec){vo.exec=false;vo.xsel=null}else if(vo&&vo.disc)vo.disc=false;else if(vo&&vo.view)vo.view=null;vieCloseZ();vieOv();return}
   const pk=t.closest('[data-pk]');if(pk&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_chance',{p_id:id,p_card:+pk.dataset.pk}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
   const dg=t.closest('[data-dg]');if(dg&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_dig',{p_id:id,p_card:+dg.dataset.dg}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const sw=t.closest('[data-sw]');if(sw&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_swing',{p_id:id,p_target:sw.dataset.sw}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const ex=t.closest('[data-ex]');if(ex&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_exhume',{p_id:id,p_card:+ex.dataset.ex}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const rn=t.closest('[data-rn]');if(rn&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_ransom',{p_id:id,p_payer:rn.dataset.rn}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const tf=t.closest('[data-tf]');if(tf&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_traffic',{p_id:id,p_card:+tf.dataset.tf}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const xc=t.closest('[data-xc]');if(xc&&vo){vo.xsel=xc.dataset.xc;vieOv();return}
+  const xg=t.closest('[data-xgo]');if(xg&&vo){const id=vo.id,q=xg.dataset.xgo.split('|');vo.busy=true;sb.rpc('vie_execute',{p_id:id,p_target:q[0],p_card:+q[1]}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.exec=false;vo.xsel=null;vo.sig='';vieApply(r.data)});return}
+  const ro=t.closest('[data-ro]');if(ro&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_roulette',{p_id:id,p_slot:+ro.dataset.ro}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const rd=t.closest('[data-rd]');if(rd&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_rdrop',{p_id:id,p_card:+rd.dataset.rd}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
   const st=t.closest('[data-st]');if(st&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_star',{p_id:id,p_card:+st.dataset.st}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
   const zz=t.closest('[data-z]');if(zz){vieOpenZ(+zz.dataset.z);return}
   const py=t.closest('[data-py]');if(py&&vo&&vo.det){const i=+py.dataset.py,p=vo.det.pay||[],k=p.indexOf(i);if(k>=0)p.splice(k,1);else p.push(i);vo.det.pay=p;vieOv();return}
@@ -3920,7 +3965,7 @@ $('vieZ').addEventListener('click',e=>{
   vieAct(b.dataset.vie,b)});
 $('vieBody').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id==='vieCode'){const b=document.querySelector('[data-vie=join2]');if(b)vieAct('join2',b)}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('vieZ').hidden&&!(vo&&vo.v&&vo.v.phase==='pick'&&vieIsMe(vo.v.turn_uid)))$('vieZ').click()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('vieZ').hidden&&!(vo&&vo.v&&vo.v.phase==='pick'&&(vieIsMe(vo.v.turn_uid)||(vo.v.me&&vo.v.me.pending))))$('vieZ').click()});
 /* chat en bas de la table : réutilise le chat de la partie */
 $('vieChS').onclick=async()=>{const i=$('vieChIn'),t=i.value;if(!t.trim())return;await gcSend(t);i.value=''};
 $('vieChIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('vieChS').click()}});
