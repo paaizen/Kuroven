@@ -2899,14 +2899,14 @@ function vieArt(){
   return vieArtP}
 /* extensions (paquets de cartes en plus) */
 const VPACKS=[
-  ['trash','🗑️','Trash','#5f7a4a','Drogues, argent sale, bourreaux et mines : l’extension pour adultes.','soon'],
+  ['trash','🗑️','Trash','#5f7a4a','Drogues, argent sale, bourreaux et mines : l’extension pour adultes.'],
   ['apoc','☄️','Apocalypse','#c0562a','Météorite, zombies, guerre : des catastrophes qui frappent toute la table.'],
   ['fantasy','🧙','Fantastique','#7a4aa8','Anges, démons, vampires, sorcières et dragons.'],
   ['politic','🏛️','Politique','#2a4fb3','Maire, Président, élections, grèves et scandales.'],
   ['luxe','💎','Vie de luxe','#b9801a','Montres, yachts, penthouse… et cambrioleurs.'],
   ['girl','💪','Girl Power','#d9327a','Les métiers au féminin, la Sororité et le Plafond de verre.']];
 const vieHasPacks=()=>!!VC&&Object.values(VC).some(c=>c.pack&&c.pack!=='base');
-const vieCnt=k=>Object.values(VC||{}).filter(c=>(c.pack||'base')===k).reduce((a,c)=>a+(c.qty||1),0);
+const vieCnt=k=>Object.values(VC||{}).filter(c=>(c.pack||'base')===k&&c.live!==false).reduce((a,c)=>a+(c.qty||1),0);
 const vieP=k=>VPACKS.find(p=>p[0]===k);
 const viePkGet=()=>store.get('viepk','').split(',').filter(k=>VPACKS.some(p=>p[0]===k&&!p[5]));
 const viePkSet=a=>store.set('viepk',a.join(','));
@@ -3113,7 +3113,7 @@ const VEFF={
   equalpay:['Le premier Salaire de la pioche est posé devant toi, sans passer par ta main.',['Il faut un métier qui permet ce niveau de salaire.']],
   trophy:['Une distinction réservée aux métiers féminins de l’extension Girl Power : 3 sourires.',['Il faut un métier féminin de l’extension.','Un seul trophée.']],
   /* --- extension Trash --- */
-  cannabis:["Prix : 1. Rapporte 1 sourire. Pas de risque d'overdose. Un seul Cannabis à la fois.", ["Prix : 1"]],
+  cannabis:["Prix : 1. Rapporte 1 sourire. Pas de risque d'overdose.", ["Prix : 1"]],
   cocaine:["Prix : 2. Chaque dose rapporte 1 sourire. Expose à la carte Overdose.", ["Prix : 2"]],
   heroin:["Prix : 2. Chaque dose rapporte 1 sourire. Expose à la carte Overdose.", ["Prix : 2"]],
   brothel:["Prix : 10 minimum (5 pour un Proxénète). Rapporte 1 sourire. Tes flirts se cumulent sans limite.", ["Prix : 10"]],
@@ -3147,6 +3147,7 @@ const VEFF={
 function vieHow(c){const e=c.eff&&VEFF[c.eff],k=VHOW[c.kind]||['',[]];
   const t=e?e[0]:k[0],cond=(e?e[1]:[]).concat(c.eff==='luxhouse'?[]:(k[1]||[]));
   let extra='';if(c.kind==='job'&&c.info)extra=c.info;
+  if(c.kind==='acq')extra='Prix : '+c.price+(c.eff==='brothel'?' (moitié pour un Proxénète)':['cannabis','cocaine','heroin'].includes(c.eff)?' (gratuit pour un Dealer)':'')+' · avec n’importe quel argent, sans rendu de monnaie.';
   if(c.kind==='house'||c.kind==='trip'||c.kind==='luxe')extra='Prix : '+c.price+' en salaires'+(c.kind==='house'?' ('+Math.ceil(c.price/2)+' si tu es marié(e))':c.kind==='trip'?' (gratuit pour un Pilote)':'')+(c.kind==='house'?' · gratuite pour un Architecte':'')+' · 1 de moins pour un Banquier ou avec la Carte Black.';
   return{t,cond,extra}}
 /* --- tests de légalité côté site (le serveur vérifie la même chose) --- */
@@ -3154,8 +3155,9 @@ const vieN=(b,k)=>b.filter(i=>VC[i]&&VC[i].kind===k).length;
 const vieStu=b=>b.reduce((n,i)=>n+(VC[i]&&VC[i].kind==='study'?(VC[i].eff==='double'?2:1):0),0);
 const vieNe=(b,e)=>b.filter(i=>VC[i]&&VC[i].eff===e).length;
 function vieJobC(b){for(const i of b){const c=VC[i];if(c&&(c.kind==='job'||c.eff==='gprof'))return c}return null}
-function viePayables(b,sp){const r=b.filter(i=>VC[i]&&(VC[i].kind==='salary'||VC[i].eff==='inherit'));(sp||[]).forEach(s=>{const k=r.indexOf(s);if(k>=0)r.splice(k,1)});return r}
-function viePrice(c,b){const j=vieJobC(b);let p=c.price||0;if(c.kind==='house'){if(vieN(b,'marriage'))p=Math.ceil(p/2);if(j&&j.eff==='architect')p=0}else if(c.kind==='trip'){if(j&&j.eff==='pilot')p=0}else if(c.kind!=='luxe')return 0;if(p>0&&((j&&j.eff==='banker')||vieNe(b,'blackcard')>0))p-=1;return p}
+function viePayables(b,sp){const r=b.filter(i=>VC[i]&&(VC[i].kind==='salary'||VC[i].kind==='dirty'||VC[i].eff==='inherit'));(sp||[]).forEach(s=>{const k=r.indexOf(s);if(k>=0)r.splice(k,1)});return r}
+const viePayK=c=>!!c&&(c.kind==='house'||c.kind==='trip'||c.kind==='luxe'||c.kind==='acq');
+function viePrice(c,b){const j=vieJobC(b);let p=c.price||0;if(c.kind==='acq'){if(c.eff==='brothel'&&j&&j.eff==='pimp')p=Math.ceil(p/2);else if(['cannabis','cocaine','heroin'].includes(c.eff)&&j&&j.eff==='dealer')p=0;return p}if(c.kind==='house'){if(vieN(b,'marriage'))p=Math.ceil(p/2);if(j&&j.eff==='architect')p=0}else if(c.kind==='trip'){if(j&&j.eff==='pilot')p=0}else if(c.kind!=='luxe')return 0;if(p>0&&((j&&j.eff==='banker')||vieNe(b,'blackcard')>0))p-=1;return p}
 const vieInterim=j=>!!j&&(j.tags||'').indexOf('interim')>=0;
 const vieAnyPolice=v=>v.players.some(p=>!p.gone&&vieNe(p.board,'police')>0);
 const vieAnySoldier=v=>v.players.some(p=>!p.gone&&vieNe(p.board,'soldier')>0);
@@ -3176,10 +3178,12 @@ function vieWhy(c,v,mineP){
     case'study':return job?'Tu ne peux plus étudier quand tu travailles.':vieStu(b)>=6?'Tu as déjà 6 niveaux d’études (le maximum).':vieStu(b)+(c.eff==='double'?2:1)>6?'Une étude double dépasserait le maximum de 6 niveaux.':'';
     case'job':return job&&!vieInterim(job)?'Tu as déjà un métier.':vieStu(b)<c.need?'Il te faut '+c.need+' étude'+(c.need>1?'s':'')+' (tu en as '+vieStu(b)+').':(c.eff==='bandit'||c.eff==='guru')&&vieAnyPolice(v)?'Un Policier est en jeu : impossible de poser ce métier.':'';
     case'salary':return!job?'Il te faut un métier pour toucher un salaire.':Math.max(job.lvl,vieNe(b,'prize')&&['journalist','researcher','writer'].includes(job.eff)?4:0)<c.lvl?'Ton métier ne permet pas ce niveau de salaire.':'';
-    case'flirt':return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':n('flirt')>=5&&!(job&&job.eff==='barman')?'Tu as déjà 5 flirts.':'';
+    case'flirt':return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':n('flirt')>=5&&!(job&&job.eff==='barman')&&!vieNe(b,'brothel')?'Tu as déjà 5 flirts.':'';
     case'adultery':return!n('marriage')?'Il faut être marié(e) pour un adultère.':n('adultery')?'Tu as déjà un adultère.':'';
-    case'marriage':return n('marriage')?'Tu es déjà marié(e).':!n('flirt')&&!(job&&job.eff==='mayor')?'Il te faut au moins un flirt pour te marier.':'';
-    case'child':return!n('marriage')?'Il faut être marié(e) pour avoir un enfant.':'';
+    case'marriage':return n('marriage')?'Tu es déjà marié(e).':job&&job.eff==='priest'?'Un Prêtre ne peut pas se marier.':!n('flirt')&&!(job&&job.eff==='mayor')&&c.eff!=='forced'?'Il te faut au moins un flirt pour te marier.':'';
+    case'child':return!n('marriage')&&!(job&&job.eff==='priest')?'Il faut être marié(e) pour avoir un enfant.':'';
+    case'dirty':return'';
+    case'acq':{const pr=viePrice(c,b),pay=viePayables(b,sp);return pr>0&&pay.reduce((a,i)=>a+VC[i].lvl,0)<pr?'Pas assez d’argent non retourné (il faut '+pr+').':''}
     case'pet':return c.eff==='dragon'&&vieNe(b,'dragon')?'Tu as déjà un Dragon.':'';
     case'house':case'trip':case'luxe':{
       if(!job)return'Il te faut un métier.';
@@ -3203,7 +3207,7 @@ function vieWhy(c,v,mineP){
       if(c.eff==='recycle')return(v.discard||[]).length<3?'Il faut au moins 3 cartes dans la défausse.':'';
       if(c.eff==='ghost')return!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&p.hand_n>0)?'Personne n’a de carte en main.':'';
       if(c.eff==='referendum')return!job?'Il faut avoir un métier pour un Référendum.':!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&vieJobC(p.board))?'Personne d’autre n’a de métier.':'';
-      if(c.eff==='potion')return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':n('flirt')>=5&&!(job&&job.eff==='barman')?'Tu as déjà 5 flirts.':'';
+      if(c.eff==='potion')return n('marriage')&&!n('adultery')?'Tu es marié(e) : il te faut une carte Adultère pour flirter.':n('flirt')>=5&&!(job&&job.eff==='barman')&&!vieNe(b,'brothel')?'Tu as déjà 5 flirts.':'';
       if(c.eff==='equalpay')return!job?'Il te faut un métier pour toucher un salaire.':'';
       if(c.eff==='piston'){const hand=(v.me&&v.me.hand)||[];return job&&!vieInterim(job)?'Tu as déjà un métier.':!hand.some(i=>VC[i]&&VC[i].kind==='job')?'Il te faut une carte Métier en main.':''}
       if(c.eff==='troc'){const hand=(v.me&&v.me.hand)||[];return hand.length<2?'Il te faut une autre carte à échanger.':!v.players.some(p=>p.id!==(me&&me.id)&&!p.gone&&p.hand_n>0)?'Personne n’a de carte en main.':''}
@@ -3745,14 +3749,14 @@ function vieDetailHTML(d,v,myTurn){
       if(needAim(c)){
         if(why)act='<div class="vwhy">🚫 '+esc(why)+'</div><div class="vopt">'+dis+'</div>';
         else act='<p class="hint">'+aimHint(c)+'</p><div class="vopt"><button class="btn" data-vie="aim">🎯 Poser et choisir le joueur</button>'+dis+'</div>'}
-      else if(c.kind==='house'||c.kind==='trip'||c.kind==='luxe'){
+      else if(viePayK(c)){
         const price=viePrice(c,mineP.board),pay=viePayables(mineP.board,mineP.spent);
         if(why)act='<div class="vwhy">🚫 '+esc(why)+'</div><div class="vopt">'+dis+'</div>';
         else if(price<=0)act='<p class="hint">Gratuit pour toi !</p><div class="vopt"><button class="btn" data-vie="play">Poser</button>'+dis+'</div>';
         else{
           if(!d.pay){const sg=viePaySuggest(price,pay);d.pay=sg||[]}
           const tot=d.pay.reduce((a,i)=>a+VC[pay[i]].lvl,0),mn=d.pay.length?Math.min(...d.pay.map(i=>VC[pay[i]].lvl)):0,okp=tot>=price&&!(d.pay.length>1&&tot-mn>=price);
-          act='<b>Paie '+price+' avec tes salaires</b> <small>(ils seront retournés, sans rendu de monnaie)</small><div class="vpay">'+pay.map((id,i)=>vieW(id,.3,'data-py="'+i+'"',d.pay.includes(i)?'on':'')).join('')+'</div><div class="vtotal '+(okp?'ok':'no')+'">Total choisi : '+tot+' / '+price+(tot>price&&!okp?' — trop payé, retire une carte':'')+'</div><div class="vopt"><button class="btn" data-vie="play"'+(okp?'':' disabled')+'>'+(c.kind==='trip'?'Partir':'Acheter')+'</button>'+dis+'</div>'}}
+          act='<b>Paie '+price+' avec ton argent</b> <small>(retourné, sans rendu de monnaie)</small><div class="vpay">'+pay.map((id,i)=>vieW(id,.3,'data-py="'+i+'"',d.pay.includes(i)?'on':'')).join('')+'</div><div class="vtotal '+(okp?'ok':'no')+'">Total choisi : '+tot+' / '+price+(tot>price&&!okp?' — trop payé, retire une carte':'')+'</div><div class="vopt"><button class="btn" data-vie="play"'+(okp?'':' disabled')+'>'+(c.kind==='trip'?'Partir':'Acheter')+'</button>'+dis+'</div>'}}
       else if(c.eff==='rainbow')act='<b>Que fais-tu ?</b><div class="vopt"><button class="btn" data-vie="play" data-aux="1">Jouer 3 cartes</button><button class="btn" data-vie="play" data-aux="2">Piocher 3 cartes</button>'+dis+'</div>';
       else if(c.eff==='piston'){
         const jobs=((v.me&&v.me.hand)||[]).filter(i=>VC[i]&&VC[i].kind==='job');
@@ -3847,7 +3851,7 @@ async function vieAct(a,b){
       else if(b.dataset.src==='discard'&&!vieReduced()){const dl=(vo.v&&vo.v.discard)||[],tp=dl[dl.length-1];if(tp!=null&&VC[tp]){vo.tookNow=1;vieRing(vieFxPt('.vmid .vpile:last-child .vstack'));vieFly(tp,vieFxPt('.vmid .vpile:last-child .vstack'),vieFxPt('#vieHand')||vieFxPt('.vmine'),{s:.5,end:.8,dur:560,rot:-6})}}done(await sb.rpc('vie_take',{p_id:id,p_src:b.dataset.src}));break}
     case'play':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;
       const c=VC[d.id],mineP=vo.v.players.find(p=>p.id===(me&&me.id))||{board:[],spent:[]};
-      let pay=null;if(c&&(c.kind==='house'||c.kind==='trip'||c.kind==='luxe')&&d.pay&&d.pay.length){const av=viePayables(mineP.board,mineP.spent);pay=d.pay.map(i=>av[i])}
+      let pay=null;if(c&&viePayK(c)&&d.pay&&d.pay.length){const av=viePayables(mineP.board,mineP.spent);pay=d.pay.map(i=>av[i])}
       const aux=b.dataset.aux?+b.dataset.aux:(d.aux||null);
       done(await sb.rpc('vie_play',{p_id:id,p_card:d.id,p_target:b.dataset.t||d.t||null,p_aux:aux,p_pay:pay}));break}
     case'stab':{const sl=document.querySelector('.vst .vsl');if(sl)sl.scrollTo({left:(+b.dataset.i)*sl.clientWidth,behavior:vieReduced()?'auto':'smooth'});break}
@@ -3937,7 +3941,7 @@ function vieTryPlay(cid,tid,pt){
       if(w){vieWarn('🚫 '+p.pseudo+' : '+w,pt);return false}
       vo.fxFrom=pt;vieCall('vie_play',{p_card:cid,p_target:tid,p_aux:null,p_pay:null});return true}
     vo.tg={id:cid};vo.det=null;vieRender();const t=document.querySelector('.vsc');if(t&&t.scrollIntoView)t.scrollIntoView({behavior:'smooth',block:'start'});return true}
-  const ch=c.kind==='house'||c.kind==='trip'||c.kind==='luxe'?viePrice(c,mineP.board)>0:(c.kind==='special'&&['rainbow','piston','troc'].includes(c.eff));
+  const ch=viePayK(c)?viePrice(c,mineP.board)>0:(c.kind==='special'&&['rainbow','piston','troc'].includes(c.eff));
   if(ch){vo.det={mode:'hand',id:cid,pay:null,aux:null,t:null};vo.disc=false;vieOv();return true}
   vo.fxFrom=pt;vieCall('vie_play',{p_card:cid,p_target:null,p_aux:null,p_pay:null});return true}
 function vieDragOk(){return!!(vo&&vo.v&&VC&&curView==='vie'&&vo.v.status==='playing'&&!vo.busy&&!vo.det&&!vo.disc&&!vieRvEl&&vieIsMe(vo.v.turn_uid))}
