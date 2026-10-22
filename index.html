@@ -2792,7 +2792,7 @@ async function msJoin(m){
   msSay('Connexion…');
   if(t.t==='room'){const r=await sb.rpc('room_join',{p_code:t.code});if(r.error){msSay(r.error.message);msFetch();return}msSay('');rmAttach(r.data)}
   else if(t.t==='uc'){const r=await sb.rpc('uc_join',{p_code:t.code});if(r.error){msSay(r.error.message);msFetch();return}msSay('');ucOAttach(r.data)}
-  else if(t.t==='vie'){const r=await sb.rpc('vie_join',{p_code:t.code});if(r.error){msSay(r.error.message);msFetch();return}msSay('');try{await vieCat()}catch(e){}vieAttach(r.data)}
+  else if(t.t==='vie'){const r=await vieRpc('vie_join',{p_code:t.code});if(r.error){msSay(r.error.message);msFetch();return}msSay('');try{await vieCat()}catch(e){}vieAttach(r.data)}
   else{const r=await sb.rpc('accept_invite',{p_id:t.ref});if(r.error){msSay('Ce défi a expiré.');msFetch();return}msSay('');startOnline(r.data)}}
 const shOpen=h=>{$('shB').innerHTML=h;$('shMsg').textContent='';$('sh').hidden=false};
 const shClose=()=>{$('sh').hidden=true;$('shB').innerHTML=''};
@@ -3262,30 +3262,40 @@ function vieTargetWhy(c,p){
     case'overdose':return p.skip?'passe déjà son tour':(vieNe(b,'heroin')+vieNe(b,'cocaine'))?'':'sans drogue dure';
   }return''}
 /* --- état et réseau --- */
-function vieDetach(){try{if(window.VSCN)VSCN.stop()}catch(x){}if(vo){clearInterval(vo.tm);clearInterval(vo.tk)}vo=null;document.body.classList.remove('vieon','vdesk','vdeal');$('vieChatW').hidden=true;vieOv();updateLive()}
+function vieDetach(){try{if(window.VFX)VFX.stop()}catch(x){}try{if(window.VSCN)VSCN.stop()}catch(x){}try{vieDragAbort()}catch(x){}if(vo){clearInterval(vo.tm);clearInterval(vo.tk)}vo=null;document.body.classList.remove('vieon','vdesk','vdeal');$('vieChatW').hidden=true;vieOv();updateLive()}
 function vieAttach(v,silent){
   vieDetach();
-  vo={id:v.id,v:null,t0:Date.now(),polling:false,busy:false,det:null,disc:false,sig:'',tm:setInterval(vieTick,2000),tk:setInterval(vieClock,1000)};
+  vo={id:v.id,v:null,t0:Date.now(),polling:false,busy:false,det:null,disc:false,sig:'',tm:setInterval(vieTick,1500),tk:setInterval(vieClock,1000)};
   Promise.all([vieCat(),vieArt()]).then(()=>{if(curView==='vie')vieRender()}).catch(()=>{});
   vieApply(v);
   if(!silent)show('vie');else updateLive()}
 async function vieResume(){
   if(vo||!me||!sb||busyOnline())return;
-  const r=await sb.rpc('vie_mine');if(r.data&&!vo&&!busyOnline()){try{await vieCat()}catch(e){return}vieAttach(r.data,true)}}
+  const r=await vieRpc('vie_mine');if(r.data&&!vo&&!busyOnline()){try{await vieCat()}catch(e){return}vieAttach(r.data,true)}}
+function vieRpc(fn,args){
+  const ms=fn==='vie_get'?7000:fn==='vie_mine'?8000:12000;let tm;
+  const lim=new Promise(ok=>{tm=setTimeout(()=>ok({data:null,error:{message:'le serveur ne répond pas (connexion lente ?), réessaie.',timeout:true}}),ms)});
+  const run=(async()=>{try{return await sb.rpc(fn,args)}catch(e){return{data:null,error:{message:(e&&e.message)||'connexion perdue'}}}})();
+  return Promise.race([run,lim]).finally(()=>clearTimeout(tm))}
+const vieMxLog=x=>{let m=0;((x&&x.log)||[]).forEach(e=>{if((e.n||0)>m)m=e.n});return m};
 async function vieTick(){
-  if(!vo||!sb||document.hidden||vo.polling)return;vo.polling=true;const id=vo.id;
+  if(!vo||!sb||document.hidden||vo.polling)return;vo.polling=true;const id=vo.id,ap=vo.ap;
   try{
-    const r=await sb.rpc('vie_get',{p_id:id});if(!vo||vo.id!==id)return;
+    const r=await vieRpc('vie_get',{p_id:id});if(!vo||vo.id!==id)return;
     if(r.error){if(/introuvable/i.test(r.error.message||'')){vieNote='Tu n’es plus dans cette partie.';vieDetach();vieView='menu';if(curView==='vie')vieEnter()}return}
+    if(vo.ap!==ap)return;
     vieApply(r.data)}
   catch(e){}
   finally{if(vo)vo.polling=false}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&vo)vieTick()});
+['focus','online','pageshow'].forEach(t=>addEventListener(t,()=>{if(vo)vieTick()}));
 const vieIsMe=u=>!!me&&u===me.id;
 const vieName=u=>{const p=vo&&vo.v&&vo.v.players.find(x=>x.id===u);return p?p.pseudo:'?'};
 function vieApply(v){
   if(!vo||!v||v.id!==vo.id)return;
-  const old=vo.v;vo.v=v;vo.t0=Date.now();
+  const old=vo.v;
+  if(old&&old.id===v.id&&vieMxLog(v)<vieMxLog(old))return;
+  vo.ap=(vo.ap||0)+1;vo.v=v;vo.t0=Date.now();
   if(v.status==='closed'){vieNote='La partie a été fermée par l’hôte.';vieDetach();vieView='menu';if(curView==='vie')vieEnter();return}
   if(v.status==='playing'&&v.turn_uid===(me&&me.id)&&(!old||old.turn_uid!==v.turn_uid)){try{navigator.vibrate&&navigator.vibrate(80)}catch(e){}}
   const mine=v.me&&v.me.hand||[],last=v.log.length?JSON.stringify(v.log[v.log.length-1]):'';
@@ -3294,10 +3304,14 @@ function vieApply(v){
   const changed=sig!==vo.sig;vo.sig=sig;
   if(vo.det&&vo.det.mode==='hand'&&!mine.includes(vo.det.id))vo.det=null;
   if(old&&old.status==='lobby'&&v.status==='playing')vo.deal=1;
-  if(v.status==='finished'&&v.next&&v.next.code&&!vo.follow&&me){vo.follow=1;const gid=vo.id;sb.rpc('vie_join',{p_code:v.next.code}).then(r=>{if(vo&&vo.id===gid&&!r.error&&r.data&&curView==='vie')vieAttach(r.data)}).catch(()=>{})}
+  if(v.status==='finished'&&v.next&&v.next.code&&!vo.follow&&me){vo.follow=1;const gid=vo.id;vieRpc('vie_join',{p_code:v.next.code}).then(r=>{if(vo&&vo.id===gid&&!r.error&&r.data&&curView==='vie')vieAttach(r.data)}).catch(()=>{})}
   if(curView==='vie'&&changed){try{vieHoldPrep(v,old)}catch(e){}vieRender();try{vieFx(v)}catch(e){}}
+  if(!vo.pre&&(v.packs||[]).includes('trash')){vo.pre=1;setTimeout(()=>{if(vo)vieScn()},1200)}
   updateLive()}
 function vieClock(){
+  if(vo){
+    if(vo.busy){if(!vo._bs)vo._bs=Date.now();else if(Date.now()-vo._bs>15000){vo.busy=false;vo._bs=0;vo.sig='';vieTick()}}else vo._bs=0;
+    if(vo.drag&&typeof vdg!=='undefined'&&(!vdg||Date.now()-(vdg.t||0)>20000))vieDragAbort()}
   const e=$('vieT'),b=$('vieTb');if(!vo||!vo.v||vo.v.status!=='playing')return;
   const l=Math.max(0,(vo.v.left||0)-Math.floor((Date.now()-vo.t0)/1000));
   if(e)e.textContent='⏱️ '+l+' s';if(b)b.style.width=Math.min(100,l/60*100)+'%';
@@ -3371,126 +3385,114 @@ const VMALIC={accident:'🚑',illness:'🤒',disaster:'🌪️',burnout:'🥵',d
   meteor:'☄️',flood:'🌊',pandemic:'🦠',zombie:'🧟',famine:'🍽️',war:'⚔️',doom:'🌍',wealth:'💸',strike:'✊',election:'🗳️',revolution:'🚩',dump:'🗑️'};
 const VSPIC={ghost:'👻',witch:'🧙',referendum:'🔁',fairy:'🧚',genie:'🧞',potion:'💘',lottery:'🎟️',equalpay:'⚖️',recycle:'♻️',rummage:'🔍',party:'🎉',trophy:'🏆',blackcard:'💳'};
 let vieFxQ=[],vieFxBusy=false;
+/* --- animations : l'essentiel seulement, jamais de retard qui s'accumule --- */
+const VFX_PLAY={orgy:'love',forced:'love',promo:'love',brothel:'love',sextour:'love',polygamy:'love',zoophile:'love',sado:'love',traffic:'kidnap',kidnap:'kidnap',sextape:'exhib',cannabis:'over',cocaine:'over',heroin:'over',condom:'herpes'};
+const VFX_MAL={hostage:'prison',amputation:'ampu',hemorrhage:'hemo',herpes:'herpes',overdose:'over',exhibition:'exhib',sterile:'ster',earlyend:'fin'};
+const VFX_ACT={swing:['love',961],exhume:['rise',962],cap:['cap',971],com:['commu',972],hunt:['chasse',970],mine:['mine',955],vdoo:['vaudou',957],rou:['roul',973]};
+const VSC_PLAY={tsunami:'tsunami',vengeance:'veng'};
+function vieFxPlan(e){
+  const c=VC&&VC[e.c];let k=null,id=e.c;
+  if(e.a==='play'&&c)k=VFX_PLAY[c.eff];
+  else if(e.a==='malus'&&c&&!e.b)k=VFX_MAL[c.eff];
+  else if(VFX_ACT[e.a]){k=VFX_ACT[e.a][0];id=VFX_ACT[e.a][1]}
+  if(!k)return null;
+  if(k==='cap'&&!e.tie&&!e.w)return null;
+  if(k==='commu'&&!(e.n>0))return null;
+  return{k,id,e}}
+function vieScnPlan(e){
+  const c=VC&&VC[e.c];
+  return e.a==='play'&&c&&VSC_PLAY[c.eff]?{k:VSC_PLAY[c.eff],u:e.u,t:e.t||null,e}:null}
+/* la carte qui précède son propre effet (ex. Mine puis explosion) ne s'annonce pas deux fois */
+const vieFxSilent=e=>{const n=vieFxQ[0];return !!(n&&(e.a==='play'||e.a==='malus')&&VFX_ACT[n.a]&&VFX_ACT[n.a][1]===e.c&&vieFxPlan(n))};
+const vieFxOk=()=>vieAnMode()!=='off'&&!vieReduced()&&!document.hidden&&curView==='vie'&&!!vo&&!!VC;
+function vieFxKill(){
+  try{if(window.VFX)VFX.stop()}catch(x){}
+  try{if(window.VSCN)VSCN.stop()}catch(x){}
+  document.querySelectorAll('#vieFx .vpc,#vieFx .vfly,#vieFx .vemo').forEach(x=>x.remove());
+  const d=$('vieDim');if(d)d.style.opacity=0}
+function vieFxTrim(){
+  if(vieFxQ.length<=3)return;
+  const last=vieFxQ.slice(-2);
+  vieFxQ=vieFxQ.filter(e=>last.includes(e)||vieFxPlan(e)||vieScnPlan(e)).slice(-5)}
 function vieFx(v){
   if(!vo)return;const L=v.log||[];let mx=0;L.forEach(e=>{if((e.n||0)>mx)mx=e.n});
   if(vo.fxN==null){vo.fxN=mx;return}
   const ev=L.filter(e=>(e.n||0)>vo.fxN);vo.fxN=Math.max(vo.fxN,mx);
   if(!ev.length||document.hidden||curView!=='vie'||vieReduced()){if(!vieFxBusy)vieHoldEnd();return}
-  ev.slice(-6).forEach(e=>vieFxQ.push(e));if(!vieFxBusy)vieFxPump()}
+  const t=Date.now();ev.forEach(e=>{e._t=t;vieFxQ.push(e)});vieFxTrim();
+  if(!vieFxBusy)vieFxPump()}
 async function vieFxPump(){
   vieFxBusy=true;
   try{while(vieFxQ.length){
     const e=vieFxQ.shift();
     if(curView!=='vie'||!vo||!VC){vieFxQ.length=0;break}
-    try{await Promise.race([vieFxRun(e),sleep(40000)])}catch(x){}}}
+    const sp=!!(vieFxPlan(e)||vieScnPlan(e));
+    if(!sp&&Date.now()-(e._t||Date.now())>5000)continue;
+    let late=false;
+    try{await Promise.race([vieFxRun(e),sleep(vieScnPlan(e)?22000:6500).then(()=>{late=true})])}catch(x){}
+    if(late)vieFxKill()}}
   finally{vieFxBusy=false;const d=$('vieDim');if(d)d.style.opacity=0;vieHoldEnd()}}
-const vieRvIdle=async()=>{let g=0;while((vieRvEl||vieRvQ.length)&&g++<60)await sleep(150)};
-/* --- scènes animées de l'extension Trash (fichier à part, chargé à la demande) --- */
+const vieRvIdle=async()=>{let g=0;while((vieRvEl||vieRvQ.length)&&g++<20)await sleep(150)};
+/* --- fichier d'animations (vie-scenes.js), chargé à la demande puis gardé en mémoire --- */
 let vieScnP=null;
 function vieScn(){
-  if(typeof VSCN!=='undefined')return Promise.resolve(true);
-  if(vieScnP)return vieScnP;
-  vieScnP=new Promise(ok=>{const s=document.createElement('script');s.src='vie-scenes.js?v=2';s.onload=()=>ok(typeof VSCN!=='undefined');s.onerror=()=>{vieScnP=null;ok(false)};document.head.appendChild(s)});
-  return vieScnP}
-const VSC_PLAY={orgy:'partouze',traffic:'trafic',forced:'marifor',sextape:'sextape',promo:'promo',brothel:'maison',sextour:'tourisme',cannabis:'drogue',cocaine:'drogue',heroin:'drogue',tsunami:'tsunami',vengeance:'veng',condom:'capote',polygamy:'poly',zoophile:'zoo',sado:'sado',kidnap:'enl'};
-const VSC_MAL={earlyend:'fin',hemorrhage:'hemo',herpes:'herpes',overdose:'over',exhibition:'exhib',amputation:'ampu',sterile:'ster',hostage:'enl'};
-const VSC_ACT={swing:'echang',exhume:'exhum',exec:'bourreau',cap:'capit',com:'commu',hunt:'chasse',mine:'mine',vdoo:'vaudou',ransom:'otage',rou:'roul'};
-const VSC_BIG={capit:1,commu:1,chasse:1,mine:1,vaudou:1};
-function vieScnPlan(e){
-  const c=VC&&VC[e.c];let k=null;
-  if(e.a==='play'&&c)k=VSC_PLAY[c.eff];
-  else if(e.a==='malus'&&c&&!e.b)k=VSC_MAL[c.eff];
-  else if(VSC_ACT[e.a])k=VSC_ACT[e.a];
-  if(!k)return null;
-  if(k==='capit'&&!e.tie&&!e.w)return null;
-  if(k==='commu'&&!(e.n>0))return null;
-  const o={k,big:!!VSC_BIG[k],u:e.u,t:e.t||null,unk:k==='marifor',e};
-  if(k==='capit')o.c2=e.w||null;
-  if(k==='enl')o.mode=c&&c.eff==='hostage'?'otage':'kidnap';
-  if(k==='otage')o.cm=[e.t,e.p||e.t,e.u,e.u];
-  if(k==='roul')o.cm=[null,null,null,e.u];
-  if(k==='mine'){const ps=((vo&&vo.v&&vo.v.players)||[]).filter(p=>!p.gone&&p.id!==e.u);o.c2=e.u;o.u=ps.length?ps[0].id:e.u}
-  return o}
-const vieEven=(t,c)=>{const r=[];let rem=t;for(let i=0;i<c;i++){const v=Math.round(rem/(c-i));r.push(v);rem-=v}return r};
-function vieScnData(p,cast){
-  const e=p.e,col=cast.col||{};
-  if(p.k==='otage')return{arg:{n:Math.max(0,e.n|0)}};
-  if(p.k==='enl')return{arg:{mode:p.mode}};
-  if(p.k==='roul')return{arg:{hit:!!e.h}};
-  if(p.k==='vaudou'){
-    const ids=(e.cs||[]).slice(0,15),PL=((vo&&vo.v&&vo.v.players)||[]).filter(q=>!q.gone);
-    const present=[0,1,2,3].filter(c=>Object.keys(col).some(u=>col[u]===c));
-    const OK=[['Études','📚'],['Salaire','💵'],['Flirt','💕'],['Maison','🏠'],['Voyage','✈️'],['Animal','🐶']];
-    const hands=[0,1,2,3].map(()=>[]);
-    ids.forEach((id,i)=>{const c=present.length?present[i%present.length]:i%4,cd=VC[id];if(hands[c].length<5)hands[c].push({n:vieClean(cd?cd.name:'Malus').slice(0,11),e:(cd&&cd.emoji)||'☠️',t:'subit '+vieClean(cd?cd.name:'un malus'),m:true})});
-    hands.forEach((h,c)=>{if(present.includes(c)||h.length)while(h.length<5){const o=OK[Math.floor(Math.random()*OK.length)];h.splice(Math.floor(Math.random()*(h.length+1)),0,{n:o[0],e:o[1],m:false})}});
-    return{arg:{hands}}}
-  if(p.k==='capit'){
-    const t=[0,0,0,0];(e.t||[]).forEach(x=>{const c=col[x[0]];if(c!=null)t[c]=x[1]});
-    return{data:{G:{cards:t.map(v=>v>0?vieEven(v,Math.min(3,Math.max(1,Math.ceil(v/4)))):[]),t,mx:Math.max(...t)}},arg:!!e.tie}}
-  if(p.k==='commu'){
-    const r=e.r||[],n=e.n||0,ord=r.map(x=>x[0]).filter(u=>col[u]!=null),bef={},aft={};
-    r.forEach(x=>{bef[x[0]]=x[1];aft[x[0]]=x[2]});
-    const cnt={};let tot=0;ord.forEach(u=>{cnt[u]=bef[u]>0?Math.max(1,Math.ceil(bef[u]/4)):0;tot+=cnt[u]});
-    const goal=ord.length===r.length?n:tot;
-    while(tot<goal){let b=null;ord.forEach(u=>{if(cnt[u]<bef[u]&&(b===null||bef[u]-cnt[u]>bef[b]-cnt[b]))b=u});if(b===null)break;cnt[b]++;tot++}
-    while(tot>goal){let b=null;ord.forEach(u=>{if(bef[u]>0&&cnt[u]>Math.max(1,Math.ceil(bef[u]/4))&&(b===null||cnt[u]>cnt[b]))b=u});if(b===null)break;cnt[b]--;tot--}
-    const G=[[],[],[],[]];
-    ord.forEach(u=>{G[col[u]]=vieEven(bef[u],cnt[u]).map(v=>({t:Math.random()<.35?'d':'s',v}))});
-    const L=ord.length||1,lists=ord.map((u,j)=>vieEven(aft[u]||0,Math.floor((tot-j+L-1)/L)));
-    const pool=[];for(let i=0;i<tot;i++){const j=i%L,v=lists[j].shift();pool.push({t:Math.random()<.35?'d':'s',v:v==null?1:v})}
-    return{data:{G,pool,order:ord.map(u=>col[u])}}}
-  if(p.k==='chasse'){
-    const d=e.d||[],sp=e.s||0,pets=[];
-    ((vo&&vo.v&&vo.v.players)||[]).forEach(q=>(q.board||[]).forEach(i=>{if(VC[i]&&VC[i].kind==='pet')pets.push([q.id,i])}));
-    const sparedL=pets.slice(0,sp);while(sparedL.length<sp)sparedL.push([e.u,null]);
-    const an=d.concat(sparedL),PAL=['#d6a53a','#e56aa0','#4fa3e0','#6fc28a','#b07cff','#ff8a5c'],OWN=[];
-    const byCol=[];Object.keys(col).forEach(u=>{byCol[col[u]]=u});
-    const nameOf=u=>{const q=((vo&&vo.v&&vo.v.players)||[]).find(x=>x.id===u);return q?String(q.pseudo||'?').charAt(0).toUpperCase():'?'};
-    for(let i=0;i<4;i++)OWN.push([byCol[i]?nameOf(byCol[i]):'·',PAL[i]]);
-    const extra={};const oi=u=>{if(col[u]!=null)return col[u];if(extra[u]==null){extra[u]=OWN.length;OWN.push([nameOf(u),PAL[OWN.length%PAL.length]])}return extra[u]};
-    const AN=an.map(a=>a[1]&&VC[a[1]]?[VC[a[1]].emoji||'🐾',vieClean(VC[a[1]].name).slice(0,8)]:['🐾','Animal']);
-    const OWNER=an.map(a=>oi(a[0])),dead=d.length;
-    return{data:{AN,OWN,OWNER,p:dead,fin:an.map((a,i)=>i<dead?i:i+1).concat([dead])}}}
-  return{}}
+  if(typeof VFX!=='undefined')return Promise.resolve(true);
+  if(!vieScnP)vieScnP=new Promise(ok=>{const s=document.createElement('script');s.src='vie-scenes.js?v=3';s.onload=()=>ok(typeof VFX!=='undefined');s.onerror=()=>{vieScnP=null;ok(false)};document.head.appendChild(s)});
+  return Promise.race([vieScnP,sleep(3500).then(()=>typeof VFX!=='undefined')])}
+function vieRouInfo(e){
+  const L=(vo&&vo.v&&vo.v.log)||[],used=[];
+  for(let i=L.length-1;i>=0;i--){const x=L[i];if((x.n||0)>=(e.n||1e9))continue;
+    if(x.a==='rou'){if(x.h)break;used.push(x.s)}else if(x.a==='play'&&VC[x.c]&&VC[x.c].eff==='roulette')break}
+  const rem=[0,1,2,3,4,5].filter(i=>!used.includes(i));
+  return{rem:rem.length||1,k:rem.indexOf(e.s),h:!!e.h,c:e.c||null}}
+async function vieFxScene(p){
+  if(!(await vieScn())||!vieFxOk())return false;
+  const o={k:p.k,id:p.id,speed:vieAnMode()==='fast'?.55:1};
+  if(p.k==='roul')o.rou=vieRouInfo(p.e);
+  try{await VFX.play(o)}catch(x){}
+  return true}
+/* anciennes scènes : seulement Tsunami et Vengeance */
 function vieScnAv(p){
   if(!p)return'<span class="vsxav ph">·</span>';
   const u=safeStore(p.avatar_url);
   return u?'<img class="vsxav" alt="" src="'+esc(u)+'">':'<span class="vsxav">'+esc(String(p.pseudo||'?').charAt(0).toUpperCase())+'</span>'}
 const vieScnNm=p=>p?esc(String(p.pseudo||'?').slice(0,11)):'···';
 function vieScnCast(o){
-  if(o.cm){const ps0=((vo&&vo.v&&vo.v.players)||[]),by0=id=>ps0.find(p=>p.id===id);
-    const cs=o.cm.map(u=>{const p=u?by0(u):null;return{n:vieScnNm(p),a:vieScnAv(p)}});
-    cs.col={};o.cm.forEach((u,i)=>{if(u&&cs.col[u]==null)cs.col[u]=i});return cs}
   const v=vo&&vo.v;if(!v)return null;
   const ps=v.players.filter(p=>!p.gone),by=id=>ps.find(p=>p.id===id);
   const ai=Math.max(0,ps.findIndex(p=>p.id===o.u)),order=ps.slice(ai+1).concat(ps.slice(0,ai));
-  const act=by(o.u)||null,want=o.c2||o.t,tg=want&&want!==o.u&&by(want)?by(want):(order[0]||null);
+  const act=by(o.u)||null,want=o.t,tg=want&&want!==o.u&&by(want)?by(want):(order[0]||null);
   const others=order.filter(p=>!tg||p.id!==tg.id);
   const C=p=>({n:vieScnNm(p),a:vieScnAv(p)});
   const cast=[C(others[1]||null),C(others[0]||null),C(tg),C(act)];
   cast.col={};[others[1],others[0],tg,act].forEach((p,i)=>{if(p)cast.col[p.id]=i});
-  if(o.unk)cast[2]={n:'Inconnu(e)',a:'<span class="vsxav ph">?</span>'};
   return cast}
 async function vieScnPlay(p){
-  const mode=vieAnMode();if(mode==='off'||vieReduced()||document.hidden)return;
-  if(!(await vieScn()))return;
-  const cast=vieScnCast(p);if(!cast||curView!=='vie'||!vo)return;
-  let dd={};try{dd=vieScnData(p,cast)||{}}catch(x){}
-  try{await VSCN.play(p.k,{cast,speed:mode==='fast'?.55:1,big:p.big,data:dd.data,arg:dd.arg,fr:p.k})}catch(x){}}
-async function vieFxRun(e){await vieFxRun0(e);const p=vieScnPlan(e);if(p&&curView==='vie'&&vo&&VC)await vieScnPlay(p)}
+  if(!(await vieScn())||typeof VSCN==='undefined')return;
+  const cast=vieScnCast(p);if(!cast||!vieFxOk())return;
+  try{await VSCN.play(p.k,{cast,speed:vieAnMode()==='fast'?.55:1,big:false,fr:p.k})}catch(x){}}
+async function vieFxRun(e){
+  const p=vieFxPlan(e);
+  if(p&&vieFxOk()&&await vieFxScene(p)){
+    if(curView!=='vie'||!vo)return;
+    vieFxOne(e,{skipFly:true,noRv:true});
+    const c=VC[e.c];if(e.a==='play'&&c&&c.smiles>0)vieSmUp(e.u,c.smiles);
+    return}
+  await vieFxRun0(e);
+  const q=vieScnPlan(e);if(q&&vieFxOk())await vieScnPlay(q)}
 async function vieFxRun0(e){
-  const c=VC&&VC[e.c],mid=me&&me.id;
+  const c=VC&&VC[e.c],mid=me&&me.id,fast=vieAnMode()==='fast',silent=vieFxSilent(e);
+  if(silent){vieFxOne(e,{skipFly:true,noRv:true});if(e.a==='play'&&c&&c.smiles>0)vieSmUp(e.u,c.smiles);return}
   const mine=!!c&&vieAnimOn()&&((e.a==='malus'&&e.t===mid)||(e.a==='event'&&e.u!==mid&&((e.h||[]).includes(mid)||(e.b||[]).includes(mid))));
   if(c&&!mine&&(e.a==='play'||e.a==='malus'||e.a==='event'||e.a==='discard')&&vieDeskCls()&&vieAnMode()!=='off'){
-    await vieAnnounce(e,vieAnMode()==='fast'||vieFxQ.length>0);
+    await vieAnnounce(e,fast||vieFxQ.length>0);
     if(curView!=='vie'||!vo)return;
     vieFxOne(e,{skipFly:true});
     if(e.a==='play'&&c.smiles>0)vieSmUp(e.u,c.smiles);
-    await sleep(vieAnMode()==='fast'||vieFxQ.length?150:350);return}
+    await sleep(fast||vieFxQ.length?50:140);return}
   vieFxOne(e);
-  if(mine){await sleep(e.a==='event'?800:200);await vieRvIdle();await sleep(200);return}
-  await sleep(e.a==='play'||e.a==='malus'||e.a==='event'?750:500)}
+  if(mine){await sleep(e.a==='event'?450:120);await vieRvIdle();return}
+  await sleep(e.a==='play'||e.a==='malus'||e.a==='event'?280:160)}
 function vieFxOne(e,opt){
   if(curView!=='vie'||!vo||!VC)return;
   const mid=me&&me.id,pnl=u=>document.querySelector(u===mid?'.vmine':'.vop[data-pid="'+u+'"]');
@@ -3515,7 +3517,7 @@ function vieFxOne(e,opt){
       else if(c.eff==='tsunami')vieToast(disc(),'🌊');
       else if(c.eff==='anniv')vieToast(into(e.u),'🎂');
       else if(c.eff==='rainbow')vieToast(into(e.u),'🌈')});
-  }else if(e.a==='malus'&&c&&e.t===mid&&vieAnimOn()){
+  }else if(e.a==='malus'&&c&&e.t===mid&&vieAnimOn()&&!(opt&&opt.noRv)){
     vieReveal({c:e.c,by:e.u,blk:!!e.b,done:()=>{const tp=pnl(e.t),to=vieFxPt(tp);
       vieFxCls(tp,e.b?'blk':'hit',900);vieToast(to,e.b?'🛡️ Bloqué !':(VMALIC[c.eff]||'💥'));
       const dp=disc();if(dp)setTimeout(()=>vieFly(e.c,to,dp,{s:.4,end:.6,dur:500}),250)}});
@@ -3527,7 +3529,7 @@ function vieFxOne(e,opt){
       const dp=disc();if(dp)setTimeout(()=>vieFly(e.c,to,dp,{s:.4,end:.6,dur:500}),250)});
   }else if(e.a==='event'&&c){
     let from=out(e.u);if(e.u===mid&&vo.fxFrom){from=vo.fxFrom;vo.fxFrom=null}if(opt&&opt.skipFly)from=null;
-    const ic=VMALIC[c.eff]||'💥',rvm=vieAnimOn()&&e.u!==mid&&((e.h||[]).includes(mid)||(e.b||[]).includes(mid)),skip=u=>rvm&&u===mid;
+    const ic=VMALIC[c.eff]||'💥',rvm=!(opt&&opt.noRv)&&vieAnimOn()&&e.u!==mid&&((e.h||[]).includes(mid)||(e.b||[]).includes(mid)),skip=u=>rvm&&u===mid;
     vieFly(e.c,from,disc(),{s:.55,end:.8,dur:700,rot:Math.random()*16-8},()=>{
       vieToast(disc(),ic+' '+vieClean(c.name));
       (e.h||[]).forEach((u,i)=>{if(skip(u))return;setTimeout(()=>{const p=pnl(u);vieFxCls(p,'hit',900);vieToast(vieFxPt(p),ic)},250+i*120)});
@@ -3568,10 +3570,10 @@ function vieRvNext(){
     '<div class="vrv-txt"><small>'+small+'</small><b>'+(o.blk?'🛡️ Bloqué !':ic+' '+esc(vieClean(c.name)))+'</b><span>'+(o.blk?'Ta protection arrête cette carte. Aucun effet sur toi.':esc(how))+'</span></div></div><div class="vrv-flash"></div><div class="vrv-hint">Touche pour continuer</div>';
   d._o=o;d.addEventListener('click',vieRvEnd);document.body.appendChild(d);vieRvEl=d;
   try{navigator.vibrate&&navigator.vibrate(o.blk?[30]:[60,40,90])}catch(e){}
-  vieRvT=setTimeout(vieRvEnd,2800)}
+  vieRvT=setTimeout(vieRvEnd,2100)}
 function vieRvEnd(){
   clearTimeout(vieRvT);const d=vieRvEl;if(!d)return;vieRvEl=null;d.classList.add('leave');
-  setTimeout(()=>{d.remove();const o=d._o;if(o&&o.done&&curView==='vie'&&vo){try{o.done()}catch(e){}}setTimeout(vieRvNext,250)},380)}
+  setTimeout(()=>{d.remove();const o=d._o;if(o&&o.done&&curView==='vie'&&vo){try{o.done()}catch(e){}}setTimeout(vieRvNext,120)},300)}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&vieRvEl)vieRvEnd()});
 async function vieRvTest(blk){
   if(vieRvEl||vieRvQ.length)return;
@@ -3646,13 +3648,13 @@ async function vieAnnounce(e,fast){
   if(dim){Object.assign(dim.style,{left:R.left+'px',top:R.top+'px',width:R.width+'px',height:R.height+'px'});dim.style.opacity=fast?'.18':'.3'}
   const dx=from.x-cx,dy=from.y-cy;
   try{
-    await pc.animate([{transform:'translate('+dx+'px,'+dy+'px) scale(.3) rotate(-10deg)',opacity:0},{opacity:1,offset:.3},{transform:'none',opacity:1}],{duration:fast?340:560,easing:'cubic-bezier(.22,.8,.25,1)',fill:'both'}).finished;
+    await pc.animate([{transform:'translate('+dx+'px,'+dy+'px) scale(.3) rotate(-10deg)',opacity:0},{opacity:1,offset:.3},{transform:'none',opacity:1}],{duration:fast?240:380,easing:'cubic-bezier(.22,.8,.25,1)',fill:'both'}).finished;
     if(!fast)A[2].forEach((m,i)=>{const sp=document.createElement('span');sp.className='vemo';sp.textContent=m;sp.style.left=(cx+(i-(A[2].length-1)/2)*w*.5-w*.1)+'px';sp.style.top=(cy-h*.1)+'px';sp.style.setProperty('--dx',((Math.random()-.5)*w*.5)+'px');sp.style.animationDelay=(i*.12)+'s';L.appendChild(sp);setTimeout(()=>sp.remove(),1500)});
-    await sleep(fast?260:850);
+    await sleep(fast?120:380);
     const tx=to.x-cx,ty=to.y-cy;
     const arc=e.a==='discard';
     const ex=pc.animate(arc?[{transform:'none',opacity:1,offset:0},{transform:'translate('+tx*.5+'px,'+(ty*.5-h*.7)+'px) scale(.62) rotate(-16deg)',opacity:1,offset:.45},{transform:'translate('+tx+'px,'+ty+'px) scale(.3) rotate(9deg)',opacity:.95,offset:.85},{transform:'translate('+tx+'px,'+ty+'px) scale(.26) rotate(5deg)',opacity:0,offset:1}]
-      :[{transform:'none',opacity:1},{transform:'translate('+tx+'px,'+ty+'px) scale(.3) rotate(6deg)',opacity:.9,offset:.85},{transform:'translate('+tx+'px,'+ty+'px) scale(.25)',opacity:0}],{duration:arc?(fast?320:660):(fast?260:440),easing:arc?'cubic-bezier(.3,.7,.3,1)':'cubic-bezier(.5,0,.75,.4)',fill:'forwards'});
+      :[{transform:'none',opacity:1},{transform:'translate('+tx+'px,'+ty+'px) scale(.3) rotate(6deg)',opacity:.9,offset:.85},{transform:'translate('+tx+'px,'+ty+'px) scale(.25)',opacity:0}],{duration:arc?(fast?240:500):(fast?200:320),easing:arc?'cubic-bezier(.3,.7,.3,1)':'cubic-bezier(.5,0,.75,.4)',fill:'forwards'});
     if(!vieFxQ.length&&dim)dim.style.opacity='0';
     await ex.finished}
   catch(x){}
@@ -3951,7 +3953,7 @@ async function vieEnter(){
   vieSay(vieNote);vieNote='';
   vieMobS=vieMob();vieDeskS=vieDesk();
   if(me){try{await vieCat()}catch(e){vieSay('Erreur : '+e.message);if(!VC)return}vieArt()}
-  if(!vo&&me&&sb&&!busyOnline()){const r=await sb.rpc('vie_mine');if(r.data&&!vo&&curView==='vie'){vieAttach(r.data,true);return}}
+  if(!vo&&me&&sb&&!busyOnline()){const r=await vieRpc('vie_mine');if(r.data&&!vo&&curView==='vie'){vieAttach(r.data,true);return}}
   vieRender2()}
 function vieRender2(){
   if(curView!=='vie')return;
@@ -3968,7 +3970,7 @@ async function vieAct(a,b){
   if(a==='create'||a==='join'){if(!me){openWelcome();return}if(busyOnline()){vieSay('Termine ou quitte ta partie en cours d’abord.');return}vieSay('');a==='create'?vieForm():vieJoinForm();return}
   if(a==='create2'){
     vieSay('Création…');const pk=vieHasPacks()?viePkGet():[],args={p_max:+$('vieMax').value,p_len:$('vieLen').value,p_smiles:$('vieSm')?$('vieSm').value==='1':true};if(pk.length)args.p_packs=pk;
-    const r=await sb.rpc('vie_create',args);
+    const r=await vieRpc('vie_create',args);
     if(r.error){vieSay('Erreur : '+r.error.message);return}vieSay('');vieAttach(r.data);return}
   if(a==='gpk'){vieGPk=b.dataset.pk;vieGuide();return}
   if(a==='pk'){
@@ -3977,36 +3979,36 @@ async function vieAct(a,b){
       if(!vieIsMe(vo.v.host)||vo.busy)return;
       const cur=(vo.v.packs||[]).slice(),i=cur.indexOf(k);if(i>=0)cur.splice(i,1);else cur.push(k);
       vo.busy=true;const id=vo.id;
-      const r=await sb.rpc('vie_packs',{p_id:id,p_packs:cur});if(!vo||vo.id!==id)return;vo.busy=false;
+      const r=await vieRpc('vie_packs',{p_id:id,p_packs:cur});if(!vo||vo.id!==id)return;vo.busy=false;
       if(r.error){vieSay('Erreur : '+r.error.message);return}vieSay('');vo.sig='';vieApply(r.data);return}
     const cur=viePkGet(),i=cur.indexOf(k);if(i>=0)cur.splice(i,1);else cur.push(k);viePkSet(cur);
     const on=cur.includes(k);b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);const ck=b.querySelector('.ck');if(ck)ck.textContent=on?'✓':'';return}
   if(a==='join2'){
     const code=($('vieCode').value||'').trim();if(code.length<4){vieSay('Écris le code de la partie.');return}
-    vieSay('Connexion…');const r=await sb.rpc('vie_join',{p_code:code});
+    vieSay('Connexion…');const r=await vieRpc('vie_join',{p_code:code});
     if(r.error){vieSay(r.error.message);return}vieSay('');vieAttach(r.data);return}
   if(!vo)return;
-  const id=vo.id,done=r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.det=null;vo.disc=false;vo.sig='';vieApply(r.data)};
+  const id=vo.id,done=r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.det=null;vo.disc=false;vo.sig='';vieApply(r.data)};
   switch(a){
-    case'start':b.disabled=true;vieSay('Distribution des cartes…');{const r=await sb.rpc('vie_start',{p_id:id});if(!vo||vo.id!==id)return;if(r.error){vieSay('Erreur : '+r.error.message);b.disabled=false}else{vieSay('');vieApply(r.data)}}break;
+    case'start':b.disabled=true;vieSay('Distribution des cartes…');{const r=await vieRpc('vie_start',{p_id:id});if(!vo||vo.id!==id)return;if(r.error){vieSay('Erreur : '+r.error.message);b.disabled=false}else{vieSay('');vieApply(r.data)}}break;
     case'take':{if(vo.busy)return;vo.busy=true;if(b.dataset.src==='deck'&&!vieReduced())vieFly(null,vieFxPt('.vmid .vpile:first-child .vstack'),vieFxPt('#vieHand')||vieFxPt('.vmine'),{s:.4,end:.7,dur:480});
-      else if(b.dataset.src==='discard'&&!vieReduced()){const dl=(vo.v&&vo.v.discard)||[],tp=dl[dl.length-1];if(tp!=null&&VC[tp]){vo.tookNow=1;vieRing(vieFxPt('.vmid .vpile:last-child .vstack'));vieFly(tp,vieFxPt('.vmid .vpile:last-child .vstack'),vieFxPt('#vieHand')||vieFxPt('.vmine'),{s:.5,end:.8,dur:560,rot:-6})}}done(await sb.rpc('vie_take',{p_id:id,p_src:b.dataset.src}));break}
+      else if(b.dataset.src==='discard'&&!vieReduced()){const dl=(vo.v&&vo.v.discard)||[],tp=dl[dl.length-1];if(tp!=null&&VC[tp]){vo.tookNow=1;vieRing(vieFxPt('.vmid .vpile:last-child .vstack'));vieFly(tp,vieFxPt('.vmid .vpile:last-child .vstack'),vieFxPt('#vieHand')||vieFxPt('.vmine'),{s:.5,end:.8,dur:560,rot:-6})}}done(await vieRpc('vie_take',{p_id:id,p_src:b.dataset.src}));break}
     case'play':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;
       const c=VC[d.id],mineP=vo.v.players.find(p=>p.id===(me&&me.id))||{board:[],spent:[]};
       let pay=null;if(c&&viePayK(c)&&d.pay&&d.pay.length){const av=viePayables(mineP.board,mineP.spent);pay=d.pay.map(i=>av[i])}
       const aux=b.dataset.aux?+b.dataset.aux:(d.aux||null);
-      done(await sb.rpc('vie_play',{p_id:id,p_card:d.id,p_target:b.dataset.t||d.t||null,p_aux:aux,p_pay:pay}));break}
+      done(await vieRpc('vie_play',{p_id:id,p_card:d.id,p_target:b.dataset.t||d.t||null,p_aux:aux,p_pay:pay}));break}
     case'stab':{const sl=document.querySelector('.vst .vsl');if(sl)sl.scrollTo({left:(+b.dataset.i)*sl.clientWidth,behavior:vieReduced()?'auto':'smooth'});break}
-    case'discard':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;done(await sb.rpc('vie_discard',{p_id:id,p_card:d.id}));break}
+    case'discard':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;done(await vieRpc('vie_discard',{p_id:id,p_card:d.id}));break}
     case'aim':{const d=vo.det;if(!d)return;vo.tg={id:d.id};vo.det=null;vieRender();const t=document.querySelector('.vsc');if(t&&t.scrollIntoView)t.scrollIntoView({behavior:'smooth',block:'start'});break}
     case'aimx':vo.tg=null;vieRender();break;
     case'aimgo':{const tg=vo.tg;if(!tg||vo.busy)return;vo.busy=true;vo.tg=null;vo.fxFrom=vieFxPt($('vieHeld'));
-      done(await sb.rpc('vie_play',{p_id:id,p_card:tg.id,p_target:b.dataset.t,p_aux:null,p_pay:null}));break}
-    case'pass':{if(vo.busy)return;vo.busy=true;b.disabled=true;done(await sb.rpc('vie_pass',{p_id:id}));break}
-    case'ack':{if(vo.busy)return;vo.busy=true;b.disabled=true;done(await sb.rpc('vie_ack',{p_id:id}));break}
+      done(await vieRpc('vie_play',{p_id:id,p_card:tg.id,p_target:b.dataset.t,p_aux:null,p_pay:null}));break}
+    case'pass':{if(vo.busy)return;vo.busy=true;b.disabled=true;done(await vieRpc('vie_pass',{p_id:id}));break}
+    case'ack':{if(vo.busy)return;vo.busy=true;b.disabled=true;done(await vieRpc('vie_ack',{p_id:id}));break}
     case'bet':{const d=vo.det;if(vo.busy||!d)return;vo.busy=true;b.disabled=true;
-      if(!vieReduced()&&VC[d.id]){vo.betNow=1;vieFly(d.id,vo.fxFrom||vieFxPt('#vieHand')||vieFxPt('.vmine'),vieFxPt('.vcas')||vieFxPt('.vmid'),{s:.5,end:.7,dur:650,rot:-8},()=>vieToast(vieFxPt('.vcas'),'🎰 Mise !'))}done(await sb.rpc('vie_bet',{p_id:id,p_card:d.id}));break}
-    case'quit':{if(vo.busy)return;if(Date.now()-vieQ>4000){vieQ=Date.now();b.textContent='Confirmer : démissionner ?';return}vieQ=0;vo.busy=true;done(await sb.rpc('vie_quit',{p_id:id}));break}
+      if(!vieReduced()&&VC[d.id]){vo.betNow=1;vieFly(d.id,vo.fxFrom||vieFxPt('#vieHand')||vieFxPt('.vmine'),vieFxPt('.vcas')||vieFxPt('.vmid'),{s:.5,end:.7,dur:650,rot:-8},()=>vieToast(vieFxPt('.vcas'),'🎰 Mise !'))}done(await vieRpc('vie_bet',{p_id:id,p_card:d.id}));break}
+    case'quit':{if(vo.busy)return;if(Date.now()-vieQ>4000){vieQ=Date.now();b.textContent='Confirmer : démissionner ?';return}vieQ=0;vo.busy=true;done(await vieRpc('vie_quit',{p_id:id}));break}
     case'closedet':vo.det=null;vieOv();break;
     case'closeview':vo.view=null;vo.det=null;vieOv();break;
     case'closeall':vo.det=null;vo.disc=false;vo.view=null;vo.exec=false;vo.xsel=null;vieOv();break;
@@ -4015,9 +4017,9 @@ async function vieAct(a,b){
     case'inv':msPickInvite('vie',id);break;
     case'leave':
       if(Date.now()-vieQ>4000){vieQ=Date.now();b.textContent='Confirmer : quitter la partie ?';return}
-      vieQ=0;try{await sb.rpc('vie_leave',{p_id:id})}catch(e){}
+      vieQ=0;try{await vieRpc('vie_leave',{p_id:id})}catch(e){}
       vieDetach();vieView='menu';vieEnter();break;
-    case'rematch':{if(vo.busy)return;vo.busy=true;b.disabled=true;const r=await sb.rpc('vie_rematch',{p_id:id});if(!vo||vo.id!==id)return;vo.busy=false;b.disabled=false;
+    case'rematch':{if(vo.busy)return;vo.busy=true;b.disabled=true;const r=await vieRpc('vie_rematch',{p_id:id});if(!vo||vo.id!==id)return;vo.busy=false;b.disabled=false;
       if(r.error){vieSay('Erreur : '+r.error.message);return}vieSay('');vieAttach(r.data);break}
     case'done':vieDetach();vieView='menu';vieEnter();break}}
 function vieOpenZ(id){
@@ -4039,17 +4041,17 @@ $('vieBody').addEventListener('click',e=>{
 $('vieZ').addEventListener('click',e=>{
   const t=e.target;
   if(t===$('vieZ')){if(vo&&vo.v&&vo.v.status==='playing'&&vo.v.phase==='pick'&&(vieIsMe(vo.v.turn_uid)||(vo.v.me&&vo.v.me.pending)))return;if(vo&&vo.det)vo.det=null;else if(vo&&vo.exec){vo.exec=false;vo.xsel=null}else if(vo&&vo.disc)vo.disc=false;else if(vo&&vo.view)vo.view=null;vieCloseZ();vieOv();return}
-  const pk=t.closest('[data-pk]');if(pk&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_chance',{p_id:id,p_card:+pk.dataset.pk}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
-  const dg=t.closest('[data-dg]');if(dg&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_dig',{p_id:id,p_card:+dg.dataset.dg}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
-  const sw=t.closest('[data-sw]');if(sw&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_swing',{p_id:id,p_target:sw.dataset.sw}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
-  const ex=t.closest('[data-ex]');if(ex&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_exhume',{p_id:id,p_card:+ex.dataset.ex}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
-  const rn=t.closest('[data-rn]');if(rn&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_ransom',{p_id:id,p_payer:rn.dataset.rn}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
-  const tf=t.closest('[data-tf]');if(tf&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_traffic',{p_id:id,p_card:+tf.dataset.tf}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const pk=t.closest('[data-pk]');if(pk&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_chance',{p_id:id,p_card:+pk.dataset.pk}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const dg=t.closest('[data-dg]');if(dg&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_dig',{p_id:id,p_card:+dg.dataset.dg}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const sw=t.closest('[data-sw]');if(sw&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_swing',{p_id:id,p_target:sw.dataset.sw}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const ex=t.closest('[data-ex]');if(ex&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_exhume',{p_id:id,p_card:+ex.dataset.ex}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const rn=t.closest('[data-rn]');if(rn&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_ransom',{p_id:id,p_payer:rn.dataset.rn}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const tf=t.closest('[data-tf]');if(tf&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_traffic',{p_id:id,p_card:+tf.dataset.tf}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
   const xc=t.closest('[data-xc]');if(xc&&vo){vo.xsel=xc.dataset.xc;vieOv();return}
-  const xg=t.closest('[data-xgo]');if(xg&&vo){const id=vo.id,q=xg.dataset.xgo.split('|');vo.busy=true;sb.rpc('vie_execute',{p_id:id,p_target:q[0],p_card:+q[1]}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.exec=false;vo.xsel=null;vo.sig='';vieApply(r.data)});return}
-  const ro=t.closest('[data-ro]');if(ro&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_roulette',{p_id:id,p_slot:+ro.dataset.ro}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
-  const rd=t.closest('[data-rd]');if(rd&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_rdrop',{p_id:id,p_card:+rd.dataset.rd}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
-  const st=t.closest('[data-st]');if(st&&vo){const id=vo.id;vo.busy=true;sb.rpc('vie_star',{p_id:id,p_card:+st.dataset.st}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const xg=t.closest('[data-xgo]');if(xg&&vo){const id=vo.id,q=xg.dataset.xgo.split('|');vo.busy=true;vieRpc('vie_execute',{p_id:id,p_target:q[0],p_card:+q[1]}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.exec=false;vo.xsel=null;vo.sig='';vieApply(r.data)});return}
+  const ro=t.closest('[data-ro]');if(ro&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_roulette',{p_id:id,p_slot:+ro.dataset.ro}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const rd=t.closest('[data-rd]');if(rd&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_rdrop',{p_id:id,p_card:+rd.dataset.rd}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
+  const st=t.closest('[data-st]');if(st&&vo){const id=vo.id;vo.busy=true;vieRpc('vie_star',{p_id:id,p_card:+st.dataset.st}).then(r=>{if(!vo||vo.id!==id)return;vo.busy=false;if(r.error){vieSay('Erreur : '+r.error.message);vo.sig='';vieTick();return}vieSay('');vo.sig='';vieApply(r.data)});return}
   const zz=t.closest('[data-z]');if(zz){vieOpenZ(+zz.dataset.z);return}
   const py=t.closest('[data-py]');if(py&&vo&&vo.det){const i=+py.dataset.py,p=vo.det.pay||[],k=p.indexOf(i);if(k>=0)p.splice(k,1);else p.push(i);vo.det.pay=p;vieOv();return}
   const ax=t.closest('[data-ax]');if(ax&&vo&&vo.det){vo.det.aux=+ax.dataset.ax;vo.det.ai=ax.dataset.ai!=null?+ax.dataset.ai:null;vieOv();return}
@@ -4078,10 +4080,10 @@ function vieCantPlay(c,v,mineP){
   return''}
 function vieWarn(t,pt){vieToast(pt||vieFxPt('.vhandw')||{x:innerWidth/2,y:innerHeight/2},t,'bad');try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}}
 async function vieCall(fn,args){
-  if(!vo||vo.busy)return;const id=vo.id;vo.busy=true;let r;
-  try{r=await sb.rpc(fn,Object.assign({p_id:id},args))}catch(e){r={error:e}}
+  if(!vo||vo.busy)return;const id=vo.id;vo.busy=true;
+  const r=await vieRpc(fn,Object.assign({p_id:id},args));
   if(!vo||vo.id!==id)return;vo.busy=false;
-  if(r.error){vieWarn('Erreur : '+(r.error.message||'réessaie'));vieSay('Erreur : '+(r.error.message||''));vieTick();return}
+  if(r.error){vieWarn('Erreur : '+(r.error.message||'réessaie'));vieSay('Erreur : '+(r.error.message||''));vo.sig='';vieTick();return}
   vieSay('');vo.det=null;vo.disc=false;vo.sig='';vieApply(r.data)}
 /* joue une carte déposée sur la table (ou sur un joueur) ; renvoie false si impossible */
 function vieTryPlay(cid,tid,pt){
@@ -4107,13 +4109,14 @@ function vieZoneAt(x,y){
   const tb=el.closest('.vsc');if(tb)return{k:'tbl',hl:document.querySelector('.vmine')};
   return null}
 $('vieBody').addEventListener('pointerdown',e=>{
-  if(vdg||(e.pointerType==='mouse'&&e.button!==0)||!vieDragOk())return;
+  if(vdg){if(Date.now()-(vdg.t||0)>1500)vieDragAbort();else return}
+  if((e.pointerType==='mouse'&&e.button!==0)||!vieDragOk())return;
   const v=vo.v,hc=e.target.closest('.vhand .vw[data-h]'),pl=e.target.closest('.vstack.can[data-src]');
   let k=null,el=null;
   if(hc&&v.phase==='play'&&!hc.classList.contains('dim')){k='card';el=hc}
   else if(pl&&v.phase==='draw'){k='pile';el=pl}
   if(!k)return;
-  vdg={k,el,id:k==='card'?+hc.dataset.h:0,src:el.dataset.src||'',sx:e.clientX,sy:e.clientY,pid:e.pointerId,on:false};
+  vdg={k,el,id:k==='card'?+hc.dataset.h:0,src:el.dataset.src||'',sx:e.clientX,sy:e.clientY,pid:e.pointerId,on:false,t:Date.now()};
   addEventListener('pointermove',vieDragMove);addEventListener('pointerup',vieDragEnd);addEventListener('pointercancel',vieDragEnd)},true);
 $('vieBody').addEventListener('click',e=>{if(Date.now()<vieNoClick){e.stopPropagation();e.preventDefault()}},true);
 function vieDragUnhook(){removeEventListener('pointermove',vieDragMove);removeEventListener('pointerup',vieDragEnd);removeEventListener('pointercancel',vieDragEnd)}
@@ -4124,7 +4127,7 @@ function vieDragClean(d){
   if(d.l)d.l.remove();
   if(d.el)d.el.classList.remove('lift')}
 function vieDragMove(e){
-  const d=vdg;if(!d||e.pointerId!==d.pid)return;
+  const d=vdg;if(!d||e.pointerId!==d.pid)return;d.t=Date.now();
   const x=e.clientX,y=e.clientY;
   if(!d.on){
     if(Math.hypot(x-d.sx,y-d.sy)<8)return;
@@ -4190,6 +4193,12 @@ function vieDragEnd(e){
     setTimeout(()=>d.g.remove(),240);
     if(d.k==='card'&&d.why)vieFxCls(document.querySelector('#vieHand [data-h="'+d.id+'"]'),'nope',500)}
   if(vo){vo.drag=false;if(vo.dirty&&!acted){vo.dirty=false;vieRender()}}}
+function vieDragAbort(){
+  const d=vdg;vieDragUnhook();vdg=null;
+  if(d&&d.on){try{vieDragClean(d)}catch(e){}if(d.g)d.g.remove()}
+  if(vo){vo.drag=false;if(vo.dirty){vo.dirty=false;vieRender()}}}
+addEventListener('blur',()=>{if(vdg)vieDragAbort()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&vdg)vieDragAbort()});
 
 /* préférences (page Paramètres) */
 function viePrefs(){
