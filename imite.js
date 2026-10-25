@@ -242,6 +242,11 @@ function load3d(){
     .then(function(){try{return window.IM3D.init(window.THREE)}catch(e){return null}})
     .catch(function(){return null});
   return p3}
+var p2=null,auto2d=false,SOFTGL=null;
+function softGL(){if(SOFTGL!==null)return SOFTGL;try{var c=document.createElement('canvas'),gl=c.getContext('webgl')||c.getContext('experimental-webgl');if(!gl)return SOFTGL=true;var ex=gl.getExtension('WEBGL_debug_renderer_info'),rn=ex?String(gl.getParameter(ex.UNMASKED_RENDERER_WEBGL)):'';SOFTGL=/swiftshader|llvmpipe|software|basic render|softpipe/i.test(rn)}catch(e){SOFTGL=true}return SOFTGL}
+function load2d(){if(p2)return p2;p2=loadScript('imite2d.js?v='+(window.IM_VER||1)).then(function(){try{return window.IM2D.init(BASE)}catch(e){return null}}).catch(function(){return null});return p2}
+function want2d(){var f=lsGet('im_2d');return f==='1'||auto2d||(f!=='0'&&softGL())}
+function loadStage(){return want2d()?load2d().then(function(a){return a||load3d()}):load3d()}
 function mountStage(){var el=$('imStage');if(!el||!st3)return;st3.mount(el)}
 function cast3d(){
   if(!st3)return;var G=S.G;
@@ -799,22 +804,24 @@ function olEnd(v){
     '<div class="hu-act"><button class="hu-b p" id="imMn">Menu</button></div>');
   $('imMn').onclick=function(){OL=null;S.G=null;menu()}}
 
+function hookSlow(){if(st3&&st3.setSlow)st3.setSlow(function(){if(auto2d)return;auto2d=true;var v2=$('imV2');if(v2)v2.setAttribute('aria-pressed','true');try{st3.unmount()}catch(e){}st3=null;loadStage().then(function(a){st3=a;if(!a)return;cast3d();mountStage();if(last3)st3.mode(last3.m,last3.o)})})}
 function softNote(){
-  try{if(!st3||!st3.stats||!st3.stats().soft||$('imSoft'))return;var u=$('imUi');if(!u||!u.firstChild)return;
+  try{if(!st3||!softGL()||$('imSoft'))return;var u=$('imUi');if(!u||!u.firstChild)return;
     var d=document.createElement('div');d.id='imSoft';d.className='hint';d.style.cssText='text-align:center;color:#a86a0e;font-weight:700';
-    d.textContent='⚠️ Ton navigateur n’utilise pas ta carte graphique : le décor est simplifié pour rester fluide. Pour un meilleur rendu, active « Utiliser l’accélération matérielle » dans les paramètres du navigateur, puis relance-le.';
+    d.textContent='⚡ Ton navigateur n’utilise pas ta carte graphique : le jeu affiche un décor simplifié en images 2D pour rester fluide. Pour la 3D complète, active « Utiliser l’accélération matérielle » dans les paramètres du navigateur, puis relance-le.';
     u.firstChild.appendChild(d)}catch(e){}}
 /* ============================ API ============================ */
 window.IM={
   enter:function(){
     injectCss();var v=lsGet('im_vol');vol=v==null?35:clamp(+v||0,0,100);use3d=lsGet('im_3d')!=='0';
     var b=$('imBody');if(!b)return;body=null;
-    b.innerHTML='<div class="im im-root" id="imRoot"><div class="im-stage" id="imStage"'+(use3d?'':' hidden')+'><div class="hu" id="imHud"></div></div><div class="im-vbar">'+volHtml()+'<button class="im-vb" id="imV3" type="button" aria-pressed="'+use3d+'" title="Afficher ou masquer le décor 3D" style="width:auto;padding:0 10px">🎭 3D</button></div><div id="imUi"><div class="im"><div class="im-state">Chargement…</div></div></div></div>';
+    b.innerHTML='<div class="im im-root" id="imRoot"><div class="im-stage" id="imStage"'+(use3d?'':' hidden')+'><div class="hu" id="imHud"></div></div><div class="im-vbar">'+volHtml()+'<button class="im-vb" id="imV3" type="button" aria-pressed="'+use3d+'" title="Afficher ou masquer le décor 3D" style="width:auto;padding:0 10px">🎭 3D</button><button class="im-vb" id="imV2" type="button" aria-pressed="false" title="Mode léger : décor en images 2D, très fluide même sans carte graphique" style="width:auto;padding:0 10px">⚡ Léger</button></div><div id="imUi"><div class="im"><div class="im-state">Chargement…</div></div></div></div>';
     bindVol(b);
     var up3=function(){if(!use3d||!st3)return;cast3d();mountStage();if(last3)st3.mode(last3.m,last3.o)};
     $('imV3').onclick=function(){use3d=!use3d;lsSet('im_3d',use3d?'1':'0');this.setAttribute('aria-pressed',String(use3d));$('imStage').hidden=!use3d;
-      if(!use3d){if(st3)st3.unmount()}else if(st3)up3();else load3d().then(function(a){st3=a;if(!a){$('imStage').hidden=true;return}up3()})};
-    if(use3d){if(st3)up3();else load3d().then(function(a){st3=a;if(!a){var e=$('imStage');if(e&&!e.parentNode.classList.contains('full'))e.hidden=true;return}up3();softNote()})}
+      if(!use3d){if(st3)st3.unmount()}else if(st3)up3();else loadStage().then(function(a){st3=a;if(!a){$('imStage').hidden=true;return}up3();hookSlow()})};
+    if(use3d){if(st3)up3();else loadStage().then(function(a){st3=a;if(!a){var e=$('imStage');if(e&&!e.parentNode.classList.contains('full'))e.hidden=true;return}up3();softNote();hookSlow()})}
+    var v2=$('imV2');if(v2){v2.setAttribute('aria-pressed',String(want2d()));v2.onclick=function(){var on=!want2d();auto2d=false;lsSet('im_2d',on?'1':'0');this.setAttribute('aria-pressed',String(on));if(!use3d)return;if(st3){try{st3.unmount()}catch(e){}st3=null}loadStage().then(function(a){st3=a;if(!a){$('imStage').hidden=true;return}up3();hookSlow()})}}
     loadDB().then(function(){menu()}).catch(function(){var u=$('imUi');if(u)u.innerHTML='<div class="im"><p class="im-err">Impossible de charger la liste des sons (imite/sons.json).</p></div>'})},
   leave:function(){olStop();tok++;clearLater();cancelAnimationFrame(anim);stopPlay();micStop();S.G=null;setFull(false);if(st3)st3.unmount()},
   _t:{analyse:analyse,score:score,toMono16k:toMono16k,envelope:envelope,pitchTrack:pitchTrack,get ctx(){return ensureCtx()},load:function(id){return loadDB().then(function(){return loadSound(DB.sons.filter(function(s){return s.id===id})[0])})},get state(){return S},get st3(){return st3},polish:polish,micKind:function(){return mic&&mic.node?mic.node.constructor.name:null}}

@@ -11,7 +11,7 @@ const seg=(t,a,b)=>clamp((t-a)/(b-a),0,1);
 /* ---------- Renderer ---------- */
 const canvas=document.createElement('canvas');canvas.className='im3d-cv';let app=document.body;
 const MOB=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||Math.min(screen.width,screen.height)<700;
-const renderer=new THREE.WebGLRenderer({canvas,antialias:!MOB,powerPreference:'high-performance'});
+const renderer=new THREE.WebGLRenderer({canvas,antialias:!MOB,powerPreference:'high-performance',alpha:!!window.IM3D_DBG,preserveDrawingBuffer:!!window.IM3D_DBG});
 let SOFT=false;try{const gl0=renderer.getContext(),ex0=gl0.getExtension('WEBGL_debug_renderer_info'),rn0=ex0?String(gl0.getParameter(ex0.UNMASKED_RENDERER_WEBGL)):'';SOFT=/swiftshader|llvmpipe|software|basic render|softpipe/i.test(rn0)}catch(e0){}
 let PR=Math.min(devicePixelRatio||1,MOB?1.25:1.5);renderer.setPixelRatio(PR);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
@@ -594,7 +594,7 @@ const MODES={
    applause=.7;const a=t*.28;camTo(Math.sin(a)*3.4,3.0+Math.sin(a*.7)*.25,11.2-Math.cos(a)*.3,0,1.75,0)}}
 };
 function setMode(m,o){mode=m;mt=0;resetFx();cam.yaw*=.3;cam.pitch*=.3;MODES[m].enter(o||{})}
-const PRS=[1.5,1.25,1,.8,.6,.5],TS=.7;let lite=false;
+let onSlow=null;const PRS=[1.5,1.25,1,.8,.6,.5],TS=.7;let lite=false;
 function goLite(){if(lite)return;lite=true;const cache=new Map();
   const cv=m=>{if(!m||!m.isMeshStandardMaterial)return m;let n=cache.get(m);if(!n){n=new THREE.MeshLambertMaterial({color:m.color,map:m.map,vertexColors:m.vertexColors,skinning:m.skinning,side:m.side,transparent:m.transparent,opacity:m.opacity,emissive:m.emissive,emissiveMap:m.emissiveMap,alphaTest:m.alphaTest,polygonOffset:m.polygonOffset,polygonOffsetFactor:m.polygonOffsetFactor,polygonOffsetUnits:m.polygonOffsetUnits});cache.set(m,n)}return n};
   scene.traverse(o=>{if(o.isMesh&&o.material){o.material=Array.isArray(o.material)?o.material.map(cv):cv(o.material)}});
@@ -605,7 +605,7 @@ function frame(now){
   if(!running)return;rafId=requestAnimationFrame(frame);
   if(now-last<14.5)return; /* 60 images/s maximum, même sur écran 120 Hz */
   const raw=(now-last)/1000,dt=Math.min(.08,raw);last=now;mt+=dt*TS;gt+=dt;
-  if(++warm>90){ftA+=raw;if(++ftN>=40){const avg=ftA/ftN;ftA=0;ftN=0;if(avg>.027&&qL<PRS.length-1){qL++;applyQ()}}}
+  if(++warm>90){ftA+=raw;if(++ftN>=40){const avg=ftA/ftN;ftA=0;ftN=0;if(avg>.027&&qL<PRS.length-1){qL++;applyQ()}else if(avg>.07&&qL>=PRS.length-1&&onSlow){const f=onSlow;onSlow=null;f()}}}
   if(mode)MODES[mode].tick(mt);
   curtCur+=(curtT-curtCur)*(1-Math.exp(-dt*1.5));setCurtains(curtCur);
   micS+=(mic-micS)*(1-Math.exp(-dt*14));
@@ -626,10 +626,12 @@ return{
  cast(list){cast=list&&list.length?list:[{name:'',key:'lea'}]},
  mode(m,o){if(m==='listen'||m==='record'||m==='countdown'||m==='result'||m==='step')perf=(o&&o.perf!=null)?o.perf:perf;if(m==='handoff')perf=o.to;setMode(m,o)},
  setPerf(i){perf=i},
+ setSlow(f){onSlow=f},
  labels(m){for(const k in m){if(CH[k]){CH[k].userData.label=m[k];CH[k].userData.tag=true}}},
  mic(v){mic=clamp(v,0,1)},
  playing(b){isPlaying=!!b},
  stats(){const i=renderer.info;return{soft:SOFT,lite:lite,calls:i.render.calls,tri:i.render.triangles,geo:i.memory.geometries,tex:i.memory.textures,pr:renderer.getPixelRatio(),q:qL,meshes:(()=>{let n=0,v=0;scene.traverse(o=>{if(o.isMesh){n++;if(o.visible)v++}});return[n,v]})()}},
+ dbg:window.IM3D_DBG?{curL,curR,notes,TM,SP,FL,jPts,tom,CH,scene,camera,renderer,animChar,put,hide,setSpot,spotA,spotB,cam,POSES,setCurtains,crown,POD,spk,get cast(){return cast}}:null,
  keys:KEYS,
  names:{lea:'Léa',kenji:'Kenji',sora:'Sora',mizuki:'Mizuki',ryo:'Ryo',ren:'Ren'}
 };
