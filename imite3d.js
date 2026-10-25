@@ -12,6 +12,7 @@ const seg=(t,a,b)=>clamp((t-a)/(b-a),0,1);
 const canvas=document.createElement('canvas');canvas.className='im3d-cv';let app=document.body;
 const MOB=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||Math.min(screen.width,screen.height)<700;
 const renderer=new THREE.WebGLRenderer({canvas,antialias:!MOB,powerPreference:'high-performance'});
+let SOFT=false;try{const gl0=renderer.getContext(),ex0=gl0.getExtension('WEBGL_debug_renderer_info'),rn0=ex0?String(gl0.getParameter(ex0.UNMASKED_RENDERER_WEBGL)):'';SOFT=/swiftshader|llvmpipe|software|basic render|softpipe/i.test(rn0)}catch(e0){}
 let PR=Math.min(devicePixelRatio||1,MOB?1.25:1.5);renderer.setPixelRatio(PR);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
 renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
@@ -593,21 +594,25 @@ const MODES={
    applause=.7;const a=t*.28;camTo(Math.sin(a)*3.4,3.0+Math.sin(a*.7)*.25,11.2-Math.cos(a)*.3,0,1.75,0)}}
 };
 function setMode(m,o){mode=m;mt=0;resetFx();cam.yaw*=.3;cam.pitch*=.3;MODES[m].enter(o||{})}
-const PRS=[1.5,1.25,1,.8,.65];let qL=0,ftA=0,ftN=0,warm=0;
+const PRS=[1.5,1.25,1,.8,.6,.5],TS=.7;let lite=false;
+function goLite(){if(lite)return;lite=true;const cache=new Map();
+  const cv=m=>{if(!m||!m.isMeshStandardMaterial)return m;let n=cache.get(m);if(!n){n=new THREE.MeshLambertMaterial({color:m.color,map:m.map,vertexColors:m.vertexColors,skinning:m.skinning,side:m.side,transparent:m.transparent,opacity:m.opacity,emissive:m.emissive,emissiveMap:m.emissiveMap,alphaTest:m.alphaTest,polygonOffset:m.polygonOffset,polygonOffsetFactor:m.polygonOffsetFactor,polygonOffsetUnits:m.polygonOffsetUnits});cache.set(m,n)}return n};
+  scene.traverse(o=>{if(o.isMesh&&o.material){o.material=Array.isArray(o.material)?o.material.map(cv):cv(o.material)}});
+  foot.visible=false}let qL=0,ftA=0,ftN=0,warm=0;
 renderer.shadowMap.autoUpdate=false;let fc=0;
-function applyQ(){const p=Math.min(PR,PRS[qL]);renderer.setPixelRatio(p);resize();if(qL>=2&&spotA.light.castShadow){spotA.light.castShadow=false;scene.traverse(o=>{if(o.material)o.material.needsUpdate=true})}}
+function applyQ(){const p=Math.min(PR,PRS[qL]);renderer.setPixelRatio(p);resize();if(qL>=3)goLite();if(qL>=2&&spotA.light.castShadow){spotA.light.castShadow=false;scene.traverse(o=>{if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.needsUpdate=true);else o.material.needsUpdate=true}})}}
 function frame(now){
   if(!running)return;rafId=requestAnimationFrame(frame);
   if(now-last<14.5)return; /* 60 images/s maximum, même sur écran 120 Hz */
-  const raw=(now-last)/1000,dt=Math.min(.08,raw);last=now;mt+=dt;gt+=dt;
+  const raw=(now-last)/1000,dt=Math.min(.08,raw);last=now;mt+=dt*TS;gt+=dt;
   if(++warm>90){ftA+=raw;if(++ftN>=40){const avg=ftA/ftN;ftA=0;ftN=0;if(avg>.027&&qL<PRS.length-1){qL++;applyQ()}}}
   if(mode)MODES[mode].tick(mt);
-  curtCur+=(curtT-curtCur)*(1-Math.exp(-dt*2.6));setCurtains(curtCur);
+  curtCur+=(curtT-curtCur)*(1-Math.exp(-dt*1.5));setCurtains(curtCur);
   micS+=(mic-micS)*(1-Math.exp(-dt*14));
   lights.forEach((b,i)=>{b.material.color.setHex((Math.floor(gt*2+i)%2)?0xffe48a:0xffc24a)});
   for(const k in CH){const c=CH[k];if(c.visible)animChar(c,gt,dt)}
-  if((fc&1)===0||qL<1)updAud(gt);updNotes(gt);updConf(dt);
-  const kk=1-Math.exp(-dt*2.4);cam.pos.lerp(cam.tp,kk);cam.look.lerp(cam.tl,kk);
+  if(qL<4&&((fc&1)===0||qL<1))updAud(gt);updNotes(gt);updConf(dt);
+  const kk=1-Math.exp(-dt*1.6);cam.pos.lerp(cam.tp,kk);cam.look.lerp(cam.tl,kk);
   const off=cam.pos.clone().sub(cam.look);const r=off.length();const a=Math.atan2(off.x,off.z)+cam.yaw,p=Math.asin(clamp(off.y/r,-1,1))+cam.pitch;
   camera.position.set(cam.look.x+Math.sin(a)*Math.cos(p)*r,cam.look.y+Math.sin(p)*r,cam.look.z+Math.cos(a)*Math.cos(p)*r);
   if(cam.shake>0){camera.position.x+=(Math.random()-.5)*cam.shake;camera.position.y+=(Math.random()-.5)*cam.shake;cam.shake*=.9}
@@ -616,7 +621,7 @@ function frame(now){
   fc++;renderer.shadowMap.needsUpdate=(fc%(qL>=1?3:2))===0;
   renderer.render(scene,camera);updTags()}
 return{
- mount(el){app=el;el.appendChild(canvas);el.appendChild(tagsEl);if(ro)ro.disconnect();if(window.ResizeObserver){ro=new ResizeObserver(resize);ro.observe(el)}resize();if(!running){running=true;last=performance.now();rafId=requestAnimationFrame(frame)}},
+ mount(el){app=el;if(SOFT&&qL<4&&!lite){qL=4;applyQ()}el.appendChild(canvas);el.appendChild(tagsEl);if(ro)ro.disconnect();if(window.ResizeObserver){ro=new ResizeObserver(resize);ro.observe(el)}resize();if(!running){running=true;last=performance.now();rafId=requestAnimationFrame(frame)}},
  unmount(){running=false;cancelAnimationFrame(rafId);if(ro){ro.disconnect();ro=null}},
  cast(list){cast=list&&list.length?list:[{name:'',key:'lea'}]},
  mode(m,o){if(m==='listen'||m==='record'||m==='countdown'||m==='result'||m==='step')perf=(o&&o.perf!=null)?o.perf:perf;if(m==='handoff')perf=o.to;setMode(m,o)},
@@ -624,7 +629,7 @@ return{
  labels(m){for(const k in m){if(CH[k]){CH[k].userData.label=m[k];CH[k].userData.tag=true}}},
  mic(v){mic=clamp(v,0,1)},
  playing(b){isPlaying=!!b},
- stats(){const i=renderer.info;return{calls:i.render.calls,tri:i.render.triangles,geo:i.memory.geometries,tex:i.memory.textures,pr:renderer.getPixelRatio(),q:qL,meshes:(()=>{let n=0,v=0;scene.traverse(o=>{if(o.isMesh){n++;if(o.visible)v++}});return[n,v]})()}},
+ stats(){const i=renderer.info;return{soft:SOFT,lite:lite,calls:i.render.calls,tri:i.render.triangles,geo:i.memory.geometries,tex:i.memory.textures,pr:renderer.getPixelRatio(),q:qL,meshes:(()=>{let n=0,v=0;scene.traverse(o=>{if(o.isMesh){n++;if(o.visible)v++}});return[n,v]})()}},
  keys:KEYS,
  names:{lea:'Léa',kenji:'Kenji',sora:'Sora',mizuki:'Mizuki',ryo:'Ryo',ren:'Ren'}
 };
