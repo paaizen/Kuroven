@@ -1846,7 +1846,7 @@ function avh(p){const u=p&&safeStore(p.avatar_url),d=p&&p.id?' data-user="'+esc(
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let tickT=null,tickN=0,invShown=null;
 const PN=()=>onl?onl.names:['Joueur 1','Joueur 2'];
-function busyOnline(){return(onl&&!onl.done)||(aon&&!aon.done)||(ron&&!ron.done)||(rm&&(rm.status==='lobby'||rm.status==='playing'))||(uo&&uo.v&&(uo.v.status==='lobby'||uo.v.status==='playing'))||(vo&&vo.v&&(vo.v.status==='lobby'||vo.v.status==='playing'))}
+function busyOnline(){return(onl&&!onl.done)||(aon&&!aon.done)||(ron&&!ron.done)||(rm&&(rm.status==='lobby'||rm.status==='playing'))||(uo&&uo.v&&(uo.v.status==='lobby'||uo.v.status==='playing'))||(vo&&vo.v&&(vo.v.status==='lobby'||vo.v.status==='playing'))||(window.IMO&&IMO.busy())}
 
 /* --- morpion en ligne : état d'une partie --- */
 function newState(){return{ri:pickN([...ROWS.keys()],3),ci:pickN([...COLS.keys()],3),b:Array(9).fill(null),used:[],turn:0,over:false,w:null,miss:0,seq:1,rs:null}}
@@ -3212,7 +3212,7 @@ function imEnter(){
   const b=$('imBody');
   if(window.IM&&IM.enter)return IM.enter();
   b.innerHTML='<p class="sub" style="text-align:center">Chargement…</p>';
-  if(!imP)imP=new Promise(ok=>{const s=document.createElement('script');window.IM_VER=3;s.src='imite.js?v=3';s.onload=()=>ok(!!window.IM);s.onerror=()=>{imP=null;ok(false)};document.head.appendChild(s)});
+  if(!imP)imP=new Promise(ok=>{const s=document.createElement('script');window.IM_VER=4;s.src='imite.js?v=4';s.onload=()=>ok(!!window.IM);s.onerror=()=>{imP=null;ok(false)};document.head.appendChild(s)});
   imP.then(o=>{if(curView!=='im')return;if(o)IM.enter();else b.innerHTML='<p class="sub" style="text-align:center">Impossible de charger le jeu (fichier imite.js manquant ?).</p>'})}
 let vieArtP=null;
 function vieArt(){
