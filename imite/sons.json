@@ -1,0 +1,1783 @@
+{
+ "version": 1,
+ "packs": {
+  "bankai": "Bankai (Bleach)",
+  "attaques": "Attaques d’anime",
+  "mbappe": "Mbappé",
+  "foot": "Dembélé & Tolisso",
+  "snap": "Snap & mèmes FR",
+  "streamers": "Streamers & YouTubeurs",
+  "rap": "Rap FR",
+  "pop": "Pop culture"
+ },
+ "sons": [
+  {
+   "id": "bk-byakuya",
+   "titre": "Bankai — Byakuya",
+   "pack": "bankai",
+   "src": "imite/sons/bk-byakuya.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 5.8,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "bk-generique",
+   "titre": "Bankai !",
+   "pack": "bankai",
+   "src": "imite/sons/bk-generique.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 5.9,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "bk-gin",
+   "titre": "Bankai — Gin",
+   "pack": "bankai",
+   "src": "imite/sons/bk-gin.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.5,
+   "cut": [
+    0.01,
+    5.01
+   ]
+  },
+  {
+   "id": "bk-ichigo",
+   "titre": "Bankai — Ichigo",
+   "pack": "bankai",
+   "src": "imite/sons/bk-ichigo.mp3",
+   "dur": 4.1,
+   "niveau": 2,
+   "orig": 4.1,
+   "cut": [
+    0,
+    4.06
+   ]
+  },
+  {
+   "id": "bk-ichigo-cri",
+   "titre": "Bankai — Ichigo (cri)",
+   "pack": "bankai",
+   "src": "imite/sons/bk-ichigo-cri.mp3",
+   "dur": 1.65,
+   "niveau": 1,
+   "orig": 1.6,
+   "cut": [
+    0,
+    1.61
+   ]
+  },
+  {
+   "id": "bk-katen",
+   "titre": "Bankai — Katen",
+   "pack": "bankai",
+   "src": "imite/sons/bk-katen.mp3",
+   "dur": 1.04,
+   "niveau": 1,
+   "orig": 6.2,
+   "cut": [
+    0.55,
+    1.55
+   ]
+  },
+  {
+   "id": "bk-kisuke",
+   "titre": "Bankai — Kisuke",
+   "pack": "bankai",
+   "src": "imite/sons/bk-kisuke.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.7,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "bk-renji",
+   "titre": "Bankai — Renji",
+   "pack": "bankai",
+   "src": "imite/sons/bk-renji.mp3",
+   "dur": 3.97,
+   "niveau": 2,
+   "orig": 4.1,
+   "cut": [
+    0,
+    3.92
+   ]
+  },
+  {
+   "id": "bk-shinji",
+   "titre": "Bankai — Shinji",
+   "pack": "bankai",
+   "src": "imite/sons/bk-shinji.mp3",
+   "dur": 1.15,
+   "niveau": 1,
+   "orig": 4.9,
+   "cut": [
+    0,
+    1.12
+   ]
+  },
+  {
+   "id": "bk-shunsui",
+   "titre": "Bankai — Shunsui",
+   "pack": "bankai",
+   "src": "imite/sons/bk-shunsui.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 11.0,
+   "cut": [
+    0.3,
+    5.3
+   ]
+  },
+  {
+   "id": "bk-soifon",
+   "titre": "Bankai — Soi Fon",
+   "pack": "bankai",
+   "src": "imite/sons/bk-soifon.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.2,
+   "cut": [
+    0.77,
+    5.77
+   ]
+  },
+  {
+   "id": "bk-toshiro",
+   "titre": "Bankai — Toshiro (Hyōrinmaru)",
+   "pack": "bankai",
+   "src": "imite/sons/bk-toshiro.mp3",
+   "dur": 4.15,
+   "niveau": 2,
+   "orig": 4.5,
+   "cut": [
+    0.41,
+    4.54
+   ]
+  },
+  {
+   "id": "bk-unohana",
+   "titre": "Bankai — Unohana",
+   "pack": "bankai",
+   "src": "imite/sons/bk-unohana.mp3",
+   "dur": 1.25,
+   "niveau": 1,
+   "orig": 1.2,
+   "cut": [
+    0.02,
+    1.25
+   ]
+  },
+  {
+   "id": "at-chidori",
+   "titre": "Chidori",
+   "pack": "attaques",
+   "src": "imite/sons/at-chidori.mp3",
+   "dur": 4.41,
+   "niveau": 3,
+   "orig": 4.4,
+   "cut": [
+    0.02,
+    4.39
+   ]
+  },
+  {
+   "id": "at-getsuga",
+   "titre": "Getsuga Tenshō",
+   "pack": "attaques",
+   "src": "imite/sons/at-getsuga.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 15.0,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "at-gomu",
+   "titre": "Gomu Gomu no Pistol",
+   "pack": "attaques",
+   "src": "imite/sons/at-gomu.mp3",
+   "dur": 4.83,
+   "niveau": 3,
+   "orig": 5.0,
+   "cut": [
+    0.21,
+    5.02
+   ]
+  },
+  {
+   "id": "at-hadouken",
+   "titre": "Hadōken",
+   "pack": "attaques",
+   "src": "imite/sons/at-hadouken.mp3",
+   "dur": 0.68,
+   "niveau": 1,
+   "orig": 0.7,
+   "cut": [
+    0,
+    0.65
+   ]
+  },
+  {
+   "id": "at-kaioken",
+   "titre": "Kaiō-ken",
+   "pack": "attaques",
+   "src": "imite/sons/at-kaioken.mp3",
+   "dur": 3.06,
+   "niveau": 2,
+   "orig": 3.0,
+   "cut": [
+    0,
+    3.02
+   ]
+  },
+  {
+   "id": "at-kamehameha",
+   "titre": "Kamehameha",
+   "pack": "attaques",
+   "src": "imite/sons/at-kamehameha.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.5,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "at-makanko",
+   "titre": "Makankōsappō",
+   "pack": "attaques",
+   "src": "imite/sons/at-makanko.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.4,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "at-muda",
+   "titre": "Muda muda muda",
+   "pack": "attaques",
+   "src": "imite/sons/at-muda.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 5.0,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "at-omae",
+   "titre": "Omae wa mō shindeiru",
+   "pack": "attaques",
+   "src": "imite/sons/at-omae.mp3",
+   "dur": 1.88,
+   "niveau": 1,
+   "orig": 2.9,
+   "cut": [
+    0.83,
+    2.66
+   ]
+  },
+  {
+   "id": "at-ora",
+   "titre": "Ora ora ora",
+   "pack": "attaques",
+   "src": "imite/sons/at-ora.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 16.1,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "at-rasengan",
+   "titre": "Rasengan",
+   "pack": "attaques",
+   "src": "imite/sons/at-rasengan.mp3",
+   "dur": 1.04,
+   "niveau": 1,
+   "orig": 1.5,
+   "cut": [
+    0.5,
+    1.51
+   ]
+  },
+  {
+   "id": "at-shoryuken",
+   "titre": "Shōryūken",
+   "pack": "attaques",
+   "src": "imite/sons/at-shoryuken.mp3",
+   "dur": 0.84,
+   "niveau": 1,
+   "orig": 0.8,
+   "cut": [
+    0.01,
+    0.8
+   ]
+  },
+  {
+   "id": "at-zawarudo",
+   "titre": "Za Warudo",
+   "pack": "attaques",
+   "src": "imite/sons/at-zawarudo.mp3",
+   "dur": 4.44,
+   "niveau": 3,
+   "orig": 4.4,
+   "cut": [
+    0,
+    4.41
+   ]
+  },
+  {
+   "id": "mb-allerkylian",
+   "titre": "Allez Kylian !",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-allerkylian.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.2,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "mb-but906",
+   "titre": "Le but à la 90+6",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-but906.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 11.0,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "mb-cestmoiwesh",
+   "titre": "C’est moi wesh",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-cestmoiwesh.mp3",
+   "dur": 1.88,
+   "niveau": 1,
+   "orig": 1.9,
+   "cut": [
+    0.02,
+    1.85
+   ]
+  },
+  {
+   "id": "mb-dictator",
+   "titre": "Mbappé dictator",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-dictator.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 17.6,
+   "cut": [
+    0.09,
+    5.09
+   ]
+  },
+  {
+   "id": "mb-footballchange",
+   "titre": "Le football il a changé",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-footballchange.mp3",
+   "dur": 1.15,
+   "niveau": 1,
+   "orig": 1.1,
+   "cut": [
+    0,
+    1.11
+   ]
+  },
+  {
+   "id": "mb-forexample",
+   "titre": "For example, nothing",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-forexample.mp3",
+   "dur": 3.03,
+   "niveau": 2,
+   "orig": 3.0,
+   "cut": [
+    0,
+    3.0
+   ]
+  },
+  {
+   "id": "mb-gerard",
+   "titre": "Nan moi c’est Gérard",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-gerard.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.5,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "mb-jesaispas",
+   "titre": "Je sais pas !",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-jesaispas.mp3",
+   "dur": 1.72,
+   "niveau": 1,
+   "orig": 1.7,
+   "cut": [
+    0,
+    1.7
+   ]
+  },
+  {
+   "id": "mb-kylian",
+   "titre": "Kylian Mbappé",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-kylian.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.5,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "mb-mbappex3",
+   "titre": "Mbappé Mbappé Mbappé",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-mbappex3.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 5.6,
+   "cut": [
+    0.02,
+    5.02
+   ]
+  },
+  {
+   "id": "mb-moijepensepas",
+   "titre": "Moi je pense pas",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-moijepensepas.mp3",
+   "dur": 0.86,
+   "niveau": 1,
+   "orig": 6.8,
+   "cut": [
+    2.72,
+    3.55
+   ]
+  },
+  {
+   "id": "mb-onestbien",
+   "titre": "Ah là, on est bien !",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-onestbien.mp3",
+   "dur": 2.38,
+   "niveau": 2,
+   "orig": 6.4,
+   "cut": [
+    0.18,
+    2.51
+   ]
+  },
+  {
+   "id": "mb-parlespasdage",
+   "titre": "Tu me parles pas d’âge",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-parlespasdage.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 21.7,
+   "cut": [
+    0.51,
+    5.51
+   ]
+  },
+  {
+   "id": "mb-stmbappe",
+   "titre": "Saint Mbappé Paris",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-stmbappe.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 5.7,
+   "cut": [
+    0.39,
+    5.39
+   ]
+  },
+  {
+   "id": "mb-vapaslachercher",
+   "titre": "Il va pas la chercher",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-vapaslachercher.mp3",
+   "dur": 2.27,
+   "niveau": 2,
+   "orig": 2.2,
+   "cut": [
+    0,
+    2.25
+   ]
+  },
+  {
+   "id": "mb-vouspensez",
+   "titre": "Vous pensez Kylian Mbappé ?",
+   "pack": "mbappe",
+   "src": "imite/sons/mb-vouspensez.mp3",
+   "dur": 0.86,
+   "niveau": 1,
+   "orig": 5.3,
+   "cut": [
+    2.25,
+    3.07
+   ]
+  },
+  {
+   "id": "dm-belebele",
+   "titre": "Dembélé bélé bélé",
+   "pack": "foot",
+   "src": "imite/sons/dm-belebele.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 20.6,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "dm-eusunt",
+   "titre": "Dembélé (Eusuntdraqu)",
+   "pack": "foot",
+   "src": "imite/sons/dm-eusunt.mp3",
+   "dur": 4.31,
+   "niveau": 3,
+   "orig": 4.3,
+   "cut": [
+    0,
+    4.26
+   ]
+  },
+  {
+   "id": "dm-gaucher",
+   "titre": "Dembélé gaucher ou droitier ?",
+   "pack": "foot",
+   "src": "imite/sons/dm-gaucher.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 16.6,
+   "cut": [
+    0.01,
+    5.01
+   ]
+  },
+  {
+   "id": "dm-liberte",
+   "titre": "Liberté, Égalité, Dembélé",
+   "pack": "foot",
+   "src": "imite/sons/dm-liberte.mp3",
+   "dur": 2.32,
+   "niveau": 2,
+   "orig": 2.3,
+   "cut": [
+    0,
+    2.28
+   ]
+  },
+  {
+   "id": "dm-ouioui",
+   "titre": "Dembélé — Oui oui",
+   "pack": "foot",
+   "src": "imite/sons/dm-ouioui.mp3",
+   "dur": 2.82,
+   "niveau": 2,
+   "orig": 2.8,
+   "cut": [
+    0,
+    2.8
+   ]
+  },
+  {
+   "id": "tl-tolisso",
+   "titre": "Laissez Tolisso tranquille",
+   "pack": "foot",
+   "src": "imite/sons/tl-tolisso.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.9,
+   "cut": [
+    0.01,
+    5.01
+   ]
+  },
+  {
+   "id": "ch-deschips",
+   "titre": "Oh, des chips",
+   "pack": "snap",
+   "src": "imite/sons/ch-deschips.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.9,
+   "cut": [
+    0.49,
+    5.49
+   ]
+  },
+  {
+   "id": "do-abject",
+   "titre": "Domingo — C’est abject",
+   "pack": "snap",
+   "src": "imite/sons/do-abject.mp3",
+   "dur": 1.02,
+   "niveau": 1,
+   "orig": 1.1,
+   "cut": [
+    0,
+    0.99
+   ]
+  },
+  {
+   "id": "fl-flamby",
+   "titre": "Mon flamby",
+   "pack": "snap",
+   "src": "imite/sons/fl-flamby.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.9,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "fr-gras",
+   "titre": "Le gras, c’est la vie",
+   "pack": "snap",
+   "src": "imite/sons/fr-gras.mp3",
+   "dur": 1.2,
+   "niveau": 1,
+   "orig": 1.2,
+   "cut": [
+    0,
+    1.15
+   ]
+  },
+  {
+   "id": "fr-pasfaux",
+   "titre": "C’est pas faux",
+   "pack": "snap",
+   "src": "imite/sons/fr-pasfaux.mp3",
+   "dur": 1.54,
+   "niveau": 1,
+   "orig": 2.0,
+   "cut": [
+    0.38,
+    1.87
+   ]
+  },
+  {
+   "id": "ju-weshalors",
+   "titre": "Jul — Wesh alors",
+   "pack": "snap",
+   "src": "imite/sons/ju-weshalors.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.0,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sn-alan",
+   "titre": "Dédicace à mon coach Alan",
+   "pack": "snap",
+   "src": "imite/sons/sn-alan.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 11.2,
+   "cut": [
+    0.05,
+    5.05
+   ]
+  },
+  {
+   "id": "sn-baptiste",
+   "titre": "Ça va pas Baptiste",
+   "pack": "snap",
+   "src": "imite/sons/sn-baptiste.mp3",
+   "dur": 2.09,
+   "niveau": 1,
+   "orig": 2.1,
+   "cut": [
+    0.03,
+    2.08
+   ]
+  },
+  {
+   "id": "sn-bordel",
+   "titre": "C’est quoi ce bordel",
+   "pack": "snap",
+   "src": "imite/sons/sn-bordel.mp3",
+   "dur": 1.59,
+   "niveau": 1,
+   "orig": 1.6,
+   "cut": [
+    0,
+    1.56
+   ]
+  },
+  {
+   "id": "sn-boubakaka",
+   "titre": "Boubakaka",
+   "pack": "snap",
+   "src": "imite/sons/sn-boubakaka.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.7,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sn-byilhan",
+   "titre": "Réveil Byilhan",
+   "pack": "snap",
+   "src": "imite/sons/sn-byilhan.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 16.5,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sn-caca",
+   "titre": "J’ai fini mon caca",
+   "pack": "snap",
+   "src": "imite/sons/sn-caca.mp3",
+   "dur": 4.02,
+   "niveau": 2,
+   "orig": 14.0,
+   "cut": [
+    2.92,
+    6.91
+   ]
+  },
+  {
+   "id": "sn-cambodge",
+   "titre": "On est au Cambodge ou quoi là",
+   "pack": "snap",
+   "src": "imite/sons/sn-cambodge.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 5.7,
+   "cut": [
+    0.11,
+    5.11
+   ]
+  },
+  {
+   "id": "sn-cestvrai",
+   "titre": "C’est vrai ?",
+   "pack": "snap",
+   "src": "imite/sons/sn-cestvrai.mp3",
+   "dur": 0.73,
+   "niveau": 1,
+   "orig": 0.7,
+   "cut": [
+    0.05,
+    0.74
+   ]
+  },
+  {
+   "id": "sn-couscous",
+   "titre": "Couscous merguez",
+   "pack": "snap",
+   "src": "imite/sons/sn-couscous.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 10.5,
+   "cut": [
+    0.02,
+    5.02
+   ]
+  },
+  {
+   "id": "sn-danette",
+   "titre": "J’ai fait des prouts dans ma Danette",
+   "pack": "snap",
+   "src": "imite/sons/sn-danette.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 9.7,
+   "cut": [
+    0.16,
+    5.16
+   ]
+  },
+  {
+   "id": "sn-dauphin",
+   "titre": "Pantalon dauphin",
+   "pack": "snap",
+   "src": "imite/sons/sn-dauphin.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 10.5,
+   "cut": [
+    0.03,
+    5.03
+   ]
+  },
+  {
+   "id": "sn-fermer",
+   "titre": "Tu vas la fermer ta gueule",
+   "pack": "snap",
+   "src": "imite/sons/sn-fermer.mp3",
+   "dur": 4.28,
+   "niveau": 3,
+   "orig": 4.4,
+   "cut": [
+    0.16,
+    4.39
+   ]
+  },
+  {
+   "id": "sn-ftg",
+   "titre": "Aller FTG",
+   "pack": "snap",
+   "src": "imite/sons/sn-ftg.mp3",
+   "dur": 1.2,
+   "niveau": 1,
+   "orig": 1.2,
+   "cut": [
+    0.07,
+    1.23
+   ]
+  },
+  {
+   "id": "sn-hugo",
+   "titre": "Hugooo",
+   "pack": "snap",
+   "src": "imite/sons/sn-hugo.mp3",
+   "dur": 4.49,
+   "niveau": 3,
+   "orig": 4.5,
+   "cut": [
+    0.02,
+    4.48
+   ]
+  },
+  {
+   "id": "sn-iltombe",
+   "titre": "Il est tombé",
+   "pack": "snap",
+   "src": "imite/sons/sn-iltombe.mp3",
+   "dur": 3.92,
+   "niveau": 2,
+   "orig": 3.9,
+   "cut": [
+    0.05,
+    3.94
+   ]
+  },
+  {
+   "id": "sn-inaf",
+   "titre": "Inaf",
+   "pack": "snap",
+   "src": "imite/sons/sn-inaf.mp3",
+   "dur": 2.48,
+   "niveau": 2,
+   "orig": 2.4,
+   "cut": [
+    0,
+    2.44
+   ]
+  },
+  {
+   "id": "sn-issou",
+   "titre": "Issou (Risitas)",
+   "pack": "snap",
+   "src": "imite/sons/sn-issou.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 11.0,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sn-jaimebien",
+   "titre": "Voilà, j’aime bien",
+   "pack": "snap",
+   "src": "imite/sons/sn-jaimebien.mp3",
+   "dur": 2.74,
+   "niveau": 2,
+   "orig": 3.1,
+   "cut": [
+    0.13,
+    2.84
+   ]
+  },
+  {
+   "id": "sn-levetoi",
+   "titre": "Lève-toi",
+   "pack": "snap",
+   "src": "imite/sons/sn-levetoi.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 13.9,
+   "cut": [
+    0.65,
+    5.65
+   ]
+  },
+  {
+   "id": "sn-libellule",
+   "titre": "Je pète ma bière, ma libellule",
+   "pack": "snap",
+   "src": "imite/sons/sn-libellule.mp3",
+   "dur": 0.97,
+   "niveau": 1,
+   "orig": 10.0,
+   "cut": [
+    0.05,
+    0.97
+   ]
+  },
+  {
+   "id": "sn-maisnan",
+   "titre": "Mais nan !",
+   "pack": "snap",
+   "src": "imite/sons/sn-maisnan.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.2,
+   "cut": [
+    0.04,
+    5.04
+   ]
+  },
+  {
+   "id": "sn-messages",
+   "titre": "Arrêtez d’envoyer les messages",
+   "pack": "snap",
+   "src": "imite/sons/sn-messages.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.4,
+   "cut": [
+    0.17,
+    5.17
+   ]
+  },
+  {
+   "id": "sn-pasnet",
+   "titre": "Mais t’es pas net",
+   "pack": "snap",
+   "src": "imite/sons/sn-pasnet.mp3",
+   "dur": 1.33,
+   "niveau": 1,
+   "orig": 1.8,
+   "cut": [
+    0.18,
+    1.48
+   ]
+  },
+  {
+   "id": "sn-pizzanizar",
+   "titre": "Pizza Nizar",
+   "pack": "snap",
+   "src": "imite/sons/sn-pizzanizar.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 18.4,
+   "cut": [
+    0.03,
+    5.03
+   ]
+  },
+  {
+   "id": "sn-porte",
+   "titre": "Ouvre la porte",
+   "pack": "snap",
+   "src": "imite/sons/sn-porte.mp3",
+   "dur": 4.91,
+   "niveau": 3,
+   "orig": 17.6,
+   "cut": [
+    0.01,
+    4.88
+   ]
+  },
+  {
+   "id": "sn-proprietaire",
+   "titre": "Je suis propriétaire",
+   "pack": "snap",
+   "src": "imite/sons/sn-proprietaire.mp3",
+   "dur": 4.13,
+   "niveau": 2,
+   "orig": 5.8,
+   "cut": [
+    0.8,
+    4.89
+   ]
+  },
+  {
+   "id": "sn-repartirmal",
+   "titre": "Tu vas repartir mal mon copain",
+   "pack": "snap",
+   "src": "imite/sons/sn-repartirmal.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 11.1,
+   "cut": [
+    0.21,
+    5.21
+   ]
+  },
+  {
+   "id": "sn-santebondy",
+   "titre": "Santé Bondy, on est là",
+   "pack": "snap",
+   "src": "imite/sons/sn-santebondy.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 11.7,
+   "cut": [
+    4.32,
+    9.32
+   ]
+  },
+  {
+   "id": "sn-souffrir",
+   "titre": "Je suis pas venue pour souffrir",
+   "pack": "snap",
+   "src": "imite/sons/sn-souffrir.mp3",
+   "dur": 1.88,
+   "niveau": 1,
+   "orig": 1.8,
+   "cut": [
+    0,
+    1.84
+   ]
+  },
+  {
+   "id": "sn-tchikibrrr",
+   "titre": "Tchiki brrr",
+   "pack": "snap",
+   "src": "imite/sons/sn-tchikibrrr.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 11.3,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sn-telephone",
+   "titre": "Ton téléphone est en train de sonner",
+   "pack": "snap",
+   "src": "imite/sons/sn-telephone.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 15.7,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sn-viande",
+   "titre": "Viande",
+   "pack": "snap",
+   "src": "imite/sons/sn-viande.mp3",
+   "dur": 4.36,
+   "niveau": 3,
+   "orig": 4.3,
+   "cut": [
+    0,
+    4.32
+   ]
+  },
+  {
+   "id": "am-boule",
+   "titre": "Amine, tu es ma boule",
+   "pack": "streamers",
+   "src": "imite/sons/am-boule.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.5,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "am-crane",
+   "titre": "Dans le crâne Talmo",
+   "pack": "streamers",
+   "src": "imite/sons/am-crane.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.8,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "am-pingouin",
+   "titre": "Talmo pingouin",
+   "pack": "streamers",
+   "src": "imite/sons/am-pingouin.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 10.7,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "am-poule",
+   "titre": "Amine, tu es ma poule",
+   "pack": "streamers",
+   "src": "imite/sons/am-poule.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.5,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "go-intro",
+   "titre": "Gotaga — Intro",
+   "pack": "streamers",
+   "src": "imite/sons/go-intro.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 21.1,
+   "cut": [
+    0.17,
+    5.17
+   ]
+  },
+  {
+   "id": "go-nonnon",
+   "titre": "Gotaga — Non non non !",
+   "pack": "streamers",
+   "src": "imite/sons/go-nonnon.mp3",
+   "dur": 1.88,
+   "niveau": 1,
+   "orig": 1.9,
+   "cut": [
+    0.03,
+    1.87
+   ]
+  },
+  {
+   "id": "go-yoptlm",
+   "titre": "Gotaga — Yop tout le monde",
+   "pack": "streamers",
+   "src": "imite/sons/go-yoptlm.mp3",
+   "dur": 1.38,
+   "niveau": 1,
+   "orig": 1.4,
+   "cut": [
+    0,
+    1.36
+   ]
+  },
+  {
+   "id": "in-couscous",
+   "titre": "Inoxtag — Maître couscous",
+   "pack": "streamers",
+   "src": "imite/sons/in-couscous.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.7,
+   "cut": [
+    0.06,
+    5.06
+   ]
+  },
+  {
+   "id": "in-cri",
+   "titre": "Inoxtag — Yahaaa",
+   "pack": "streamers",
+   "src": "imite/sons/in-cri.mp3",
+   "dur": 3.42,
+   "niveau": 2,
+   "orig": 3.4,
+   "cut": [
+    0,
+    3.4
+   ]
+  },
+  {
+   "id": "in-mouchoirs",
+   "titre": "Sortez les mouchoirs",
+   "pack": "streamers",
+   "src": "imite/sons/in-mouchoirs.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 26.1,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "in-quoicoubeh",
+   "titre": "Inoxtag — Quoicoubeh",
+   "pack": "streamers",
+   "src": "imite/sons/in-quoicoubeh.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 13.7,
+   "cut": [
+    0.79,
+    5.79
+   ]
+  },
+  {
+   "id": "in-terreentiere",
+   "titre": "Inoxtag — La terre entière",
+   "pack": "streamers",
+   "src": "imite/sons/in-terreentiere.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 14.1,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "jo-caca",
+   "titre": "Joyca — Caca de chien",
+   "pack": "streamers",
+   "src": "imite/sons/jo-caca.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.1,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "jo-grillon",
+   "titre": "Joyca — Glace au grillon",
+   "pack": "streamers",
+   "src": "imite/sons/jo-grillon.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.8,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "jo-souleve",
+   "titre": "Joyca — Soulève-moi",
+   "pack": "streamers",
+   "src": "imite/sons/jo-souleve.mp3",
+   "dur": 4.21,
+   "niveau": 3,
+   "orig": 4.2,
+   "cut": [
+    0.03,
+    4.2
+   ]
+  },
+  {
+   "id": "ka-10min",
+   "titre": "Kameto — Pendant 10 minutes",
+   "pack": "streamers",
+   "src": "imite/sons/ka-10min.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 11.6,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "ka-cartes",
+   "titre": "Kameto — Manger des cartes graphiques",
+   "pack": "streamers",
+   "src": "imite/sons/ka-cartes.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 12.9,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "lo-sniper",
+   "titre": "Locklear — Je suis un sniper",
+   "pack": "streamers",
+   "src": "imite/sons/lo-sniper.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.0,
+   "cut": [
+    0.66,
+    5.66
+   ]
+  },
+  {
+   "id": "ma-drole",
+   "titre": "Mastu — C’est drôle ça",
+   "pack": "streamers",
+   "src": "imite/sons/ma-drole.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.9,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "ma-mcdo",
+   "titre": "Mastu — Théodort McDo",
+   "pack": "streamers",
+   "src": "imite/sons/ma-mcdo.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 15.4,
+   "cut": [
+    0.14,
+    5.14
+   ]
+  },
+  {
+   "id": "ma-soiree",
+   "titre": "Mastu — Encore une soirée",
+   "pack": "streamers",
+   "src": "imite/sons/ma-soiree.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 32.3,
+   "cut": [
+    0.54,
+    5.54
+   ]
+  },
+  {
+   "id": "mi-club",
+   "titre": "Michou — Posé dans le club",
+   "pack": "streamers",
+   "src": "imite/sons/mi-club.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.6,
+   "cut": [
+    0.02,
+    5.02
+   ]
+  },
+  {
+   "id": "mi-couleur",
+   "titre": "Michou — La couleur de mes amis",
+   "pack": "streamers",
+   "src": "imite/sons/mi-couleur.mp3",
+   "dur": 1.7,
+   "niveau": 1,
+   "orig": 1.6,
+   "cut": [
+    0,
+    1.65
+   ]
+  },
+  {
+   "id": "mi-moto",
+   "titre": "Michou — Moto",
+   "pack": "streamers",
+   "src": "imite/sons/mi-moto.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 15.7,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "mi-pleurer",
+   "titre": "Michou — J’vais pleurer",
+   "pack": "streamers",
+   "src": "imite/sons/mi-pleurer.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 5.5,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "po-macron",
+   "titre": "Ponce — Macron",
+   "pack": "streamers",
+   "src": "imite/sons/po-macron.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 8.7,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sa-boulanger",
+   "titre": "Sardoche — Le boulanger",
+   "pack": "streamers",
+   "src": "imite/sons/sa-boulanger.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 14.0,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sa-concentre",
+   "titre": "Sardoche — Concentre-toi",
+   "pack": "streamers",
+   "src": "imite/sons/sa-concentre.mp3",
+   "dur": 1.96,
+   "niveau": 1,
+   "orig": 1.9,
+   "cut": [
+    0,
+    1.92
+   ]
+  },
+  {
+   "id": "sa-multimillionnaire",
+   "titre": "Sardoche — Multimillionnaire",
+   "pack": "streamers",
+   "src": "imite/sons/sa-multimillionnaire.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 6.3,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "sa-ouilest",
+   "titre": "Sardoche — Mais il est où ?!",
+   "pack": "streamers",
+   "src": "imite/sons/sa-ouilest.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 9.2,
+   "cut": [
+    0.26,
+    5.26
+   ]
+  },
+  {
+   "id": "sa-pavard",
+   "titre": "Sardoche — Pavard",
+   "pack": "streamers",
+   "src": "imite/sons/sa-pavard.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.6,
+   "cut": [
+    0.58,
+    5.58
+   ]
+  },
+  {
+   "id": "sa-sur",
+   "titre": "Sardoche — Mais c’était sûr",
+   "pack": "streamers",
+   "src": "imite/sons/sa-sur.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.5,
+   "cut": [
+    0.38,
+    5.38
+   ]
+  },
+  {
+   "id": "sq-badbaby",
+   "titre": "Squeezie — Bad Baby no",
+   "pack": "streamers",
+   "src": "imite/sons/sq-badbaby.mp3",
+   "dur": 3.11,
+   "niveau": 2,
+   "orig": 4.0,
+   "cut": [
+    0,
+    3.07
+   ]
+  },
+  {
+   "id": "sq-ciao",
+   "titre": "Squeezie — C’est ciao",
+   "pack": "streamers",
+   "src": "imite/sons/sq-ciao.mp3",
+   "dur": 0.97,
+   "niveau": 1,
+   "orig": 0.9,
+   "cut": [
+    0,
+    0.94
+   ]
+  },
+  {
+   "id": "sq-cringe",
+   "titre": "Tu es cringe Squeezie",
+   "pack": "streamers",
+   "src": "imite/sons/sq-cringe.mp3",
+   "dur": 0.81,
+   "niveau": 1,
+   "orig": 1.8,
+   "cut": [
+    0.73,
+    1.49
+   ]
+  },
+  {
+   "id": "sq-ohlavache",
+   "titre": "Dylan — Oh la vache !",
+   "pack": "streamers",
+   "src": "imite/sons/sq-ohlavache.mp3",
+   "dur": 0.94,
+   "niveau": 1,
+   "orig": 0.9,
+   "cut": [
+    0,
+    0.89
+   ]
+  },
+  {
+   "id": "sq-vermicelle",
+   "titre": "J’adore le vermicelle",
+   "pack": "streamers",
+   "src": "imite/sons/sq-vermicelle.mp3",
+   "dur": 0.99,
+   "niveau": 1,
+   "orig": 1.0,
+   "cut": [
+    0,
+    0.95
+   ]
+  },
+  {
+   "id": "ks-licorne",
+   "titre": "Kaaris — Licorne",
+   "pack": "rap",
+   "src": "imite/sons/ks-licorne.mp3",
+   "dur": 3.94,
+   "niveau": 2,
+   "orig": 4.4,
+   "cut": [
+    0,
+    3.9
+   ]
+  },
+  {
+   "id": "ks-melange",
+   "titre": "Kaaris — Et je mélange",
+   "pack": "rap",
+   "src": "imite/sons/ks-melange.mp3",
+   "dur": 3.24,
+   "niveau": 2,
+   "orig": 3.2,
+   "cut": [
+    0,
+    3.2
+   ]
+  },
+  {
+   "id": "ks-patron",
+   "titre": "Kaaris — Patron",
+   "pack": "rap",
+   "src": "imite/sons/ks-patron.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.2,
+   "cut": [
+    0,
+    5.0
+   ]
+  },
+  {
+   "id": "ks-renseigne",
+   "titre": "Kaaris — T’es bien renseigné",
+   "pack": "rap",
+   "src": "imite/sons/ks-renseigne.mp3",
+   "dur": 2.61,
+   "niveau": 2,
+   "orig": 2.6,
+   "cut": [
+    0,
+    2.58
+   ]
+  },
+  {
+   "id": "ni-salut",
+   "titre": "Ninho — Salut c’est Ninho",
+   "pack": "rap",
+   "src": "imite/sons/ni-salut.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 7.7,
+   "cut": [
+    0.85,
+    5.85
+   ]
+  },
+  {
+   "id": "pc-gandalf",
+   "titre": "Vous ne passerez pas !",
+   "pack": "pop",
+   "src": "imite/sons/pc-gandalf.mp3",
+   "dur": 4.75,
+   "niveau": 3,
+   "orig": 4.7,
+   "cut": [
+    0,
+    4.72
+   ]
+  },
+  {
+   "id": "pc-hasta",
+   "titre": "Hasta la vista, baby",
+   "pack": "pop",
+   "src": "imite/sons/pc-hasta.mp3",
+   "dur": 4.55,
+   "niveau": 3,
+   "orig": 6.6,
+   "cut": [
+    0.03,
+    4.53
+   ]
+  },
+  {
+   "id": "pc-houston",
+   "titre": "Houston, on a un problème",
+   "pack": "pop",
+   "src": "imite/sons/pc-houston.mp3",
+   "dur": 2.12,
+   "niveau": 1,
+   "orig": 3.5,
+   "cut": [
+    0.61,
+    2.68
+   ]
+  },
+  {
+   "id": "pc-mario",
+   "titre": "It’s-a me, Mario",
+   "pack": "pop",
+   "src": "imite/sons/pc-mario.mp3",
+   "dur": 3.08,
+   "niveau": 2,
+   "orig": 4.1,
+   "cut": [
+    0.07,
+    3.11
+   ]
+  },
+  {
+   "id": "pc-pere",
+   "titre": "Je suis ton père",
+   "pack": "pop",
+   "src": "imite/sons/pc-pere.mp3",
+   "dur": 5.04,
+   "niveau": 3,
+   "orig": 18.6,
+   "cut": [
+    1.31,
+    6.31
+   ]
+  },
+  {
+   "id": "pc-pikachu",
+   "titre": "Pikachu",
+   "pack": "pop",
+   "src": "imite/sons/pc-pikachu.mp3",
+   "dur": 1.15,
+   "niveau": 1,
+   "orig": 1.4,
+   "cut": [
+    0.25,
+    1.36
+   ]
+  },
+  {
+   "id": "pc-wingardium",
+   "titre": "Wingardium Leviosa",
+   "pack": "pop",
+   "src": "imite/sons/pc-wingardium.mp3",
+   "dur": 2.59,
+   "niveau": 2,
+   "orig": 2.5,
+   "cut": [
+    0,
+    2.55
+   ]
+  },
+  {
+   "id": "pc-wololo",
+   "titre": "Wololo",
+   "pack": "pop",
+   "src": "imite/sons/pc-wololo.mp3",
+   "dur": 1.54,
+   "niveau": 1,
+   "orig": 1.5,
+   "cut": [
+    0,
+    1.52
+   ]
+  }
+ ]
+}
