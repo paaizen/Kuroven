@@ -531,7 +531,7 @@ function resetFx(){clearConf();noteOn=false;applause=0;spk.visible=false;POD.for
 const SEATK={ryo:0,kenji:1,sora:2,mizuki:3};
 function seatList(keys,pose,max){const free=[0,1,2,3];
   keys.slice(0,max).forEach(k=>{let i=SEATK[k];if(i===undefined||free.indexOf(i)<0)i=free[0];if(i===undefined)return;free.splice(free.indexOf(i),1);const s=SEATS[i];put(k,s[0],s[1],s[2],Math.PI,pose);CH[k].userData.tag=false})}
-function seatOthers(pose,except){const ks=[];cast.forEach(c=>{if(c.key!==except&&ks.indexOf(c.key)<0)ks.push(c.key)});['kenji','sora','mizuki','ryo','lea','ren'].forEach(k=>{if(k!==except&&ks.indexOf(k)<0)ks.push(k)});
+function seatOthers(pose,except){const ex=[].concat(except);const ks=[];cast.forEach(c=>{if(ex.indexOf(c.key)<0&&ks.indexOf(c.key)<0)ks.push(c.key)});['kenji','sora','mizuki','ryo','lea','ren'].forEach(k=>{if(ex.indexOf(k)<0&&ks.indexOf(k)<0)ks.push(k)});
   seatList(ks,pose,3)}
 function showName(k,i){const u=CH[k].userData;u.tag=cast.length>1&&!!nameOf(i);u.label=escH(nameOf(i))}
 const MODES={
@@ -566,6 +566,10 @@ const MODES={
       if(f<0&&o.done)o.done=false});
     CSP.forEach(c=>{const v=new THREE.Vector3(c.ox,c.oy,-1.6).applyMatrix4(camera.matrixWorld);c.sp.position.copy(v);const age=t-c.t0;c.sp.material.opacity=age<0?0:Math.max(0,.92-Math.max(0,age-1.2)*.45)});juiceUpdate(t);
     const w=Math.max(0,1-(t-S.lh)/.22);CH[k].rotation.z=Math.sin(t*55)*.07*w}}},
+ handoff:{enter(o){const a=keyOf(o.from),b=keyOf(o.to);S={a:a,b:b};curtT=1;camTo(0,2.2,8.9,0,1.4,0,true);put(a,0,0,.9,0,'bow');put(b,7.5,0,.8,-Math.PI/2,'walk');showName(a,o.from);showName(b,o.to);seatOthers('idle',[a,b])},
+  tick(t){const A=CH[S.a],Bc=CH[S.b];const ex=seg(t,1.2,3.4),lx=lerp(0,-8.5,ease(ex));A.position.x=lx;A.rotation.y=lerp(0,-Math.PI/2,ease(seg(t,1,1.6)));A.userData.pose=t<1.1?'bow':'walk';
+   const en=seg(t,1.8,4.4),kx=lerp(7.5,.2,ease(en));Bc.position.x=kx;Bc.rotation.y=lerp(-Math.PI/2,0,ease(seg(t,4,4.6)));Bc.userData.pose=en<1?'walk':'wave';
+   camTo(Math.sin(t*.3)*1,2.2,8.9,0,1.4,0);setSpot(spotA,2,lx<-1?-1.5:0,1,1,0xfff0c8);spotA.setX(0);setSpot(spotB,en>0?1.6:0,kx,.8,.8,0xffe0a0);spotB.setX(3);applause=t<1.5?.6:0}},
  podium:{enter(o){const L=(o&&o.list)||[];S={used:[],ks:[]};curtT=1;camTo(0,3.0,11.2,0,1.75,0,true);POD.forEach((p,i)=>p.visible=i<L.length);
    const used={};const pickKey=(i)=>{let k=KEYS[i%6];const want=cast[L[i].i]&&cast[L[i].i].key;if(want&&!used[want])k=want;if(used[k]){k=KEYS.filter(x=>!used[x])[0]}used[k]=1;return k};
    const xs=[0,-1.9,1.9],ps=['cheer','clap','clap'];L.slice(0,3).forEach((r,i)=>{const k=pickKey(i);S.ks.push(k);put(k,xs[i],0,.2,i===1?.15:i===2?-.15:0,ps[i]);const u=CH[k].userData;u.tag=true;u.label=escH(r.name)+' <b>'+r.score+'</b>'});
@@ -598,7 +602,7 @@ return{
  mount(el){app=el;el.appendChild(canvas);el.appendChild(tagsEl);if(ro)ro.disconnect();if(window.ResizeObserver){ro=new ResizeObserver(resize);ro.observe(el)}resize();if(!running){running=true;last=performance.now();rafId=requestAnimationFrame(frame)}},
  unmount(){running=false;cancelAnimationFrame(rafId);if(ro){ro.disconnect();ro=null}},
  cast(list){cast=list&&list.length?list:[{name:'',key:'lea'}]},
- mode(m,o){if(m==='listen'||m==='record'||m==='countdown'||m==='result')perf=(o&&o.perf!=null)?o.perf:perf;setMode(m,o)},
+ mode(m,o){if(m==='listen'||m==='record'||m==='countdown'||m==='result')perf=(o&&o.perf!=null)?o.perf:perf;if(m==='handoff')perf=o.to;setMode(m,o)},
  setPerf(i){perf=i},
  mic(v){mic=clamp(v,0,1)},
  playing(b){isPlaying=!!b},

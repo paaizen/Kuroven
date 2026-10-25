@@ -3212,7 +3212,7 @@ function imEnter(){
   const b=$('imBody');
   if(window.IM&&IM.enter)return IM.enter();
   b.innerHTML='<p class="sub" style="text-align:center">Chargement…</p>';
-  if(!imP)imP=new Promise(ok=>{const s=document.createElement('script');window.IM_VER=2;s.src='imite.js?v=2';s.onload=()=>ok(!!window.IM);s.onerror=()=>{imP=null;ok(false)};document.head.appendChild(s)});
+  if(!imP)imP=new Promise(ok=>{const s=document.createElement('script');window.IM_VER=3;s.src='imite.js?v=3';s.onload=()=>ok(!!window.IM);s.onerror=()=>{imP=null;ok(false)};document.head.appendChild(s)});
   imP.then(o=>{if(curView!=='im')return;if(o)IM.enter();else b.innerHTML='<p class="sub" style="text-align:center">Impossible de charger le jeu (fichier imite.js manquant ?).</p>'})}
 let vieArtP=null;
 function vieArt(){
