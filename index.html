@@ -1402,7 +1402,17 @@ function timer(){clearInterval(tm);left=onl?30:(+store.get('tt','20')||20);$('t'
 function next(){turn=1-turn;draw();timer()}
 function close(){$('m').classList.remove('on');sel=null}
 function end(t){over=true;clearInterval(tm);draw();$('msg').textContent=t}
+/* En ligne, le serveur vérifie le coup lui-même (fonction ttt-move) : le navigateur ne décide plus de rien. */
+async function pickOnline(k,ch){
+try{const r=await sb.functions.invoke('ttt-move',{body:{match_id:onl.id,cell:k,char_id:ch.id}});busy=false;if(!onl||onl.done)return;
+const d=r.data;
+if(r.error||!d){$('msg').textContent='Coup refusé ou connexion impossible. Plateau remis à jour.';onlResync('');return}
+if(!d.ok){if(d.retry){$('msg').textContent='AniList ne répond pas. Clique sur la case et réessaie.';draw()}else{$('msg').textContent=d.reason||'Coup refusé.';onlResync(d.reason)}return}
+if(!d.valid){$('msg').textContent=`❌ ${d.name} ne correspond pas. Tour perdu.`;advance(true);return}
+applyRemote({id:onl.id,state:d.state,status:'playing'});if(!over)$('msg').textContent=`✅ ${d.name}`}
+catch(e){busy=false;$('msg').textContent='Erreur : '+e.message+'. Clique sur la case et réessaie.';draw()}}
 async function pick(ch){if(sel==null||used.has(ch.id))return;if(onl&&(turn!==onl.me||over))return;const k=sel,i=Math.floor(k/3),j=k%3;close();busy=true;$('msg').textContent='Vérification…';draw();
+if(onl)return pickOnline(k,ch);
 try{const d=(await gql(QD,{id:ch.id})).Character;busy=false;
 if(!ok(R[i],d)||!ok(K[j],d)){$('msg').textContent=`❌ ${ch.name.full} ne correspond pas. Tour perdu.`;advance(true);return}
 used.add(ch.id);B[k]={p:turn,name:ch.name.full.slice(0,60),img:ch.image.large};
