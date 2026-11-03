@@ -44,6 +44,30 @@ h1{font-size:1.5rem;margin:4px 0 12px;text-align:center}
 .c .nm{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);color:#fff;font-size:.6rem;font-weight:700;padding:2px 3px;text-align:center}
 .c .bd{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;color:#fff;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center}
 .p0 .bd{background:var(--p1)}.p1 .bd{background:var(--p2)}
+/* Morpion : animations et définitions des catégories */
+#g .h{cursor:pointer;position:relative;transition:transform .15s,border-color .15s}
+#g .h:hover,#g .h:focus-visible{border-color:var(--ac);transform:translateY(-2px)}
+#g .h:after{content:"i";position:absolute;top:3px;right:3px;width:14px;height:14px;border-radius:50%;background:var(--bd);color:var(--tx);font-size:.6rem;font-weight:800;display:flex;align-items:center;justify-content:center;opacity:.75}
+@keyframes tIn{from{opacity:0;transform:translateY(-16px) scale(.75)}to{opacity:1;transform:none}}
+@keyframes tPop{0%{transform:scale(.2) rotate(-14deg);opacity:0}55%{transform:scale(1.15) rotate(2deg);opacity:1}78%{transform:scale(.95)}100%{transform:none}}
+@keyframes tImg{from{filter:brightness(2.4) saturate(0)}to{filter:none}}
+@keyframes tWin{0%,100%{transform:none}40%{transform:scale(1.09);box-shadow:0 0 0 3px #ffd84a,0 0 22px #ffd84acc}}
+@keyframes tShake{0%,100%{transform:none}15%{transform:translateX(-9px) rotate(-.6deg)}35%{transform:translateX(8px) rotate(.6deg)}55%{transform:translateX(-6px)}75%{transform:translateX(4px)}}
+@keyframes tTurn{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--c) 0%,transparent),0 0 14px color-mix(in srgb,var(--c) 55%,transparent)}}
+@keyframes tLow{50%{transform:scale(1.35)}}
+#g.intro>*{animation:tIn .5s cubic-bezier(.2,.9,.3,1.2) backwards;animation-delay:calc(var(--i,0)*45ms)}
+#g .c.pop{animation:tPop .55s cubic-bezier(.2,.9,.3,1.3)}
+#g .c.pop img{animation:tImg .7s .15s backwards}
+#g .c.win{outline:3px solid #ffd84a;outline-offset:-3px;z-index:1;animation:tWin .9s ease-in-out calc(.15s + var(--w,0)*.15s) 2}
+#g .c.pop.win{animation:tPop .55s cubic-bezier(.2,.9,.3,1.3),tWin .9s ease-in-out calc(.7s + var(--w,0)*.15s) 2}
+#g.won .c.f:not(.win){filter:saturate(.45) brightness(.85);transition:filter .6s .4s}
+#g.shake{animation:tShake .45s}
+.pl.on{animation:tTurn 1.6s ease-in-out infinite}
+#t{display:inline-block}#t.low{color:#e5484d;animation:tLow 1s ease-in-out infinite}
+#dfp{position:fixed;left:50%;bottom:16px;transform:translate(-50%,30px);width:min(92vw,420px);background:var(--card);color:var(--tx);border:2px solid var(--ac);border-radius:16px;padding:12px 16px;box-shadow:0 10px 40px #0006;z-index:60;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#dfp.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#dfp b{display:block;margin-bottom:4px}#dfp p{margin:0;font-size:.9rem;line-height:1.35}
+@media(prefers-reduced-motion:reduce){#g.intro>*,#g .c.pop,#g .c.pop img,#g .c.win,#g.shake,.pl.on,#t.low{animation:none!important}}
 .fb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:.9rem;padding:6px;word-break:break-word}
 .msg{text-align:center;margin:12px 0;min-height:1.4em;font-weight:700}
 .btn{background:var(--ac);color:var(--onac);border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
@@ -1375,7 +1399,7 @@ const IC={
 };
 const slug=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const badge=l=>{let h=0;for(const ch of l)h=(h*31+ch.charCodeAt(0))%360;return `<span class="ic fb2" style="background:hsl(${h} 65% 48%)">${l[0]}</span>`};
-const hd=c=>`<div class="h"><img class="ic" src="icons/${slug(c.l)}.png" alt="" data-l="${c.l}"><span>${c.l}</span></div>`;
+const hd=(c,id='')=>`<div class="h" data-h="${id}" role="button" tabindex="0" title="Voir la définition"><img class="ic" src="icons/${slug(c.l)}.png" alt="" data-l="${c.l}"><span>${c.l}</span></div>`;
 function fbIc(img){img.outerHTML=IC[img.dataset.l]||badge(img.dataset.l)}
 function ok(c,d){const E=d.media.edges;switch(c.k){
 case'tag':return E.some(e=>e.node.tags.some(t=>t.name===c.v&&t.rank>=50&&!t.isMediaSpoiler));
@@ -1395,10 +1419,31 @@ let R,K,B,used,turn,over,sel,tm,left,busy,deb,seq=0,onl=null,miss=0,RI,CI,wres=n
 const pickN=(a,n)=>[...a].sort(()=>Math.random()-.5).slice(0,n);
 function start(){onlDetach();RI=pickN([...ROWS.keys()],3);CI=pickN([...COLS.keys()],3);R=RI.map(i=>ROWS[i]);K=CI.map(i=>COLS[i]);B=Array(9).fill(null);used=new Set();turn=0;over=false;busy=false;miss=0;wres=null;$('msg').textContent='';draw();timer()}
 function cell(k){const b=B[k];if(!b)return `<button class="c" data-k="${k}" ${over||busy||(onl&&turn!==onl.me)?'disabled':''}></button>`;
-return `<div class="c f p${b.p}"><img src="${esc(safeImg(b.img))}" alt="${esc(b.name)}"><span class="bd">${b.p?'◯':'✕'}</span><span class="nm">${esc(b.name)}</span></div>`}
-function draw(){let h='<div></div>'+K.map(c=>hd(c)).join('');R.forEach((r,i)=>{h+=hd(r);for(let j=0;j<3;j++)h+=cell(i*3+j)});$('g').innerHTML=h;$('p0').classList.toggle('on',turn===0&&!over);$('p1').classList.toggle('on',turn===1&&!over);$('p0').textContent=PN()[0]+(onl&&onl.me===0?' (toi)':'');$('p1').textContent=PN()[1]+(onl&&onl.me===1?' (toi)':'');syncNw()}
+return `<div class="c f p${b.p}" data-k="${k}"><img src="${esc(safeImg(b.img))}" alt="${esc(b.name)}"><span class="bd">${b.p?'◯':'✕'}</span><span class="nm">${esc(b.name)}</span></div>`}
+const DEF={'Shōnen':'Manga/anime visant les garçons ados : action, amitié, dépassement de soi (ex. Naruto).','Seinen':'Visant un public adulte : souvent plus sombre, réaliste ou mature.','Shōjo':'Visant les filles ados : émotions, relations et romance.','Isekai':'Un personnage est transporté ou réincarné dans un autre monde.','Super-pouvoirs':'Des personnages ont des pouvoirs surnaturels (force, télékinésie, etc.).','Voyage dans le temps':'Le temps est manipulé : retours dans le passé, sauts dans le futur…','Boucle temporelle':'Le même moment ou la même journée recommence sans cesse.','Tsundere':'Personnage froid ou agressif en façade, mais tendre en réalité.','Yandere':'Personnage dont l’amour obsessionnel peut devenir dangereux.','Kuudere':'Personnage calme et impassible, qui cache ses émotions.','Anti-héros':'Héros aux méthodes douteuses ou sans les qualités du héros classique.','Héroïne principale':'L’histoire suit une héroïne comme personnage principal.','Jeu de la mort':'Des participants sont forcés de s’affronter pour survivre.','Jeux de cartes':'Les combats se jouent avec des cartes (ex. Yu-Gi-Oh!).','Monde virtuel':'L’action se passe dans un jeu en réseau ou un monde numérique.','Post-apocalyptique':'Le monde a été détruit et les survivants s’adaptent.','Dystopie':'Une société future oppressive ou contrôlée.','Cyberpunk':'Futur high-tech et sombre, dominé par les grandes entreprises et les machines.','Steampunk':'Univers rétro où tout fonctionne à la vapeur et aux engrenages.','Yōkai':'Créatures et esprits du folklore japonais.','Kaiju':'Monstres géants qui ravagent tout sur leur passage.','Yakuza':'Mafia japonaise et ses clans.','Mechas':'Grands robots, souvent pilotés par des humains.','Métamorphes':'Des personnages peuvent changer de forme ou d’apparence.','Famille royale':'Intrigues de rois, reines, princes et palais.','Magical girl':'Des filles se transforment pour combattre le mal (ex. Sailor Moon).','Tranche de vie':'Quotidien tranquille, sans grande intrigue ni combats.','Psychologique':'L’histoire joue sur l’esprit, les nerfs et la manipulation.','Surnaturel':'Phénomènes que la science n’explique pas : fantômes, pouvoirs, esprits.','Tiré d’un manga':'Anime adapté d’un manga (BD japonaise).','Tiré d’un light novel':'Anime adapté d’un light novel (court roman illustré japonais).','Tiré d’un jeu vidéo':'Anime adapté d’un jeu vidéo.','Anime original':'Histoire créée directement pour l’anime, sans œuvre d’origine.','Personnage féminin':'Le personnage est une femme ou une fille (genre indiqué sur AniList).','Personnage masculin':'Le personnage est un homme ou un garçon (genre indiqué sur AniList).','Rôle principal':'Le personnage est noté « principal » dans au moins un anime, pas simple rôle secondaire.','Très populaire (3000+ favoris)':'Au moins 3 000 personnes ont mis ce personnage en favori sur AniList.','Apparaît dans 3 animes ou plus':'Le personnage figure dans au moins 3 animes différents.'};
+function defOf(c){if(DEF[c.l])return DEF[c.l];const e='Il suffit que le personnage apparaisse dans un anime qui correspond.';
+switch(c.k){case'tag':return`Animes ayant pour thème « ${c.l} » sur AniList. ${e}`;case'genre':return`Animes classés dans le genre « ${c.l} » sur AniList. ${e}`;case'year':return c.b>=2100?`Anime sorti depuis ${c.a}. ${e}`:`Anime sorti entre ${c.a} et ${c.b}. ${e}`}return''}
+let dfT;function defHide(){const p=$('dfp');if(p)p.classList.remove('on');clearTimeout(dfT)}
+function defShow(c){let p=$('dfp');if(!p){p=document.createElement('div');p.id='dfp';p.setAttribute('role','status');document.body.appendChild(p)}
+p.innerHTML=`<b>${esc(c.l)}</b><p>${esc(defOf(c))}</p>`;p.classList.add('on');clearTimeout(dfT);dfT=setTimeout(defHide,9000)}
+function defClick(e){const h=e.target.closest('.h');if(!h)return;const id=h.dataset.h||'',c=(id[0]==='r'?R:K)[+id.slice(1)];if(c){e.preventDefault();defShow(c)}}
+document.addEventListener('click',e=>{if(!e.target.closest('#dfp,#g .h'))defHide()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')defHide()});
+$('g').addEventListener('click',defClick);
+$('g').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')defClick(e)});
+/* Animations : apparition de la grille, pose d’un personnage, ligne gagnante */
+let fxS=null;
+function fx(){const g=$('g'),key=RI.join()+'|'+CI.join(),prev=fxS&&fxS.k===key?fxS.s:null;fxS={k:key,s:B.map(Boolean)};
+g.classList.toggle('intro',!prev);
+if(!prev)[...g.children].forEach((el,i)=>el.style.setProperty('--i',i));
+else B.forEach((b,k)=>{if(b&&!prev[k]){const el=g.querySelector('.c[data-k="'+k+'"]');if(el)el.classList.add('pop')}});
+const w=over?L.find(l=>B[l[0]]&&l.every(x=>B[x]&&B[x].p===B[l[0]].p)):null;
+g.classList.toggle('won',!!w);if(over)$('t').classList.remove('low');
+if(w)w.forEach((k,n)=>{const el=g.querySelector('.c[data-k="'+k+'"]');if(el){el.classList.add('win');el.style.setProperty('--w',n)}})}
+function shake(){const g=$('g');g.classList.remove('shake');void g.offsetWidth;g.classList.add('shake')}
+function draw(){let h='<div></div>'+K.map((c,j)=>hd(c,'c'+j)).join('');R.forEach((r,i)=>{h+=hd(r,'r'+i);for(let j=0;j<3;j++)h+=cell(i*3+j)});$('g').innerHTML=h;fx();$('p0').classList.toggle('on',turn===0&&!over);$('p1').classList.toggle('on',turn===1&&!over);$('p0').textContent=PN()[0]+(onl&&onl.me===0?' (toi)':'');$('p1').textContent=PN()[1]+(onl&&onl.me===1?' (toi)':'');syncNw()}
 $('g').addEventListener('error',e=>{if(e.target.tagName==='IMG'&&e.target.classList.contains('ic')){fbIc(e.target);return}if(e.target.tagName==='IMG'){const f=document.createElement('div');f.className='fb';f.textContent=e.target.alt;e.target.replaceWith(f)}},true);
-function timer(){clearInterval(tm);left=onl?30:(+store.get('tt','20')||20);$('t').textContent=left;tm=setInterval(()=>{if(over||busy)return;left--;$('t').textContent=Math.max(left,0);if(left<=0){if(onl&&turn!==onl.me)return;$('msg').textContent='⏱️ Temps écoulé, tour perdu.';close();advance(true)}},1000)}
+function timer(){clearInterval(tm);left=onl?30:(+store.get('tt','20')||20);$('t').textContent=left;$('t').classList.remove('low');tm=setInterval(()=>{if(over||busy)return;left--;$('t').textContent=Math.max(left,0);$('t').classList.toggle('low',left<=5&&left>0);if(left<=0){if(onl&&turn!==onl.me)return;$('msg').textContent='⏱️ Temps écoulé, tour perdu.';close();advance(true)}},1000)}
 function next(){turn=1-turn;draw();timer()}
 function close(){$('m').classList.remove('on');sel=null}
 function end(t){over=true;clearInterval(tm);draw();$('msg').textContent=t}
@@ -1408,13 +1453,13 @@ try{const r=await sb.functions.invoke('ttt-move',{body:{match_id:onl.id,cell:k,c
 const d=r.data;
 if(r.error||!d){$('msg').textContent='Coup refusé ou connexion impossible. Plateau remis à jour.';onlResync('');return}
 if(!d.ok){if(d.retry){$('msg').textContent='AniList ne répond pas. Clique sur la case et réessaie.';draw()}else{$('msg').textContent=d.reason||'Coup refusé.';onlResync(d.reason)}return}
-if(!d.valid){$('msg').textContent=`❌ ${d.name} ne correspond pas. Tour perdu.`;advance(true);return}
+if(!d.valid){$('msg').textContent=`❌ ${d.name} ne correspond pas. Tour perdu.`;shake();advance(true);return}
 applyRemote({id:onl.id,state:d.state,status:'playing'});if(!over)$('msg').textContent=`✅ ${d.name}`}
 catch(e){busy=false;$('msg').textContent='Erreur : '+e.message+'. Clique sur la case et réessaie.';draw()}}
 async function pick(ch){if(sel==null||used.has(ch.id))return;if(onl&&(turn!==onl.me||over))return;const k=sel,i=Math.floor(k/3),j=k%3;close();busy=true;$('msg').textContent='Vérification…';draw();
 if(onl)return pickOnline(k,ch);
 try{const d=(await gql(QD,{id:ch.id})).Character;busy=false;
-if(!ok(R[i],d)||!ok(K[j],d)){$('msg').textContent=`❌ ${ch.name.full} ne correspond pas. Tour perdu.`;advance(true);return}
+if(!ok(R[i],d)||!ok(K[j],d)){$('msg').textContent=`❌ ${ch.name.full} ne correspond pas. Tour perdu.`;shake();advance(true);return}
 used.add(ch.id);B[k]={p:turn,name:ch.name.full.slice(0,60),img:ch.image.large};
 const w=L.find(l=>l.every(x=>B[x]&&B[x].p===turn));
 if(w)return finishGame(turn);
