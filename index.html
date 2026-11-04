@@ -1308,6 +1308,22 @@ body.vmb .thT{display:none}
   .mh-tile b{font:800 14.5px/1.1 var(--display);letter-spacing:-.03em}.mh-tile span:not(.hv-i){color:var(--mut)}
   .mh-tile:active{transform:scale(.97);border-color:var(--ac)}
 }
+/* ===== Menus de Ma Vie, Imite le son, Undercover : même style que le Morpion ===== */
+.mlx-g{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px!important;margin:18px 0!important}
+.mlx-d{display:grid!important;grid-template-columns:auto 1fr auto;column-gap:16px;row-gap:2px;align-items:center;text-align:left;padding:18px!important;min-height:92px;border:1px solid var(--bd)!important;border-radius:20px!important;background:var(--card);color:var(--tx);cursor:pointer;overflow:hidden;position:relative;
+  transition:transform .55s var(--ease),border-color .3s,box-shadow .55s var(--ease),opacity .45s,filter .45s;animation:mlUp 1s var(--ease) backwards;animation-delay:calc(var(--k,0)*80ms)}
+.mlx-d .mbx{grid-row:1/span 2;width:58px;height:58px;border-radius:16px;background:var(--panel);display:grid;place-items:center;transition:transform .6s var(--ease),background .3s}
+.mlx-d .mbx .uic{width:36px;height:36px}
+.mlx-d>b{grid-column:2;font:800 1.08rem/1.15 var(--display)!important;letter-spacing:-.03em}
+.mlx-d>small{grid-column:2;color:var(--mut);font-size:.86rem;line-height:1.35}
+.mlx-d:after{content:"→";grid-column:3;grid-row:1/span 2;font:600 1.3rem var(--sans);color:var(--mut);transition:transform .45s var(--ease),color .3s}
+.mlx-d:hover,.mlx-d:focus-visible{transform:translateY(-6px) scale(1.035);border-color:var(--ac)!important;box-shadow:0 30px 50px -30px rgba(0,0,0,.6);z-index:2}
+.mlx-d:hover .mbx{transform:rotate(-8deg) scale(1.1);background:color-mix(in srgb,var(--ac) 16%,var(--panel))}
+.mlx-d:hover:after{transform:translateX(6px);color:var(--ac)}
+*:has(>.mlx-d:hover)>.mlx-d:not(:hover){opacity:.42;filter:saturate(.6);transform:scale(.975)}
+.mlx-d .im-t{font-weight:800}
+.mlx-m>.sub{max-width:62ch}
+@media (prefers-reduced-motion:reduce){.mlx-d{animation:none!important;transition:none!important}}
 @media (max-width:760px){.mlhero{grid-template-columns:1fr;gap:20px}.mcard{max-width:170px}.mlcols{grid-template-columns:1fr;gap:6px}.mllines i:nth-child(2),.mllines i:nth-child(3){display:none}}
 @media (prefers-reduced-motion:reduce){#v-ml *,#v-ml *:before,#v-ml *:after{animation:none!important;transition:none!important}}
 </style>
@@ -5253,6 +5269,27 @@ try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
   })();
   new MutationObserver(lab).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   $('thT').onclick=()=>{const n=lab()?'light':'dark';store.set('theme',n);applyTheme(n);lab();try{syncApp()}catch(e){}};
+})();
+/* Menus Ma Vie / Imite le son / Undercover : style unifié */
+(function(){
+  const IC={'data-uc:local':'profil','data-uc:ocreate':'en-ligne','data-uc:ojoin':'invitation','data-vie:create':'des','data-vie:join':'invitation','data-vie:guide':'regles','data-go:set':'reglages','data-rm:form':'joueurs','data-rm:join':'invitation','data-rm:resume':'manette','data-m:online':'en-ligne','data-m:train':'cible','data-m:surv':'vie','data-m:turn':'joueurs'};
+  function key(b){for(const a of ['data-uc','data-vie','data-m','data-go','data-rm']){const v=b.getAttribute(a);if(v)return IC[a+':'+v]||null}return null}
+  function deco(root){
+    root.querySelectorAll('#v-uc .mlb,#v-uc .card[data-uc],#v-vie .mlb,#v-im .im-mode,#v-rm .mlb').forEach((b,i)=>{
+      if(b.classList.contains('mlx-d'))return;
+      const ic=key(b);if(!ic)return;
+      b.classList.add('mlx-d');b.style.setProperty('--k',i);
+      const f=b.querySelector('b>.uic.inl:first-child');if(f)f.remove();const bb=b.querySelector('b'),tn=bb&&bb.firstChild;if(tn&&tn.nodeType===3)tn.nodeValue=tn.nodeValue.replace(/^[^\p{L}\p{N}]+/u,'');
+      const s=document.createElement('span');s.className='mbx';s.innerHTML=uic(ic);b.insertBefore(s,b.firstChild);
+      if(b.parentNode&&!b.parentNode.classList.contains('mlx-g'))b.parentNode.classList.add('mlx-g');
+    });
+    /* page en mode menu : grille de fond, titre qui monte */
+    const v=document.getElementById('v-vie'),vm=document.querySelector('#vieBody .mlx-d');if(v)v.classList.toggle('gx',!!vm);
+    const m=document.getElementById('v-im'),mm=document.querySelector('#imBody .mlx-d');if(m)m.classList.toggle('gx',!!mm);
+  }
+  let t=0;const run=()=>{clearTimeout(t);t=setTimeout(()=>deco(document),30)};
+  ['v-uc','v-vie','v-im','v-rm'].forEach(id=>{const e=document.getElementById(id);if(e)new MutationObserver(run).observe(e,{childList:true,subtree:true})});
+  deco(document);
 })();
 /* Accueil téléphone : icônes des tuiles */
 (function(){
