@@ -1226,6 +1226,10 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 .hv-t:hover b,.hv-t:focus-visible b{color:#fff}
 .hv-t:hover span:not(.hv-i),.hv-t:focus-visible span:not(.hv-i){color:#ffffffcc}
 .hv-t:hover .hv-d,.hv-t:focus-visible .hv-d{max-height:6em;opacity:1;margin-top:4px}
+.hv-hero .hv-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s;z-index:0}
+.hv-hero:after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(90deg,rgba(10,12,16,.92) 15%,rgba(10,12,16,.25));opacity:0;transition:opacity .4s}
+.hv-hero.hv-on .hv-v,.hv-hero:hover:after{opacity:1}
+.hv-hero:hover .hv-ht b,.hv-hero:hover .hv-ht p{color:#fff}.hv-hero:hover .hv-cd{opacity:0;transition:opacity .3s}
 @media (max-width:1000px){.hv-grid{grid-template-columns:repeat(2,1fr)}}
 @media (prefers-reduced-motion:reduce){.hv-t,.hv-hero,.hv-cd i{animation:none!important;transition:none!important}.hv-t .hv-v{display:none}}
 /* ===== Autres pages + téléphone : nouveau style ===== */
@@ -5166,6 +5170,9 @@ try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
 (function(){
   const IC={im:'micro',ttt:'des',hl:'classement',gs:'inconnu',bt:'regard',dt:'duel',at:'casque',rm:'joueurs',uc:'profil'};
   const TS={im:1,uc:1,ttt:1,hl:1,gs:1,bt:1,dt:1,at:1};
+  (function(){const t=document.getElementById('vieFeat');if(!t)return;let v=null;
+    t.addEventListener('mouseenter',()=>{if(!v){v=document.createElement('video');v.className='hv-v';v.muted=true;v.loop=true;v.playsInline=true;v.preload='none';v.src='teasers/vie.webm';t.insertBefore(v,t.firstChild);v.addEventListener('playing',()=>t.classList.add('hv-on'))}v.play().catch(()=>{})});
+    t.addEventListener('mouseleave',()=>{if(v){v.pause();v.currentTime=0;t.classList.remove('hv-on')}})})();
   document.querySelectorAll('#hvGrid .hv-t').forEach((t,i)=>{
     const key=t.dataset.go==='ml'?t.dataset.hub:t.dataset.go;
     t.style.setProperty('--k',i);
