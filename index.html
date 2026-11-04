@@ -1240,12 +1240,12 @@ body.vmb .thT{display:none}
 .lh-lines{position:absolute;inset:0;pointer-events:none;display:grid;grid-template-columns:repeat(4,1fr);-webkit-mask-image:linear-gradient(#000,transparent 92%);mask-image:linear-gradient(#000,transparent 92%)}
 .lh-lines i{border-left:1px solid var(--ln);transform-origin:top;animation:mlDraw 1.6s var(--ease) both}.lh-lines i:last-child{border-right:1px solid var(--ln)}
 .lh-lines i:nth-child(2){animation-delay:.12s}.lh-lines i:nth-child(3){animation-delay:.24s}.lh-lines i:nth-child(4){animation-delay:.36s}
-.lh-in{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center;max-width:1080px;margin:0 auto}
+.lh-in{position:relative;display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center;max-width:1080px;margin:0 auto}
 .lh-eb small{display:flex;align-items:center;gap:10px;font:500 .8rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);animation:mlUp 1.2s var(--ease) both .2s}
 .lh-eb small:before{content:"";width:28px;height:1px;background:var(--mut)}
-.lh-h{margin:14px 0 18px;text-align:left;font:800 clamp(2.8rem,8.4vw,7rem)/.92 var(--display);letter-spacing:-.045em}
+.hv .lh-h{margin:14px 0 18px;text-align:left;font:800 clamp(3rem,11vw,10rem)/.9 var(--display);letter-spacing:-.045em}
 .lh-h .ln{display:block;overflow:hidden;padding-bottom:.1em}.lh-h .ln span{display:inline-block;animation:mlRise 1.6s var(--ease) both;animation-delay:calc(.35s + var(--i)*80ms)}.lh-h em{font-style:normal;color:var(--ac)}
-.lh-p{max-width:34ch;font-size:clamp(1rem,1.4vw,1.15rem);color:var(--mut);margin:0 0 24px;animation:mlUp 1.4s var(--ease) both 1s}
+.lh-p{max-width:44ch;font-size:clamp(1rem,1.4vw,1.15rem);color:var(--mut);margin:0 0 24px;animation:mlUp 1.4s var(--ease) both 1s}
 .lh-cta{display:flex;gap:12px;flex-wrap:wrap;animation:mlUp 1.4s var(--ease) both 1.15s}
 .lh-b{display:inline-flex;align-items:center;gap:10px;padding:13px 24px;border-radius:10px;font:600 .95rem var(--sans);border:1px solid transparent;cursor:pointer;transition:transform .2s,border-color .2s}
 .lh-b.p{background:var(--ac);color:var(--onac)}.lh-b.p:hover{transform:translateY(-2px)}.lh-b.p span{transition:transform .35s var(--ease)}.lh-b.p:hover span{transform:translateX(5px)}
@@ -1337,7 +1337,6 @@ body.vmb .thT{display:none}
 <h1 class="lh-h" aria-label="Joue avec ta bande."><span class="ln"><span style="--i:0">Joue</span></span><span class="ln"><span style="--i:1">avec</span> <span style="--i:2"><em>ta</em></span></span><span class="ln"><span style="--i:3">bande.</span></span></h1>
 <p class="lh-p">Dix jeux à lancer en quelques secondes. Défie un ami, monte au classement ou ouvre un salon.</p>
 <div class="lh-cta"><button type="button" class="lh-b p" id="lhGo">Voir les jeux <span>→</span></button><button type="button" class="lh-b g" id="lhAcc">Créer un compte</button></div></div>
-<figure class="lh-art" id="lhArt"><div class="lh-img"></div><figcaption><div><b>Morpion anime</b>Place le bon personnage sur chaque case</div><span>À deux</span></figcaption></figure>
 </div></section>
 <section class="lh-st"><div class="lh-stin"><div class="lh-s"><b data-n="10">10</b><span>jeux disponibles</span></div><div class="lh-s"><b data-n="134">134</b><span>catégories au morpion</span></div><div class="lh-s"><b data-n="12">12</b><span>joueurs par salon, au maximum</span></div></div></section>
 <div class="lh-mq" aria-hidden="true"><div id="lhMq"></div></div>
