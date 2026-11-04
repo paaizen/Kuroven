@@ -8,6 +8,7 @@
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23313338'/%3E%3Cpath d='M17 14h9v36h-9z' fill='%23eef3f9'/%3E%3Cpath d='M26 27L40 14H52L34 34H26z' fill='%239cc3f0'/%3E%3Cpath d='M26 34H40L54 50H41z' fill='%23eef3f9'/%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="icons.js"></script>
 <style>
 :root{color-scheme:light;--bg:#f3f4f7;--card:#fff;--tx:#1b2130;--mut:#667085;--bd:#e2e5ec;--p1:#2563eb;--p2:#e11d48;--ac:#2f6fd8;--onac:#fff;--in:#eef0f5}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#17181c;--card:#232529;--tx:#f2f2f4;--mut:#a3a7b0;--bd:#34363d;--p1:#60a5fa;--p2:#fb7185;--ac:#9ec3f2;--onac:#14233a;--in:#2c2e35}
@@ -85,6 +86,7 @@ h1{font-size:1.5rem;margin:4px 0 12px;text-align:center}
 /* Plateau plus soigné */
 #g{padding:10px;border-radius:20px;background:linear-gradient(150deg,color-mix(in srgb,var(--card) 80%,transparent),transparent);border:1px solid var(--bd);gap:8px}
 #g .h{background:linear-gradient(160deg,var(--card),color-mix(in srgb,var(--card) 75%,var(--bd)))}
+#g .h .ic{width:46px;height:46px}
 #g .c{transition:transform .18s,border-color .18s,box-shadow .18s,background .18s}
 #g button.c:not(:disabled):after{content:"+";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:300;color:var(--bd);transition:transform .2s,color .2s}
 #g button.c:not(:disabled):hover{transform:translateY(-3px) scale(1.03);background:color-mix(in srgb,var(--ac) 10%,var(--card));box-shadow:0 8px 20px #0003}
@@ -1426,9 +1428,10 @@ const IC={
 'Rôle principal':svg(star),
 'Très populaire (3000+ favoris)':svg('<path d="M5 37l-2-23 13 10 8-15 8 15 13-10-2 23z" fill="#facc15"/>'),
 };
+for(const k in (window.IC_EXTRA||{}))IC[k]=svg(IC_EXTRA[k]);
 const slug=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const badge=l=>{let h=0;for(const ch of l)h=(h*31+ch.charCodeAt(0))%360;return `<span class="ic fb2" style="background:hsl(${h} 65% 48%)">${l[0]}</span>`};
-const hd=(c,id='')=>`<div class="h" data-h="${id}" role="button" tabindex="0" title="Voir la définition"><img class="ic" src="icons/${slug(c.l)}.png" alt="" data-l="${c.l}"><span>${c.l}</span></div>`;
+const hd=(c,id='')=>`<div class="h" data-h="${id}" role="button" tabindex="0" title="Voir la définition">${IC[c.l]||badge(c.l)}<span>${c.l}</span></div>`;
 function fbIc(img){img.outerHTML=IC[img.dataset.l]||badge(img.dataset.l)}
 function ok(c,d){const E=d.media.edges;switch(c.k){
 case'tag':return E.some(e=>e.node.tags.some(t=>t.name===c.v&&t.rank>=50&&!t.isMediaSpoiler));
