@@ -8,12 +8,16 @@
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23313338'/%3E%3Cpath d='M17 14h9v36h-9z' fill='%23eef3f9'/%3E%3Cpath d='M26 27L40 14H52L34 34H26z' fill='%239cc3f0'/%3E%3Cpath d='M26 34H40L54 50H41z' fill='%23eef3f9'/%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Fraunces:opsz,wght@9..144,600&family=Instrument+Sans:wght@400;500;600;700&display=swap">
 <script src="icons.js"></script>
+<script src="ui-icons.js"></script>
 <style>
-:root{color-scheme:light;--bg:#f3f4f7;--card:#fff;--tx:#1b2130;--mut:#667085;--bd:#e2e5ec;--p1:#2563eb;--p2:#e11d48;--ac:#2f6fd8;--onac:#fff;--in:#eef0f5}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#17181c;--card:#232529;--tx:#f2f2f4;--mut:#a3a7b0;--bd:#34363d;--p1:#60a5fa;--p2:#fb7185;--ac:#9ec3f2;--onac:#14233a;--in:#2c2e35}
-:root[data-theme="black"]{color-scheme:dark;--bg:#000;--card:#121214;--tx:#f5f5f6;--mut:#9a9ca3;--bd:#26272b;--p1:#60a5fa;--p2:#fb7185;--ac:#9ec3f2;--onac:#14233a;--in:#1c1c1f}
-@media(prefers-color-scheme:dark){:root[data-theme="auto"]{color-scheme:dark;--bg:#17181c;--card:#232529;--tx:#f2f2f4;--mut:#a3a7b0;--bd:#34363d;--p1:#60a5fa;--p2:#fb7185;--ac:#9ec3f2;--onac:#14233a;--in:#2c2e35}}
+:root{color-scheme:light;--bg:#e8e9ed;--card:#f4f5f7;--tx:#15171c;--mut:#596070;--bd:#c6cad3;--p1:#2563eb;--p2:#e11d48;--ac:#2c5cc0;--onac:#f3f6fc;--in:#e2e4ea;--ac2:#86a5e4;--panel:#e2e4ea;--ease:cubic-bezier(.2,.7,0,1);--display:'Unbounded','Arial Black',system-ui,sans-serif;--serif:'Fraunces',Georgia,serif;--sans:'Instrument Sans',system-ui,'Segoe UI',sans-serif}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111214;--card:#1a1b1e;--tx:#ecebe7;--mut:#9a9ca3;--bd:#2e3036;--p1:#60a5fa;--p2:#fb7185;--ac:#7ea0d6;--onac:#0e1522;--in:#222326;--ac2:#b9cbea;--panel:#222326}
+:root[data-theme="black"]{color-scheme:dark;--bg:#000;--card:#121214;--tx:#f5f5f6;--mut:#9a9ca3;--bd:#26272b;--p1:#60a5fa;--p2:#fb7185;--ac:#9ec3f2;--onac:#14233a;--in:#1c1c1f;--ac2:#c3d6f0;--panel:#1c1c1f}
+@media(prefers-color-scheme:dark){:root[data-theme="auto"]{color-scheme:dark;--bg:#111214;--card:#1a1b1e;--tx:#ecebe7;--mut:#9a9ca3;--bd:#2e3036;--p1:#60a5fa;--p2:#fb7185;--ac:#7ea0d6;--onac:#0e1522;--in:#222326;--ac2:#b9cbea;--panel:#222326}}
+:root{--accent:var(--ac);--accent2:var(--ac2)}
 .thm{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 4px}
 .thm button{flex:1 1 110px;min-width:0;display:flex;flex-direction:column;gap:8px;background:var(--card);color:var(--tx);border:2px solid var(--bd);border-radius:16px;padding:8px;font:inherit;font-weight:800;font-size:.9rem;cursor:pointer;text-align:left;position:relative}
 .thm button[aria-pressed="true"]{border-color:var(--ac)}
@@ -1086,6 +1090,50 @@ body.vmb #vieChatW .vch{border-bottom-color:#34363d;padding:12px 14px}
   #mhNS .bi.un{border-left:4px solid #ff5a4d}#mhNS .bi small{display:block;color:var(--mm);margin-top:2px}
   #mhNS .be{color:var(--mm);padding:12px 2px}
 }
+/* ===== Menu d'un jeu : nouveau style (grille visible, carte à rang, cartes de mode) ===== */
+#v-ml{position:relative;max-width:1020px}
+#v-ml>*:not(.mllines){position:relative;z-index:1}
+.mllines{position:absolute;inset:0;pointer-events:none;display:grid;grid-template-columns:repeat(4,1fr);z-index:0}
+.mllines i{border-left:1px solid var(--bd);transform-origin:top;animation:mlDraw 1.6s var(--ease) both}
+.mllines i:last-child{border-right:1px solid var(--bd)}.mllines i:nth-child(2){animation-delay:.12s}.mllines i:nth-child(3){animation-delay:.24s}.mllines i:nth-child(4){animation-delay:.36s}
+@keyframes mlDraw{from{transform:scaleY(0)}to{transform:none}}
+@keyframes mlUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes mlRise{from{transform:translateY(112%) rotate(4deg)}to{transform:none}}
+@keyframes mlDeal{from{opacity:0;transform:translate3d(220px,80px,0) rotate(50deg)}}
+#v-ml .back{background:transparent;color:var(--mut);border:1px solid var(--bd);border-radius:99px;padding:8px 16px;font-weight:500;font-size:.86rem;animation:mlUp 1.2s var(--ease) backwards .1s;transition:color .2s,border-color .2s}
+#v-ml .back:hover{color:var(--tx);border-color:var(--tx)}
+.mlhero{display:grid;grid-template-columns:230px 1fr;gap:38px;align-items:center;margin-top:22px}
+.mcard{position:relative;aspect-ratio:5/6.6;border-radius:16px;background:var(--card);border:1px solid var(--bd);box-shadow:0 26px 44px -26px rgba(0,0,0,.5);animation:mlDeal 1.6s var(--ease) backwards .3s}
+.mcard:after{content:"";position:absolute;inset:7px;border:1px solid var(--bd);border-radius:11px}
+.mcard .mn{position:absolute;left:18px;top:14px;font:600 1.1rem var(--serif);color:var(--ac)}.mcard .mn.b{left:auto;right:18px;top:auto;bottom:14px;transform:rotate(180deg)}
+.mcard svg{position:absolute;inset:18% 16% 16%;width:68%;height:66%}
+.mleb{font:500 .78rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:10px;animation:mlUp 1.2s var(--ease) backwards .35s}.mleb:before{content:"";width:28px;height:1px;background:var(--mut)}
+#v-ml h1{margin:12px 0 14px;font:800 clamp(2.1rem,5.4vw,4rem)/.98 var(--display);letter-spacing:-.04em;text-align:left;overflow:hidden;padding-bottom:.08em;animation:mlRise 1.5s var(--ease) backwards .5s}
+.mllead{max-width:46ch;color:var(--mut);font-size:1.02rem;margin:0 0 16px;animation:mlUp 1.3s var(--ease) backwards .9s}
+.mlchips{display:flex;gap:8px;flex-wrap:wrap;animation:mlUp 1.3s var(--ease) backwards 1.05s}.mlchips span{padding:6px 14px;border-radius:99px;border:1px solid var(--bd);font:500 .82rem var(--sans);color:var(--mut)}
+#mlElo{margin-top:30px}#mlElo .hint{display:none}
+.mlnote{display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--bd);border-radius:14px;background:var(--card);animation:mlUp 1.3s var(--ease) backwards 1.15s}
+.mlnote .uic{width:34px;height:34px;flex:none}.mlnote p{margin:0;flex:1;font-size:.92rem;color:var(--mut)}.mlnote b{color:var(--tx)}
+#mlElo .eloc{border-radius:14px;background:var(--card);animation:mlUp 1.3s var(--ease) backwards 1.15s}
+.mlcols{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:28px}
+.mlcol h2{margin:0 0 14px;font:700 .8rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:10px;text-align:left}.mlcol h2:after{content:"";flex:1;height:1px;background:var(--bd)}
+.mlcol .mlg{display:block;margin:0}
+#v-ml .mlb{position:relative;display:flex;flex-direction:row;align-items:center;gap:16px;width:100%;padding:16px 18px;margin-bottom:12px;border:1px solid var(--bd);border-radius:14px;background:var(--card);color:var(--tx);
+  animation:mlUp 1.2s var(--ease) backwards;animation-delay:calc(1.2s + var(--k,0)*110ms);transition:transform .5s var(--ease),border-color .3s,box-shadow .5s var(--ease),opacity .4s}
+#v-ml .mlb[hidden]{display:none}
+.mlb .mbx{flex:none;width:64px;height:64px;border-radius:12px;background:var(--panel);display:grid;place-items:center;transition:transform .6s var(--ease),background .3s}
+.mlb .uic{width:42px;height:42px;color:var(--tx)}
+.uic *[fill="var(--card)"]{fill:var(--panel)}
+.mlb .mtx{display:flex;flex-direction:column;gap:4px;min-width:0}.mlb .mtx b{font:600 1.12rem/1.1 var(--serif)}.mlb .mtx small{color:var(--mut);font-size:.86rem;line-height:1.35}
+.mlb .mtag{display:none;position:absolute;right:16px;top:14px;font:600 .68rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);border:1px solid var(--bd);padding:2px 8px;border-radius:99px}
+#v-ml.guest .mlb .mtag{display:block}
+.mlb .mgo{margin-left:auto;flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--bd);display:grid;place-items:center;color:var(--mut);transition:all .45s var(--ease)}
+#v-ml .mlb:hover,#v-ml .mlb:focus-visible{transform:translateY(-5px);border-color:var(--ac);box-shadow:0 22px 36px -24px rgba(0,0,0,.55)}
+.mlb:hover .mbx,.mlb:focus-visible .mbx{transform:rotate(-6deg) scale(1.1);background:color-mix(in srgb,var(--ac) 14%,var(--panel))}
+.mlb:hover .mgo,.mlb:focus-visible .mgo{background:var(--ac);border-color:var(--ac);color:var(--onac);transform:translateX(4px)}
+.mlcols:has(.mlb:hover) .mlb:not(:hover){opacity:.42}
+@media (max-width:760px){.mlhero{grid-template-columns:1fr;gap:20px}.mcard{max-width:170px}.mlcols{grid-template-columns:1fr;gap:6px}.mllines i:nth-child(2),.mllines i:nth-child(3){display:none}}
+@media (prefers-reduced-motion:reduce){#v-ml *,#v-ml *:before,#v-ml *:after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -1276,18 +1324,24 @@ body.vmb #vieChatW .vch{border-bottom-color:#34363d;padding:12px 14px}
 <div class="msg" id="vieMsg"></div>
 <div class="vchat" id="vieChatW" hidden><div class="vch"><span>💬 Chat de la partie</span><span class="vchb"><button class="btn alt sm" type="button" id="vieChX" aria-label="Fermer le chat">✕</button><button class="btn alt sm vcht" type="button" id="vieChT" aria-label="Afficher ou cacher l’historique du chat">▴</button><button class="btn alt sm" type="button" id="vieChM">🔕 Couper</button></span></div><div id="vieChL" role="log" aria-live="polite"></div><div class="msI"><input id="vieChIn" maxlength="500" placeholder="Dis quelque chose à la table…" autocomplete="off"><button class="btn sm" id="vieChS" type="button">Envoyer</button></div></div>
 </main>
-<main id="v-ml" hidden>
+<main id="v-ml" class="mlx" hidden>
+<div class="mllines" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <button class="btn back" data-go="home">← Accueil</button>
-<h1 id="mlT">Morpion anime</h1>
-<div class="artb" id="mlArt"></div>
+<div class="artb" id="mlArt" hidden></div>
+<section class="mlhero"><div class="mcard" aria-hidden="true"><span class="mn" id="mlN"></span><span class="mn b" id="mlN2"></span><svg viewBox="0 0 100 100" id="mlSym"></svg></div>
+<div class="mlhd"><div class="mleb" id="mlEb"></div><h1 id="mlT">Morpion anime</h1><p class="mllead" id="mlLead"></p><div class="mlchips" id="mlChips"></div></div></section>
 <div id="mlElo"></div>
-<div class="mlg">
-<button class="mlb" id="mlRank"><b>Partie classée</b><small>Contre un joueur de ton niveau. Ton Elo monte ou descend.</small></button>
-<button class="mlb" id="mlQuick"><b>Partie rapide</b><small>Contre un joueur au hasard, sans enjeu.</small></button>
-<button class="mlb" id="mlFr"><b>Défier un ami</b><small>Amical ou classé, ton ami reçoit l’invitation.</small></button>
-<button class="mlb" id="mlSolo"><b id="mlSoloT">Solo</b><small id="mlSoloS"></small></button>
-<button class="mlb" id="mlLocal"><b id="mlLocalT">2 joueurs, même écran</b><small id="mlLocalS">Sans compte, à tour de rôle.</small></button>
-<button class="mlb" id="mlLb"><b>Classement</b><small id="mlLbS">Les meilleurs joueurs.</small></button>
+<div class="mlcols">
+<div class="mlcol"><h2>En ligne</h2><div class="mlg">
+<button class="mlb" id="mlRank"><span class="mbx" data-i="trophee"></span><span class="mtx"><b>Partie classée</b><small>Contre un joueur de ton niveau. Ton Elo monte ou descend.</small></span><span class="mtag">Compte requis</span><span class="mgo">→</span></button>
+<button class="mlb" id="mlQuick"><span class="mbx" data-i="eclair"></span><span class="mtx"><b>Partie rapide</b><small>Contre un joueur au hasard, sans enjeu.</small></span><span class="mtag">Compte requis</span><span class="mgo">→</span></button>
+<button class="mlb" id="mlFr"><span class="mbx" data-i="duel"></span><span class="mtx"><b>Défier un ami</b><small>Amical ou classé, ton ami reçoit l’invitation.</small></span><span class="mtag">Compte requis</span><span class="mgo">→</span></button>
+</div></div>
+<div class="mlcol"><h2>Sur cet appareil</h2><div class="mlg">
+<button class="mlb" id="mlSolo"><span class="mbx" data-i="profil"></span><span class="mtx"><b id="mlSoloT">Solo</b><small id="mlSoloS"></small></span><span class="mgo">→</span></button>
+<button class="mlb" id="mlLocal"><span class="mbx" data-i="joueurs"></span><span class="mtx"><b id="mlLocalT">2 joueurs, même écran</b><small id="mlLocalS">Sans compte, à tour de rôle.</small></span><span class="mgo">→</span></button>
+<button class="mlb" id="mlLb"><span class="mbx" data-i="classement"></span><span class="mtx"><b>Classement</b><small id="mlLbS">Les meilleurs joueurs.</small></span><span class="mgo">→</span></button>
+</div></div>
 </div>
 <div class="msg" id="mlMsg"></div>
 </main>
@@ -2124,13 +2178,32 @@ const HUB={
   hl:{solo:['Solo · série','Enchaîne les bonnes réponses, bats ton record.'],local:['2 joueurs, même écran','Chacun son tour, 10 questions en tout.']},
   dt:{local:['2 joueurs, même écran','Chacun choisit un thème et interroge l’autre.']}};
 const HUBART={ttt:'m1',hl:'m2',gs:'m3',bt:'m4',dt:'m5',at:'m6'};
-async function renderMl(){const ma=$('mlArt');if(ma){ma.dataset.art=HUBART[hubGame]||'';ma.innerHTML='';artBanners()}
-  const g=hubGame,h=HUB[g];$('mlT').textContent=GN[g];$('mlMsg').textContent='';
+const HSY={
+morpion:'<path d="M38 12v76M62 12v76M12 38h76M12 62h76" stroke="var(--tx)" stroke-width="5" stroke-linecap="round"/><path d="M44 44l12 12M56 44L44 56" stroke="var(--ac2)" stroke-width="6" stroke-linecap="round"/><circle cx="25" cy="25" r="8" fill="none" stroke="var(--ac)" stroke-width="6"/>',
+plusmoins:'<path d="M50 10L82 46H18z" fill="var(--ac)"/><path d="M50 90L18 54h64z" fill="var(--ac2)"/>',
+quiest:'<path d="M50 14a36 36 0 0 0 0 72z" fill="var(--ac)"/><g fill="var(--tx)"><rect x="54" y="14" width="12" height="12"/><rect x="66" y="26" width="12" height="12"/><rect x="54" y="38" width="12" height="12"/><rect x="66" y="50" width="12" height="12"/><rect x="54" y="62" width="12" height="12"/></g><rect x="78" y="38" width="8" height="8" fill="var(--ac2)"/>',
+blindvisuel:'<path d="M6 50Q50 4 94 50Q50 96 6 50z" fill="var(--tx)"/><circle cx="50" cy="50" r="20" fill="var(--ac)"/><circle cx="50" cy="50" r="8" fill="var(--card)"/><circle cx="57" cy="43" r="4" fill="var(--tx)"/>',
+duel:'<defs><clipPath id="hcl"><circle cx="38" cy="50" r="28"/></clipPath></defs><circle cx="38" cy="50" r="28" fill="var(--ac)"/><circle cx="62" cy="50" r="28" fill="var(--ac2)"/><circle cx="62" cy="50" r="28" fill="var(--tx)" clip-path="url(#hcl)"/>',
+blindaudio:'<g stroke-linecap="round" stroke-width="8" stroke="var(--tx)"><path d="M14 50v0M26 38v24M38 24v52M62 28v44M74 38v24M86 46v8"/><path d="M50 12v76" stroke="var(--ac)"/></g>'};
+const HUBX={
+  ttt:{n:3,sym:HSY.morpion,tag:'À deux',lead:'Une grille 3×3 : pose ton symbole en citant un personnage qui correspond aux deux critères de la case.',chips:['À deux','Même écran','En ligne']},
+  hl:{n:4,sym:HSY.plusmoins,tag:'Solo ou à deux',lead:'Lequel des deux personnages a le plus de favoris ? Enchaîne les bonnes réponses et bats ton record.',chips:['Solo','2 joueurs','En ligne']},
+  gs:{n:5,sym:HSY.quiest,tag:'Solo ou à deux',lead:'Retrouve le personnage sur un portrait flouté, en 5 essais.',chips:['Solo','2 joueurs','En ligne']},
+  bt:{n:6,sym:HSY.blindvisuel,tag:'Solo ou à deux',lead:'Devine le personnage avec un seul détail : les cheveux, puis les yeux, puis le visage.',chips:['Solo','2 joueurs','En ligne']},
+  dt:{n:7,sym:HSY.duel,tag:'À deux',lead:'Chacun choisit un thème, l’autre répond à un QCM dessus.',chips:['2 joueurs','Même écran','En ligne']},
+  at:{n:8,sym:HSY.blindaudio,tag:'Solo ou à deux',lead:'Reconnais le titre à l’écoute d’un opening ou d’un ending.',chips:['Solo','2 joueurs','En ligne']}};
+async function renderMl(){
+  const g=hubGame,h=HUB[g],X=HUBX[g]||HUBX.ttt;
+  $('mlT').textContent=GN[g];$('mlMsg').textContent='';
+  $('mlN').textContent=X.n;$('mlN2').textContent=X.n;$('mlSym').innerHTML=X.sym;$('mlEb').textContent=X.tag;$('mlLead').textContent=X.lead;$('mlChips').innerHTML=X.chips.map(c=>'<span>'+c+'</span>').join('');
+  document.querySelectorAll('#v-ml .mbx').forEach(e=>{e.innerHTML=uic(e.dataset.i)});
+  document.querySelectorAll('#v-ml .mlb').forEach((b,i)=>b.style.setProperty('--k',i));
+  $('v-ml').classList.toggle('guest',!me);
   $('mlSolo').hidden=!h.solo;if(h.solo){$('mlSoloT').textContent=h.solo[0];$('mlSoloS').textContent=h.solo[1]}
   $('mlLocalT').textContent=h.local[0];$('mlLocalS').textContent=h.local[1];
   $('mlLbS').textContent='Les meilleurs joueurs : '+GN[g].toLowerCase()+'.';
   const c=$('mlElo');
-  if(!me||!sb){c.innerHTML='<p class="hint">Connecte-toi pour jouer en ligne et obtenir un classement Elo.</p>';return}
+  if(!me||!sb){c.innerHTML='<div class="mlnote">'+uic('inconnu')+'<p><b>Tu joues en invité.</b> Connecte-toi pour jouer en ligne et monter au classement Elo.</p><button class="btn sm" type="button" id="mlLogin">Se connecter</button></div>';$('mlLogin').onclick=()=>openWelcome();return}
   const r=await sb.from('ratings').select('*').eq('user_id',me.id).eq('game',g).maybeSingle();const d=r.data||{elo:1000,played:0,wins:0,losses:0,draws:0};
   if(hubGame===g)c.innerHTML='<div class="eloc"><b>'+d.elo+'</b><span>'+rk(d.elo)+'</span><small>'+d.played+' classée'+(d.played>1?'s':'')+' · '+d.wins+' V · '+d.losses+' D · '+d.draws+' N</small></div>'}
 $('mlQuick').onclick=()=>findOnline(false);
