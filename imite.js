@@ -1,4 +1,4 @@
-/* Imite-moi — jeu d'imitation sonore pour Kuroven (même écran). Chargé à la demande par index.html.
+/* Imite le son — jeu d'imitation sonore pour Kuroven (même écran). Chargé à la demande par index.html.
    Données : imite/sons.json + imite/sons/*.mp3 (à mettre à côté de index.html). */
 (function(){
 'use strict';
@@ -339,7 +339,7 @@ function modeText(){
 function buildHud(){
   var G=S.G,h=hud();if(!h)return;
   var pls=(G.mode==='turn'||G.mode==='online')?'<span class="hu-pls" id="huPls">'+G.pl.map(function(p,i){return '<span class="hu-pl" data-i="'+i+'" data-u="'+esc(p.id||'')+'"><i style="background:'+PLC[i%8]+'">'+esc((p.name[0]||'?').toUpperCase())+'</i>'+esc(p.name)+'</span>'}).join('')+'</span>':'';
-  h.innerHTML='<div class="hu-top"><span class="hu-pill"><span class="hu-logo">'+MIC+'</span>Imite-moi</span><span class="hu-chip" id="huMode" style="background:var(--es);color:#b8431a"></span><span id="huHr"></span><span class="hu-sp"></span>'+pls+
+  h.innerHTML='<div class="hu-top"><span class="hu-pill"><span class="hu-logo">'+MIC+'</span>Imite le son</span><span class="hu-chip" id="huMode" style="background:var(--es);color:#b8431a"></span><span id="huHr"></span><span class="hu-sp"></span>'+pls+
     '<span class="hu-vol"><button class="vol-m" type="button" aria-label="Moins fort">🔉</button><input type="range" class="vol-sl" min="0" max="100" step="1" value="'+vol+'" aria-label="Volume du jeu"><output class="vol-o">'+Math.round(vol)+'%</output><button class="vol-p" type="button" aria-label="Plus fort">🔊</button></span>'+
     '<button class="hu-x" id="huX" type="button" aria-label="Quitter la partie">✕</button></div><div class="hu-scr" id="huScr"></div>';
   bindVol(h);$('huX').onclick=function(){stopPlay();micStop();clearLater();if(G.mode==='online')olLeave();else menu()}}

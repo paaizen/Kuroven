@@ -107,7 +107,7 @@ h1{font-size:1.5rem;margin:4px 0 12px;text-align:center}
 .btn{background:var(--ac);color:var(--onac);border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
 .row{display:flex;gap:8px;justify-content:center}
 :focus-visible{outline:3px solid var(--ac);outline-offset:2px}
-#m{position:fixed;inset:0;background:rgba(10,8,30,.65);display:none;align-items:flex-start;justify-content:center;padding:12px}
+#m{position:fixed;inset:0;z-index:60;background:rgba(10,8,30,.65);display:none;align-items:flex-start;justify-content:center;padding:12px}
 #m.on{display:flex}
 .box{background:var(--card);border-radius:16px;padding:14px;width:100%;max-width:440px;max-height:90vh;overflow:auto}
 .box p{margin:0 0 8px;color:var(--mut);font-size:.9rem}
@@ -1191,6 +1191,43 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 @keyframes vdTxt{0%{transform:translateY(24px) scale(.9);opacity:0}100%{transform:none;opacity:1}}
 @keyframes vdP{0%{transform:translate(-50%,-50%) scale(.4);opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(220deg) scale(1);opacity:0}}
 @media (prefers-reduced-motion:reduce){#vd *,#vd .vdb{animation-duration:.01s!important}#vd .vdb{animation:vdIn 1.2s both!important}}
+/* ===== Accueil PC : nouveau style (cartes, 3 par ligne, aperçu au survol) ===== */
+.hv{max-width:1080px;margin:0 auto;gap:26px}
+.hv h1{font:800 clamp(2rem,4.6vw,3.1rem)/1 var(--display);letter-spacing:-.045em}
+.hv-hd small{font-family:var(--serif);font-style:italic;font-size:1rem;font-weight:500}
+.hv-sec h2{font:800 1.5rem/1 var(--display);letter-spacing:-.04em}
+.hv-hero{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;transition:transform .5s var(--ease),border-color .3s}
+.hv-hero:hover{transform:translateY(-4px);border-color:var(--ac)}
+.hv-ht em{background:var(--ac);color:var(--onac);border-radius:99px;padding:4px 12px}
+.hv-ht b{font:800 2.6rem/1 var(--display);letter-spacing:-.045em}
+.hv-ht p{color:var(--mut);font-family:var(--serif);font-size:1.02rem}
+.hv-y{background:var(--ac);color:var(--onac);border-radius:12px;font-weight:700;transition:transform .25s var(--ease),filter .2s}
+.hv-y:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.hv-cd i{background:var(--panel)!important;border:1px solid var(--bd);transition:transform .6s var(--ease)}
+.hv-hero:hover .hv-cd i:nth-child(1){transform:rotate(-20deg) translateY(-6px)}.hv-hero:hover .hv-cd i:nth-child(2){transform:rotate(-2deg) translateY(-12px)}.hv-hero:hover .hv-cd i:nth-child(3){transform:rotate(17deg) translateY(-6px)}
+.hv-cd svg{stroke:var(--ac)}
+.hv-res{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:20px}
+.hv-rk{color:var(--ac)}.hv-ra .mav{border-color:var(--card)}.hv-ra em{color:var(--mut)}
+.hv-flt button{font-weight:600;transition:transform .25s var(--ease)}.hv-flt button:hover{transform:translateY(-2px)}
+.hv-grid{grid-template-columns:repeat(3,1fr);gap:18px}
+.hv-t{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;min-height:250px;padding:20px;gap:6px;justify-content:flex-end;transition:transform .5s var(--ease),border-color .3s,box-shadow .5s var(--ease);animation:mlUp 1s var(--ease) backwards;animation-delay:calc(var(--k,0)*70ms)}
+.hv-t:hover,.hv-t:focus-visible{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 30px 50px -30px rgba(0,0,0,.6)}
+.hv-t>svg{display:none}
+.hv-t .hv-i{position:absolute;left:20px;top:20px;width:58px;height:58px;border-radius:16px;background:var(--panel);display:grid;place-items:center;z-index:2;transition:transform .6s var(--ease)}
+.hv-t .hv-i .uic{width:36px;height:36px}
+.hv-t:hover .hv-i{transform:rotate(-8deg) scale(1.08)}
+.hv-t b{font:800 1.25rem/1.1 var(--display);letter-spacing:-.035em;position:relative;z-index:2}
+.hv-t span:not(.hv-i){position:relative;z-index:2;color:var(--mut);font-size:.9rem;font-weight:500}
+.hv-t .hv-d{max-height:0;opacity:0;overflow:hidden;font-family:var(--serif);font-size:.95rem;line-height:1.4;position:relative;z-index:2;transition:max-height .5s var(--ease),opacity .4s;color:#fff}
+.hv-t .hv-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s;z-index:0}
+.hv-t:after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(rgba(10,12,16,.1) 20%,rgba(10,12,16,.92));opacity:0;transition:opacity .4s}
+.hv-t.hv-on .hv-v{opacity:1}
+.hv-t:hover:after,.hv-t:focus-visible:after{opacity:1}
+.hv-t:hover b,.hv-t:focus-visible b{color:#fff}
+.hv-t:hover span:not(.hv-i),.hv-t:focus-visible span:not(.hv-i){color:#ffffffcc}
+.hv-t:hover .hv-d,.hv-t:focus-visible .hv-d{max-height:6em;opacity:1;margin-top:4px}
+@media (max-width:1000px){.hv-grid{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){.hv-t,.hv-hero,.hv-cd i{animation:none!important;transition:none!important}.hv-t .hv-v{display:none}}
 @media (max-width:760px){.mlhero{grid-template-columns:1fr;gap:20px}.mcard{max-width:170px}.mlcols{grid-template-columns:1fr;gap:6px}.mllines i:nth-child(2),.mllines i:nth-child(3){display:none}}
 @media (prefers-reduced-motion:reduce){#v-ml *,#v-ml *:before,#v-ml *:after{animation:none!important;transition:none!important}}
 </style>
@@ -1210,7 +1247,7 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 <div class="mh-sec"><b>Jouer</b><button type="button" id="mhAll">Tout voir</button></div>
 <div class="mh-feat" data-go="vie" role="button" tabindex="0" aria-label="Jouer à Ma Vie"><span class="mh-cd" aria-hidden="true"><i></i><i></i><i><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></i></span><div class="mft"><em>NOUVEAU</em><b>Ma Vie</b><small>Le jeu de cartes. De 2 à 6 joueurs, le plus de sourires gagne.</small></div><div class="mgo"><span class="mh-btn" style="display:inline-flex;align-items:center">Jouer</span></div></div>
 <div class="mh-grid" id="mhGrid">
-<button class="mh-tile" style="background:#d9534f" data-go="im"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="17" y="6" width="14" height="22" rx="7"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 42h14"/></svg><b>Imite-moi</b><span>Imite le son !</span></button>
+<button class="mh-tile" style="background:#d9534f" data-go="im"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="17" y="6" width="14" height="22" rx="7"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 42h14"/></svg><b>Imite le son</b><span>Un son passe, imite-le</span></button>
 <button class="mh-tile" style="background:#6a55a8" data-go="ml" data-hub="ttt"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="6" width="36" height="36" rx="6"/><path d="M18 6v36M30 6v36M6 18h36M6 30h36"/></svg><b>Morpion anime</b><span>Défie un ami</span></button>
 <button class="mh-tile" style="background:#1f8a7a" data-go="ml" data-hub="hl"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40V26M20 40V14M32 40V22M44 40V8" transform="scale(.9) translate(2 4)"/></svg><b>Plus ou moins</b><span>Bats ta série</span></button>
 <button class="mh-tile" style="background:#5b4bc4" data-go="ml" data-hub="gs"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 17a7 7 0 1 1 10 6c-2 1.4-3 2.6-3 5"/><path d="M24 36v.5"/></svg><b>Qui est-ce ?</b><span>Portrait flouté</span></button>
@@ -1233,7 +1270,7 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 <section class="pn" id="hsNW" hidden><div class="ph"><h2>Notifications</h2><button class="lk" id="hsAll" type="button">Tout marquer comme lu</button></div><div id="hsN"></div></section>
 </div></div>
 <div class="hv-sec"><h2 id="hmGames">Tous les jeux</h2><div class="hv-flt" id="hvFlt" role="group" aria-label="Filtrer les jeux"><button type="button" data-f="all" aria-pressed="true">Tous</button><button type="button" data-f="solo" aria-pressed="false">Solo</button><button type="button" data-f="duo" aria-pressed="false">À deux</button><button type="button" data-f="group" aria-pressed="false">En groupe</button></div></div>
-<div class="hv-grid" id="hvGrid"><button type="button" class="hv-t" data-k="group" data-go="im" style="--tc:#d9534f" title="Un son passe, imite-le avec ta voix : le jeu te donne une note sur 100."><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="17" y="6" width="14" height="22" rx="7"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 42h14"/></svg><b>Imite-moi</b><span>Imite le son !</span></button><button type="button" class="hv-t" data-k="duo" data-go="ml" data-hub="ttt" style="--tc:#6a55a8" title="Une grille 3×3 : pose ton symbole en citant un personnage qui correspond aux deux critères."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 6h36v36H6zM18 6v36M30 6v36M6 18h36M6 30h36"/></svg><b>Morpion anime</b><span>Défie un ami</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="hl" style="--tc:#1f8a7a" title="Quel personnage a le plus de favoris ? Bats ton record de série."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40V26M20 40V14M32 40V22M44 40V8"/></svg><b>Plus ou moins</b><span>Bats ta série</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="gs" style="--tc:#5b4bc4" title="Retrouve le personnage sur un portrait flouté, en 5 essais."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 17a7 7 0 1 1 10 6c-2 1.4-3 2.6-3 5M24 36v.5"/></svg><b>Qui est-ce ?</b><span>Portrait flouté</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="bt" style="--tc:#d97a1f" title="Devine le personnage avec un seul détail : les cheveux, puis les yeux, puis le visage."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4 24c5-9 12-13 20-13s15 4 20 13c-5 9-12 13-20 13S9 33 4 24zM30 24a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><b>Blind test visuel</b><span>Indice après indice</span></button><button type="button" class="hv-t" data-k="duo" data-go="ml" data-hub="dt" style="--tc:#3f6aa6" title="Chacun choisit un anime, l’autre répond à un QCM dessus."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 12h32v20H8zM18 40h12M24 32v8"/></svg><b>Duel de thèmes</b><span>Un QCM à deux</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="at" style="--tc:#b04a82" title="Reconnais l’anime à l’écoute d’un opening ou d’un ending."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 20v8M16 14v20M24 8v32M32 14v20M40 20v8"/></svg><b>Blind test audio</b><span>Reconnais l’opening</span></button><button type="button" class="hv-t" data-k="group" data-go="rm" style="--tc:#2f86a8" title="Crée un salon, partage le code : mêmes questions pour tous, classement en direct."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 38c1-7 5-10 10-10s9 3 10 10M16 24a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM30 30c5-1 9 1 12 8M33 22a5 5 0 1 0 0-10"/></svg><b>Salons et tournois</b><span>Jusqu’à 12 joueurs</span></button><button type="button" class="hv-t" data-k="group" data-go="uc" style="--tc:#6b7280" title="Un personnage secret pour chacun, sauf un infiltré. Un mot chacun, puis on vote."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24c5-9 12-13 16-13s11 4 16 13M12 24h24l-3 14H15z"/></svg><b>Undercover</b><span>Trouve l’infiltré</span></button></div>
+<div class="hv-grid" id="hvGrid"><button type="button" class="hv-t" data-k="group" data-go="im" style="--tc:#d9534f" title="Un son passe, imite-le avec ta voix : le jeu te donne une note sur 100."><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="17" y="6" width="14" height="22" rx="7"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 42h14"/></svg><b>Imite le son</b><span>Un son passe, imite-le</span></button><button type="button" class="hv-t" data-k="duo" data-go="ml" data-hub="ttt" style="--tc:#6a55a8" title="Une grille 3×3 : pose ton symbole en citant un personnage qui correspond aux deux critères."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 6h36v36H6zM18 6v36M30 6v36M6 18h36M6 30h36"/></svg><b>Morpion anime</b><span>Défie un ami</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="hl" style="--tc:#1f8a7a" title="Quel personnage a le plus de favoris ? Bats ton record de série."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40V26M20 40V14M32 40V22M44 40V8"/></svg><b>Plus ou moins</b><span>Bats ta série</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="gs" style="--tc:#5b4bc4" title="Retrouve le personnage sur un portrait flouté, en 5 essais."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 17a7 7 0 1 1 10 6c-2 1.4-3 2.6-3 5M24 36v.5"/></svg><b>Qui est-ce ?</b><span>Portrait flouté</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="bt" style="--tc:#d97a1f" title="Devine le personnage avec un seul détail : les cheveux, puis les yeux, puis le visage."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4 24c5-9 12-13 20-13s15 4 20 13c-5 9-12 13-20 13S9 33 4 24zM30 24a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><b>Blind test visuel</b><span>Indice après indice</span></button><button type="button" class="hv-t" data-k="duo" data-go="ml" data-hub="dt" style="--tc:#3f6aa6" title="Chacun choisit un anime, l’autre répond à un QCM dessus."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 12h32v20H8zM18 40h12M24 32v8"/></svg><b>Duel de thèmes</b><span>Un QCM à deux</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="at" style="--tc:#b04a82" title="Reconnais l’anime à l’écoute d’un opening ou d’un ending."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 20v8M16 14v20M24 8v32M32 14v20M40 20v8"/></svg><b>Blind test audio</b><span>Reconnais l’opening</span></button><button type="button" class="hv-t" data-k="group" data-go="rm" style="--tc:#2f86a8" title="Crée un salon, partage le code : mêmes questions pour tous, classement en direct."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 38c1-7 5-10 10-10s9 3 10 10M16 24a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM30 30c5-1 9 1 12 8M33 22a5 5 0 1 0 0-10"/></svg><b>Salons et tournois</b><span>Jusqu’à 12 joueurs</span></button><button type="button" class="hv-t" data-k="group" data-go="uc" style="--tc:#6b7280" title="Un personnage secret pour chacun, sauf un infiltré. Un mot chacun, puis on vote."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24c5-9 12-13 16-13s11 4 16 13M12 24h24l-3 14H15z"/></svg><b>Undercover</b><span>Trouve l’infiltré</span></button></div>
 <div class="hv-bot"><section class="pn"><div class="ph"><h2>Classement</h2><button class="lk" type="button" data-go="lb">Tout voir</button></div><div class="chips" id="hsTabs"><button type="button" data-g="ttt" aria-pressed="true">Morpion</button><button type="button" data-g="hl" aria-pressed="false">Plus ou moins</button><button type="button" data-g="at" aria-pressed="false">Blind test</button></div><div id="hsLb"><div class="hint">Chargement…</div></div></section>
 <section class="pn dash"><h2>Prochainement</h2><div class="soon"><span>Connexion Google</span><span>Nom de domaine personnalisé</span></div></section></div>
 </div>
@@ -1372,7 +1409,7 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 </main>
 <main id="v-im" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
-<h1>Imite-moi</h1>
+<h1>Imite le son</h1>
 <div id="imBody"></div>
 </main>
 <main id="v-vie" hidden>
@@ -3440,7 +3477,7 @@ async function vieCat(){
   try{sessionStorage.setItem('viecat8',JSON.stringify(r.data))}catch(e){}
   VC=vieMap(r.data);return VC}
 /* les dessins sont dans un fichier à part, chargé à la demande */
-/* ===== Imite-moi (chargé à la demande : imite.js + imite/sons.json + imite/sons/*.mp3) ===== */
+/* ===== Imite le son (chargé à la demande : imite.js + imite/sons.json + imite/sons/*.mp3) ===== */
 let imP=null;
 function imEnter(){
   const b=$('imBody');
@@ -5090,6 +5127,26 @@ if(!L.length)return;const u=L[Math.floor(Math.random()*L.length)];const im=new I
 /* loadHero(); (désactivé) */
 try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
 
+/* Accueil : icônes, description et aperçu vidéo au survol */
+(function(){
+  const IC={im:'micro',ttt:'des',hl:'classement',gs:'inconnu',bt:'regard',dt:'duel',at:'casque',rm:'joueurs',uc:'profil'};
+  const TS={im:1,ttt:1,hl:1,gs:1,bt:1,dt:1,at:1};
+  document.querySelectorAll('#hvGrid .hv-t').forEach((t,i)=>{
+    const key=t.dataset.go==='ml'?t.dataset.hub:t.dataset.go;
+    t.style.setProperty('--k',i);
+    const ic=document.createElement('span');ic.className='hv-i';ic.innerHTML=uic(IC[key]||'manette');t.insertBefore(ic,t.firstChild);
+    const d=document.createElement('p');d.className='hv-d';d.textContent=t.getAttribute('title')||'';d.style.margin=0;
+    t.removeAttribute('title');t.appendChild(d);
+    if(!TS[key])return;
+    let v=null;
+    const on=()=>{
+      if(!v){v=document.createElement('video');v.className='hv-v';v.muted=true;v.loop=true;v.playsInline=true;v.preload='none';v.src='teasers/'+key+'.webm';t.insertBefore(v,t.firstChild);v.addEventListener('playing',()=>t.classList.add('hv-on'))}
+      v.play().catch(()=>{});
+    };
+    const off=()=>{if(v){v.pause();v.currentTime=0;t.classList.remove('hv-on')}};
+    t.addEventListener('mouseenter',on);t.addEventListener('focus',on);t.addEventListener('mouseleave',off);t.addEventListener('blur',off);
+  });
+})();
 /* Icônes à la place des emojis d'interface (toute la page, y compris le texte ajouté plus tard) */
 (function(){
   const G={'🏆':'trophee','🥇':'trophee','🥈':'trophee','🥉':'trophee','❌':'erreur','🚫':'erreur','✕':'erreur','✅':'valide','✔':'valide','✓':'valide','🤷':'inconnu','⏱':'chrono','🤝':'egalite','👑':'couronne','🎯':'cible','👥':'joueurs','💬':'discussion','🔕':'discussion','😂':'discussion','🌐':'en-ligne','🎮':'manette','⚔':'duel','🔁':'rejouer','🎧':'casque','🎤':'micro','🔊':'son','🔉':'son','👀':'regard','📖':'regles','📨':'invitation','✉':'invitation','🏁':'arrivee','🗑':'supprimer','💎':'diamant','⭐':'etoile','✨':'etoile','🌠':'etoile','⚡':'eclair','🎲':'des','😊':'sourire','🙂':'sourire','🛡':'bouclier','🕵':'profil','🎴':'joueurs','📊':'classement','⚙':'reglages','💤':'quitter','🚪':'quitter','💼':'job','💰':'salaire','🪙':'salaire','🍺':'bar','🎓':'etudes','📚':'etudes','🏠':'maison','🧺':'maison','🪟':'maison','🏚':'maison','🚗':'voiture','✈':'voyage','💍':'mariage','👶':'enfant','🎁':'cadeau','🎈':'cadeau','🎂':'gateau','🍀':'trefle','🚑':'secours','🦿':'secours','🤒':'thermometre','🌪':'tornade','🔥':'flamme','🥵':'flamme','💔':'coeur-brise','💸':'billet','🦹':'masque','😈':'masque','🪆':'masque','☄':'meteore','🌊':'vague','💧':'vague','🦠':'virus','🐀':'virus','🧟':'crane','🍽':'assiette','👻':'fantome','🧙':'chapeau','🧚':'baguette','🧞':'lampe','💘':'vie','💖':'vie','🫀':'vie','🩸':'vie','🧛':'chauve-souris','🐺':'lune','🗳':'urne','🎟':'ticket','⚖':'balance','🔍':'loupe','💳':'carte-bancaire','🔮':'boule','🪓':'hache','🏦':'banque','🏛':'banque','🏹':'cible','🔫':'cible','🌍':'en-ligne','📰':'regles','📂':'regles','🚩':'arrivee','✊':'arrivee','☭':'arrivee','⛓':'bouclier','🏅':'etoile','🌈':'etoile','🎨':'etoile','💪':'etoile','🧩':'des','🂠':'des','😏':'sourire'};
