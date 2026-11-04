@@ -5165,7 +5165,7 @@ try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
 /* Accueil : icônes, description et aperçu vidéo au survol */
 (function(){
   const IC={im:'micro',ttt:'des',hl:'classement',gs:'inconnu',bt:'regard',dt:'duel',at:'casque',rm:'joueurs',uc:'profil'};
-  const TS={ttt:1,hl:1,gs:1,bt:1,dt:1,at:1};
+  const TS={im:1,uc:1,ttt:1,hl:1,gs:1,bt:1,dt:1,at:1};
   document.querySelectorAll('#hvGrid .hv-t').forEach((t,i)=>{
     const key=t.dataset.go==='ml'?t.dataset.hub:t.dataset.go;
     t.style.setProperty('--k',i);
