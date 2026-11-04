@@ -1177,12 +1177,12 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 /* Verdict au centre de l'écran */
 #vd{position:fixed;inset:0;z-index:90;pointer-events:none;display:grid;place-items:center;background:radial-gradient(closest-side,rgba(0,0,0,.45),transparent 90%);animation:vdIn 1.5s var(--ease) both}
 #vd .vdb{display:grid;justify-items:center;gap:14px;animation:vdIn 1.5s var(--ease) both}
-#vd .vdi{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:2px solid var(--vc);box-shadow:0 0 0 0 var(--vc),0 30px 60px -20px rgba(0,0,0,.6);position:relative;animation:vdPop .7s var(--ease) both}
+#vd .vdi{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:2px solid var(--vc);box-shadow:0 0 0 0 var(--vc),0 30px 60px -20px rgba(0,0,0,.6);position:relative;animation:vdPop .7s var(--ease) both}
 #vd .vdi{--accent:var(--vc);--accent2:var(--vc);color:#fff;background:var(--vc);border-color:#fff}
-#vd .vdi .uic{width:84px;height:84px}
+#vd .vdi .uic{width:68px;height:68px}
 #vd .vdi .uic *{stroke-width:4.2}
 #vd .vdi:after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--vc);animation:vdRing 1s var(--ease) both}
-#vd .vdt{font:800 clamp(1.6rem,5.5vw,2.8rem)/1 var(--display);letter-spacing:-.04em;color:#fff;background:var(--vc);border:0;box-shadow:0 20px 40px -18px var(--vc);border-radius:99px;padding:12px 26px;animation:vdTxt .8s var(--ease) .12s both}
+#vd .vdt{font:800 clamp(1.3rem,4.4vw,2.2rem)/1 var(--display);letter-spacing:-.04em;color:#fff;background:var(--vc);border:0;box-shadow:0 20px 40px -18px var(--vc);border-radius:99px;padding:10px 22px;animation:vdTxt .8s var(--ease) .12s both}
 #vd.bad .vdi{animation:vdPop .5s var(--ease) both,mlShake .6s .35s}
 #vd i{position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:3px;background:var(--vc);animation:vdP 1s var(--ease) both;animation-delay:var(--d)}
 @keyframes vdIn{0%,78%{opacity:1}100%{opacity:0;transform:scale(1.06)}}
@@ -5103,7 +5103,7 @@ try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
     const old=document.getElementById('vd');if(old)old.remove();
     const bad=VD[k][1],d=document.createElement('div');d.id='vd';d.className=bad?'bad':'';
     d.style.setProperty('--vc',bad?'#e03a2f':k==='egalite'?'var(--ac)':'#2fa866');
-    let ps='';if(!bad)for(let i=0;i<16;i++){const a=i/16*6.283+Math.random()*.4,r=130+Math.random()*90;ps+='<i style="--x:'+Math.cos(a)*r+'px;--y:'+Math.sin(a)*r+'px;--d:'+(.1+Math.random()*.15)+'s"></i>'}
+    let ps='';if(!bad)for(let i=0;i<16;i++){const a=i/16*6.283+Math.random()*.4,r=105+Math.random()*70;ps+='<i style="--x:'+Math.cos(a)*r+'px;--y:'+Math.sin(a)*r+'px;--d:'+(.1+Math.random()*.15)+'s"></i>'}
     d.innerHTML='<div class="vdb"><div class="vdi">'+uic(k)+ps+'</div><div class="vdt">'+VD[k][0]+'</div></div>';
     document.body.appendChild(d);setTimeout(()=>d.remove(),1600);
   }
