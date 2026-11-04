@@ -1228,6 +1228,33 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 .hv-t:hover .hv-d,.hv-t:focus-visible .hv-d{max-height:6em;opacity:1;margin-top:4px}
 @media (max-width:1000px){.hv-grid{grid-template-columns:repeat(2,1fr)}}
 @media (prefers-reduced-motion:reduce){.hv-t,.hv-hero,.hv-cd i{animation:none!important;transition:none!important}.hv-t .hv-v{display:none}}
+/* ===== Autres pages + téléphone : nouveau style ===== */
+.card{border:1px solid var(--bd);border-left:1px solid var(--bd);border-radius:18px;transition:transform .45s var(--ease),border-color .3s,box-shadow .45s var(--ease)}
+.card:hover{transform:translateY(-4px);border-color:var(--ac);box-shadow:0 24px 40px -28px rgba(0,0,0,.55)}
+.pn{border-radius:22px;transition:border-color .3s}
+.pn h2{font:800 1.1rem/1.1 var(--display);letter-spacing:-.03em}
+.chips button{background:var(--panel);font-weight:600;transition:transform .25s var(--ease),background .2s}.chips button:hover{transform:translateY(-2px)}
+.fr-row{border-radius:16px;transition:border-color .3s,transform .4s var(--ease)}.fr-row:hover{border-color:var(--ac)}
+.gx h2{font-family:var(--display);letter-spacing:-.03em}
+.gx .pn,.gx .fr-row,.gx .card{animation:mlUp .9s var(--ease) backwards .35s}
+@media (max-width:700px){
+  .gx:before{display:none}
+  .mh-feat{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px}
+  .mh-feat .mft em{background:var(--ac);color:var(--onac);border-radius:99px;padding:3px 10px}
+  .mh-feat .mft b{font:800 24px/1.05 var(--display);letter-spacing:-.04em}
+  .mh-feat .mft small{color:var(--mut);font-family:var(--serif)}
+  .mh-cd i{background:var(--panel)!important;border:1px solid var(--bd)}.mh-cd svg{stroke:var(--ac)}
+  .mh-btn{background:var(--ac);color:var(--onac);border-radius:12px}
+  .mh-res{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:20px}
+  .mh-res .mrk{color:var(--ac)}.mh-res .mra em{color:var(--mut)}.mh-res .mra .mav{border-color:var(--card)}
+  .mh-sec b{font:800 18px var(--display);letter-spacing:-.03em}
+  .mh-tile{background:var(--card)!important;color:var(--tx);border:1px solid var(--bd);border-radius:20px;min-height:128px;padding:14px;animation:mlUp .9s var(--ease) backwards;animation-delay:calc(var(--k,0)*60ms)}
+  .mh-tile>svg{display:none}
+  .mh-tile .hv-i{position:absolute;left:14px;top:14px;width:46px;height:46px;border-radius:14px;background:var(--panel);display:grid;place-items:center}
+  .mh-tile .hv-i .uic{width:28px;height:28px}
+  .mh-tile b{font:800 14.5px/1.1 var(--display);letter-spacing:-.03em}.mh-tile span:not(.hv-i){color:var(--mut)}
+  .mh-tile:active{transform:scale(.97);border-color:var(--ac)}
+}
 @media (max-width:760px){.mlhero{grid-template-columns:1fr;gap:20px}.mcard{max-width:170px}.mlcols{grid-template-columns:1fr;gap:6px}.mllines i:nth-child(2),.mllines i:nth-child(3){display:none}}
 @media (prefers-reduced-motion:reduce){#v-ml *,#v-ml *:before,#v-ml *:after{animation:none!important;transition:none!important}}
 </style>
@@ -1275,12 +1302,12 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 <section class="pn dash"><h2>Prochainement</h2><div class="soon"><span>Connexion Google</span><span>Nom de domaine personnalisé</span></div></section></div>
 </div>
 </main>
-<main id="v-tb" hidden>
+<main id="v-tb" class="gx" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <div class="tb-hd"><small id="tbHi"></small><h1>Tableau de bord</h1></div>
 <div id="tbBody"></div>
 </main>
-<main id="v-set" hidden>
+<main id="v-set" class="gx" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <h1>Paramètres</h1>
 <div class="set"><h2>Thème</h2><p>Le blanc est le thème par défaut. « Auto » suit le réglage de ton appareil.</p><div class="thm" id="thmB">
@@ -1395,13 +1422,13 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 <div class="row" id="rcAct" style="flex-wrap:wrap"></div>
 <div class="row"><button class="btn alt" id="rcClaim" hidden>Adversaire absent : réclamer la victoire</button></div>
 </main>
-<main id="v-rm" hidden>
+<main id="v-rm" class="gx" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <h1>Salons et tournois</h1>
 <div id="rmBody"></div>
 <div class="msg" id="rmMsg"></div>
 </main>
-<main id="v-uc" hidden>
+<main id="v-uc" class="gx" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <h1>Undercover</h1>
 <div id="ucBody"></div>
@@ -1441,7 +1468,7 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 </div>
 <div class="msg" id="mlMsg"></div>
 </main>
-<main id="v-prof" hidden>
+<main id="v-prof" class="gx" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <div class="pcard"><div class="pban" id="pbBan"></div><div class="pav" id="pbAv"></div>
 <div class="pbody"><h2 id="pbName"></h2><div id="pbBio" class="pbio"></div><div id="pbFav" class="pfav"></div><div id="pbSince" class="psince"></div></div></div>
@@ -1461,7 +1488,7 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 </div>
 <div class="set" id="pbHistW" hidden><h2>Dernières parties</h2><div id="pfHist"></div></div>
 </main>
-<main id="v-fr" hidden>
+<main id="v-fr" class="gx" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <h1>Amis</h1>
 <input id="frQ" placeholder="Chercher un joueur par pseudo…" autocomplete="off">
@@ -1470,13 +1497,13 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 <div class="msg" id="frMsg"></div>
 <div id="frInc"></div><div id="frList"></div><div id="frOut"></div>
 </main>
-<main id="v-msg" hidden>
+<main id="v-msg" class="gx" hidden>
 <button class="btn back" data-go="home">← Accueil</button>
 <h1>Messages</h1>
 <div id="msgBody"></div>
 <div class="msg" id="msMsg"></div>
 </main>
-<main id="v-lb" hidden>
+<main id="v-lb" class="gx" hidden>
 <button class="btn back" data-go="ml">← Retour</button>
 <h1>Classement</h1>
 <p class="sub" id="lbS"></p>
@@ -5127,6 +5154,14 @@ if(!L.length)return;const u=L[Math.floor(Math.random()*L.length)];const im=new I
 /* loadHero(); (désactivé) */
 try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
 
+/* Accueil téléphone : icônes des tuiles */
+(function(){
+  const IC={im:'micro',ttt:'des',hl:'classement',gs:'inconnu',bt:'regard',dt:'duel',at:'casque',rm:'joueurs',uc:'profil'};
+  document.querySelectorAll('#mhGrid .mh-tile').forEach((t,i)=>{
+    const key=t.dataset.go==='ml'?t.dataset.hub:t.dataset.go;t.style.setProperty('--k',i);
+    const ic=document.createElement('span');ic.className='hv-i';ic.innerHTML=uic(IC[key]||'manette');t.insertBefore(ic,t.firstChild);
+  });
+})();
 /* Accueil : icônes, description et aperçu vidéo au survol */
 (function(){
   const IC={im:'micro',ttt:'des',hl:'classement',gs:'inconnu',bt:'regard',dt:'duel',at:'casque',rm:'joueurs',uc:'profil'};
