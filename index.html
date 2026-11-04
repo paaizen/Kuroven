@@ -1174,6 +1174,21 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 .pl{border:1px solid var(--bd);border-radius:14px;transition:border-color .3s,box-shadow .5s}
 .gx .bar{max-width:640px}
 @media (prefers-reduced-motion:reduce){.gx *,.gx:before,.mpop{animation:none!important;transition:none!important}}
+/* Verdict au centre de l'écran */
+#vd{position:fixed;inset:0;z-index:90;pointer-events:none;display:grid;place-items:center;background:radial-gradient(closest-side,rgba(0,0,0,.45),transparent 90%);animation:vdIn 1.5s var(--ease) both}
+#vd .vdb{display:grid;justify-items:center;gap:14px;animation:vdIn 1.5s var(--ease) both}
+#vd .vdi{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:2px solid var(--vc);box-shadow:0 0 0 0 var(--vc),0 30px 60px -20px rgba(0,0,0,.6);position:relative;animation:vdPop .7s var(--ease) both}
+#vd .vdi .uic{width:76px;height:76px}
+#vd .vdi:after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--vc);animation:vdRing 1s var(--ease) both}
+#vd .vdt{font:800 clamp(1.5rem,5vw,2.4rem)/1 var(--display);letter-spacing:-.04em;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:99px;padding:12px 26px;animation:vdTxt .8s var(--ease) .12s both}
+#vd.bad .vdi{animation:vdPop .5s var(--ease) both,mlShake .6s .35s}
+#vd i{position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:3px;background:var(--vc);animation:vdP 1s var(--ease) both;animation-delay:var(--d)}
+@keyframes vdIn{0%,78%{opacity:1}100%{opacity:0;transform:scale(1.06)}}
+@keyframes vdPop{0%{transform:scale(.2) rotate(-14deg);opacity:0}55%{transform:scale(1.14) rotate(3deg);opacity:1}100%{transform:none}}
+@keyframes vdRing{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.3);opacity:0}}
+@keyframes vdTxt{0%{transform:translateY(24px) scale(.9);opacity:0}100%{transform:none;opacity:1}}
+@keyframes vdP{0%{transform:translate(-50%,-50%) scale(.4);opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(220deg) scale(1);opacity:0}}
+@media (prefers-reduced-motion:reduce){#vd *,#vd .vdb{animation-duration:.01s!important}#vd .vdb{animation:vdIn 1.2s both!important}}
 @media (max-width:760px){.mlhero{grid-template-columns:1fr;gap:20px}.mcard{max-width:170px}.mlcols{grid-template-columns:1fr;gap:6px}.mllines i:nth-child(2),.mllines i:nth-child(3){display:none}}
 @media (prefers-reduced-motion:reduce){#v-ml *,#v-ml *:before,#v-ml *:after{animation:none!important;transition:none!important}}
 </style>
@@ -5079,6 +5094,17 @@ try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
   const RE=new RegExp('('+Object.keys(G).join('|')+')️?','g');
   const TEST=new RegExp(RE.source);
   const SKIP=/^(SCRIPT|STYLE|TEXTAREA|INPUT|OPTION|SVG|TITLE)$/i;
+  const VD={valide:['Bonne réponse',0],erreur:['Raté',1],trophee:['Victoire',0],egalite:['Égalité',0]};
+  let vdLast=0;
+  function verdict(k,txt){
+    const now=Date.now();if(now-vdLast<900)return;vdLast=now;
+    const old=document.getElementById('vd');if(old)old.remove();
+    const bad=VD[k][1],d=document.createElement('div');d.id='vd';d.className=bad?'bad':'';
+    d.style.setProperty('--vc',bad?'#d4574c':k==='egalite'?'var(--ac)':'#4ea57d');
+    let ps='';if(!bad)for(let i=0;i<16;i++){const a=i/16*6.283+Math.random()*.4,r=130+Math.random()*90;ps+='<i style="--x:'+Math.cos(a)*r+'px;--y:'+Math.sin(a)*r+'px;--d:'+(.1+Math.random()*.15)+'s"></i>'}
+    d.innerHTML='<div class="vdb"><div class="vdi">'+uic(k)+ps+'</div><div class="vdt">'+VD[k][0]+'</div></div>';
+    document.body.appendChild(d);setTimeout(()=>d.remove(),1600);
+  }
   function walk(root){
     if(!root||root.nodeType===8)return;
     if(root.nodeType===3){one(root);return}
@@ -5097,8 +5123,8 @@ try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
       last=m.index+m[0].length;
     }
     if(last<v.length)f.appendChild(document.createTextNode(v.slice(last)));
-    const p=t.parentNode;p.replaceChild(f,t);
-    const g=p.closest&&p.closest('.gx .msg');if(g){g.classList.remove('mpop');void g.offsetWidth;g.classList.add('mpop')}
+    const p=t.parentNode;const first=RE.exec(v)&&0;RE.lastIndex=0;const m0=RE.exec(v);RE.lastIndex=0;p.replaceChild(f,t);
+    const g=p.closest&&p.closest('.gx .msg');if(g){g.classList.remove('mpop');void g.offsetWidth;g.classList.add('mpop');if(m0&&m0.index===0&&VD[G[m0[1]]])verdict(G[m0[1]],g.textContent)}
   }
   const fill=r=>(r.querySelectorAll?r:document).querySelectorAll('.bi[data-i]:empty').forEach(e=>{e.innerHTML=uic(e.dataset.i)});
   fill(document);walk(document.body);
