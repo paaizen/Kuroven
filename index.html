@@ -1210,7 +1210,8 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 .hv-rk{color:var(--ac)}.hv-ra .mav{border-color:var(--card)}.hv-ra em{color:var(--mut)}
 .hv-flt button{font-weight:600;transition:transform .25s var(--ease)}.hv-flt button:hover{transform:translateY(-2px)}
 .hv-grid{grid-template-columns:repeat(3,1fr);gap:18px}
-.hv-t{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;min-height:250px;padding:20px;gap:6px;justify-content:flex-end;transition:transform .5s var(--ease),border-color .3s,box-shadow .5s var(--ease);animation:mlUp 1s var(--ease) backwards;animation-delay:calc(var(--k,0)*70ms)}
+.hv-t{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;min-height:250px;padding:20px;gap:6px;justify-content:flex-end;transition:transform .5s var(--ease),border-color .3s,box-shadow .5s var(--ease);}
+.hv-t.in{animation:mlUp 1.1s var(--ease) backwards;animation-delay:calc(var(--k,0)%3*90ms)}
 .hv-t:hover,.hv-t:focus-visible{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 30px 50px -30px rgba(0,0,0,.6)}
 .hv-t>svg{display:none}
 .hv-t .hv-i{position:absolute;left:20px;top:20px;width:58px;height:58px;border-radius:16px;background:var(--panel);display:grid;place-items:center;z-index:2;transition:transform .6s var(--ease)}
@@ -1230,6 +1231,45 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 .hv-hero:after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(90deg,rgba(10,12,16,.92) 15%,rgba(10,12,16,.25));opacity:0;transition:opacity .4s}
 .hv-hero.hv-on .hv-v,.hv-hero:hover:after{opacity:1}
 .hv-hero:hover .hv-ht b,.hv-hero:hover .hv-ht p{color:#fff}.hv-hero:hover .hv-cd{opacity:0;transition:opacity .3s}
+/* ===== Accueil : grand titre, illustration, chiffres, bandeau défilant ===== */
+.thT{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--bd);border-radius:99px;background:transparent;color:var(--tx);font:500 .82rem var(--sans);cursor:pointer;transition:border-color .2s}
+.thT:hover{border-color:var(--tx)}.thT i{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--tx);background:linear-gradient(90deg,var(--tx) 50%,transparent 50%)}
+body.vmb .thT{display:none}
+.hv-hd{display:none}
+.lh{position:relative;margin:0 -24px;padding:clamp(26px,5vw,64px) 24px clamp(26px,4vw,52px);overflow:hidden}
+.lh-lines{position:absolute;inset:0;pointer-events:none;display:grid;grid-template-columns:repeat(4,1fr);-webkit-mask-image:linear-gradient(#000,transparent 92%);mask-image:linear-gradient(#000,transparent 92%)}
+.lh-lines i{border-left:1px solid var(--ln);transform-origin:top;animation:mlDraw 1.6s var(--ease) both}.lh-lines i:last-child{border-right:1px solid var(--ln)}
+.lh-lines i:nth-child(2){animation-delay:.12s}.lh-lines i:nth-child(3){animation-delay:.24s}.lh-lines i:nth-child(4){animation-delay:.36s}
+.lh-in{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center;max-width:1080px;margin:0 auto}
+.lh-eb small{display:flex;align-items:center;gap:10px;font:500 .8rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);animation:mlUp 1.2s var(--ease) both .2s}
+.lh-eb small:before{content:"";width:28px;height:1px;background:var(--mut)}
+.lh-h{margin:14px 0 18px;text-align:left;font:800 clamp(2.8rem,8.4vw,7rem)/.92 var(--display);letter-spacing:-.045em}
+.lh-h .ln{display:block;overflow:hidden;padding-bottom:.1em}.lh-h .ln span{display:inline-block;animation:mlRise 1.6s var(--ease) both;animation-delay:calc(.35s + var(--i)*80ms)}.lh-h em{font-style:normal;color:var(--ac)}
+.lh-p{max-width:34ch;font-size:clamp(1rem,1.4vw,1.15rem);color:var(--mut);margin:0 0 24px;animation:mlUp 1.4s var(--ease) both 1s}
+.lh-cta{display:flex;gap:12px;flex-wrap:wrap;animation:mlUp 1.4s var(--ease) both 1.15s}
+.lh-b{display:inline-flex;align-items:center;gap:10px;padding:13px 24px;border-radius:10px;font:600 .95rem var(--sans);border:1px solid transparent;cursor:pointer;transition:transform .2s,border-color .2s}
+.lh-b.p{background:var(--ac);color:var(--onac)}.lh-b.p:hover{transform:translateY(-2px)}.lh-b.p span{transition:transform .35s var(--ease)}.lh-b.p:hover span{transform:translateX(5px)}
+.lh-b.g{border-color:var(--bd);background:transparent;color:var(--tx)}.lh-b.g:hover{border-color:var(--tx)}
+.lh-art{position:relative;margin:0;aspect-ratio:4/5;max-height:540px;width:100%;border:1px solid var(--bd);border-radius:8px;overflow:hidden;clip-path:inset(0 0 100% 0);animation:lhReveal 1.8s var(--ease) both .5s}
+@keyframes lhReveal{to{clip-path:inset(0)}}
+.lh-img{position:absolute;inset:-6%;background:#0c0d0f url(home/morpion.jpg) 60% 50%/cover;transform:translate3d(var(--px,0),var(--py,0),0) scale(1.06);transition:transform .9s var(--ease)}
+.lh-art:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(12,13,15,.78),transparent 55%)}
+.lh-art figcaption{position:absolute;left:16px;right:16px;bottom:14px;z-index:2;color:#ecebe7;font:600 .82rem var(--sans);display:flex;justify-content:space-between;align-items:end;gap:10px}
+.lh-art figcaption b{font:700 1.15rem var(--display);display:block;letter-spacing:-.01em}.lh-art figcaption span{opacity:.75;font-weight:500}
+.lh-st{margin:0 -24px;border-block:1px solid var(--bd)}.lh-stin{display:grid;grid-template-columns:repeat(3,1fr);max-width:1080px;margin:0 auto}
+.lh-s{padding:22px 18px;border-left:1px solid var(--bd)}.lh-s:first-child{border-left:0}
+.lh-s b{display:block;font:700 clamp(1.8rem,4.4vw,3.1rem)/1 var(--display);letter-spacing:-.03em;font-variant-numeric:tabular-nums}.lh-s span{display:block;margin-top:6px;color:var(--mut);font-size:.88rem}
+.lh-mq{margin:-4px -24px 0;overflow:hidden;border-bottom:1px solid var(--bd);padding-block:16px}
+.lh-mq div{display:flex;gap:44px;width:max-content;animation:lhSlide 42s linear infinite;font:700 clamp(1.1rem,2.4vw,1.6rem) var(--display);letter-spacing:-.02em;color:var(--mut)}
+.lh-mq:hover div{animation-play-state:paused}.lh-mq span:nth-child(odd){color:var(--tx)}
+@keyframes lhSlide{to{transform:translateX(-50%)}}
+.hv-t.rv:not(.in),.hv-hero.rv:not(.in),.hv-bot.rv:not(.in){opacity:0;transform:translateY(34px) scale(.96)}
+.lh-big{margin:10px -24px -14px;overflow:hidden;padding-top:10px;pointer-events:none}
+.lh-big span{display:block;white-space:nowrap;width:max-content;font:800 clamp(5rem,21vw,19rem)/.82 var(--display);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1.5px color-mix(in srgb,var(--tx) 30%,transparent);transform:translateX(var(--bx,0px));will-change:transform}
+.lh-h,.lh-art{will-change:transform}
+.lh-mq div{will-change:transform}
+@media (max-width:900px){.lh-in{grid-template-columns:1fr}.lh-art{aspect-ratio:16/11;max-height:none}}
+@media (prefers-reduced-motion:reduce){.lh-art{clip-path:none}.lh-mq div{animation:none}.hv-t.rv:not(.in),.hv-hero.rv:not(.in),.hv-bot.rv:not(.in){opacity:1;transform:none}}
 @media (max-width:1000px){.hv-grid{grid-template-columns:repeat(2,1fr)}}
 @media (prefers-reduced-motion:reduce){.hv-t,.hv-hero,.hv-cd i{animation:none!important;transition:none!important}.hv-t .hv-v{display:none}}
 /* ===== Autres pages + téléphone : nouveau style ===== */
@@ -1264,7 +1304,7 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 </style>
 </head>
 <body>
-<header class="top"><div class="in"><button class="logo" data-go="home" aria-label="Retour à l’accueil Kuroven"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><span>Kuroven</span></button><span class="pill">Bêta</span><nav class="tn" aria-label="Navigation principale"><button type="button" data-go="home">Accueil</button><button type="button" data-sc="hmGames">Jeux</button><button type="button" data-go="rm">Salons</button><button type="button" data-go="lb">Classement</button><button type="button" data-go="fr">Amis</button><button type="button" data-go="tb">Tableau</button></nav><div class="rt"><div class="bellw" id="msgW" hidden><button class="ib" id="msgB" data-go="msg" aria-label="Messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span class="ibn" id="msgN" hidden></span></button></div><div class="bellw" id="bellW" hidden><button id="bell" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" aria-controls="bp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="bellN" hidden></span></button><div id="bp" role="region" aria-label="Notifications"><div class="bh"><b>Notifications</b><span><button id="bAll">Tout marquer comme lu</button><button id="bClr">Effacer les lues</button></span></div><div class="bl" id="bList"></div></div></div><div class="menu"><button class="pm" id="pm" aria-haspopup="true" aria-expanded="false" aria-controls="pd"><span class="av2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg></span><span id="pmName">Invité</span><span aria-hidden="true">▾</span></button><div id="pd" role="menu"><div class="who"><b id="pdName">Invité</b><small id="pdSub">Non connecté · invité</small></div><button id="pdAuth" role="menuitem">Se connecter</button><button data-go="prof" role="menuitem">Mon profil</button><button data-go="fr" role="menuitem">Amis <em id="frBadge" hidden></em></button><button data-go="msg" role="menuitem">Messages <em id="msgBadge" hidden></em></button><button data-go="tb" role="menuitem">Tableau de bord</button><button data-go="lb" role="menuitem">Classement</button><button data-go="prof" role="menuitem">Historique des parties</button><hr><button data-go="set" role="menuitem">Paramètres</button><button id="pdSwitch" role="menuitem">Changer de profil</button></div></div></div></div></header>
+<header class="top"><div class="in"><button class="logo" data-go="home" aria-label="Retour à l’accueil Kuroven"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="14" fill="#313338" stroke="#9cc3f0" stroke-opacity=".6" stroke-width="2"/><path d="M17 14h9v36h-9z" fill="#eef3f9"/><path d="M26 27L40 14H52L34 34H26z" fill="#9cc3f0"/><path d="M26 34H40L54 50H41z" fill="#eef3f9"/></svg><span>Kuroven</span></button><span class="pill">Bêta</span><nav class="tn" aria-label="Navigation principale"><button type="button" data-go="home">Accueil</button><button type="button" data-sc="hmGames">Jeux</button><button type="button" data-go="rm">Salons</button><button type="button" data-go="lb">Classement</button><button type="button" data-go="fr">Amis</button><button type="button" data-go="tb">Tableau</button></nav><div class="rt"><button class="thT" id="thT" type="button" aria-label="Changer de thème"><i></i><span id="thTl">Clair</span></button><div class="bellw" id="msgW" hidden><button class="ib" id="msgB" data-go="msg" aria-label="Messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span class="ibn" id="msgN" hidden></span></button></div><div class="bellw" id="bellW" hidden><button id="bell" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" aria-controls="bp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="bellN" hidden></span></button><div id="bp" role="region" aria-label="Notifications"><div class="bh"><b>Notifications</b><span><button id="bAll">Tout marquer comme lu</button><button id="bClr">Effacer les lues</button></span></div><div class="bl" id="bList"></div></div></div><div class="menu"><button class="pm" id="pm" aria-haspopup="true" aria-expanded="false" aria-controls="pd"><span class="av2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 3.8-8 8.5-8s8.5 3 8.5 8z"/></svg></span><span id="pmName">Invité</span><span aria-hidden="true">▾</span></button><div id="pd" role="menu"><div class="who"><b id="pdName">Invité</b><small id="pdSub">Non connecté · invité</small></div><button id="pdAuth" role="menuitem">Se connecter</button><button data-go="prof" role="menuitem">Mon profil</button><button data-go="fr" role="menuitem">Amis <em id="frBadge" hidden></em></button><button data-go="msg" role="menuitem">Messages <em id="msgBadge" hidden></em></button><button data-go="tb" role="menuitem">Tableau de bord</button><button data-go="lb" role="menuitem">Classement</button><button data-go="prof" role="menuitem">Historique des parties</button><hr><button data-go="set" role="menuitem">Paramètres</button><button id="pdSwitch" role="menuitem">Changer de profil</button></div></div></div></div></header>
 <nav id="mtabs" aria-label="Navigation"><button class="mh-tab" type="button" data-go="home"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>Jeux</button><button class="mh-tab" type="button" data-go="fr"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3 19c.6-3.4 3-4.8 6-4.8s5.4 1.4 6 4.8"/><path d="M16 5.6a3.2 3.2 0 0 1 0 5.8M18 14.6c1.8.6 2.8 2 3.1 4.4"/></svg>Amis<span class="mbd2" id="mtF" hidden></span></button><button class="mh-tab" type="button" data-go="msg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4A2.5 2.5 0 0 1 4 13.5Z"/></svg>Messages<span class="mbd2" id="mtM" hidden></span></button><button class="mh-tab" type="button" data-go="lb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20V11M12 20V4M18 20v-6"/></svg>Classement</button><button class="mh-tab" type="button" data-go="prof"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.5 20c.8-4 4-5.6 7.5-5.6s6.7 1.6 7.5 5.6"/></svg>Profil</button></nav>
 <div id="mhNS"><div class="msb" role="dialog" aria-label="Notifications"><div class="mshd"><b>Notifications</b><button type="button" id="mhNAll">Tout marquer comme lu</button></div><div id="mhNL"></div></div></div>
 <button id="live" hidden><span id="liveT"></span></button>
@@ -1292,7 +1332,15 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 <button class="mh-set" type="button" data-go="set" style="margin-top:0">⚙️ Paramètres</button>
 </div>
 <div class="hv">
-<div class="hv-hd"><small id="hvHi">Bonjour</small><h1 id="hvTi">À quoi on joue ?</h1></div>
+<section class="lh" id="lh"><div class="lh-lines" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="lh-in">
+<div class="lh-tx"><div class="lh-eb"><small id="hvHi">Jeux entre amis</small></div><span id="hvTi" hidden></span>
+<h1 class="lh-h" aria-label="Joue avec ta bande."><span class="ln"><span style="--i:0">Joue</span></span><span class="ln"><span style="--i:1">avec</span> <span style="--i:2"><em>ta</em></span></span><span class="ln"><span style="--i:3">bande.</span></span></h1>
+<p class="lh-p">Dix jeux à lancer en quelques secondes. Défie un ami, monte au classement ou ouvre un salon.</p>
+<div class="lh-cta"><button type="button" class="lh-b p" id="lhGo">Voir les jeux <span>→</span></button><button type="button" class="lh-b g" id="lhAcc">Créer un compte</button></div></div>
+<figure class="lh-art" id="lhArt"><div class="lh-img"></div><figcaption><div><b>Morpion anime</b>Place le bon personnage sur chaque case</div><span>À deux</span></figcaption></figure>
+</div></section>
+<section class="lh-st"><div class="lh-stin"><div class="lh-s"><b data-n="10">10</b><span>jeux disponibles</span></div><div class="lh-s"><b data-n="134">134</b><span>catégories au morpion</span></div><div class="lh-s"><b data-n="12">12</b><span>joueurs par salon, au maximum</span></div></div></section>
+<div class="lh-mq" aria-hidden="true"><div id="lhMq"></div></div>
 <div class="hv-top">
 <div class="hv-hero" id="vieFeat" data-go="vie" role="button" tabindex="0" aria-label="Jouer à Ma Vie"><div class="hv-ht"><em>NOUVEAU</em><b>Ma Vie</b><p>Le jeu de cartes. Études, métier, amour, voyages… et des galères pour les autres. De 2 à 6 joueurs, le plus de sourires gagne.</p><span class="hv-y">Jouer</span></div><div class="hv-cd" aria-hidden="true"><i></i><i></i><i><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></i></div></div>
 <div class="hv-col">
@@ -1304,6 +1352,7 @@ button.pc:hover{transform:translateY(-6px);border-color:var(--ac);box-shadow:0 2
 <div class="hv-grid" id="hvGrid"><button type="button" class="hv-t" data-k="group" data-go="im" style="--tc:#d9534f" title="Un son passe, imite-le avec ta voix : le jeu te donne une note sur 100."><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="17" y="6" width="14" height="22" rx="7"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 42h14"/></svg><b>Imite le son</b><span>Un son passe, imite-le</span></button><button type="button" class="hv-t" data-k="duo" data-go="ml" data-hub="ttt" style="--tc:#6a55a8" title="Une grille 3×3 : pose ton symbole en citant un personnage qui correspond aux deux critères."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 6h36v36H6zM18 6v36M30 6v36M6 18h36M6 30h36"/></svg><b>Morpion anime</b><span>Défie un ami</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="hl" style="--tc:#1f8a7a" title="Quel personnage a le plus de favoris ? Bats ton record de série."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40V26M20 40V14M32 40V22M44 40V8"/></svg><b>Plus ou moins</b><span>Bats ta série</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="gs" style="--tc:#5b4bc4" title="Retrouve le personnage sur un portrait flouté, en 5 essais."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 17a7 7 0 1 1 10 6c-2 1.4-3 2.6-3 5M24 36v.5"/></svg><b>Qui est-ce ?</b><span>Portrait flouté</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="bt" style="--tc:#d97a1f" title="Devine le personnage avec un seul détail : les cheveux, puis les yeux, puis le visage."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4 24c5-9 12-13 20-13s15 4 20 13c-5 9-12 13-20 13S9 33 4 24zM30 24a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><b>Blind test visuel</b><span>Indice après indice</span></button><button type="button" class="hv-t" data-k="duo" data-go="ml" data-hub="dt" style="--tc:#3f6aa6" title="Chacun choisit un anime, l’autre répond à un QCM dessus."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 12h32v20H8zM18 40h12M24 32v8"/></svg><b>Duel de thèmes</b><span>Un QCM à deux</span></button><button type="button" class="hv-t" data-k="solo" data-go="ml" data-hub="at" style="--tc:#b04a82" title="Reconnais l’anime à l’écoute d’un opening ou d’un ending."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 20v8M16 14v20M24 8v32M32 14v20M40 20v8"/></svg><b>Blind test audio</b><span>Reconnais l’opening</span></button><button type="button" class="hv-t" data-k="group" data-go="rm" style="--tc:#2f86a8" title="Crée un salon, partage le code : mêmes questions pour tous, classement en direct."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 38c1-7 5-10 10-10s9 3 10 10M16 24a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM30 30c5-1 9 1 12 8M33 22a5 5 0 1 0 0-10"/></svg><b>Salons et tournois</b><span>Jusqu’à 12 joueurs</span></button><button type="button" class="hv-t" data-k="group" data-go="uc" style="--tc:#6b7280" title="Un personnage secret pour chacun, sauf un infiltré. Un mot chacun, puis on vote."><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24c5-9 12-13 16-13s11 4 16 13M12 24h24l-3 14H15z"/></svg><b>Undercover</b><span>Trouve l’infiltré</span></button></div>
 <div class="hv-bot"><section class="pn"><div class="ph"><h2>Classement</h2><button class="lk" type="button" data-go="lb">Tout voir</button></div><div class="chips" id="hsTabs"><button type="button" data-g="ttt" aria-pressed="true">Morpion</button><button type="button" data-g="hl" aria-pressed="false">Plus ou moins</button><button type="button" data-g="at" aria-pressed="false">Blind test</button></div><div id="hsLb"><div class="hint">Chargement…</div></div></section>
 <section class="pn dash"><h2>Prochainement</h2><div class="soon"><span>Connexion Google</span><span>Nom de domaine personnalisé</span></div></section></div>
+<div class="lh-big" id="lhBig" aria-hidden="true"><span>Kuroven</span></div>
 </div>
 </main>
 <main id="v-tb" class="gx" hidden>
@@ -5158,6 +5207,45 @@ if(!L.length)return;const u=L[Math.floor(Math.random()*L.length)];const im=new I
 /* loadHero(); (désactivé) */
 try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
 
+/* Accueil : défilement, chiffres, thème, illustration */
+(function(){
+  const $$=s=>document.querySelectorAll(s);
+  const io='IntersectionObserver' in window?new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12}):null;
+  $$('#hvGrid .hv-t,.hv-hero,.hv-bot').forEach(e=>{e.classList.add('rv');io?io.observe(e):e.classList.add('in')});
+  const mq=$('lhMq');if(mq){const n=[...$$('#hvGrid .hv-t b')].map(b=>'<span>'+b.textContent+'</span>').join('');mq.innerHTML=n+n}
+  let done=false;function count(){if(done)return;done=true;$$('.lh-s b[data-n]').forEach(b=>{const n=+b.dataset.n,t0=performance.now(),d=1800;(function f(t){const p=Math.min((t-t0)/d,1),e=1-Math.pow(1-p,4);b.textContent=Math.round(n*e);if(p<1)requestAnimationFrame(f)})(t0)})}
+  const st=document.querySelector('.lh-st');if(io&&st){const so=new IntersectionObserver(es=>{if(es[0].isIntersecting){count();so.disconnect()}},{threshold:.4});so.observe(st)}
+  const ha=$('lhArt');if(ha&&matchMedia('(hover:hover)').matches){ha.addEventListener('mousemove',e=>{const r=ha.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;ha.style.setProperty('--px',(-x*22)+'px');ha.style.setProperty('--py',(-y*16)+'px')});ha.addEventListener('mouseleave',()=>{ha.style.setProperty('--px','0px');ha.style.setProperty('--py','0px')})}
+  $('lhGo').onclick=()=>{const g=$('hmGames');if(g)g.scrollIntoView({behavior:'smooth',block:'start'})};
+  $('lhAcc').onclick=()=>{try{openWelcome()}catch(e){}};
+  const lhSync=()=>{const b=$('lhAcc');if(b)b.hidden=!!me};
+  const _hv=hvHi;hvHi=function(){_hv();lhSync()};lhSync();
+  const lab=()=>{const t=document.documentElement.dataset.theme;const d=t==='dark'||t==='black'||(t==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);$('thTl').textContent=d?'Sombre':'Clair';return d};
+  lab();
+  /* défilement : le titre, l'illustration, le bandeau et le mot géant bougent avec la molette */
+  (function(){
+    const h1=document.querySelector('.lh-h'),art=$('lhArt'),big=$('lhBig'),mqd=document.querySelector('.lh-mq div');
+    if(!h1||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    let last=scrollY,vel=0,skew=0,tick=false,off=0;
+    function frame(){
+      tick=false;const y=scrollY,hv=document.getElementById('v-home');
+      if(!hv||hv.hidden||curView!=='home'){return}
+      vel=y-last;last=y;
+      h1.style.transform='translate3d(0,'+Math.min(y,700)*.16+'px,0)';
+      if(art)art.style.transform='translate3d(0,'+Math.min(y,700)*-.07+'px,0)';
+      if(big){const r=big.getBoundingClientRect(),p=Math.max(0,Math.min(1,1-r.top/innerHeight));big.style.setProperty('--bx',(-p*38-2)+'vw')}
+      skew+=(Math.max(-14,Math.min(14,vel*-.5))-skew)*.18;
+      if(mqd){off=(off-.6-Math.abs(vel)*.35)%(mqd.scrollWidth/2);mqd.style.animation='none';mqd.style.transform='translateX('+off+'px) skewX('+skew+'deg)'}
+      if(Math.abs(vel)>.1||Math.abs(skew)>.1)requestAnimationFrame(frame);else{tick=false}
+    }
+    const kick=()=>{if(!tick){tick=true;requestAnimationFrame(frame)}};
+    addEventListener('scroll',kick,{passive:true});
+    /* le bandeau avance tout seul même sans défilement */
+    (function loop(){const hv=document.getElementById('v-home');if(hv&&!hv.hidden&&curView==='home'&&mqd){off=(off-.6)%(mqd.scrollWidth/2);mqd.style.animation='none';mqd.style.transform='translateX('+off+'px) skewX('+skew+'deg)';skew*=.92}requestAnimationFrame(loop)})();
+  })();
+  new MutationObserver(lab).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  $('thT').onclick=()=>{const n=lab()?'light':'dark';store.set('theme',n);applyTheme(n);lab();try{syncApp()}catch(e){}};
+})();
 /* Accueil téléphone : icônes des tuiles */
 (function(){
   const IC={im:'micro',ttt:'des',hl:'classement',gs:'inconnu',bt:'regard',dt:'duel',at:'casque',rm:'joueurs',uc:'profil'};
