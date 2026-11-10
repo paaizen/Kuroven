@@ -5329,7 +5329,7 @@ try{homeSide()}catch(e){}try{hvHi();hvSync()}catch(e){}
 /* Accueil : icônes, description et aperçu vidéo au survol */
 (function(){
   const IC={im:'micro',ttt:'des',hl:'classement',gs:'inconnu',bt:'regard',dt:'duel',at:'casque',rm:'joueurs',uc:'profil'};
-  const TS={rm:1,im:1,uc:1,ttt:1,hl:1,gs:1,bt:1,dt:1,at:1};
+  const TS={rm:1,im:1,uc:1,ttt:1,hl:1,gs:1,bt:1,dt:1,at:1,cb:1};
   (function(){const t=document.getElementById('vieFeat');if(!t)return;let v=null;
     t.addEventListener('mouseenter',()=>{if(!v){v=document.createElement('video');v.className='hv-v';v.muted=true;v.loop=true;v.playsInline=true;v.preload='none';v.src='teasers/vie.webm';t.insertBefore(v,t.firstChild);v.addEventListener('playing',()=>t.classList.add('hv-on'))}v.play().catch(()=>{})});
     t.addEventListener('mouseleave',()=>{if(v){v.pause();v.currentTime=0;t.classList.remove('hv-on')}})})();
