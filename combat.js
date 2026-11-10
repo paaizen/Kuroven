@@ -19,6 +19,12 @@ let G=null, ui={}, view='menu', alive=false;
 const KM='<svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-24 50 50)"><rect x="29" y="14" width="42" height="72" rx="6" fill="none" stroke="var(--k2)" stroke-width="4"/></g><g transform="rotate(24 50 50)"><rect x="29" y="14" width="42" height="72" rx="6" fill="var(--k1)" stroke="var(--bk)" stroke-width="2"/></g><circle cx="50" cy="50" r="13" fill="var(--bk)" stroke="var(--k1)" stroke-width="3"/><path d="M44 43h3.2v14H44zM47.2 49.6l5-6.6h4.2l-6 8 6 8h-4.2l-5-6.6z" fill="var(--k1)"/></svg>';
 const backHTML=()=>'<div class="cb-back">'+KM+'</div>';
 const whoHTML=k=>{const s=a=>a.map(i=>'<span style="background:'+COL[i].c+'">'+COL[i].k+'</span>').join('');return '<span class="wh">Fort : '+s([(k+1)%6,(k+2)%6])+' · Faible : '+s([(k+4)%6,(k+5)%6])+'</span>'};
+/* « ✦ Évolution : condition » dans la description des personnages qui peuvent évoluer */
+function evoDesc(c){
+ if(typeof EVOS==='undefined'||!EVOS)return '';
+ const l=EVOS.filter(e=>e.mats.some(x=>x.id===c.id));if(!l.length)return '';
+ return '<br><b style="color:#5a2fb0">✦ Évolution</b> : '+l.map(e=>e.cond&&e.cond.length?esc(e.cond.map(condShort).join(' ; ')):'aucune condition').join(' / ')+'.';
+}
 function cardHTML(c,o){
  o=o||{};
  if(c.k==='c'||c.k==='e'){
@@ -29,7 +35,7 @@ function cardHTML(c,o){
   return '<div class="y '+(evo?'evo holo':c.ex?'ex holo':'eff')+' k'+c.col+'"><div class="cface"></div><div class="plate"></div><div class="sticker"></div>'+
   '<div class="name">'+esc(c.n)+'</div><span class="orb">'+COL[c.col].k+'</span><div class="stars">'+'<i></i>'.repeat(c.lvl)+'</div>'+
   '<div class="artf"><div class="cart">'+im+'</div></div><div class="code">'+(evo?'ÉVOLUTION':esc((c.series||'KVN').slice(0,22)))+'</div>'+
-  '<div class="desc"><b>['+(evo?'Évolution':'Personnage')+' / '+COL[c.col].n+(c.ex&&!evo?' / Rare':'')+']</b> <b>「'+esc(c.sn)+'」</b> : '+esc(c.sd)+(evo?evoNote(c):whoHTML(c.col))+'</div><div class="id">'+c.no+'</div>'+
+  '<div class="desc"><b>['+(evo?'Évolution':'Personnage')+' / '+COL[c.col].n+(c.ex&&!evo?' / Rare':'')+']</b> <b>「'+esc(c.sn)+'」</b> : '+esc(c.sd)+(evo?evoNote(c):whoHTML(c.col)+evoDesc(c))+'</div><div class="id">'+c.no+'</div>'+
   '<div class="stat"><span>ATK/ <u'+sa+'>'+a+'</u></span><span>DEF/ <u'+sd+'>'+d+'</u></span></div></div>';
  }
  const trap=c.t==='trap';
@@ -52,7 +58,7 @@ async function loadPool(){
   ls.set('cbpool1',{t:Date.now(),l});
  }
  CHARS=l.map((x,i)=>mkChar(x,i));REG={};CHARS.forEach(c=>REG[c.id]=c);SUP.forEach(s=>REG[s.id]=s);
- EVOS=[];EVO.forEach(e=>{const ms=e.mat.map(k=>CHARS.find(c=>c.n.toLowerCase().includes(k)));if(ms.every(Boolean)){const ev={k:'e',id:'e_'+e.id,eid:e.id,n:e.n,img:ms[0].img,series:ms.map(m=>m.n).join(' + '),lvl:7,atk:Math.round(e.atk*.5/50)*50,def:Math.round(e.def*.5/50)*50,col:e.col,ex:true,sn:e.sn,sd:e.sd,cond:e.cond||[],mats:ms,no:90000000+EVOS.length*13};EVOS.push(ev);REG[ev.id]=ev}});
+ EVOS=[];EVO.forEach(e=>{const ms=e.mat.map(k=>CHARS.find(c=>c.n.toLowerCase().includes(k)));if(ms.every(Boolean)){const ev={k:'e',id:'e_'+e.id,eid:e.id,n:e.n,img:ms[0].img,series:ms.map(m=>m.n).join(' + '),lvl:7,atk:Math.round(e.atk*.335/50)*50,def:Math.round(e.def*.335/50)*50,col:e.col,ex:true,sn:e.sn,sd:e.sd,cond:e.cond||[],mats:ms,no:90000000+EVOS.length*13};EVOS.push(ev);REG[ev.id]=ev}});
  POOL=true;return POOL;
 }
 const isSup=c=>c.k==='s';
@@ -85,8 +91,8 @@ const eqN=(pi,m,id)=>G.p[pi].st.filter(s=>s&&s.to===m&&s.card.id===id).length;
 const hasCape=(pi,m)=>eqN(pi,m,'cape')>0;
 const fld=()=>G.field&&G.field.card.id;
 const friend=pi=>mons(pi).length>=3&&G.p[pi].st.some(s=>s&&s.up&&s.card.id==='amitie');
-function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+250*eqN(pi,m,'forgeron')+150*eqN(pi,m,'epee');if(fld()==='arene')v+=100;if(fld()==='lune'&&m.card.col===4)v+=150;if(friend(pi))v+=500;return Math.max(0,v)}
-function def(pi,m){let v=m.card.def+m.defP+150*eqN(pi,m,'epee');if(fld()==='village')v+=150;return Math.max(0,v)}
+function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;return Math.max(0,v)}
+function def(pi,m){let v=m.card.def+m.defP+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;return Math.max(0,v)}
 const freeMon=pi=>G.p[pi].mon.indexOf(null), freeSt=pi=>G.p[pi].st.indexOf(null);
 
 /* ---------- interface : utilitaires ---------- */
@@ -253,7 +259,7 @@ function heal(pi,v){const e=zoneEl('p',pi,0);setLP(pi,P(pi).lp+v);floatTxt(e,'+'
 async function drawN(pi,n,quiet){
  for(let k=0;k<n;k++){
   const p=P(pi);
-  if(!p.deck.length){endGame(1-pi,pi===0?'Ta pioche est vide.':'La pioche adverse est vide.');return}
+  if(!p.deck.length){log(S(pi,'as','a')+' la pioche vide : aucune carte à piocher.');if(!G.emptyMsg||G.emptyMsg!==pi+':'+G.n){G.emptyMsg=pi+':'+G.n;toast(pi===0?'Ta pioche est vide, mais tu continues de jouer.':'La pioche adverse est vide, mais la partie continue.')}break}
   const c=p.deck.shift();p.hand.push(c);G.newC=c;if(!quiet)log(S(pi,'pioches','pioche')+' une carte.');
   render();await sleep(260);
  }
@@ -279,7 +285,7 @@ function trapChoices(od,pi,i){
   if(!s||s.up||!TRAPS.includes(s.card.id))return;
   const id=s.card.id;
   if((id==='rival'||id==='embuscade')&&hasCape(pi,A))return;
-  if(id==='embuscade'&&atk(pi,A)>750)return;
+  if(id==='embuscade'&&atk(pi,A)>500)return;
   out.push(k);
  });
  return out;
@@ -400,7 +406,7 @@ function spellInfo(pi,c){
   case 'examen':return p.deck.length<1?{ok:0,why:'Pioche vide.'}:{ok:1,tg:'none'};
   case 'flashback':return p.grave.some(x=>x.k==='c')?{ok:1,tg:'grave'}:{ok:0,why:'Aucun personnage au cimetière.'};
   case 'entrainement':return mm.length?{ok:1,tg:'mon'}:{ok:0,why:'Il faut un personnage.'};
-  case 'pacte':return !mm.length?{ok:0,why:'Il faut un personnage.'}:p.lp<=500?{ok:0,why:'Pas assez de points de vie.'}:{ok:1,tg:'mon'};
+  case 'pacte':return !mm.length?{ok:0,why:'Il faut un personnage.'}:p.lp<=350?{ok:0,why:'Pas assez de points de vie.'}:{ok:1,tg:'mon'};
   case 'reunion':return !p.hand.some(x=>x.k==='c'&&x.lvl>=5)?{ok:0,why:'Aucun personnage de niveau 5 ou 6 en main.'}:freeMon(pi)<0?{ok:0,why:'Aucune zone libre.'}:{ok:1,tg:'hand56'};
   case 'forgeron':case 'epee':case 'cape':return !mm.length?{ok:0,why:'Il faut un personnage.'}:freeSt(pi)<0?{ok:0,why:'Aucune zone de soutien libre.'}:{ok:1,tg:'mon'};
   case 'amitie':return freeSt(pi)<0?{ok:0,why:'Aucune zone de soutien libre.'}:{ok:1,tg:'none'};
@@ -426,8 +432,8 @@ async function playSpell(pi,hi,tg){
   case 'senzu':heal(pi,750);p.senzu=true;p.grave.push(c);break;
   case 'examen':p.grave.push(c);await drawN(pi,2);break;
   case 'flashback':{const k=p.grave.indexOf(tg);if(k>=0){p.grave.splice(k,1);p.hand.push(tg);log(tg.n+' revient en main.')}p.grave.push(c);break}
-  case 'entrainement':{const m=p.mon[tg];if(m){m.tmp+=200;log(m.card.n+' gagne 200 ATK ce tour.')}p.grave.push(c);break}
-  case 'pacte':{const m=p.mon[tg];setLP(pi,p.lp-500);floatTxt(zoneEl('p',pi,0),'-500');if(m){m.atkP+=400;log(m.card.n+' gagne 400 ATK pour de bon.')}p.grave.push(c);checkEnd();break}
+  case 'entrainement':{const m=p.mon[tg];if(m){m.tmp+=150;log(m.card.n+' gagne 150 ATK ce tour.')}p.grave.push(c);break}
+  case 'pacte':{const m=p.mon[tg];setLP(pi,p.lp-350);floatTxt(zoneEl('p',pi,0),'-350');if(m){m.atkP+=250;log(m.card.n+' gagne 250 ATK pour de bon.')}p.grave.push(c);checkEnd();break}
   case 'reunion':{const k=p.hand.indexOf(tg);const s=freeMon(pi);p.grave.push(c);if(k>=0&&s>=0)await doSummon(pi,k,s,'a',false,true);break}
   case 'forgeron':case 'epee':case 'cape':{const m=p.mon[tg],s=freeSt(pi);if(m&&s>=0){p.st[s]={card:c,up:true,to:m};log(c.n+' équipe '+m.card.n+'.')}else p.grave.push(c);break}
   case 'arene':case 'village':case 'lune':{if(G.field)P(G.field.owner).grave.push(G.field.card);G.field={card:c,owner:pi};G.fxChanged=1;break}
@@ -500,6 +506,36 @@ function evoWhy(pi,c){
  if(!idx)return c.mats.map(x=>x.n).join(' + ')+' est sur ton terrain depuis trop peu de temps : il doit y être depuis le tour précédent.';
  return 'Condition manquante : '+condsFail(pi,c,idx).map(condLong).join(' ');
 }
+/* liste lisible des conditions d'une évolution, avec ✓ / ✗ quand on connaît la situation (m = personnage du plateau) */
+function evoChecks(e,m,strict){
+ const out=[],p=P(0),live=!!m;
+ const mi=live?p.mon.indexOf(m):-1;
+ e.mats.forEach(x=>{
+  const here=live&&mons(0).some(y=>y.m.card.id===x.id);
+  out.push({ok:live?(x.id===m.card.id?true:here):strict?mons(0).some(y=>y.m.card.id===x.id):null,t:(x.id===(m&&m.card.id)?x.n+' est sur ton terrain':'Avoir '+x.n+' sur ton terrain')});
+ });
+ out.push({ok:live?(e.mats.length>1?!!evoMats(0,e):m.ts<G.n):strict?!!evoMats(0,e):null,t:'Être sur le terrain depuis le tour précédent (pas le tour où on l’invoque)'});
+ const idx=live&&mi>=0?(e.mats.length>1?evoMats(0,e,true):[mi]):null;
+ const bad=idx?condsFail(0,e,idx):null;
+ (e.cond||[]).forEach(cd=>{let ok=idx?!bad.includes(cd):null;if(ok===null&&strict){ok=cd.t==='field'?fld()===cd.id:cd.t==='trap'?p.st.some(z=>z&&!z.up&&z.card.t==='trap'):cd.t==='grave'?p.grave.length>=cd.n:cd.t==='lp'?p.lp<=cd.max:cd.t==='card'?p.grave.some(g=>g.id===cd.id):false}out.push({ok,t:condLong(cd).replace(/\.$/,'')})});
+ return out;
+}
+const evoLi=l=>'<li style="margin:2px 0;list-style:none;color:'+(l.ok===true?'#6ee09a':l.ok===false?'#ff8a94':'inherit')+'">'+(l.ok===true?'✓ ':l.ok===false?'✗ ':'• ')+esc(l.t)+'</li>';
+/* bloc « Évolution » affiché quand on ouvre un personnage qui peut évoluer */
+function evoBlock(c,m){
+ if(!G||!c||c.k!=='c')return '';
+ const p=P(0),mine=m?p.mon.includes(m):p.hand.includes(c);
+ if(!mine)return '';
+ const list=p.extra.filter(e=>e.mats.some(x=>x.id===c.id));
+ if(!list.length)return '';
+ return list.map(e=>{
+  const ready=m&&mons(0).some(y=>y.m===m)&&evoReady(0,e);
+  return '<div class="evb2" style="margin-top:10px;padding:9px 11px;border:1px solid #b79cf0;border-radius:10px;background:#b79cf018;text-align:left"><b style="color:#d6c6ff">✦ Peut évoluer en « '+esc(e.n)+' »</b>'+
+  (ready?' <b style="color:#6ee09a">· prête !</b>':'')+
+  '<ul style="margin:6px 0 0;padding:0;font-size:.82rem">'+evoChecks(e,m).map(evoLi).join('')+'</ul>'+
+  '<small style="display:block;margin-top:6px;color:#b8c2d8">Quand tout est ✓ : bouton « Évolution » à droite, ou ici.</small></div>';
+ }).join('');
+}
 /* un personnage ne peut évoluer que s'il est sur le terrain depuis un tour précédent (any = on ignore cette attente) */
 function evoMats(pi,c,any){
  const used=new Set(),idx=[];
@@ -517,11 +553,17 @@ async function doEvolve(pi,c,idx){
  p.mon[slot]=mkM(c,'a');G.pop='m'+pi+slot;
  render();hitAt(zoneEl('m',pi,slot));burst(zoneEl('m',pi,slot),'#b79cf0');await sleep(900);G.pop=null;
 }
+async function runEvolve(ci){
+ if(!myTurn())return;
+ const p=P(0),c=p.extra[ci];if(!c)return;const idx=evoReady(0,c);if(!idx)return toast(evoWhy(0,c));
+ netSend('evo',{ci,idx});
+ G.busy=true;ui.sel=null;ui.selMon=null;closeZoom();await doEvolve(0,c,idx);G.busy=false;render();
+}
 async function actEvolve(){
  if(!myTurn())return;
  const p=P(0);if(!p.extra.length)return toast('Ton deck d’évolution est vide.');
  const opts=p.extra.map(c=>({c,idx:evoReady(0,c)}));
- const m=modal('<h3>Évolution</h3><p>Choisis la transformation. Le personnage doit être sur ton terrain depuis le tour précédent, et la condition de la carte doit être remplie. Il est remplacé et va au cimetière.</p><div class="cbgrid2">'+opts.map((o,i)=>'<div class="it" data-i="'+i+'" style="'+(o.idx?'':'opacity:.4')+'">'+cardHTML(o.c)+'</div>').join('')+'</div><div class="cbact"><button class="sec" data-x="1">Annuler</button></div>');
+ const m=modal('<h3>Évolution</h3><p>Choisis la transformation. Le personnage doit être sur ton terrain depuis le tour précédent, et la condition de la carte doit être remplie. Il est remplacé et va au cimetière.</p><div class="cbgrid2">'+opts.map((o,i)=>{const mm=mons(0).find(y=>o.c.mats.some(x=>x.id===y.m.card.id)),chk=evoChecks(o.c,mm?mm.m:null,true);return '<div class="it" data-i="'+i+'" style="'+(o.idx?'':'opacity:.55')+'">'+cardHTML(o.c)+'<ul style="margin:6px 0 0;padding:0;font-size:.74rem;text-align:left;max-width:230px">'+chk.map(evoLi).join('')+'</ul></div>'}).join('')+'</div><div class="cbact"><button class="sec" data-x="1">Annuler</button></div>');
  const r=await new Promise(res=>{m.onclick=e=>{const it=e.target.closest('.it');if(it){const o=opts[+it.dataset.i];if(!o.idx){m.querySelector('p').textContent=evoWhy(0,o.c);return}closeModal(m);res(o);return}if(e.target.closest('[data-x]')||e.target===m){closeModal(m);res(null)}}});
  if(!r)return;
  netSend('evo',{ci:p.extra.indexOf(r.c),idx:r.idx});
@@ -718,10 +760,21 @@ async function actPos(i){
 
 /* ---------- rendu du plateau ---------- */
 function slot(z,p,i,label,inner,cls){return '<div class="slot '+(cls||'')+(ui.pick&&ui.pick.cands.some(c=>c.z===z&&c.p===p&&c.i===i)?' tg':'')+'" data-z="'+z+'" data-p="'+p+'" data-i="'+i+'" data-l="'+label+'">'+(inner||'')+'</div>'}
+function evoReadyMap(){
+ const r={};if(!G||G.over||G.turn!==0)return r;
+ P(0).extra.forEach((e,ci)=>{const idx=evoReady(0,e);if(idx)idx.forEach(i=>{if(!r[i])r[i]={ci,e}})});
+ return r;
+}
 function monHTML(pi,i){
  const m=P(pi).mon[i];if(!m)return '';
  const cls=(m.pos==='d'?' def':'')+(ui.selMon===i&&pi===0?' sel':'')+(pi===0&&m.att?' used':'')+(G.pop==='m'+pi+i?' pop':'');
- return '<div class="bc'+cls+'">'+cardHTML(m.card,{atk:atk(pi,m),def:def(pi,m)})+'</div>';
+ let evx='';
+ if(pi===0&&G&&!G.over){
+  const rd=evoReadyMap()[i];
+  if(rd&&myTurn())evx='<span class="evgo" data-evo="'+rd.ci+'">✦ ÉVOLUER</span>';
+  else if(P(0).extra.some(e=>e.mats.some(x=>x.id===m.card.id)))evx='<span class="evh" title="Ce personnage peut évoluer : clique dessus pour voir la condition">✦</span>';
+ }
+ return '<div class="bc'+cls+(evx.indexOf('evgo')>0?' evr':'')+'">'+cardHTML(m.card,{atk:atk(pi,m),def:def(pi,m)})+evx+'</div>';
 }
 function stHTML(pi,i){
  const s=P(pi).st[i];if(!s)return '';
@@ -768,7 +821,7 @@ function render(){
  row(myMon,'fr')+row(mySt,'bk')+
  (mob?strip(0):'')+
  '<div class="hnd m">'+hand+'</div>'+
- '<button class="endb" id="cbEnd"'+(can?'':' disabled')+'>Fin du tour</button>'+(dglow?'<div class="needd"><span>À toi de piocher</span><button type="button">Piocher</button></div>':'')+
+ '<button class="endb" id="cbEnd"'+(can?'':' disabled')+'>Fin du tour</button>'+(dglow?'<div class="needd"><span>À toi de piocher</span><button type="button">Piocher</button></div>':'')+(!dglow&&can&&Object.keys(evoReadyMap()).length?'<div class="needd evp"><span>✦ Une de tes cartes peut évoluer !</span><button type="button">Évoluer</button></div>':'')+
  '<div class="cpl m'+(G.turn===0&&!G.over?' act':'')+'"><div class="cring" id="cbR0" data-z="p" data-p="0" data-i="0" style="--p:'+(G.turn===0&&G.t0?Math.max(0,100-(Date.now()-G.t0)/LIM*100):0)+'">'+avHTML(G.pr[0])+'</div><div class="cpt"><small>'+esc(G.pr[0].n.toUpperCase())+'</small><em class="tag">À TOI</em><b id="cbLp0">'+me.lp+'</b></div></div>';
  if(G.fxChanged){b.classList.toggle('fa',fld()==='arene');G.fxChanged=0}
  renderPanel();
@@ -810,7 +863,7 @@ function actHTML(){
 }
 function renderPanel(){
  const el=$('cbAct');if(!el||!G)return;
- const ev=$('cbEvoW');if(ev){const n=P(0).extra.length,rd=P(0).extra.some(c=>evoReady(0,c));ev.innerHTML=n?'<button class="sec'+(rd&&myTurn()?' ready':'')+'" data-a="evo">Évolution ('+n+')'+(rd?' · prête':'')+'</button>':''}
+ const ev=$('cbEvoW');if(ev){const n=P(0).extra.length,rd=P(0).extra.some(c=>evoReady(0,c));ev.innerHTML=n?'<button class="sec'+(rd&&myTurn()?' ready':'')+'" data-a="evo">✦ Évolution ('+n+')'+(rd?' · PRÊTE !':'')+'</button>':''}
  const h=actHTML();
  el.innerHTML=h||'<small style="color:#b8c2d8">'+(G.needDraw&&G.turn===0?'<b style="color:#ffd84a">C’est à toi de piocher : clique sur ta pioche (elle brille).</b>':myTurn()?'Clique sur une carte pour la lire et la jouer.':G.turn===1?'C’est le tour de l’adversaire.':'')+'</small>';
 }
@@ -818,12 +871,12 @@ function renderPanel(){
 function closeZoom(){const z=ui.zoomEl;if(z&&z.parentNode)z.remove();ui.zoomEl=null}
 function openZoom(src,info,acts){
  closeZoom();
- const c=info.c,zs=Math.max(.6,Math.min(1.25,(window.innerWidth-40)/260,(window.innerHeight-230)/379));
+ const c=info.c,zs=Math.max(.6,Math.min(1.25,(window.innerWidth-40)/260,(window.innerHeight-230-(c.k==='c'&&evoBlock(c,info.m)?150:0))/379));
  const o=document.createElement('div');o.className='cbzoom bk'+backN();o.style.setProperty('--zs',zs.toFixed(3));
  const isC=c.k==='c'||c.k==='e';
  const txt=isC?'「'+c.sn+'」 : '+c.sd+(c.k==='e'?evoNoteLong(c):'')+' Niveau '+c.lvl+' · ATK '+(info.atk!=null?info.atk:c.atk)+' · DEF '+(info.def!=null?info.def:c.def)+'.':c.txt;
  const sub=isC?(c.k==='e'?'Évolution':'Personnage')+' · '+COL[c.col].k+' '+COL[c.col].n+(c.ex?' · Rare':''):'Carte '+(c.t==='trap'?'Piège':'Magie')+' · '+c.sub;
- o.innerHTML='<div class="zw"><div class="zc">'+cardHTML(c,{atk:info.atk,def:info.def})+'</div><div class="ztx"><b>'+esc(c.n)+'</b><small>'+esc(sub)+'</small><p>'+esc(txt)+'</p></div><div class="cbact">'+(acts||'')+'<button class="sec" data-a="close">Fermer</button></div></div>';
+ o.innerHTML='<div class="zw"><div class="zc">'+cardHTML(c,{atk:info.atk,def:info.def})+'</div><div class="ztx"><b>'+esc(c.n)+'</b><small>'+esc(sub)+'</small><p>'+esc(txt)+'</p>'+(isC?evoBlock(c,info.m):'')+'</div><div class="cbact">'+(acts||'')+(isC&&info.m&&myTurn()&&P(0).extra.some(e=>e.mats.some(x=>x.id===c.id)&&evoReady(0,e))?'<button data-a="evo">Évoluer</button>':'')+'<button class="sec" data-a="close">Fermer</button></div></div>';
  (document.getElementById('v-cb')||document.body).appendChild(o);ui.zoomEl=o;
  const zc=o.querySelector('.zc');
  if(src&&src.getBoundingClientRect){
@@ -859,7 +912,9 @@ function onBoardClick(e){
  if(!G)return;
  if(dragSup){dragSup=false;return}
  hidePop();popTarget=null;
+ if(e.target.closest('.evp button')){actEvolve();return}
  if(e.target.closest('.needd button')){doDraw();return}
+ {const eg=e.target.closest('.evgo');if(eg){runEvolve(+eg.dataset.evo);return}}
  if(e.target.closest('#cbEnd')){humanEnd();return}
  const z=e.target.closest('[data-z]');if(!z)return;
  const zz=z.dataset.z,p=+z.dataset.p,i=+z.dataset.i;
@@ -1105,7 +1160,7 @@ function mountGame(){
  const vc=document.getElementById('v-cb');if(vc)vc.classList.add('ingame');window.scrollTo(0,0);
  body().innerHTML='<div id="cbGame"><div class="cbt bk'+backN()+'" id="cbT"></div><div class="cbside" id="cbSide"><div><button class="cbchip" id="cbQuit">← Quitter la partie</button></div><div class="cbprev" id="cbPrev"></div><div class="cbact" id="cbAct"></div><div class="cbact" id="cbEvoW"></div><div id="cbHint" style="color:#e5483b;font-size:.85rem;min-height:1.2em;opacity:0;transition:opacity .3s"></div><div class="cblog" id="cbLog"></div></div></div>';
  $('cbQuit').onclick=async()=>{if(G&&!G.over){const r=await ask('Quitter la partie ?','La partie en cours sera perdue.',[{v:true,t:'Quitter'},{v:false,t:'Continuer',sec:1}]);if(!r)return}showMenu()};
- const b=boardEl();fit();b.onclick=onBoardClick;b.onpointerdown=onDragStart;b.onmouseover=onOver;b.onmouseout=onOut;$('cbAct').onclick=onAct;$('cbEvoW').onclick=onAct;
+ const b=boardEl();fit();requestAnimationFrame(fit);setTimeout(fit,150);setTimeout(fit,600);b.onclick=onBoardClick;b.onpointerdown=onDragStart;b.onmouseover=onOver;b.onmouseout=onOut;$('cbAct').onclick=onAct;$('cbEvoW').onclick=onAct;
  renderPrev(null);
 }
 async function startGame(){

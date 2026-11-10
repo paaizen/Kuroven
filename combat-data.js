@@ -119,21 +119,21 @@ const SUP=[
 {id:'senzu',n:'Senzu',t:'mag',sub:'Rapide',img:'senzu',col:2,txt:'Soigne 750 points de vie. Un seul Senzu par tour.'},
 {id:'examen',n:'Examen d’entrée',t:'mag',sub:'Normale',img:'examen',col:3,txt:'Pioche 2 cartes.'},
 {id:'flashback',n:'Flashback',t:'mag',sub:'Normale',img:'flashback',col:4,txt:'Choisis un personnage de ton cimetière : ajoute-le à ta main.'},
-{id:'entrainement',n:'Entraînement intense',t:'mag',sub:'Normale',img:'entrainement',col:1,txt:'Un de tes personnages gagne 200 ATK jusqu’à la fin du tour.'},
+{id:'entrainement',n:'Entraînement intense',t:'mag',sub:'Normale',img:'entrainement',col:1,txt:'Un de tes personnages gagne 150 ATK jusqu’à la fin du tour.'},
 {id:'reunion',n:'Réunion de guilde',t:'mag',sub:'Normale',img:'reunion',col:0,txt:'Pose un personnage de niveau 5 ou 6 depuis ta main sans sacrifice.'},
-{id:'pacte',n:'Pacte avec un démon',t:'mag',sub:'Normale',img:'pacte',col:4,txt:'Perds 500 points de vie : un de tes personnages gagne 400 ATK de façon permanente.'},
-{id:'forgeron',n:'Forgeron',t:'eq',sub:'Équipement',img:'forgeron',col:1,txt:'Équipe un de tes personnages : il gagne 250 ATK. Si le personnage quitte le terrain, cette carte est détruite.'},
-{id:'epee',n:'Épée légendaire',t:'eq',sub:'Équipement',img:'epee',col:3,txt:'Équipe un de tes personnages : il gagne 150 ATK et 150 DEF.'},
+{id:'pacte',n:'Pacte avec un démon',t:'mag',sub:'Normale',img:'pacte',col:4,txt:'Perds 350 points de vie : un de tes personnages gagne 250 ATK de façon permanente.'},
+{id:'forgeron',n:'Forgeron',t:'eq',sub:'Équipement',img:'forgeron',col:1,txt:'Équipe un de tes personnages : il gagne 150 ATK. Si le personnage quitte le terrain, cette carte est détruite.'},
+{id:'epee',n:'Épée légendaire',t:'eq',sub:'Équipement',img:'epee',col:3,txt:'Équipe un de tes personnages : il gagne 100 ATK et 100 DEF.'},
 {id:'cape',n:'Cape d’invisibilité',t:'eq',sub:'Équipement',img:'cape',col:5,txt:'Équipe un de tes personnages : les pièges de l’adversaire ne peuvent pas le cibler.'},
-{id:'arene',n:'Arène du tournoi',t:'field',sub:'Terrain',img:'arene',col:1,txt:'Tant que cette carte est sur le terrain, tous les personnages gagnent 100 ATK.'},
-{id:'village',n:'Village caché',t:'field',sub:'Terrain',img:'village',col:2,txt:'Tant que cette carte est sur le terrain, tous les personnages gagnent 150 DEF.'},
-{id:'lune',n:'Nuit de pleine lune',t:'field',sub:'Terrain',img:'lune',col:4,txt:'Tant que cette carte est sur le terrain, les personnages Ombre (闇) gagnent 150 ATK.'},
+{id:'arene',n:'Arène du tournoi',t:'field',sub:'Terrain',img:'arene',col:1,txt:'Tant que cette carte est sur le terrain, tous les personnages gagnent 75 ATK.'},
+{id:'village',n:'Village caché',t:'field',sub:'Terrain',img:'village',col:2,txt:'Tant que cette carte est sur le terrain, tous les personnages gagnent 100 DEF.'},
+{id:'lune',n:'Nuit de pleine lune',t:'field',sub:'Terrain',img:'lune',col:4,txt:'Tant que cette carte est sur le terrain, les personnages Ombre (闇) gagnent 100 ATK.'},
 {id:'rival',n:'Rival jaloux',t:'trap',sub:'Normale',img:'rival',col:4,txt:'Quand un personnage de l’adversaire attaque : annule l’attaque et force-le à passer en position de défense.'},
-{id:'embuscade',n:'Embuscade',t:'trap',sub:'Normale',img:'embuscade',col:0,txt:'Quand un personnage de l’adversaire attaque avec 750 ATK ou moins : détruis-le.'},
+{id:'embuscade',n:'Embuscade',t:'trap',sub:'Normale',img:'embuscade',col:0,txt:'Quand un personnage de l’adversaire attaque avec 500 ATK ou moins : détruis-le.'},
 {id:'contre',n:'Contre-attaque',t:'trap',sub:'Normale',img:'contre',col:3,txt:'Quand un personnage de l’adversaire attaque : annule l’attaque et inflige à l’adversaire des dégâts égaux à l’ATK de l’attaquant.'},
 {id:'rideau',n:'Rideau de fumée',t:'trap',sub:'Contre',img:'rideau',col:2,txt:'Quand l’adversaire active une carte Magie : annule son effet et détruis-la.'},
 {id:'sacrifice',n:'Sacrifice héroïque',t:'trap',sub:'Normale',img:'sacrifice',col:2,txt:'Quand un de tes personnages va être détruit au combat : détruis un autre de tes personnages à la place. Le premier survit.'},
-{id:'amitie',n:'Pouvoir de l’amitié',t:'trap',sub:'Continu',img:'amitie',col:5,txt:'Tant que tu contrôles 3 personnages, tous tes personnages gagnent 500 ATK. Si tu en contrôles moins, elle n’a aucun effet.'}];
+{id:'amitie',n:'Pouvoir de l’amitié',t:'trap',sub:'Continu',img:'amitie',col:5,txt:'Tant que tu contrôles 3 personnages, tous tes personnages gagnent 350 ATK. Si tu en contrôles moins, elle n’a aucun effet.'}];
 SUP.forEach((s,i)=>{s.k='s';s.no=(s.t==='trap'?30000000:20000000)+i+1});
 
 const hash=n=>{let h=(n*2654435761)>>>0;h^=h>>>13;h=Math.imul(h,0x5bd1e995)>>>0;return h^(h>>>15)};
@@ -142,8 +142,8 @@ const hash=n=>{let h=(n*2654435761)>>>0;h^=h>>>13;h=Math.imul(h,0x5bd1e995)>>>0;
 function mkChar(c,rank){
  const lvl=rank<10?6:rank<28?5:rank<60?4:rank<100?3:2;
  const h=hash(c.id);
- const base={2:450,3:650,4:850,5:1150,6:1400}[lvl];
- const atk=Math.round((base+(h%5)*25)/50)*50;
+ const base={2:300,3:450,4:550,5:750,6:950}[lvl];
+ const atk=Math.round((base+(h%5)*15)/50)*50;
  const def=Math.round(atk*(0.45+((h>>3)%5)*0.1)/50)*50;
  const col=c.id%6;
  const s=sigFor(c.name.full,col);
