@@ -117,7 +117,7 @@
 .cbt .hnd.o{height:calc(var(--cw)*.46);margin:0 0 4px}.cbt .hnd.o .hc{transform:rotate(180deg)}
 .cbt .hc{position:relative;width:calc(var(--cw)*.64);height:100%;margin:0 calc(var(--cw)*-.12);transition:transform .25s;transform-origin:50% 150%;cursor:pointer}
 .cbt .hc .y,.cbt .hc .cb-back{zoom:calc(var(--s)*.64);position:absolute;left:0;top:0}
-.cbt .hnd.m .hc:hover,.cbt .hnd.m .hc.sel{transform:translateY(calc(var(--cw)*-.55)) scale(1.7)!important;z-index:20}
+
 .cbt .hc.off .y{filter:grayscale(.8) brightness(.6)}
 .cbt .hc.new{animation:cbdraw .55s}
 @keyframes cbdraw{from{transform:translateY(-120px) scale(.4);opacity:0}}
@@ -198,3 +198,144 @@
 .cbt .cring .avp{z-index:2}
 .cbt .cring.think{animation:none;background:#ffffff1c}
 .cbt .cring.think:after{content:"";position:absolute;inset:0;border-radius:50%;z-index:0;background:conic-gradient(#9cc3f0 25%,#0000 0);animation:cbspin 1.4s linear infinite}
+
+/* ---- plateau agrandi, survol sans clignotement, indication du tour ---- */
+#v-cb{max-width:1500px}
+#cbGame{grid-template-columns:minmax(0,1fr) 270px}
+.cbt .crw{gap:calc(var(--cw)*.16);margin:calc(var(--cw)*.1) 0}
+.cbt.mob .crw{grid-template-columns:repeat(3,var(--cw))}
+.cbt .hc .y{transition:transform .18s,filter .18s}
+@media (hover:hover){
+ .cbt .hnd.m .hc:hover .y{transform:translateY(calc(var(--cw)*-.07)) scale(1.02);filter:brightness(1.1)}
+ .cbt .bc:not(.def):hover .y{transform:translateY(-4px)}
+}
+#v-cb .cbt .y:hover{transform:none;box-shadow:0 6px 16px #000a}
+#v-cb .cbt .bc.def .y:hover{transform:rotate(90deg) scale(.7)}
+#v-cb .cbt .bc:not(.def):hover .y:hover{transform:translateY(-4px)}
+.cbt .hc.sel .y{box-shadow:0 0 0 3px #f1e6c8,0 0 14px #f1e6c8}
+.cbt .strip{display:flex;justify-content:center;gap:8px;margin:6px 0;position:relative;z-index:2}
+.cbt .strip .chip{background:#ffffff0f;border:1px solid #2c3546;border-radius:999px;padding:5px 12px;font:700 11px var(--tx);color:#c8cee6;cursor:pointer}
+.cbt .strip .chip.glow{border-color:#ffd84a;color:#ffd84a;box-shadow:0 0 14px #ffd84a88;animation:cbp 1s infinite}
+.cbt .slot.glow{border-color:#ffd84a;box-shadow:0 0 0 2px #ffd84a,0 0 26px #ffd84acc;animation:cbp 1s infinite;cursor:pointer}
+.cbt .slot.glow:before{color:#ffd84a}
+.cbt.mine{box-shadow:0 0 0 2px #3dae5a88,0 0 34px #3dae5a2e,0 18px 44px #0008}
+.cbt.theirs{box-shadow:0 0 0 2px #ec5fa088,0 0 34px #ec5fa02e,0 18px 44px #0008}
+.cbt .mid span{font-size:11px;letter-spacing:3px}
+.cbt .mid.me span{color:#6ee09a}.cbt .mid.op span{color:#ff8ab8}
+.cbt .cpl .tag{display:none;font:800 9px var(--tx);letter-spacing:2px;color:#12151b;background:#3dae5a;border-radius:99px;padding:1px 8px;margin:2px 0;font-style:normal;width:max-content}
+.cbt .cpl.o .tag{background:#ec5fa0}
+.cbt .cpl.m .cpt{text-align:right}.cbt .cpl.m .tag{margin-left:auto}
+.cbt .cpl.act .tag{display:block}
+.cbt .cpl.act .cring{box-shadow:0 0 0 3px #3dae5a,0 0 18px #3dae5a88}
+.cbt .cpl.o.act .cring{box-shadow:0 0 0 3px #ec5fa0,0 0 18px #ec5fa088}
+#v-cb .cbitem .evb{position:absolute;left:3px;top:3px;z-index:9;background:#5a3aa6;color:#fff;font:800 12px var(--tx);padding:1px 8px;border-radius:99px}
+
+@media(max-width:900px){#cbGame{grid-template-columns:1fr}}
+
+/* aperçu d'une carte après une seconde de survol */
+.cbpop{position:fixed;z-index:9970;pointer-events:none;filter:drop-shadow(0 16px 24px #000c);animation:cbpopin .2s ease-out}
+.cbpop .y{zoom:var(--zs);position:absolute;left:0;top:0}
+@keyframes cbpopin{from{opacity:0;transform:scale(.92) translateY(6px)}}
+
+/* ---- ordinateur : tout le plateau dans l'écran, sans défiler ---- */
+.cbt{--s:var(--s0,.4)}
+#v-cb.ingame{padding-top:6px;padding-bottom:8px}
+#v-cb.ingame>.btn.back{display:none}
+#v-cb.ingame .cbtop{margin-bottom:4px}
+.cbt .crw.dk{display:flex;justify-content:center;align-items:center;gap:calc(var(--cw)*.3);margin:calc(var(--cw)*.08) 0}
+.cbt .grp{display:flex;gap:calc(var(--cw)*.1);align-items:center}
+.cbt:not(.mob) .slot.st{width:calc(var(--cw)*.75);height:calc(var(--cw)*1.095);--s:calc(var(--s0)*.75)}
+.cbt:not(.mob) .slot.sd{width:calc(var(--cw)*.6);height:calc(var(--cw)*.876);--s:calc(var(--s0)*.6)}
+.cbt .slot.e.sd{visibility:hidden}
+.cbt .mid{margin:calc(var(--cw)*.1) 6%}
+.cbt:not(.mob) .hnd.o{margin-bottom:calc(var(--cw)*.04)}
+
+/* ---- c'est à toi de piocher : halo jaune qui pulse sur la pioche + message au milieu ---- */
+@keyframes cbglow{50%{filter:drop-shadow(0 0 14px #ffd84a)}}
+.cbt .slot.glow{box-shadow:none;animation:none;border-color:#ffd84a99}
+.cbt .slot.glow .bc{animation:cbglow 1.4s ease-in-out infinite}
+.cbt .needd{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;display:flex;gap:12px;align-items:center;background:#0b1118ef;border:2px solid #ffd84a;border-radius:14px;padding:8px 10px 8px 16px;box-shadow:0 0 26px #ffd84a55;font:800 14px var(--tx);color:#fff;white-space:nowrap;animation:cbglowbox 1.4s ease-in-out infinite}
+.cbt .needd button{background:#ffd84a;color:#12151b;border:0;border-radius:999px;padding:8px 16px;font:800 13px var(--tx);cursor:pointer}
+@keyframes cbglowbox{50%{box-shadow:0 0 34px #ffd84a99}}
+
+#v-cb.ingame{max-width:1900px}
+
+/* main de l'adversaire : plus petite, sans déborder sur ses zones */
+.cbt .hnd.o{height:calc(var(--cw)*.62)}
+.cbt .hnd.o .hc{width:calc(var(--cw)*.43)}
+.cbt .hnd.o .hc .cb-back{zoom:calc(var(--s)*.42)}
+.cbt .hnd.o .hc{transform-origin:50% 50%}
+
+/* téléphone : la main adverse à droite du profil, le bouton de fin de tour en bas à gauche */
+.cbt.mob .hnd.o{justify-content:flex-end;padding-right:10px}
+.cbt.mob .endb{top:auto;bottom:calc(var(--cw)*.25);left:10px;right:auto;margin-top:0}
+
+/* ---- disposition de base conservée : on resserre seulement les marges pour agrandir les cartes ---- */
+.cbt:not(.mob) .slot.st,.cbt:not(.mob) .slot.sd{width:var(--cw);height:calc(var(--cw)*1.46);--s:var(--s0)}
+.cbt .crw.first{margin-top:calc(var(--cw)*.5)}
+.cbt:not(.mob) .crw.first{margin-top:calc(var(--cw)*.02)}
+.cbt .crw{position:relative;z-index:1}
+.cbt:not(.mob) .hnd.o{margin-bottom:calc(var(--cw)*-.24);position:relative;z-index:0}
+.cbt:not(.mob) .hnd.m{margin-top:calc(var(--cw)*-.1)}
+#v-cb.ingame{max-width:1500px}
+
+/* ---- marges resserrées : les soutiens passent un peu derrière les personnages ---- */
+.cbt:not(.mob){padding:10px 8px 8px}
+.cbt:not(.mob) .crw{margin:calc(var(--cw)*.03) 0}
+.cbt:not(.mob) .crw.bk{z-index:1}
+.cbt:not(.mob) .crw.fr{z-index:2}
+.cbt:not(.mob) .crw.first.bk{margin-bottom:calc(var(--cw)*-.18)}
+.cbt:not(.mob) .crw.bk:not(.first){margin-top:calc(var(--cw)*-.18)}
+.cbt:not(.mob) .mid{margin:calc(var(--cw)*.02) 6%}
+.cbt:not(.mob) .hnd.m{margin-top:calc(var(--cw)*-.2)}
+
+/* ---- Terrain : au milieu du plateau, commun aux deux joueurs ---- */
+.cbt:not(.mob) .mid{margin:calc(var(--cw)*.02) 0}
+.cbt .mid .fz{position:absolute;left:calc(var(--cw)*.1);top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:3px}
+.cbt .mid .fz .slot{width:calc(var(--cw)*.9);height:calc(var(--cw)*1.31);--s:calc(var(--s0)*.9)}
+.cbt .mid .fz i{font:700 9px var(--tx);letter-spacing:1.5px;color:#6b7690;font-style:normal;white-space:nowrap}
+
+/* ---- glisser-déposer : zones libres en pointillé lumineux ---- */
+@keyframes cbdz{0%,100%{box-shadow:0 0 8px #ffd84a66,inset 0 0 10px #ffd84a22}50%{box-shadow:0 0 20px #ffd84acc,inset 0 0 18px #ffd84a55}}
+@keyframes cbdash{to{background-position:16px 0,-16px 100%,0 -16px,100% 16px}}
+.cbt .slot.dz{border:2px dashed #ffd84a!important;background:#ffd84a14;animation:cbdz 1.1s ease-in-out infinite;cursor:copy}
+.cbt .slot.dz.over{background:#ffd84a38;border-style:solid!important;transform:scale(1.04)}
+.cbt .hc.dragging{opacity:.25}
+.cbt.dragging .hc:hover .y{transform:none!important}
+.cbt .hc[data-z="h"]{cursor:grab}
+.cbghost{position:fixed;left:0;top:0;z-index:9980;pointer-events:none;filter:drop-shadow(0 18px 22px #000d);opacity:.95;will-change:transform}
+.cbghost .y{zoom:var(--zs);position:absolute;left:0;top:0}
+
+/* ---- glisser : tout est déplaçable ; impossible = rouge, secousse, message ---- */
+.cbt .cring.dz{box-shadow:0 0 0 3px #ffd84a,0 0 24px #ffd84acc;animation:cbdz 1.1s ease-in-out infinite;border-radius:50%}
+.cbt .cring.dz.over{transform:scale(1.12)}
+.cbt .slot[data-z="m"][data-p="0"] .bc{cursor:grab}
+.cbt .slot.dragging .bc{opacity:.3}
+.cbt.nodrop{cursor:not-allowed}
+.cbghost.bad{filter:drop-shadow(0 0 14px #ff3b4e) saturate(.6) brightness(.9)}
+.cbghost .ban2{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-style:normal;font-size:calc(var(--zs)*110px);background:#ff3b4ecc;border-radius:50%;width:1.2em;height:1.2em;line-height:1.2em;text-align:center;z-index:5;box-shadow:0 0 18px #ff3b4e}
+#cbDragHint{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9990;background:#0b1118f0;border:2px solid #ffd84a;color:#ffe27a;font:800 14px var(--tx);padding:9px 18px;border-radius:999px;pointer-events:none;box-shadow:0 0 22px #ffd84a55;max-width:90vw;text-align:center}
+#cbDragHint.no{border-color:#ff3b4e;color:#ff8a94;box-shadow:0 0 22px #ff3b4e66;animation:cbhno .35s}
+@keyframes cbhno{20%{transform:translateX(-52%)}50%{transform:translateX(-48%)}80%{transform:translateX(-51%)}}
+
+/* ---- main : survol fluide comme Ma Vie (la zone cliquable ne bouge jamais, seule la carte monte) ---- */
+.cbt .hnd.m .hc .y{pointer-events:none;transition:transform .18s cubic-bezier(.2,.9,.3,1.25),filter .18s,box-shadow .18s;filter:drop-shadow(0 3px 5px #0008)}
+@media (hover:hover){
+ .cbt .hnd.m .hc:hover{z-index:20}
+ .cbt .hnd.m .hc:hover .y{transform:translateY(calc(var(--cw)*-.32));filter:drop-shadow(0 10px 14px #000b) brightness(1.08)}
+ .cbt .hnd.m .hc.off:hover .y{filter:grayscale(.8) brightness(.7) drop-shadow(0 10px 14px #000b)}
+}
+.cbt .hnd.m .hc.dragging .y{transform:none}
+
+/* ---- cartes aux coins arrondis, comme Ma Vie ---- */
+#v-cb .y{border-radius:26px;padding:5px;box-shadow:0 12px 28px #000c,inset 0 0 0 1px #ffffff22}
+#v-cb .y .cface{inset:5px;border-radius:21px}
+#v-cb .y .plate{border-radius:14px;left:14px;right:58px;top:12px}
+#v-cb .y .artf{border-radius:20px;left:24px;width:212px;height:212px;padding:3px}
+#v-cb .y .cart{border-radius:17px}
+#v-cb .y .orb{right:14px;top:12px}
+#v-cb .y .desc{border-radius:14px;left:20px;right:20px}
+#v-cb .y .stat{border-radius:0 0 21px 21px}
+#v-cb .y .sticker{right:22px;bottom:12px}
+#v-cb .y.ex:after{border-radius:26px}
+#v-cb .cb-back{border-radius:22px}

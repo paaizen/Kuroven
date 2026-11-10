@@ -3416,6 +3416,7 @@ function chMsg(m,users,prevU,showName){
   const nm=u=>esc((users[u]&&users[u].pseudo)||'?'),mine=me&&m.u===me.id;
   if(m.k==='sys')return'<div class="msS"><b>'+nm(m.u)+'</b> '+esc(m.b)+'</div>';
   if(m.k==='invite')return chInv(m,users);
+  {const cb=m.k==='text'&&/^\[\[cb:([A-Z]{4})\]\]/.exec(m.b||'');if(cb)return'<div class="msC"><b>🃏 '+(mine?'Tu':nm(m.u))+(mine?' défies un ami':' te défie')+' à Kuroven Combat</b><small>Duel en ligne · code '+cb[1]+'</small>'+(mine?'<span class="hint">En attente de ton ami…</span>':'<button class="btn sm" data-ms="cbjoin" data-code="'+cb[1]+'">Rejoindre le duel</button>')+'</div>'}
   return'<div class="msM '+(mine?'me':'th')+'">'+(showName&&!mine&&prevU!==m.u?'<small>'+nm(m.u)+'</small>':'')+'<div class="b">'+esc(m.b)+'</div><small>'+msTime(m.at)+(mine?'':' <button class="flg" type="button" data-rp="message" data-id="'+esc(m.id)+'" data-u="'+esc(m.u)+'" data-n="'+nm(m.u)+'" aria-label="Signaler ce message" title="Signaler">⚑</button>')+'</small></div>'}
 function chList(msgs,users,showName){let p=null;return msgs.map(m=>{const h=chMsg(m,users,p,showName);p=m.k==='text'?m.u:null;return h}).join('')}
 function chPut(el,html,force){const near=el.scrollHeight-el.scrollTop-el.clientHeight<90;el.innerHTML=html;if(force||near)el.scrollTop=el.scrollHeight}
@@ -3508,6 +3509,12 @@ async function msPickInvite(type,ref){
   if(gs.length)h+='<div class="hint">Groupes</div>'+gs.map(c=>'<div class="fr-row"><span class="avi">👥</span><div class="g"><b>'+esc(c.name)+'</b></div>'+btn('data-c="'+esc(c.id)+'"')+'</div>').join('');
   h+=fr.length?'<div class="hint">Amis</div>'+fr.map(p=>'<div class="fr-row">'+avs(p)+'<div class="g"><b>'+esc(p.pseudo)+'</b></div>'+btn('data-u="'+esc(p.id)+'"')+'</div>').join(''):'<div class="hint">Ajoute des amis pour pouvoir les inviter.</div>';
   shOpen(h)}
+async function cbInvite(code){
+  if(!me||!sb){openWelcome();return}
+  shOpen('<h2>Inviter à ton duel</h2><div class="hint">Chargement…</div>');
+  const fr=await msFriends();
+  const btn=u=>'<button class="btn sm" data-sh="cbsend" data-code="'+esc(code)+'" data-u="'+esc(u)+'">Inviter</button>';
+  shOpen('<h2>Inviter à ton duel</h2>'+(fr.length?fr.map(p=>'<div class="fr-row">'+avs(p)+'<div class="g"><b>'+esc(p.pseudo)+'</b></div>'+btn(p.id)+'</div>').join(''):'<div class="hint">Ajoute des amis pour pouvoir les inviter.</div>')+'<div class="hint" style="margin-top:8px">Ton ami reçoit un message avec un bouton « Rejoindre le duel ». Reste sur cet écran d’attente.</div>')}
 async function msInviteTo(type,ref,chat,friend){
   let id=chat;if(!id){const d=await sb.rpc('chat_dm',{p_friend:friend});if(d.error)return d.error.message;id=d.data}
   const r=await sb.rpc('chat_invite',{p_chat:id,p_type:type,p_ref:ref});return r.error?r.error.message:null}
@@ -3553,6 +3560,7 @@ $('sh').addEventListener('click',async e=>{
   if(a==='blk'){if(Date.now()-shQ>4000){shQ=Date.now();b.textContent='Confirmer : bloquer '+b.dataset.n+' ?';return}
     shQ=0;const r=await sb.rpc('block_user',{p_user:b.dataset.u});if(r.error){shSay(r.error.message);return}shClose();afterBlock();return}
   if(a==='unblk'){b.disabled=true;const r=await sb.rpc('unblock_user',{p_user:b.dataset.u});if(r.error){shSay(r.error.message);b.disabled=false}else{const row=b.closest('.fr-row');if(row)row.remove();shSay('Débloqué.');if(curView==='prof'&&profId)loadProfile(profId)}return}
+  if(a==='cbsend'){b.disabled=true;const d=await sb.rpc('chat_dm',{p_friend:b.dataset.u});if(d.error){shSay(d.error.message);b.disabled=false;return}const r=await sb.rpc('chat_send',{p_chat:d.data,p_body:'[[cb:'+b.dataset.code+']] Duel Kuroven Combat : rejoins-moi !'});if(r.error){shSay(r.error.message);b.disabled=false}else{b.textContent='✓ Envoyée';shSay('')}return}
   if(a==='send'){b.disabled=true;const err=await msInviteTo(b.dataset.t,b.dataset.ref,b.dataset.c,b.dataset.u);if(err){shSay(err);b.disabled=false}else{b.textContent='✓ Envoyée';shSay('');if(curView==='msg'&&MS.view==='chat')msFetch()}}
   else if(a==='duel')msDuel(b.dataset.r==='1');
   else if(a==='add'){b.disabled=true;const r=await sb.rpc('chat_group_add',{p_chat:MS.chat.id,p_user:b.dataset.u});if(r.error){shSay(r.error.message);b.disabled=false}else{b.textContent='✓ Ajouté';shSay('');msFetch()}}
@@ -3572,7 +3580,8 @@ $('v-msg').addEventListener('click',async e=>{
   else if(a==='invite')msInviteSheet();
   else if(a==='members')msMembers();
   else if(a==='blocks')blOpen();
-  else if(a==='join'){const m=MS.msgs.find(x=>String(x.id)===b.dataset.id);if(m)msJoin(m)}});
+  else if(a==='join'){const m=MS.msgs.find(x=>String(x.id)===b.dataset.id);if(m)msJoin(m)}
+  else if(a==='cbjoin'){if(busyOnline()){msSay('Termine ou quitte ta partie en cours d’abord.');return}show('cb');(function w(n){if(window.CB&&CB.joinCode)CB.joinCode(b.dataset.code);else if(n<60)setTimeout(()=>w(n+1),200)})(0)}});
 $('v-msg').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='msIn')msSend()});
 /* ===== Ma Vie : construis ta vie carte après carte, le plus de sourires gagne ===== */
 let VC=null,vieView='menu',vieNote='',vieQ=0;
@@ -3595,8 +3604,8 @@ function cbEnter(){
   b.innerHTML='<p class="sub" style="text-align:center">Chargement…</p>';
   if(!cbP){
     const ld=u=>new Promise((ok,ko)=>{const x=document.createElement('script');x.src=u;x.onload=ok;x.onerror=ko;document.head.appendChild(x)});
-    const lk=document.createElement('link');lk.rel='stylesheet';lk.href='combat.css?v=7';document.head.appendChild(lk);
-    cbP=ld('combat-data.js?v=22').then(()=>ld('combat.js?v=25')).then(()=>!!window.CB).catch(()=>{cbP=null;return false});
+    const lk=document.createElement('link');lk.rel='stylesheet';lk.href='combat.css?v=22';document.head.appendChild(lk);
+    cbP=ld('combat-data.js?v=24').then(()=>ld('combat.js?v=36')).then(()=>!!window.CB).catch(()=>{cbP=null;return false});
   }
   cbP.then(o=>{if(curView!=='cb')return;if(o)CB.enter();else b.innerHTML='<p class="sub" style="text-align:center">Impossible de charger le jeu (fichiers combat manquants ?).</p>'})}
 /* ===== Imite le son (chargé à la demande : imite.js + imite/sons.json + imite/sons/*.mp3) ===== */

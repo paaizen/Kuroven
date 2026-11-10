@@ -52,28 +52,29 @@ async function loadPool(){
   ls.set('cbpool1',{t:Date.now(),l});
  }
  CHARS=l.map((x,i)=>mkChar(x,i));REG={};CHARS.forEach(c=>REG[c.id]=c);SUP.forEach(s=>REG[s.id]=s);
- EVOS=[];EVO.forEach(e=>{const ms=e.mat.map(k=>CHARS.find(c=>c.n.toLowerCase().includes(k)));if(ms.every(Boolean)){const ev={k:'e',id:'e_'+e.id,eid:e.id,n:e.n,img:ms[0].img,series:ms.map(m=>m.n).join(' + '),lvl:7,atk:e.atk,def:e.def,col:e.col,ex:true,sn:e.sn,sd:e.sd,cond:e.cond||[],mats:ms,no:90000000+EVOS.length*13};EVOS.push(ev);REG[ev.id]=ev}});
+ EVOS=[];EVO.forEach(e=>{const ms=e.mat.map(k=>CHARS.find(c=>c.n.toLowerCase().includes(k)));if(ms.every(Boolean)){const ev={k:'e',id:'e_'+e.id,eid:e.id,n:e.n,img:ms[0].img,series:ms.map(m=>m.n).join(' + '),lvl:7,atk:Math.round(e.atk*.5/50)*50,def:Math.round(e.def*.5/50)*50,col:e.col,ex:true,sn:e.sn,sd:e.sd,cond:e.cond||[],mats:ms,no:90000000+EVOS.length*13};EVOS.push(ev);REG[ev.id]=ev}});
  POOL=true;return POOL;
 }
 const isSup=c=>c.k==='s';
 function ensureMats(d,e0){e0.mats.forEach(m=>{if(!d.includes(m.id)){const k=d.findIndex(id=>REG[id]&&REG[id].k==='c'&&REG[id].lvl<=4&&!e0.mats.some(x=>x.id===id));if(k>=0)d[k]=m.id}});return d}
+const evolvableId=id=>EVOS.some(e=>e.mats.some(m=>m.id===id));
+const extraFor=ids=>EVOS.filter(e=>e.mats.every(m=>ids.includes(m.id))).map(e=>e.id);
 function autoDeck(){
- const by=f=>shuffle(CHARS.filter(f));
+ const by=f=>shuffle(CHARS.filter(c=>f(c)&&!evolvableId(c.id)));
  const ch=[].concat(by(c=>c.lvl<=3).slice(0,4),by(c=>c.lvl===4).slice(0,4),by(c=>c.lvl===5).slice(0,3),by(c=>c.lvl===6).slice(0,1)).map(c=>c.id);
  const sp=shuffle(SUP.slice()).slice(0,8).map(c=>c.id);
  const d=shuffle(ch.concat(sp));if(EVOS.length)ensureMats(d,EVOS[rnd(EVOS.length)]);return d;
 }
 function deckCheck(ids){
  const cnt={};ids.forEach(i=>cnt[i]=(cnt[i]||0)+1);
- const n=ids.length,s=ids.filter(i=>REG[i]&&isSup(REG[i])).length,hasLow=ids.some(i=>REG[i]&&REG[i].k==='c'&&REG[i].lvl<=4);
+ const n=ids.length,ev=ids.filter(i=>REG[i]&&evolvableId(i)).length,s=ids.filter(i=>REG[i]&&isSup(REG[i])).length,hasLow=ids.some(i=>REG[i]&&REG[i].k==='c'&&REG[i].lvl<=4);
  let msg='';
- if(n!==MAXD)msg='Il faut exactement '+MAXD+' cartes ('+n+').';else if(s>MAXS)msg='Maximum '+MAXS+' cartes soutien.';else if(!hasLow)msg='Ajoute au moins un personnage de niveau 4 ou moins.';
- return {n,s,ok:!msg,msg};
+ if(n!==MAXD)msg='Il faut exactement '+MAXD+' cartes ('+n+').';else if(s>MAXS)msg='Maximum '+MAXS+' cartes soutien.';else if(ev>MAXX)msg='Maximum '+MAXX+' cartes évolutives (✦) dans le deck ('+ev+').';else if(!hasLow)msg='Ajoute au moins un personnage de niveau 4 ou moins.';
+ return {n,s,ev,ok:!msg,msg};
 }
 const getDeck=()=>(ls.get('cbdeck2',[])||[]).filter(i=>REG[i]);
 const setDeck=d=>ls.set('cbdeck2',d);
-const getExtra=()=>{const v=ls.get('cbextra1',null);return (v==null?[]:v).filter(i=>REG[i]&&REG[i].k==='e').slice(0,MAXX)};
-const setExtra=d=>ls.set('cbextra1',d);
+const getExtra=()=>extraFor(getDeck());
 
 /* ---------- état de partie ---------- */
 const mkP=(ids,ex,rng)=>({extra:(ex||[]).map(i=>REG[i]).filter(Boolean),lp:8000,deck:shuffle(ids.map(i=>REG[i]),rng),hand:[],mon:[null,null,null],st:[null,null,null],grave:[],normal:false,senzu:false});
@@ -84,8 +85,8 @@ const eqN=(pi,m,id)=>G.p[pi].st.filter(s=>s&&s.to===m&&s.card.id===id).length;
 const hasCape=(pi,m)=>eqN(pi,m,'cape')>0;
 const fld=()=>G.field&&G.field.card.id;
 const friend=pi=>mons(pi).length>=3&&G.p[pi].st.some(s=>s&&s.up&&s.card.id==='amitie');
-function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+500*eqN(pi,m,'forgeron')+300*eqN(pi,m,'epee');if(fld()==='arene')v+=200;if(fld()==='lune'&&m.card.col===4)v+=300;if(friend(pi))v+=1000;return Math.max(0,v)}
-function def(pi,m){let v=m.card.def+m.defP+300*eqN(pi,m,'epee');if(fld()==='village')v+=300;return Math.max(0,v)}
+function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+250*eqN(pi,m,'forgeron')+150*eqN(pi,m,'epee');if(fld()==='arene')v+=100;if(fld()==='lune'&&m.card.col===4)v+=150;if(friend(pi))v+=500;return Math.max(0,v)}
+function def(pi,m){let v=m.card.def+m.defP+150*eqN(pi,m,'epee');if(fld()==='village')v+=150;return Math.max(0,v)}
 const freeMon=pi=>G.p[pi].mon.indexOf(null), freeSt=pi=>G.p[pi].st.indexOf(null);
 
 /* ---------- interface : utilitaires ---------- */
@@ -222,6 +223,7 @@ async function remoteAct(m){
   switch(m.t){
    case 'sum':await doSummon(1,m.hi,m.slot,m.pos,m.trib);break;
    case 'spl':{let tg=null;if(m.tgk==='m')tg=m.tg;else if(m.tgk==='g')tg=p.grave[m.tg];else if(m.tgk==='h')tg=p.hand[m.tg];await playSpell(1,m.hi,tg);break}
+   case 'drw':await drawN(1,1);break;
    case 'set':await setTrap(1,m.hi);break;
    case 'att':await battle(1,m.i,m.ti);break;
    case 'pos':await changePos(1,m.i);break;
@@ -277,7 +279,7 @@ function trapChoices(od,pi,i){
   if(!s||s.up||!TRAPS.includes(s.card.id))return;
   const id=s.card.id;
   if((id==='rival'||id==='embuscade')&&hasCape(pi,A))return;
-  if(id==='embuscade'&&atk(pi,A)>1500)return;
+  if(id==='embuscade'&&atk(pi,A)>750)return;
   out.push(k);
  });
  return out;
@@ -398,7 +400,7 @@ function spellInfo(pi,c){
   case 'examen':return p.deck.length<1?{ok:0,why:'Pioche vide.'}:{ok:1,tg:'none'};
   case 'flashback':return p.grave.some(x=>x.k==='c')?{ok:1,tg:'grave'}:{ok:0,why:'Aucun personnage au cimetière.'};
   case 'entrainement':return mm.length?{ok:1,tg:'mon'}:{ok:0,why:'Il faut un personnage.'};
-  case 'pacte':return !mm.length?{ok:0,why:'Il faut un personnage.'}:p.lp<=1000?{ok:0,why:'Pas assez de points de vie.'}:{ok:1,tg:'mon'};
+  case 'pacte':return !mm.length?{ok:0,why:'Il faut un personnage.'}:p.lp<=500?{ok:0,why:'Pas assez de points de vie.'}:{ok:1,tg:'mon'};
   case 'reunion':return !p.hand.some(x=>x.k==='c'&&x.lvl>=5)?{ok:0,why:'Aucun personnage de niveau 5 ou 6 en main.'}:freeMon(pi)<0?{ok:0,why:'Aucune zone libre.'}:{ok:1,tg:'hand56'};
   case 'forgeron':case 'epee':case 'cape':return !mm.length?{ok:0,why:'Il faut un personnage.'}:freeSt(pi)<0?{ok:0,why:'Aucune zone de soutien libre.'}:{ok:1,tg:'mon'};
   case 'amitie':return freeSt(pi)<0?{ok:0,why:'Aucune zone de soutien libre.'}:{ok:1,tg:'none'};
@@ -420,12 +422,12 @@ async function playSpell(pi,hi,tg){
  else dest=zoneEl('g',pi,0);
  await spellLand(c,dest);
  switch(c.id){
-  case 'ramen':heal(pi,800);p.grave.push(c);break;
-  case 'senzu':heal(pi,1500);p.senzu=true;p.grave.push(c);break;
+  case 'ramen':heal(pi,400);p.grave.push(c);break;
+  case 'senzu':heal(pi,750);p.senzu=true;p.grave.push(c);break;
   case 'examen':p.grave.push(c);await drawN(pi,2);break;
   case 'flashback':{const k=p.grave.indexOf(tg);if(k>=0){p.grave.splice(k,1);p.hand.push(tg);log(tg.n+' revient en main.')}p.grave.push(c);break}
-  case 'entrainement':{const m=p.mon[tg];if(m){m.tmp+=400;log(m.card.n+' gagne 400 ATK ce tour.')}p.grave.push(c);break}
-  case 'pacte':{const m=p.mon[tg];setLP(pi,p.lp-1000);floatTxt(zoneEl('p',pi,0),'-1000');if(m){m.atkP+=800;log(m.card.n+' gagne 800 ATK pour de bon.')}p.grave.push(c);checkEnd();break}
+  case 'entrainement':{const m=p.mon[tg];if(m){m.tmp+=200;log(m.card.n+' gagne 200 ATK ce tour.')}p.grave.push(c);break}
+  case 'pacte':{const m=p.mon[tg];setLP(pi,p.lp-500);floatTxt(zoneEl('p',pi,0),'-500');if(m){m.atkP+=400;log(m.card.n+' gagne 400 ATK pour de bon.')}p.grave.push(c);checkEnd();break}
   case 'reunion':{const k=p.hand.indexOf(tg);const s=freeMon(pi);p.grave.push(c);if(k>=0&&s>=0)await doSummon(pi,k,s,'a',false,true);break}
   case 'forgeron':case 'epee':case 'cape':{const m=p.mon[tg],s=freeSt(pi);if(m&&s>=0){p.st[s]={card:c,up:true,to:m};log(c.n+' équipe '+m.card.n+'.')}else p.grave.push(c);break}
   case 'arene':case 'village':case 'lune':{if(G.field)P(G.field.owner).grave.push(G.field.card);G.field={card:c,owner:pi};G.fxChanged=1;break}
@@ -632,7 +634,7 @@ async function startTurn(){
  p.normal=false;p.senzu=false;p.mon.forEach(m=>{if(m){m.att=false;m.chg=false}});
  banner(pi===0?'À TOI DE JOUER':'TOUR ADVERSE',pi===0?'#3dae5a':'#ec5fa0');
  G.busy=true;render();await sleep(600);
- if(G.n>1)await drawN(pi,1);
+ if(G.n>1){if(pi===0)G.needDraw=true;else if(!NET)await drawN(pi,1)}
  if(G.over)return;
  G.busy=false;render();
  if(pi===0)startTimer();else if(NET)remoteLoop();else aiTurn();
@@ -648,6 +650,7 @@ function tick(){
 async function humanEnd(){
  if(!G||G.over||G.turn!==0||G.busy||G.ai||ui.modal)return;
  if(ui.pick&&ui.pickDone)ui.pickDone(null);
+ if(G.needDraw){G.needDraw=false;G.busy=true;netSend('drw');await drawN(0,1)}
  stopTimer();netSend('end');G.busy=true;render();await finishTurn(0);
 }
 function endGame(winner,why){
@@ -660,7 +663,12 @@ function endGame(winner,why){
 }
 
 /* ---------- actions du joueur ---------- */
-const myTurn=()=>G&&!G.over&&G.turn===0&&!G.busy&&!G.ai&&!ui.pick&&!ui.modal;
+const myTurn=()=>G&&!G.over&&G.turn===0&&!G.busy&&!G.ai&&!G.needDraw&&!ui.pick&&!ui.modal;
+async function doDraw(){
+ if(!G||!G.needDraw||G.turn!==0||G.over||G.busy)return;
+ G.needDraw=false;netSend('drw');G.busy=true;render();
+ await drawN(0,1);G.busy=false;render();
+}
 async function actSummon(hi,pos){
  if(!myTurn())return;
  const p=P(0),c=p.hand[hi];if(!c||c.k!=='c')return;
@@ -691,12 +699,12 @@ async function actSet(hi){
  netSend('set',{hi});
  G.busy=true;ui.sel=null;await setTrap(0,hi);G.busy=false;render();
 }
-async function actAttack(i){
+async function actAttack(i,pre){
  if(!myTurn())return;
  if(G.n===1)return toast('On ne peut pas attaquer au premier tour de la partie.');
  const m=P(0).mon[i];if(!m||m.att||m.pos!=='a')return;
  const opps=mons(1);let ti=-1;
- if(opps.length){const t=await pick('Choisis le personnage à attaquer',opps.map(x=>({z:'m',p:1,i:x.i})));if(!t)return;ti=t.i}
+ if(pre!=null)ti=pre;else if(opps.length){const t=await pick('Choisis le personnage à attaquer',opps.map(x=>({z:'m',p:1,i:x.i})));if(!t)return;ti=t.i}
  netSend('att',{i,ti});
  G.busy=true;ui.selMon=null;await battle(0,i,ti);G.busy=false;render();
 }
@@ -722,8 +730,10 @@ function stHTML(pi,i){
 }
 function render(){
  const b=boardEl();if(!b||!G)return;
- const me=P(0),op=P(1),can=myTurn();
+ hidePop();popTarget=null;
+ const me=P(0),op=P(1),can=myTurn(),mob=window.innerWidth<700;G.mob=mob;
  const gv=pi=>{const g=P(pi).grave,t=g[g.length-1];return t?'<div class="bc">'+cardHTML(t)+'</div><span class="cnt">'+g.length+'</span>':''};
+ const dk=pi=>{const n=P(pi).deck.length;return n?'<div class="bc">'+backHTML()+'</div><span class="cnt">'+n+'</span>':''};
  const hand=me.hand.map((c,i)=>{
   const inf=c.k==='c'?{ok:!me.normal&&(c.lvl<5||mons(0).length>0)&&(c.lvl>=5||freeMon(0)>=0)}:c.t==='trap'?{ok:freeSt(0)>=0}:spellInfo(0,c);
   const r=(i-(me.hand.length-1)/2)*(me.hand.length>6?5:7),y=Math.abs(i-(me.hand.length-1)/2)*4;
@@ -731,19 +741,35 @@ function render(){
  }).join('');
  const oh=op.hand.map(()=>'<div class="hc">'+backHTML()+'</div>').join('');
  const fcard=G.field?'<div class="bc">'+cardHTML(G.field.card)+'</div>':'';
- const rr=(a,b2)=>'<div class="crw">'+a+'</div>';
+ const dglow=G.needDraw&&G.turn===0&&!G.over;
+ const st=pi=>[0,1,2].map(i=>slot('s',pi,i,'Soutien',stHTML(pi,i),'st'));
+ const mn=pi=>[0,1,2].map(i=>slot('m',pi,i,'Personnage',monHTML(pi,i),''));
+ const chip=(z,pi,i,label,n,gl)=>'<span class="chip'+(gl?' glow':'')+'" data-z="'+z+'" data-p="'+pi+'" data-i="'+i+'">'+label+(n!=null?' · '+n:'')+'</span>';
+ const strip=pi=>'<div class="strip">'+chip('g',pi,0,'Cimetière',P(pi).grave.length)+chip('d',pi,0,dglow&&pi===0?'Pioche !':'Pioche',P(pi).deck.length,dglow&&pi===0)+(pi===1?chip('f',0,0,'Terrain',G.field?1:0):'')+'</div>';
+ const row=(a,c)=>'<div class="crw '+(c||'')+'">'+a.join('')+'</div>';
+ const rowF=a=>'<div class="crw first bk">'+a.join('')+'</div>';
+ const grp=(a,c)=>'<div class="grp '+c+'">'+a.join('')+'</div>';
+ const dRow=(m,t,d)=>'<div class="crw dk">'+grp(m,'gm')+grp(t,'gs')+grp(d,'gd')+'</div>';
+ const sdOpp=[slot('g',1,0,'Cimetière',gv(1),'sd'),slot('d',1,0,'Pioche',dk(1),'deck sd'),slot('f',0,0,'Terrain',fcard,'sd')];
+ const sdMe=[slot('g',0,0,'Cimetière',gv(0),'sd'),slot('d',0,0,dglow?'Pioche !':'Pioche',dk(0),'deck sd'+(dglow?' glow':'')),slot('x',0,2,'','','e sd')];
+ const oppSt=mob?st(1):[slot('g',1,0,'Cimetière',gv(1),'sd')].concat(st(1),[slot('d',1,0,'Pioche',dk(1),'deck sd')]);
+ const oppMon=mob?mn(1):[slot('x',0,0,'','','e')].concat(mn(1),[slot('x',0,0,'','','e')]);
+ const myMon=mob?mn(0):[slot('x',0,1,'','','e')].concat(mn(0),[slot('x',0,2,'','','e')]);
+ const mySt=mob?st(0):[slot('d',0,0,dglow?'Pioche !':'Pioche',dk(0),'deck sd'+(dglow?' glow':''))].concat(st(0),[slot('g',0,0,'Cimetière',gv(0),'sd')]);
+ b.classList.toggle('mob',mob);b.classList.toggle('mine',G.turn===0&&!G.over);b.classList.toggle('theirs',G.turn===1&&!G.over);
+ const mid=G.over?'PARTIE TERMINÉE':G.turn===0?(G.needDraw?'À TOI DE PIOCHER · TOUR '+G.n:'À TOI DE JOUER · TOUR '+G.n):'TOUR DE L’ADVERSAIRE · TOUR '+G.n;
  b.innerHTML=
  '<div class="ban" id="cbBan"><b></b></div>'+
- '<div class="cpl o"><div class="cring'+(G.ai?' think':'')+'" id="cbR1" data-z="p" data-p="1" data-i="0">'+avHTML(G.pr[1])+'</div><div class="cpt"><small>'+esc(G.pr[1].n.toUpperCase())+'</small><b id="cbLp1">'+op.lp+'</b></div></div>'+
+ '<div class="cpl o'+(G.turn===1&&!G.over?' act':'')+'"><div class="cring'+(G.ai?' think':'')+'" id="cbR1" data-z="p" data-p="1" data-i="0">'+avHTML(G.pr[1])+'</div><div class="cpt"><small>'+esc(G.pr[1].n.toUpperCase())+'</small><em class="tag">SON TOUR</em><b id="cbLp1">'+op.lp+'</b></div></div>'+
  '<div class="hnd o">'+oh+'</div>'+
- '<div class="crw" style="margin-top:calc(var(--cw)*.5)">'+slot('g',1,0,'Cimetière',gv(1),'')+slot('s',1,0,'Soutien',stHTML(1,0),'st')+slot('s',1,1,'Soutien',stHTML(1,1),'st')+slot('s',1,2,'Soutien',stHTML(1,2),'st')+slot('d',1,0,'Pioche',op.deck.length?'<div class="bc">'+backHTML()+'</div><span class="cnt">'+op.deck.length+'</span>':'','deck')+'</div>'+
- '<div class="crw">'+slot('f',0,0,'Terrain',fcard,'')+slot('m',1,0,'Personnage',monHTML(1,0),'')+slot('m',1,1,'Personnage',monHTML(1,1),'')+slot('m',1,2,'Personnage',monHTML(1,2),'')+slot('x',0,0,'','','e')+'</div>'+
- '<div class="mid"><span>'+(G.over?'PARTIE TERMINÉE':G.turn===0?'TON TOUR · TOUR '+G.n:'TOUR ADVERSE · TOUR '+G.n)+'</span></div>'+
- '<div class="crw">'+slot('x',0,1,'','','e')+slot('m',0,0,'Personnage',monHTML(0,0),'')+slot('m',0,1,'Personnage',monHTML(0,1),'')+slot('m',0,2,'Personnage',monHTML(0,2),'')+slot('x',0,2,'','','e')+'</div>'+
- '<div class="crw">'+slot('d',0,0,'Pioche',me.deck.length?'<div class="bc">'+backHTML()+'</div><span class="cnt">'+me.deck.length+'</span>':'','deck')+slot('s',0,0,'Soutien',stHTML(0,0),'st')+slot('s',0,1,'Soutien',stHTML(0,1),'st')+slot('s',0,2,'Soutien',stHTML(0,2),'st')+slot('g',0,0,'Cimetière',gv(0),'')+'</div>'+
+ (mob?strip(1):'')+
+ rowF(oppSt)+row(oppMon,'fr')+
+ '<div class="mid '+(G.turn===0?'me':'op')+'"><span>'+mid+'</span>'+(mob?'':'<div class="fz">'+slot('f',0,0,'Terrain',fcard,'sd')+'<i>TERRAIN · COMMUN</i></div>')+'</div>'+
+ row(myMon,'fr')+row(mySt,'bk')+
+ (mob?strip(0):'')+
  '<div class="hnd m">'+hand+'</div>'+
- '<button class="endb" id="cbEnd"'+(can?'':' disabled')+'>Fin du tour</button>'+
- '<div class="cpl m"><div class="cring" id="cbR0" data-z="p" data-p="0" data-i="0" style="--p:'+(G.turn===0&&G.t0?Math.max(0,100-(Date.now()-G.t0)/LIM*100):0)+'">'+avHTML(G.pr[0])+'</div><div class="cpt"><small>'+esc(G.pr[0].n.toUpperCase())+'</small><b id="cbLp0">'+me.lp+'</b></div></div>';
+ '<button class="endb" id="cbEnd"'+(can?'':' disabled')+'>Fin du tour</button>'+(dglow?'<div class="needd"><span>À toi de piocher</span><button type="button">Piocher</button></div>':'')+
+ '<div class="cpl m'+(G.turn===0&&!G.over?' act':'')+'"><div class="cring" id="cbR0" data-z="p" data-p="0" data-i="0" style="--p:'+(G.turn===0&&G.t0?Math.max(0,100-(Date.now()-G.t0)/LIM*100):0)+'">'+avHTML(G.pr[0])+'</div><div class="cpt"><small>'+esc(G.pr[0].n.toUpperCase())+'</small><em class="tag">À TOI</em><b id="cbLp0">'+me.lp+'</b></div></div>';
  if(G.fxChanged){b.classList.toggle('fa',fld()==='arene');G.fxChanged=0}
  renderPanel();
 }
@@ -786,7 +812,7 @@ function renderPanel(){
  const el=$('cbAct');if(!el||!G)return;
  const ev=$('cbEvoW');if(ev){const n=P(0).extra.length,rd=P(0).extra.some(c=>evoReady(0,c));ev.innerHTML=n?'<button class="sec'+(rd&&myTurn()?' ready':'')+'" data-a="evo">Évolution ('+n+')'+(rd?' · prête':'')+'</button>':''}
  const h=actHTML();
- el.innerHTML=h||'<small style="color:#b8c2d8">'+(myTurn()?'Clique sur une carte pour la lire et la jouer.':G.ai?'L’adversaire joue…':'')+'</small>';
+ el.innerHTML=h||'<small style="color:#b8c2d8">'+(G.needDraw&&G.turn===0?'<b style="color:#ffd84a">C’est à toi de piocher : clique sur ta pioche (elle brille).</b>':myTurn()?'Clique sur une carte pour la lire et la jouer.':G.turn===1?'C’est le tour de l’adversaire.':'')+'</small>';
 }
 /* zoom : la carte arrive au milieu de l’écran, texte lisible, actions dessous */
 function closeZoom(){const z=ui.zoomEl;if(z&&z.parentNode)z.remove();ui.zoomEl=null}
@@ -818,18 +844,28 @@ function showGrave(pi){
 }
 function fit(){
  const b=boardEl();if(!b)return;
- const w=b.clientWidth-16;const cw=Math.max(50,Math.min(104,Math.floor(w/5.5)));
- b.style.setProperty('--cw',cw+'px');b.style.setProperty('--s',(cw/260).toFixed(4));
+ const mob=window.innerWidth<700,w=b.clientWidth-16;
+ const set=c=>{b.style.setProperty('--cw',c+'px');b.style.setProperty('--s0',(c/260).toFixed(4))};
+ if(mob){set(Math.max(60,Math.min(130,Math.floor(w/3.3))));return}
+ const top=b.getBoundingClientRect().top+window.scrollY,H=Math.max(420,window.innerHeight-top-10);
+ const cap=()=>Math.max(60,Math.min(170,Math.floor(w/5.9)));
+ let cw=Math.max(60,Math.min(cap(),Math.floor((H-30)/7.2)));
+ set(cw);
+ for(let i=0;i<4;i++){const h=b.offsetHeight;if(h>H||h<H*.95){const n=Math.max(60,Math.min(cap(),Math.floor(cw*H/h*.995)));if(n===cw)break;cw=n;set(cw)}else break}
 }
 
 /* ---------- entrées (clic, survol) ---------- */
 function onBoardClick(e){
  if(!G)return;
+ if(dragSup){dragSup=false;return}
+ hidePop();popTarget=null;
+ if(e.target.closest('.needd button')){doDraw();return}
  if(e.target.closest('#cbEnd')){humanEnd();return}
  const z=e.target.closest('[data-z]');if(!z)return;
  const zz=z.dataset.z,p=+z.dataset.p,i=+z.dataset.i;
  if(ui.pick){const c=ui.pick.cands.find(c=>c.z===zz&&c.p===p&&c.i===i);if(c&&ui.pickDone)ui.pickDone(c);return}
  if(ui.modal)return;
+ if(zz==='d'&&p===0&&G.needDraw&&!G.busy){doDraw();return}
  if(zz==='d'){toast((p===0?'Ta pioche : ':'Pioche adverse : ')+P(p).deck.length+' carte'+(P(p).deck.length>1?'s':'')+'.');return}
  if(zz==='g'){showGrave(p);return}
  if(zz==='h'&&p===0){
@@ -843,6 +879,114 @@ function onBoardClick(e){
  }
  if(zz==='s'||zz==='f'){const inf=cardAt(zz,p,i);if(inf)openZoom(z,inf,'');return}
 }
+
+/* ---------- glisser-déposer : on tient une carte de la main, les zones libres brillent ---------- */
+let dragSup=false,drag=null;
+function dropTargets(src){
+ const p=P(0),q=sel=>[...boardEl().querySelectorAll(sel)];
+ if(src.z==='m'){
+  const m=p.mon[src.i];if(!m)return {no:'Rien à faire avec cette carte.'};
+  if(G.n===1)return {no:'On ne peut pas attaquer au premier tour de la partie.'};
+  if(m.att)return {no:'Ce personnage a déjà attaqué ce tour.'};
+  if(m.pos!=='a')return {no:'Un personnage en défense ne peut pas attaquer : passe-le en attaque.'};
+  const opps=mons(1);
+  if(opps.length)return {els:q('.slot[data-z="m"][data-p="1"]').filter(e=>P(1).mon[+e.dataset.i]),act:e=>actAttack(src.i,+e.dataset.i),hint:'Dépose sur le personnage à attaquer'};
+  return {els:q('.cring[data-p="1"]'),act:()=>actAttack(src.i,-1),hint:'Attaque directe : dépose sur l’adversaire'};
+ }
+ const hi=src.i,c=p.hand[hi];if(!c)return {no:'Carte introuvable.'};
+ if(c.k==='c'){
+  if(p.normal)return {no:'Tu as déjà invoqué un personnage ce tour.'};
+  if(c.lvl>=5){if(!mons(0).length)return {no:'Il faut sacrifier un personnage pour invoquer le niveau '+c.lvl+' : aucun personnage à sacrifier.'};return {els:q('.slot[data-z="m"][data-p="0"]').filter(e=>p.mon[+e.dataset.i]),act:()=>actSummon(hi,'a'),hint:'Dépose sur le personnage à sacrifier'}}
+  if(freeMon(0)<0)return {no:'Aucune zone de personnage libre.'};
+  return {els:q('.slot[data-z="m"][data-p="0"]').filter(e=>!p.mon[+e.dataset.i]),act:()=>actSummon(hi,'a'),hint:'Dépose sur une zone libre'};
+ }
+ if(c.t==='trap'){
+  if(freeSt(0)<0)return {no:'Aucune zone de soutien libre.'};
+  return {els:q('.slot[data-z="s"][data-p="0"]').filter(e=>!p.st[+e.dataset.i]),act:()=>actSet(hi),hint:'Dépose sur une zone de soutien'};
+ }
+ const inf=spellInfo(0,c);if(!inf.ok)return {no:inf.why};
+ if(c.t==='field')return {els:q('.slot[data-z="f"]'),act:()=>actSpell(hi),hint:'Dépose sur le Terrain'};
+ if(freeSt(0)<0)return {no:'Aucune zone de soutien libre.'};
+ return {els:q('.slot[data-z="s"][data-p="0"]').filter(e=>!p.st[+e.dataset.i]),act:()=>actSpell(hi),hint:'Dépose sur une zone de soutien'};
+}
+function dragHint(t){
+ let h=document.getElementById('cbDragHint');
+ if(!t){if(h)h.remove();return}
+ if(!h){h=document.createElement('div');h.id='cbDragHint';(document.getElementById('v-cb')||document.body).appendChild(h)}
+ h.className=t.no?'no':'';h.textContent=t.no?'⛔ '+t.no:t.hint||'';
+}
+function endDrag(keepGhost){
+ if(!drag)return;
+ document.removeEventListener('pointermove',onDragMove);document.removeEventListener('pointerup',onDragEnd);document.removeEventListener('pointercancel',onDragEnd);
+ if(drag.ghost&&!keepGhost)drag.ghost.remove();
+ if(drag.el)drag.el.classList.remove('dragging');
+ document.querySelectorAll('.dz').forEach(e=>e.classList.remove('dz','over'));
+ const b=boardEl();if(b)b.classList.remove('dragging','nodrop');
+ dragHint(null);
+ drag=null;
+}
+function onDragStart(e){
+ if(!G||G.over||e.button!==0||e.pointerType==='touch')return;
+ let el=e.target.closest('.hc[data-z="h"]'),src;
+ if(el&&!el.closest('.hnd.o'))src={z:'h',i:+el.dataset.i};
+ else{el=e.target.closest('.slot[data-z="m"][data-p="0"]');if(!el||!P(0).mon[+el.dataset.i])return;src={z:'m',i:+el.dataset.i}}
+ let t;
+ if(myTurn())t=dropTargets(src);
+ else if(G.needDraw&&G.turn===0&&!G.busy&&!ui.pick&&!ui.modal)t={no:'Pioche d’abord : clique sur ta pioche.'};
+ else if(G.turn===1&&!ui.modal)t={no:'Ce n’est pas ton tour.'};
+ else return;
+ drag={el,src,t,x:e.clientX,y:e.clientY,on:false,ghost:null,over:null};
+ document.addEventListener('pointermove',onDragMove);document.addEventListener('pointerup',onDragEnd);document.addEventListener('pointercancel',onDragEnd);
+}
+function onDragMove(e){
+ if(!drag)return;
+ if(!drag.on){
+  if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<9)return;
+  drag.on=true;hidePop();popTarget=null;
+  const inner=drag.src.z==='m'?(drag.el.querySelector('.y')||drag.el):drag.el;
+  const r=inner.getBoundingClientRect(),g=document.createElement('div');
+  g.className='cbghost bk'+backN()+(drag.t.no?' bad':'');g.style.width=r.width+'px';g.style.height=r.height+'px';
+  g.style.setProperty('--zs',(r.width/260).toFixed(3));
+  g.innerHTML=drag.src.z==='h'?drag.el.innerHTML:(drag.el.querySelector('.y')?drag.el.querySelector('.y').outerHTML:drag.el.innerHTML);
+  if(drag.t.no)g.insertAdjacentHTML('beforeend','<i class="ban2">⛔</i>');
+  (document.getElementById('v-cb')||document.body).appendChild(g);
+  drag.ghost=g;drag.w=r.width;drag.h=r.height;drag.r0=r;
+  drag.el.classList.add('dragging');
+  const b=boardEl();b.classList.add('dragging');if(drag.t.no)b.classList.add('nodrop');
+  if(drag.t.els)drag.t.els.forEach(x=>x.classList.add('dz'));
+  dragHint(drag.t);
+ }
+ drag.ghost.style.transform='translate('+(e.clientX-drag.w/2)+'px,'+(e.clientY-drag.h/2)+'px) scale(1.08) rotate(-4deg)';
+ if(!drag.t.els)return;
+ const el=document.elementFromPoint(e.clientX,e.clientY),sl=el&&el.closest?el.closest('.dz'):null;
+ if(sl!==drag.over){if(drag.over)drag.over.classList.remove('over');if(sl)sl.classList.add('over');drag.over=sl}
+}
+function onDragEnd(e){
+ if(!drag)return;
+ const d=drag;
+ if(!d.on){endDrag();return}
+ dragSup=true;setTimeout(()=>dragSup=false,80);
+ let go=null;
+ if(d.t.els){const el=document.elementFromPoint(e.clientX,e.clientY),sl=el&&el.closest?el.closest('.dz'):null;if(sl)go=()=>d.t.act(sl)}
+ if(go){endDrag();go();return}
+ const msg=d.t.no||'Dépose la carte sur une zone qui brille.';
+ toast(msg);
+ const g=d.ghost,x=e.clientX-d.w/2,y=e.clientY-d.h/2;
+ g.classList.add('bad');
+ if(!g.querySelector('.ban2'))g.insertAdjacentHTML('beforeend','<i class="ban2">⛔</i>');
+ endDrag(true);
+ try{
+  g.animate([
+   {transform:'translate('+x+'px,'+y+'px) scale(1.08) rotate(-4deg)'},
+   {transform:'translate('+(x-16)+'px,'+y+'px) scale(1.08) rotate(-9deg)'},
+   {transform:'translate('+(x+16)+'px,'+y+'px) scale(1.08) rotate(3deg)'},
+   {transform:'translate('+(x-12)+'px,'+y+'px) scale(1.08) rotate(-6deg)'},
+   {transform:'translate('+(x+8)+'px,'+y+'px) scale(1.06) rotate(0deg)'},
+   {transform:'translate('+d.r0.left+'px,'+d.r0.top+'px) scale(1) rotate(0deg)',opacity:.6}
+  ],{duration:700,easing:'ease-in-out'}).onfinish=()=>g.remove();
+  setTimeout(()=>g.remove(),1000);
+ }catch(er){g.remove()}
+}
 function onAct(e){
  const b=e.target.closest('button[data-a]');if(!b||!myTurn())return;
  const a=b.dataset.a;
@@ -851,9 +995,32 @@ function onAct(e){
  else if(a==='act')actSpell(ui.sel);else if(a==='set')actSet(ui.sel);
  else if(a==='att')actAttack(ui.selMon);else if(a==='pos')actPos(ui.selMon);
 }
+let popT=null,popEl=null,popTarget=null;
+function hidePop(){clearTimeout(popT);popT=null;if(popEl){popEl.remove();popEl=null}}
+function showPop(target,info){
+ hidePop();if(!G||ui.zoomEl||ui.modal)return;
+ const r=target.getBoundingClientRect(),zs=Math.min(.8,(window.innerHeight-24)/379),w=260*zs,h=379*zs;
+ const d=document.createElement('div');d.className='cbpop bk'+backN();d.style.setProperty('--zs',zs.toFixed(3));
+ d.style.width=w+'px';d.style.height=h+'px';
+ d.innerHTML=cardHTML(info.c,{atk:info.atk,def:info.def});
+ let x=r.right+10;if(x+w>window.innerWidth-8)x=r.left-w-10;if(x<8)x=Math.max(8,Math.min(window.innerWidth-w-8,r.left));
+ const y=Math.max(8,Math.min(window.innerHeight-h-8,r.top+r.height/2-h/2));
+ d.style.left=x+'px';d.style.top=y+'px';
+ (document.getElementById('v-cb')||document.body).appendChild(d);popEl=d;
+}
 function onOver(e){
  const z=e.target.closest('[data-z]');if(!z||!G)return;
  const info=cardAt(z.dataset.z,+z.dataset.p,+z.dataset.i);if(info)renderPrev(info);
+ if(!window.matchMedia||!matchMedia('(hover:hover)').matches)return;
+ if(z===popTarget)return;
+ popTarget=z;hidePop();
+ if(!info||!info.c)return;
+ /* aperçu après 1 s retiré */
+}
+function onOut(e){
+ const z=e.target.closest('[data-z]');if(!z)return;
+ const to=e.relatedTarget&&e.relatedTarget.closest?e.relatedTarget.closest('[data-z]'):null;
+ if(to===z)return;popTarget=null;hidePop();
 }
 
 /* ---------- vues : menu, deck, règles, partie ---------- */
@@ -887,7 +1054,7 @@ function showRules(){
  '<li><b>Combat</b> : chaque personnage en attaque peut attaquer une fois par tour. Contre un personnage en attaque, le plus fort détruit l’autre et la différence est retirée aux points de vie du perdant. Contre un personnage en défense, s’il est plus fort il le détruit sans dégâts, sinon l’attaquant perd la différence. Sans personnage en face, c’est une attaque directe.</li>'+
  '<li><b>Couleurs</b> : chaque couleur est forte contre les deux suivantes (+20 % d’ATK) et faible contre les deux précédentes (−20 %) : 炎 Braise → 雷 Éclair → 森 Sève → 水 Marée → 闇 Ombre → 光 Éclat → 炎.</li>'+
  '<li><b>Soutiens</b> : les Magies se jouent pendant ton tour. Les Équipements restent attachés à un personnage. Un seul Terrain à la fois, il compte pour les deux joueurs. Les Pièges se posent face cachée et se déclenchent pendant le tour de l’adversaire.</li>'+
- '<li><b>Transformation</b> : ton deck d’évolution (2 cartes au plus, à part des 20 cartes) contient des cartes violettes. Un personnage peut se transformer en carte évoluée s’il est sur ton terrain <b>depuis le tour précédent</b> (on ne peut pas poser un personnage et le transformer aussitôt) et si la <b>condition écrite sur la carte</b> est remplie : un équipement sur le personnage, un Terrain en jeu, un piège posé, des cartes au cimetière, des points de vie bas, un allié de la même couleur, ou avoir joué une carte précise (par exemple « Entraînement intense » pour Goku). Il va au cimetière et la carte évoluée prend sa place, sans compter comme ton invocation du tour. Bouton « Évolution » à droite du plateau.</li><li><b>Duel en ligne</b> : « Duel en ligne » dans le menu. L’un crée un duel et donne le code à 4 lettres, l’autre le tape. Chacun joue avec son deck, une photo de profil et un chronomètre s’affichent pour les deux.</li><li><b>Temps</b> : 45 secondes par tour. L’anneau autour de ton avatar se vide, puis devient rouge.</li></ul></div>';
+ '<li><b>Transformation</b> : les personnages marqués ✦ dans le constructeur ont une transformation (carte violette). Ton deck peut en contenir <b>2 au maximum</b>, et leur transformation est disponible automatiquement. Un personnage peut se transformer s’il est sur ton terrain <b>depuis le tour précédent</b> (pas le tour où il est posé) et si la <b>condition écrite sur la carte</b> est remplie : un équipement, un Terrain en jeu, un piège posé, des cartes au cimetière, des points de vie bas, un allié de la même couleur, ou avoir joué une carte précise. Il va au cimetière et la carte évoluée prend sa place. Bouton « Évolution » à droite du plateau.</li><li><b>Duel en ligne</b> : « Duel en ligne » dans le menu. L’un crée un duel et donne le code à 4 lettres, l’autre le tape. Chacun joue avec son deck, une photo de profil et un chronomètre s’affichent pour les deux.</li><li><b>Temps</b> : 45 secondes par tour. L’anneau autour de ton avatar se vide, puis devient rouge.</li></ul></div>';
  bindTabs();
 }
 let bf={t:'all',c:-1,q:''};
@@ -901,22 +1068,21 @@ function showBuild(){
  if(bf.q)list=list.filter(x=>x.n.toLowerCase().includes(bf.q.toLowerCase()));
  const full=d.length>=MAXD;
  body().innerHTML=tabs('build')+
- '<div class="cbbar"><span class="cbcount '+(ck.ok?'ok':d.length>MAXD||ck.s>MAXS?'bad':'')+'">Deck : '+d.length+'/'+MAXD+' · soutiens '+ck.s+'/'+MAXS+'</span><span style="color:var(--mut);font-size:.85rem">'+esc(ck.ok?'Deck valide.':ck.msg)+'</span><span style="flex:1"></span><button class="cbchip" id="cbRand">Deck aléatoire</button><button class="cbchip" id="cbClear">Vider</button><button class="cbchip on" id="cbGo"'+(ck.ok?'':' disabled')+'>Jouer</button></div>'+
+ '<div class="cbbar"><span class="cbcount '+(ck.ok?'ok':d.length>MAXD||ck.s>MAXS?'bad':'')+'">Deck : '+d.length+'/'+MAXD+' · soutiens '+ck.s+'/'+MAXS+' · ✦ évolutions '+ck.ev+'/'+MAXX+'</span><span style="color:var(--mut);font-size:.85rem">'+esc(ck.ok?'Deck valide.':ck.msg)+'</span><span style="flex:1"></span><button class="cbchip" id="cbRand">Deck aléatoire</button><button class="cbchip" id="cbClear">Vider</button><button class="cbchip on" id="cbGo"'+(ck.ok?'':' disabled')+'>Jouer</button></div>'+
  '<div class="cbdeck" id="cbDeck">'+(d.length?d.slice().sort((a,b)=>(REG[b].lvl||0)-(REG[a].lvl||0)).map(id=>'<div class="cbitem mini" data-r="'+id+'">'+cardHTML(REG[id])+'</div>').join(''):'<span style="color:var(--mut)">Clique sur des cartes ci-dessous pour les ajouter. Clique sur une carte du deck pour la retirer.</span>')+'</div>'+
- '<div class="cbcard"><b>Deck d’évolution ('+getExtra().length+'/'+MAXX+')</b> <span style="color:var(--mut);font-size:.85rem">Cartes violettes, à part des 20 cartes. Tu peux en choisir <b>2 au maximum</b>. Le personnage doit être sur le terrain depuis le tour précédent pour se transformer. Clique pour ajouter ou retirer.</span><div class="cbgrid" id="cbEx">'+EVOS.map(e=>{const on=getExtra().includes(e.id),have=e.mats.every(m=>d.includes(m.id));return '<div class="cbitem'+(on?'':' max')+'" data-e="'+e.eid+'">'+cardHTML(e)+'<span class="nq" style="background:'+(have?'#1d7f3a':'#a15a12')+'">'+(on?'✓ ':'')+(have?'prête':'incomplète')+'</span></div>'}).join('')+'</div></div>'+
+ '<div class="cbcard" style="margin:10px 0"><b>✦ Évolutions</b> <span style="color:var(--mut);font-size:.85rem">Les personnages marqués ✦ peuvent se transformer en cours de partie : leur transformation est disponible <b>automatiquement</b> dès que le personnage est dans ton deck. <b>2 cartes évolutives au maximum</b> dans le deck ('+ck.ev+'/'+MAXX+').</span></div>'+
  '<div class="cbtabs" id="cbF" style="margin-bottom:6px">'+[['all','Tout'],['c','Personnages'],['m','Magies'],['p','Pièges']].map(x=>'<button data-t="'+x[0]+'" class="'+(bf.t===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+COL.map((c,i)=>'<button data-c="'+i+'" class="'+(bf.c===i?'on':'')+'" style="border-color:'+c.c+'">'+c.k+'</button>').join('')+'<input class="cbsearch" id="cbQ" placeholder="Rechercher un nom…" value="'+esc(bf.q)+'"></div>'+
- '<div class="cbgrid" id="cbGrid">'+list.map(x=>{const n=cnt[x.id]||0;const mx=n>=2||(isSup(x)&&ck.s>=MAXS&&true&&false);return '<div class="cbitem'+(n>=2?' max':'')+'" data-a="'+x.id+'">'+(n?'<span class="nq">×'+n+'</span>':'')+cardHTML(x)+'</div>'}).join('')+'</div>';
+ '<div class="cbgrid" id="cbGrid">'+list.map(x=>{const n=cnt[x.id]||0;const mx=n>=2||(isSup(x)&&ck.s>=MAXS&&true&&false);return '<div class="cbitem'+(n>=2?' max':'')+'" data-a="'+x.id+'">'+(n?'<span class="nq">×'+n+'</span>':'')+(evolvableId(x.id)?'<span class="evb" title="'+esc(evoTitle(x.id))+'">✦</span>':'')+cardHTML(x)+'</div>'}).join('')+'</div>';
  bindTabs();
  const z=document.createElement('div');z.id='cbZoom';z.style.cssText='position:fixed;right:16px;top:90px;z-index:50;pointer-events:none;display:none';document.body.appendChild(z);ui.zoom=z;
  const g=$('cbGrid'),dk=$('cbDeck');
  const hov=e=>{const it=e.target.closest('.cbitem');if(!it){z.style.display='none';return}const c=REG[it.dataset.a||it.dataset.r||(it.dataset.e?'e_'+it.dataset.e:'')];if(!c||window.innerWidth<900){z.style.display='none';return}z.innerHTML='<div style="width:'+(260*.8)+'px;height:'+(379*.8)+'px;position:relative" class="bk'+backN()+'"><div style="zoom:.8">'+cardHTML(c)+'</div></div>';z.style.display='block'};
  g.onmouseover=hov;dk.onmouseover=hov;g.onmouseleave=dk.onmouseleave=()=>z.style.display='none';
- $('cbEx').onclick=e=>{const it=e.target.closest('.cbitem');if(!it)return;const id='e_'+it.dataset.e;const cur=getExtra();const k=cur.indexOf(id);const y=window.scrollY;if(k>=0)cur.splice(k,1);else{if(cur.length>=MAXX)return flash('Le deck d’évolution est complet.');cur.push(id)}setExtra(cur);showBuild();window.scrollTo(0,y)};
- $('cbEx').onmouseover=hov;
  g.onclick=e=>{const it=e.target.closest('.cbitem');if(!it)return;const id=it.dataset.a,c=REG[id];const cur=getDeck();
   if(cur.length>=MAXD)return flash('Le deck est complet (20).');
   if(cur.filter(x=>x===id).length>=2)return flash('Maximum 2 exemplaires.');
   if(isSup(c)&&cur.filter(x=>REG[x]&&isSup(REG[x])).length>=MAXS)return flash('Maximum '+MAXS+' cartes soutien.');
+  if(evolvableId(id)&&cur.filter(x=>evolvableId(x)).length>=MAXX)return flash('Maximum '+MAXX+' cartes évolutives (✦) dans le deck.');
   const y=window.scrollY;cur.push(id);setDeck(cur);showBuild();window.scrollTo(0,y)};
  dk.onclick=e=>{const it=e.target.closest('.cbitem');if(!it)return;const cur=getDeck();const k=cur.indexOf(it.dataset.r);if(k>=0)cur.splice(k,1);setDeck(cur);showBuild()};
  $('cbF').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t){bf.t=b.dataset.t}else if(b.dataset.c!=null){bf.c=bf.c===+b.dataset.c?-1:+b.dataset.c}showBuild()};
@@ -925,6 +1091,7 @@ function showBuild(){
  $('cbClear').onclick=()=>{setDeck([]);showBuild()};
  $('cbGo').onclick=()=>{if(deckCheck(getDeck()).ok)startGame()};
 }
+const evoTitle=id=>{const e=EVOS.find(e=>e.mats.some(m=>m.id===id));return e?'Évolution : '+e.n+(e.cond&&e.cond.length?' — '+e.cond.map(condLong).join(' '):''):''};
 function flash(t){const b=document.querySelector('#cbBody .cbbar span');if(b){const o=b.textContent;b.textContent=t;setTimeout(()=>{if(b)b.textContent=o},1800)}}
 function leaveGame(keepNet){
  if(!keepNet)netClose();
@@ -932,18 +1099,19 @@ function leaveGame(keepNet){
  if(document.getElementById('cbZoom'))document.getElementById('cbZoom').remove();
  document.querySelectorAll('.cbmodal').forEach(m=>m.remove());
  closeZoom();document.querySelectorAll('.cbfly').forEach(x=>x.remove());
+ {const vc=document.getElementById('v-cb');if(vc)vc.classList.remove('ingame')}
 }
 function mountGame(){
- body().innerHTML='<div class="cbtop"><button class="cbchip" id="cbQuit">← Quitter la partie</button></div><div id="cbGame"><div class="cbt bk'+backN()+'" id="cbT"></div><div class="cbside" id="cbSide"><div class="cbprev" id="cbPrev"></div><div class="cbact" id="cbAct"></div><div class="cbact" id="cbEvoW"></div><div id="cbHint" style="color:#e5483b;font-size:.85rem;min-height:1.2em;opacity:0;transition:opacity .3s"></div><div class="cblog" id="cbLog"></div></div></div>';
+ const vc=document.getElementById('v-cb');if(vc)vc.classList.add('ingame');window.scrollTo(0,0);
+ body().innerHTML='<div id="cbGame"><div class="cbt bk'+backN()+'" id="cbT"></div><div class="cbside" id="cbSide"><div><button class="cbchip" id="cbQuit">← Quitter la partie</button></div><div class="cbprev" id="cbPrev"></div><div class="cbact" id="cbAct"></div><div class="cbact" id="cbEvoW"></div><div id="cbHint" style="color:#e5483b;font-size:.85rem;min-height:1.2em;opacity:0;transition:opacity .3s"></div><div class="cblog" id="cbLog"></div></div></div>';
  $('cbQuit').onclick=async()=>{if(G&&!G.over){const r=await ask('Quitter la partie ?','La partie en cours sera perdue.',[{v:true,t:'Quitter'},{v:false,t:'Continuer',sec:1}]);if(!r)return}showMenu()};
- const b=boardEl();fit();b.onclick=onBoardClick;b.onmouseover=onOver;$('cbAct').onclick=onAct;$('cbEvoW').onclick=onAct;
+ const b=boardEl();fit();b.onclick=onBoardClick;b.onpointerdown=onDragStart;b.onmouseover=onOver;b.onmouseout=onOut;$('cbAct').onclick=onAct;$('cbEvoW').onclick=onAct;
  renderPrev(null);
 }
 async function startGame(){
  const mine=getDeck();if(!deckCheck(mine).ok){showBuild();return}
  leaveGame();view='game';
- const ad=autoDeck();let ax=[];
- if(EVOS.length){const pl=shuffle(EVOS.slice());ax=pl.slice(0,2).map(e=>e.id);ensureMats(ad,pl[0])}
+ const ad=autoDeck();const ax=extraFor(ad);
  G={pr:[who0(),aiPersona()],p:[mkP(mine,getExtra()),mkP(ad,ax)],turn:0,n:1,field:null,over:false,busy:true,ai:false,log:[],t0:0,tm:null,pop:null,newC:null};
  ui={};
  mountGame();
@@ -976,8 +1144,8 @@ async function hostDuel(){
  const code=Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('');
  $('cbOnMsg').textContent='Création du duel…';
  try{await netOpen(code)}catch(e){showOnline(e.message);return}
- body().innerHTML=tabs('menu')+'<div class="cbcard" style="text-align:center"><h2 style="margin-top:0">En attente d’un ami…</h2><p>Donne ce code à ton ami :</p><div style="font:900 3rem Georgia,serif;letter-spacing:.3em;margin:10px 0">'+code+'</div><p style="color:var(--mut)">Il doit aller dans Kuroven Combat, « Duel en ligne », puis taper le code. La partie démarre toute seule.</p><button class="cbbtn lt" id="cbCancel">Annuler</button></div>';
- bindTabs();$('cbCancel').onclick=()=>showOnline();
+ body().innerHTML=tabs('menu')+'<div class="cbcard" style="text-align:center"><h2 style="margin-top:0">En attente d’un ami…</h2><p>Donne ce code à ton ami :</p><div style="font:900 3rem Georgia,serif;letter-spacing:.3em;margin:10px 0">'+code+'</div><p style="color:var(--mut)">Il doit aller dans Kuroven Combat, « Duel en ligne », puis taper le code. La partie démarre toute seule.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cbbtn lt" id="cbInv">📨 Inviter des amis</button><button class="cbbtn" id="cbCancel">Annuler</button></div></div>';
+ bindTabs();$('cbCancel').onclick=()=>showOnline();$('cbInv').onclick=()=>{if(typeof cbInvite==='function')cbInvite(code);else toast('Connecte-toi pour inviter tes amis.')};
  NET.onLobby=pl=>{
   if(pl.t!=='hello')return;NET.onLobby=null;
   const deck=getDeck(),extra=getExtra(),first=Math.random()<.5,sh=1+rnd(2e9),sg=1+rnd(2e9);
@@ -997,7 +1165,7 @@ async function joinDuel(code){
  setTimeout(()=>{if(!ok&&NET===n)showOnline('Aucun duel trouvé avec ce code (ou ton ami n’est pas encore prêt).')},12000);
 }
 const origEnter=()=>{};
-window.addEventListener('resize',()=>{if(G&&alive)fit()});
+window.addEventListener('resize',()=>{if(G&&alive){fit();setTimeout(fit,60);if((window.innerWidth<700)!==G.mob)render()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeZoom()});
 
 /* ---------- API pour index.html ---------- */
@@ -1010,6 +1178,7 @@ window.CB={
   if(!getDeck().length&&deckCheck(getDeck()).n===0)setDeck(autoDeck());
   if(view==='build')showBuild();else if(view==='rules')showRules();else showMenu();
  },
+ async joinCode(code){await CB.enter();if(!getDeck().length)return;showOnline();const i=$('cbCode');if(i)i.value=code;joinDuel(code)},
  leave(){alive=false;stopTimer()}
 };
 })();
