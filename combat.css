@@ -326,16 +326,3 @@
  .cbt .hnd.m .hc.off:hover .y{filter:grayscale(.8) brightness(.7) drop-shadow(0 10px 14px #000b)}
 }
 .cbt .hnd.m .hc.dragging .y{transform:none}
-
-/* ---- cartes aux coins arrondis, comme Ma Vie ---- */
-#v-cb .y{border-radius:26px;padding:5px;box-shadow:0 12px 28px #000c,inset 0 0 0 1px #ffffff22}
-#v-cb .y .cface{inset:5px;border-radius:21px}
-#v-cb .y .plate{border-radius:14px;left:14px;right:58px;top:12px}
-#v-cb .y .artf{border-radius:20px;left:24px;width:212px;height:212px;padding:3px}
-#v-cb .y .cart{border-radius:17px}
-#v-cb .y .orb{right:14px;top:12px}
-#v-cb .y .desc{border-radius:14px;left:20px;right:20px}
-#v-cb .y .stat{border-radius:0 0 21px 21px}
-#v-cb .y .sticker{right:22px;bottom:12px}
-#v-cb .y.ex:after{border-radius:26px}
-#v-cb .cb-back{border-radius:22px}
