@@ -713,3 +713,16 @@ body.cbfull input,body.cbfull select,body.cbfull textarea{color-scheme:dark}
 .qs[disabled]{opacity:.3;cursor:not-allowed}
 .hb-cta .cta{padding:15px 38px;border:0;border-radius:6px;background:linear-gradient(180deg,#ffe27a,#ffc21a);color:#1a1200;font:900 18px system-ui;cursor:pointer;box-shadow:0 8px 24px #ffc21a55}
 body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
+
+/* plusieurs decks + deck auto en un clic */
+.dk-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.dkt{border:1.5px solid #ffffff2a;background:#ffffff0a;color:#cfd6e4;border-radius:6px;padding:7px 12px;font:800 12px system-ui;cursor:pointer}
+.dkt small{margin-left:6px;opacity:.6;font-weight:700}
+.dkt.on{background:#ffd84a;color:#12151b;border-color:#ffd84a}.dkt.on small{opacity:.7}
+.dkt.new{border-style:dashed;color:#ffd84a}
+.dk-tools{display:flex;gap:6px;margin-bottom:10px}
+.dk-tools button{border:0;background:transparent;color:#aab3c8;font:700 11px system-ui;text-decoration:underline;cursor:pointer;padding:2px 4px}
+.dk-tools button:hover{color:#fff}
+.dk-autob{display:flex;flex-direction:column;gap:6px}
+.dk-autob button.sec{background:#ffffff14!important;color:#eef0f8!important}
+.dk-auto{justify-content:space-between}

@@ -115,8 +115,8 @@ const sigFor=(name,col)=>{const n=name.toLowerCase();const f=SIG.find(x=>n.inclu
 
 /* cartes soutien : t = type, sub = sous-type, img = fichier dans combat/img */
 const SUP=[
-{id:'ramen',n:'Bol de ramen',t:'mag',sub:'Rapide',img:'ramen',col:2,txt:'Soigne 400 points de vie.'},
-{id:'senzu',n:'Senzu',t:'mag',sub:'Rapide',img:'senzu',col:2,txt:'Soigne 750 points de vie. Un seul Senzu par tour.'},
+{id:'ramen',n:'Bol de ramen',t:'mag',sub:'Rapide',img:'ramen',col:2,txt:'Rends 400 PV à un de tes personnages blessés.'},
+{id:'senzu',n:'Senzu',t:'mag',sub:'Rapide',img:'senzu',col:2,txt:'Rends 750 PV à un de tes personnages blessés. Un seul Senzu par tour.'},
 {id:'examen',n:'Examen d’entrée',t:'mag',sub:'Normale',img:'examen',col:3,txt:'Pioche 2 cartes.'},
 {id:'flashback',n:'Flashback',t:'mag',sub:'Normale',img:'flashback',col:4,txt:'Choisis un personnage de ton cimetière : ajoute-le à ta main.'},
 {id:'entrainement',n:'Entraînement intense',t:'mag',sub:'Normale',img:'entrainement',col:1,txt:'Un de tes personnages gagne 150 ATK jusqu’à la fin du tour.'},

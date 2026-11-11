@@ -3604,8 +3604,8 @@ function cbEnter(){
   b.innerHTML='<p class="sub" style="text-align:center">Chargement…</p>';
   if(!cbP){
     const ld=u=>new Promise((ok,ko)=>{const x=document.createElement('script');x.src=u;x.onload=ok;x.onerror=ko;document.head.appendChild(x)});
-    const lk=document.createElement('link');lk.rel='stylesheet';lk.href='combat.css?v=64';document.head.appendChild(lk);
-    cbP=ld('combat-data.js?v=30').then(()=>ld('combat.js?v=73')).then(()=>!!window.CB).catch(()=>{cbP=null;return false});
+    const lk=document.createElement('link');lk.rel='stylesheet';lk.href='combat.css?v=70';document.head.appendChild(lk);
+    cbP=ld('combat-data.js?v=31').then(()=>ld('combat.js?v=82')).then(()=>!!window.CB).catch(()=>{cbP=null;return false});
   }
   cbP.then(o=>{if(curView!=='cb')return;if(o)CB.enter();else b.innerHTML='<p class="sub" style="text-align:center">Impossible de charger le jeu (fichiers combat manquants ?).</p>'})}
 /* ===== Imite le son (chargé à la demande : imite.js + imite/sons.json + imite/sons/*.mp3) ===== */

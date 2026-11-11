@@ -67,7 +67,7 @@ const isSup=c=>c.k==='s';
 function ensureMats(d,e0){e0.mats.forEach(m=>{if(!d.includes(m.id)){const k=d.findIndex(id=>REG[id]&&REG[id].k==='c'&&REG[id].lvl<=4&&!e0.mats.some(x=>x.id===id));if(k>=0)d[k]=m.id}});return d}
 const evolvableId=id=>EVOS.some(e=>e.mats.some(m=>m.id===id));
 const extraFor=ids=>EVOS.filter(e=>e.mats.every(m=>ids.includes(m.id))).map(e=>e.id);
-const AIOFF=['provocation','haki','rappel'];
+const AIOFF=[];
 function autoDeck(col,seed,anchor,forAI){
  seed=(seed||[]).filter(i=>REG[i]);
  const d=seed.slice();
@@ -114,8 +114,16 @@ function deckCheck(ids){
  if(n!==MAXD)msg='Il faut exactement '+MAXD+' cartes ('+n+').';else if(s>MAXS)msg='Maximum '+MAXS+' cartes soutien.';else if(ev>MAXX)msg='Maximum '+MAXX+' cartes évolutives (✦) dans le deck ('+ev+').';else if(!hasLow)msg='Ajoute au moins un personnage de niveau 4 ou moins.';
  return {n,s,ev,ok:!msg,msg};
 }
-const getDeck=()=>(ls.get('cbdeck2',[])||[]).filter(i=>REG[i]);
-const setDeck=d=>ls.set('cbdeck2',d);
+/* plusieurs decks nommés : {list:[{name,ids}],cur:0}, avec reprise de l'ancien deck unique */
+function deckStore(){
+ let st=ls.get('cbdecks1',null);
+ if(!st||!Array.isArray(st.list)||!st.list.length){st={list:[{name:'Deck 1',ids:ls.get('cbdeck2',[])||[]}],cur:0};ls.set('cbdecks1',st)}
+ if(st.cur>=st.list.length)st.cur=0;
+ return st;
+}
+const getDeck=()=>(deckStore().list[deckStore().cur].ids||[]).filter(i=>REG[i]);
+const setDeck=d=>{const st=deckStore();st.list[st.cur].ids=d;ls.set('cbdecks1',st)};
+const deckName=()=>deckStore().list[deckStore().cur].name;
 const getExtra=()=>extraFor(getDeck());
 
 /* ---------- état de partie ---------- */
@@ -143,7 +151,7 @@ const freeMon=pi=>G.p[pi].mon.indexOf(null), freeSt=pi=>G.p[pi].st.indexOf(null)
 
 /* ---------- interface : utilitaires ---------- */
 const boardEl=()=>$('cbT');
-function log(t){G.log.unshift(t);if(G.log.length>40)G.log.pop();const l=$('cbLog');if(l)l.innerHTML=G.log.slice(0,14).map(x=>'<div>'+esc(x)+'</div>').join('')}
+function log(t){if(!G)return;G.log.unshift(t);if(G.log.length>40)G.log.pop();const l=$('cbLog');if(l)l.innerHTML=G.log.slice(0,14).map(x=>'<div>'+esc(x)+'</div>').join('')}
 function banner(t,col){const b=$('cbBan');if(!b)return;b.firstElementChild.textContent=t;b.style.setProperty('--c',col||'#f1e6c8');b.classList.remove('go');void b.offsetWidth;b.classList.add('go')}
 function zoneEl(z,p,i){const b=boardEl();return b&&b.querySelector('[data-z="'+z+'"][data-p="'+p+'"][data-i="'+i+'"]')}
 function floatTxt(el,t,heal){if(!el)return;const r=el.getBoundingClientRect();const d=document.createElement('div');d.className='cbdmg'+(heal?' heal':'');d.textContent=t;d.style.left=(r.left+r.width/2-30)+'px';d.style.top=(r.top+r.height/2-20)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1300)}
@@ -479,7 +487,8 @@ async function doSummon(pi,hi,slot,pos,trib,free){
 function spellInfo(pi,c){
  const p=P(pi),mm=mons(pi);
  switch(c.id){
-  case 'senzu':return p.senzu?{ok:0,why:'Un seul Senzu par tour.'}:{ok:1,tg:'none'};
+  case 'senzu':return p.senzu?{ok:0,why:'Un seul Senzu par tour.'}:mm.some(x=>x.m.hp<def(pi,x.m))?{ok:1,tg:'mon'}:{ok:0,why:'Aucun de tes personnages n’est blessé.'};
+  case 'ramen':return mm.some(x=>x.m.hp<def(pi,x.m))?{ok:1,tg:'mon'}:{ok:0,why:'Aucun de tes personnages n’est blessé.'};
   case 'examen':return p.deck.length<1?{ok:0,why:'Pioche vide.'}:{ok:1,tg:'none'};
   case 'flashback':return p.grave.some(x=>x.k==='c')?{ok:1,tg:'grave'}:{ok:0,why:'Aucun personnage au cimetière.'};
   case 'entrainement':return mm.length?{ok:1,tg:'mon'}:{ok:0,why:'Il faut un personnage.'};
@@ -510,8 +519,8 @@ async function playSpell(pi,hi,tg){
  else dest=zoneEl('g',pi,0);
  await spellLand(c,dest);
  switch(c.id){
-  case 'ramen':heal(pi,400);p.grave.push(c);break;
-  case 'senzu':heal(pi,750);p.senzu=true;p.grave.push(c);break;
+  case 'ramen':healMon(pi,tg,400);p.grave.push(c);break;
+  case 'senzu':healMon(pi,tg,750);p.senzu=true;p.grave.push(c);break;
   case 'examen':p.grave.push(c);await drawN(pi,2);break;
   case 'flashback':{const k=p.grave.indexOf(tg);if(k>=0){p.grave.splice(k,1);p.hand.push(tg);log(tg.n+' revient en main.')}p.grave.push(c);break}
   case 'entrainement':{const m=p.mon[tg];if(m){m.tmp+=150;log(m.card.n+' gagne 150 ATK ce tour.')}p.grave.push(c);break}
@@ -683,8 +692,10 @@ async function aiSpellOnce(){
   const inf=spellInfo(1,c);if(!inf.ok)continue;
   let go=false,tg=null;const st=aiStrongest(1);
   switch(c.id){
-   case 'ramen':go=p.lp<=7200;break;
-   case 'senzu':go=p.lp<=6500;break;
+   case 'ramen':case 'senzu':{const h=mons(1).filter(x=>x.m.hp<def(1,x.m)*.6).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h;if(go)tg=h.i;break}
+   case 'provocation':{const t=mons(1).filter(x=>x.m.card.role==='def').sort((a,b)=>b.m.hp-a.m.hp)[0];go=!!t&&mons(1).length>1&&!G.taunt;if(go)tg=t.i;break}
+   case 'haki':{const ids=inf.ids||[];const f=ids.map(i=>({i,a:atk(0,P(0).mon[i])})).sort((a,b)=>b.a-a.a)[0];go=!!f&&G.n>1;if(go)tg=f.i;break}
+   case 'rappel':{const h=mons(1).filter(x=>x.m.hp<def(1,x.m)*.25).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h&&!P(1).normal;if(go)tg=h.i;break}
    case 'examen':go=p.hand.length<=5&&p.deck.length>3;break;
    case 'flashback':go=p.hand.length<=6;if(go)tg=p.grave.filter(x=>x.k==='c').sort((a,b)=>b.atk-a.atk)[0];break;
    case 'entrainement':go=!!st&&G.n>1;if(go)tg=st.i;break;
@@ -1229,13 +1240,13 @@ function showMenu(){
  let d=getDeck(),ck=deckCheck(d);
  body().innerHTML=tabs('menu')+
  '<div class="cbhero bk'+backN()+'"><div><h2>Kuroven Combat</h2><p>Compose un deck de 20 cartes avec tes personnages préférés, puis affronte l’adversaire. Les six couleurs se battent en cercle : chaque couleur domine deux autres.</p>'+
- '<button class="cbbtn" id="cbPlay">'+(ck.ok?'Jouer contre l’IA':'Prépare ton deck pour jouer')+'</button><button class="cbbtn sec" id="cbOnline">Duel en ligne</button><button class="cbbtn sec" id="cbBuild">Mon deck ('+d.length+'/20)</button><button class="cbbtn sec" id="cbAuto">Deck aléatoire</button></div>'+
+ '<button class="cbbtn" id="cbPlay">'+(ck.ok?'Jouer contre l’IA':'Prépare ton deck pour jouer')+'</button><button class="cbbtn sec" id="cbOnline">Duel en ligne</button><button class="cbbtn sec" id="cbBuild">Mes decks · '+esc(deckName())+' ('+d.length+'/20)</button><button class="cbbtn sec" id="cbAuto">Deck aléatoire</button></div>'+
  '<div class="em">'+KM+'</div></div>'+
  '<div class="cbcard"><b>Dos des cartes</b><div class="cbtabs" id="cbBk" style="margin:8px 0 0">'+['Noir','Bleu nuit','Rouge sobre','Clair'].map((n,i)=>'<button data-b="'+(i+1)+'" class="'+(backN()===i+1?'on':'')+'">'+n+'</button>').join('')+'</div></div>';
  bindTabs();
  $('cbPlay').onclick=()=>{if(!deckCheck(getDeck()).ok){showBuild();return}startGame()};
  $('cbBuild').onclick=showBuild;$('cbOnline').onclick=()=>showOnline();
- $('cbAuto').onclick=async()=>{const c=await pickElem();if(c==null)return;setDeck(autoDeck(c.col,c.seed,c.anchor));showMenu()};
+ $('cbAuto').onclick=()=>{setDeck(autoDeck(null,[],null));showMenu()};
  $('cbBk').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('cbback',+b.dataset.b);showMenu()};
 }
 
@@ -1572,7 +1583,9 @@ function showBuild(){
  const sel=dkSelId&&REG[dkSelId]?REG[dkSelId]:null,inDeck=sel&&cnt[sel.id]>0;
  body().innerHTML=tabs('build')+
  '<div class="dk" id="cbDk">'+
- '<section class="dk-left" id="dkDeck"><div class="dk-auto"><div><b>Deck automatique</b><small>Choisis un élément, un personnage de départ, ou complète ce que tu as déjà posé : on te fait un deck cohérent.</small></div><button type="button" id="cbRand">Remplir</button></div>'+
+ '<section class="dk-left" id="dkDeck"><div class="dk-tabs" id="dkTabs">'+deckStore().list.map((x,i)=>'<button type="button" class="dkt'+(i===deckStore().cur?' on':'')+'" data-i="'+i+'">'+esc(x.name)+'<small>'+(x.ids||[]).length+'/20</small></button>').join('')+(deckStore().list.length<8?'<button type="button" class="dkt new" id="dkNew">+ Nouveau</button>':'')+'</div>'+
+ '<div class="dk-tools"><button type="button" id="dkRen">Renommer</button><button type="button" id="dkDup">Dupliquer</button>'+(deckStore().list.length>1?'<button type="button" id="dkDel">Supprimer</button>':'')+'</div>'+
+ '<div class="dk-auto"><div><b>⚡ Deck automatique</b><small>Un clic : on remplit ton deck de façon cohérente. Ou choisis un élément, un personnage de départ, ou complète ce que tu as déjà posé.</small></div><div class="dk-autob"><button type="button" id="cbAuto1">Remplir tout de suite</button><button type="button" id="cbRand" class="sec">Options…</button></div></div>'+
  '<div class="dk-cnt"><span class="'+(ck.ok?'ok':'')+'">Deck : '+d.length+' / '+MAXD+'</span><span>Personnages '+chars.length+'</span><span>Soutiens '+sups.length+' / '+MAXS+'</span><span>✦ '+ck.ev+' / '+MAXX+'</span></div>'+
  '<div class="dk-msg'+(ck.ok?' ok':'')+'">'+esc(ck.ok?'Deck valide : tu peux jouer.':ck.msg)+'</div>'+
  '<div class="dk-grp"><h4>Personnages <em>'+chars.length+' / 12+</em></h4><div class="dk-slots">'+chH+'</div></div>'+
@@ -1590,6 +1603,12 @@ function showBuild(){
  $('cbF').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t){bf.t=b.dataset.t}else if(b.dataset.c!=null){bf.c=bf.c===+b.dataset.c?-1:+b.dataset.c}reload()};
  $('cbQ').oninput=e=>{bf.q=e.target.value;clearTimeout(showBuild.t);showBuild.t=setTimeout(()=>{reload();const q=$('cbQ');q.focus();q.setSelectionRange(q.value.length,q.value.length)},300)};
  $('cbRand').onclick=async()=>{const c=await pickElem();if(c==null)return;setDeck(autoDeck(c.col,c.seed,c.anchor));dkSelId=null;reload()};
+ $('cbAuto1').onclick=()=>{const cur=getDeck();setDeck(autoDeck(null,cur.length&&cur.length<MAXD?cur:[],null));dkSelId=null;toast('Deck rempli.');reload()};
+ document.querySelectorAll('#dkTabs .dkt[data-i]').forEach(b=>b.onclick=()=>{const st=deckStore();st.cur=+b.dataset.i;ls.set('cbdecks1',st);dkSelId=null;reload()});
+ const nb=$('dkNew');if(nb)nb.onclick=()=>{const st=deckStore();st.list.push({name:'Deck '+(st.list.length+1),ids:[]});st.cur=st.list.length-1;ls.set('cbdecks1',st);dkSelId=null;reload()};
+ $('dkRen').onclick=()=>{const st=deckStore(),n=prompt('Nom du deck',st.list[st.cur].name);if(n&&n.trim()){st.list[st.cur].name=n.trim().slice(0,18);ls.set('cbdecks1',st);reload()}};
+ $('dkDup').onclick=()=>{const st=deckStore();if(st.list.length>=8)return toast('8 decks maximum.');st.list.push({name:(st.list[st.cur].name+' (copie)').slice(0,18),ids:st.list[st.cur].ids.slice()});st.cur=st.list.length-1;ls.set('cbdecks1',st);reload()};
+ const dl=$('dkDel');if(dl)dl.onclick=()=>{const st=deckStore();if(!confirm('Supprimer « '+st.list[st.cur].name+' » ?'))return;st.list.splice(st.cur,1);st.cur=0;ls.set('cbdecks1',st);reload()};
  $('cbClear').onclick=()=>{setDeck([]);reload()};
  $('cbGo').onclick=()=>{if(deckCheck(getDeck()).ok)startGame()};
  const ad=$('dkAdd');if(ad)ad.onclick=()=>{if(addToDeck(sel.id))reload()};
