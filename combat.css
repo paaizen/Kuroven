@@ -823,3 +823,7 @@ body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
 .ci-c{width:143px;height:208px}
 .ci-c .y,.ci-c .cb-back{zoom:.55}
 .ci-r{font-size:12px}
+.cbcolgrid{grid-template-columns:repeat(auto-fill,minmax(192px,1fr));gap:20px 14px}
+.ci-c{width:182px;height:265px}
+.ci-c .y,.ci-c .cb-back{zoom:.7}
+.ci-r{font-size:13px}
