@@ -27,6 +27,7 @@ function evoDesc(c){
 }
 /* rôle d'un personnage, d'après ses stats : attaquant, défenseur ou polyvalent */
 function roleOf(c){return c.role==='att'?['att','Attaquant']:c.role==='def'?['def','Défenseur']:['pol','Polyvalent']}
+const FULLART=new Set(['gojo-vide-infini']);
 function cardHTML(c,o){
  o=o||{};
  if(c.k==='c'||c.k==='e'){
@@ -34,6 +35,13 @@ function cardHTML(c,o){
   const a=o.atk!=null?o.atk:c.atk,d=o.def!=null?o.def:c.def;
   const sa=a>c.atk?' style="color:#0a7a2a"':a<c.atk?' style="color:#b3241a"':'', sd=d>c.def?' style="color:#0a7a2a"':d<c.def?' style="color:#b3241a"':'';
   const im=evo?'<img src="combat/img/evo-'+c.eid+'.jpg" alt="" onerror="this.onerror=null;this.src=\''+esc(c.img)+'\'" referrerpolicy="no-referrer">':'<img src="'+esc(c.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer">';
+  if(evo&&FULLART.has(c.eid)){
+   const rt=roleOf(c);
+   return '<div class="y full k'+c.col+'"><div class="fa-art"><img src="combat/img/full/'+c.eid+'.jpg" alt=""></div><div class="fa-shade"></div><div class="fa-holo"></div><i class="fa-bd"></i>'+
+   '<div class="fa-nm">'+esc(c.n).replace(' : ',' :<br>')+'</div><span class="fa-orb">'+COL[c.col].k+'</span><span class="fa-rt r-'+rt[0]+'">'+rt[1]+'</span><div class="fa-ev">ÉVOLUTION</div><div class="fa-st">'+'<i>★</i>'.repeat(c.lvl)+'</div>'+
+   '<div class="fa-box"><span class="fa-t">ÉVOLUTION</span><b>「'+esc(c.sn)+'」</b> : '+esc(c.sd)+(c.cond&&c.cond.length?'<span class="fa-c">✦ Condition : '+c.cond.map(condShort).join(' ; ')+'</span>':'')+'</div>'+
+   '<div class="fa-stat"><span><small>ATK</small>'+a+'</span><span><small>ARMURE</small>'+(c.arm||0)+'</span><span><small>PV</small>'+d+'</span></div></div>';
+  }
   return '<div class="y '+(evo?'evo holo':c.ex?'ex holo':'eff')+' k'+c.col+'"><span class="rtab r-'+roleOf(c)[0]+'">'+roleOf(c)[1]+'</span><div class="cface"></div><div class="plate"></div><div class="sticker"></div>'+
   '<div class="name">'+esc(c.n)+'</div><span class="orb">'+COL[c.col].k+'</span><div class="stars">'+'<i>★</i>'.repeat(c.lvl)+'</div>'+
   '<div class="artf"><div class="cart">'+im+'</div></div><div class="code">'+(evo?'ÉVOLUTION':esc((c.series||'KVN').slice(0,22)))+'</div>'+
