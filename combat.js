@@ -138,7 +138,7 @@ const mkP=(ids,ex,rng)=>mkSide([mkPl(ids,ex,rng)],3);
 const isH=pi=>pi===0&&G.p[0].cur===0;
 /* qui possède quel emplacement de personnage (en 2 contre 2 : 2 emplacements chacun) */
 const ownsSlot=(pi,i)=>{const sd=G.p[pi];return sd.pl.length<2||Math.floor(i/(sd.mon.length/sd.pl.length))===sd.cur};
-const mkM=(c,pos)=>({card:c,pos,atkP:0,defP:0,tmp:0,ts:G.n,att:false,chg:false,hp:c.def,full:true,para:0,sleep:0});
+const mkM=(c,pos)=>({card:c,pos,atkP:0,defP:0,tmp:0,ts:G.n,att:false,chg:false,hp:c.def,full:true,para:0,sleep:0,armLost:0});
 const P=i=>G.p[i], nm=i=>i===0?'Toi':'L’adversaire', S=(pi,a,b)=>isH(pi)?'Tu '+a:(pi===0?'Ton coéquipier '+b:(G.v2?'Un adversaire ':'L’adversaire ')+b);
 const mons=pi=>G.p[pi].mon.map((m,i)=>m?{m,i}:null).filter(Boolean);
 const eqN=(pi,m,id)=>G.p[pi].st.filter(s=>s&&s.to===m&&s.card.id===id).length;
@@ -147,15 +147,15 @@ const fld=()=>G.field&&G.field.card.id;
 const friend=pi=>mons(pi).length>=3&&G.p[pi].st.some(s=>s&&s.up&&s.card.id==='amitie');
 function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;return Math.max(0,v)}
 function def(pi,m){return Math.max(1,m.card.def+m.defP)}
-function armor(pi,m){let v=(m.card.arm||0)+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;return v}
+function armor(pi,m){let v=Math.max(0,(m.card.arm||0)-(m.armLost||0))+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;return v}
 const tauntIdx=att=>{const t=G&&G.taunt;if(!t||t.owner===att||!P(t.owner).mon.includes(t.m))return -1;return P(t.owner).mon.indexOf(t.m)};
 /* dégâts d'une attaque : en attaque on reçoit tout et on riposte ; en défense l'armure absorbe, les Épines renvoient */
 function calcHit(pi,A,T){
- const a=atk(pi,A),f=factor(A.card.col,T.card.col);let dmg,back;
+ const a=atk(pi,A),f=factor(A.card.col,T.card.col);let dmg,back,absorbed=0;
  if(T.pos==='a'){dmg=Math.round(a*f);back=Math.round(atk(1-pi,T)*factor(T.card.col,A.card.col))}
- else{const raw=a*f,arm=A.card.pierce?0:armor(1-pi,T);dmg=Math.round(Math.max(raw-arm,.2*raw)*.75);back=T.card.refl||0}
+ else{const raw=a*f,arm=A.card.pierce?0:armor(1-pi,T);dmg=Math.round(Math.max(raw-arm,.2*raw)*.75);back=T.card.refl||0;absorbed=arm>0?Math.round(raw):0}
  const kill=dmg>=T.hp&&!T.full,survive=!kill;
- return {dmg,back,kill,dies:survive&&back>=A.hp&&!A.full,left:Math.max(0,T.hp-dmg),pierce:!!A.card.pierce&&T.pos==='d',arm:T.pos==='d'?armor(1-pi,T):0,f};
+ return {dmg,back,kill,dies:survive&&back>=A.hp&&!A.full,left:Math.max(0,T.hp-dmg),pierce:!!A.card.pierce&&T.pos==='d',arm:T.pos==='d'?armor(1-pi,T):0,absorbed,f};
 }
 const freeMon=pi=>G.p[pi].mon.findIndex((m,i)=>!m&&ownsSlot(pi,i)), freeSt=pi=>G.p[pi].st.indexOf(null);
 
@@ -479,6 +479,7 @@ async function battle(pi,i,ti){
   if(T.pos==='a')log(A.card.n+' frappe '+T.card.n+' ('+h.dmg+' dégâts) ; riposte : '+h.back+'.');
   else log(A.card.n+' frappe '+T.card.n+' en défense : '+h.dmg+' dégâts'+(h.pierce?' (perce l’armure)':' (armure '+h.arm+')')+'.');
   await hitMon(1-pi,ti,h.dmg);
+  if(o.mon[ti]===T&&h.absorbed>0&&(T.card.arm||0)-(T.armLost||0)>0){const w=Math.max(40,Math.round(h.absorbed*.2)),left=(T.card.arm||0)-(T.armLost||0);T.armLost=(T.armLost||0)+Math.min(w,left);if((T.card.arm||0)-T.armLost<=0){log('L’armure de '+T.card.n+' est brisée pour de bon !');banner('ARMURE BRISÉE','#4a90e2')}else log('L’armure de '+T.card.n+' s’abîme (−'+Math.min(w,left)+').');render()}
   if(o.mon[ti]===T&&T.hp>0&&h.back>0&&p.mon[i]===A){if(T.pos==='d')log(T.card.n+' renvoie '+h.back+' dégâts (Épines).');await hitMon(pi,i,h.back)}
  }
  render();await sleep(250);
@@ -858,7 +859,7 @@ function attackPreview(i,ti){
  if(!T)return {risky:false,direct:true,text:A.card.n+' attaque directement : l’adversaire perd '+a+' points de vie.'};
  const h=calcHit(0,A,T),fx=h.f>1?' (avantage de couleur ×1,2)':h.f<1?' (désavantage de couleur ×0,8)':'';
  let t=A.card.n+' inflige '+h.dmg+' dégâts à '+T.card.n+fx+' (PV '+T.hp+' → '+h.left+')';
- if(T.pos==='d')t+=h.pierce?', l’armure est percée':', son armure absorbe '+h.arm;
+ if(T.pos==='d')t+=h.pierce?', l’armure est percée (elle ne s’use pas)':', son armure absorbe '+h.arm+' mais s’abîme (−'+Math.max(40,Math.round(h.absorbed*.2))+', définitivement)';
  t+='. ';
  if(h.kill)t+=T.card.n+' est détruit. ';
  else if(h.back>0)t+=(T.pos==='a'?'Il riposte':'Ses Épines renvoient')+' '+h.back+' dégâts : '+A.card.n+' passe à '+Math.max(0,A.hp-h.back)+' PV'+(h.dies?' et sera détruit':'')+'.';
@@ -1552,7 +1553,7 @@ function showRules(){
  '<li><b>Début</b> : on pioche 5 cartes. Celui qui commence ne pioche pas et ne peut pas attaquer au premier tour. Main limitée à 7 cartes.</li>'+
  '<li><b>Invoquer</b> : un personnage par tour. Niveau 1 à 4 : gratuit. Niveau 5 et 6 : il faut sacrifier un de tes personnages. Tu as 3 zones de personnages.</li>'+
  '<li><b>Points de vie des cartes</b> : chaque personnage a des <b>PV</b>, avec une barre sur la carte. Une attaque lui retire des PV ; il n’est détruit que s’il tombe à 0. Une carte à PV pleins qui reçoit un coup mortel tient bon à 1 PV, une seule fois (<b>Dernier souffle</b>).</li>'+
-'<li><b>Positions</b> : en <b>attaque</b>, un personnage peut attaquer mais il est vulnérable : s’il est attaqué il reçoit tout et <b>riposte</b>. En <b>défense</b>, il n’attaque pas mais son <b>armure</b> réduit chaque coup (ATK − armure, au moins 20 %, puis −25 %) ; les <b>défenseurs</b> renvoient des <b>Épines</b>. Il peut changer de position une fois par tour, mais pas le tour où il est invoqué.</li>'+
+'<li><b>Positions</b> : en <b>attaque</b>, un personnage peut attaquer mais il est vulnérable : s’il est attaqué il reçoit tout et <b>riposte</b>. En <b>défense</b>, il n’attaque pas mais son <b>armure</b> réduit chaque coup (ATK − armure, au moins 20 %, puis −25 %), mais elle s’use à chaque coup encaissé et, une fois brisée, elle le reste pour toujours ; les <b>défenseurs</b> renvoient des <b>Épines</b>. Il peut changer de position une fois par tour, mais pas le tour où il est invoqué.</li>'+
 '<li><b>Rôles</b> : <b>Attaquant</b> (beaucoup d’ATK, peu de PV), <b>Polyvalent</b> (équilibré, son coup perce l’armure) et <b>Défenseur</b> (beaucoup de PV, armure et Épines, peu d’ATK).</li>'+
 '<li><b>Combat</b> : chaque personnage en attaque peut attaquer une fois par tour. Le coup retire des PV à la cible, qui riposte si elle est en attaque. Sans personnage en face, c’est une attaque directe : l’adversaire perd des points de vie.</li>'+
 '<li><b>Couleurs</b> : chaque couleur est forte contre les deux suivantes (+20 % d’ATK) et faible contre les deux précédentes (−20 %) : 炎 Braise → 雷 Éclair → 森 Sève → 水 Marée → 闇 Ombre → 光 Éclat → 炎.</li>'+
