@@ -3604,7 +3604,7 @@ function cbEnter(){
   b.innerHTML='<p class="sub" style="text-align:center">Chargement…</p>';
   if(!cbP){
     const ld=u=>new Promise((ok,ko)=>{const x=document.createElement('script');x.src=u;x.onload=ok;x.onerror=ko;document.head.appendChild(x)});
-    const lk=document.createElement('link');lk.rel='stylesheet';lk.href='combat.css?v=102';document.head.appendChild(lk);
+    const lk=document.createElement('link');lk.rel='stylesheet';lk.href='combat.css?v=103';document.head.appendChild(lk);
     cbP=ld('combat-data.js?v=32').then(()=>ld('combat.js?v=115')).then(()=>!!window.CB).catch(()=>{cbP=null;return false});
   }
   cbP.then(o=>{if(curView!=='cb')return;if(o)CB.enter();else b.innerHTML='<p class="sub" style="text-align:center">Impossible de charger le jeu (fichiers combat manquants ?).</p>'})}
