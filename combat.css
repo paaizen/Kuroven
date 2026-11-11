@@ -21,7 +21,7 @@
 #v-cb .y.pie .orb{--c:#d05a97;--c2:#7a2255}
 #v-cb .y .stars{position:absolute;right:13px;top:49px;display:flex;flex-direction:row-reverse;gap:2.5px}
 #v-cb .y .stars i{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#ffd27d,#f08a20 55%,#a84608);border:1px solid #6a2a04;font:normal 9px/1 var(--tx);color:#fff8e8;box-shadow:0 1px 2px #0005}
-#v-cb .y .stars i:after{content:"★"}
+
 #v-cb .y .spell-t{position:absolute;right:14px;top:50px;font:700 11px var(--tx);letter-spacing:.3px;color:#0c0c0c}
 #v-cb .y .artf{position:absolute;left:21px;top:66px;width:214px;height:214px;padding:3px;background:linear-gradient(135deg,#f3df9b,#8a6a22 45%,#f3df9b);box-shadow:0 0 0 1px #111,0 2px 6px #0007}
 #v-cb .y.ex .artf{background:linear-gradient(135deg,#fff,#8e929c 45%,#fff)}
@@ -649,3 +649,9 @@ body.cbfull .hb-row{margin:0;padding:18px 44px}
 body.cbfull .dk{margin:0;border:0;border-radius:0;height:calc(100vh - 64px)}
 body.cbfull #v-cb.ingame{padding:6px 8px}
 body.cbfull #cbBody>.cbcard,body.cbfull #cbBody>.cbhero{margin-top:18px}
+
+#v-cb .y .stars i{color:#fff8e8;font:normal 10px/1 var(--tx);text-shadow:0 0 2px #7a3200}
+#v-cb .y .rtab{position:absolute;left:21px;top:46px;z-index:6;padding:2px 9px 2px 8px;border-radius:3px 3px 0 0;font:800 9.5px/1.25 var(--tx);letter-spacing:.6px;text-transform:uppercase;color:#fff;box-shadow:0 1px 3px #0008}
+#v-cb .y .rtab.r-att{background:#d6322c}#v-cb .y .rtab.r-def{background:#2a6fd0}#v-cb .y .rtab.r-pol{background:#2f9b55}
+#v-cb .y .stars i{display:flex!important;align-items:center;justify-content:center;line-height:1!important;font-size:10px;padding:0;overflow:hidden;font-family:system-ui,'Segoe UI Symbol',sans-serif}
+#v-cb .y .stars i:after,#v-cb .y .stars i:before{content:none!important}

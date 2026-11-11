@@ -25,6 +25,8 @@ function evoDesc(c){
  const l=EVOS.filter(e=>e.mats.some(x=>x.id===c.id));if(!l.length)return '';
  return '<br><b style="color:#5a2fb0">✦ Évolution</b> : '+l.map(e=>e.cond&&e.cond.length?esc(e.cond.map(condShort).join(' ; ')):'aucune condition').join(' / ')+'.';
 }
+/* rôle d'un personnage, d'après ses stats : attaquant, défenseur ou polyvalent */
+function roleOf(c){const r=c.def/Math.max(1,c.atk);return r<=.55?['att','Attaquant']:r>=.75?['def','Défenseur']:['pol','Polyvalent']}
 function cardHTML(c,o){
  o=o||{};
  if(c.k==='c'||c.k==='e'){
@@ -32,8 +34,8 @@ function cardHTML(c,o){
   const a=o.atk!=null?o.atk:c.atk,d=o.def!=null?o.def:c.def;
   const sa=a>c.atk?' style="color:#0a7a2a"':a<c.atk?' style="color:#b3241a"':'', sd=d>c.def?' style="color:#0a7a2a"':d<c.def?' style="color:#b3241a"':'';
   const im=evo?'<img src="combat/img/evo-'+c.eid+'.jpg" alt="" onerror="this.onerror=null;this.src=\''+esc(c.img)+'\'" referrerpolicy="no-referrer">':'<img src="'+esc(c.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer">';
-  return '<div class="y '+(evo?'evo holo':c.ex?'ex holo':'eff')+' k'+c.col+'"><div class="cface"></div><div class="plate"></div><div class="sticker"></div>'+
-  '<div class="name">'+esc(c.n)+'</div><span class="orb">'+COL[c.col].k+'</span><div class="stars">'+'<i></i>'.repeat(c.lvl)+'</div>'+
+  return '<div class="y '+(evo?'evo holo':c.ex?'ex holo':'eff')+' k'+c.col+'"><span class="rtab r-'+roleOf(c)[0]+'">'+roleOf(c)[1]+'</span><div class="cface"></div><div class="plate"></div><div class="sticker"></div>'+
+  '<div class="name">'+esc(c.n)+'</div><span class="orb">'+COL[c.col].k+'</span><div class="stars">'+'<i>★</i>'.repeat(c.lvl)+'</div>'+
   '<div class="artf"><div class="cart">'+im+'</div></div><div class="code">'+(evo?'ÉVOLUTION':esc((c.series||'KVN').slice(0,22)))+'</div>'+
   '<div class="desc"><b>['+(evo?'Évolution':'Personnage')+' / '+COL[c.col].n+(c.ex&&!evo?' / Rare':'')+']</b> <b>「'+esc(c.sn)+'」</b> : '+esc(c.sd)+(evo?evoNote(c):whoHTML(c.col)+evoDesc(c))+'</div><div class="id">'+c.no+'</div>'+
   '<div class="stat"><span>ATK/ <u'+sa+'>'+a+'</u></span><span>DEF/ <u'+sd+'>'+d+'</u></span></div></div>';
