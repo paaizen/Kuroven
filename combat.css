@@ -731,3 +731,12 @@ body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
 .cbt.v2 .crw{grid-template-columns:repeat(6,var(--cw))}
 .cbt.v2 .slot.mate{border-color:#4ddf7a66;background:#4ddf7a0a}
 .cbt.v2 .slot.mate:before{content:'ALLIÉ';position:absolute;top:2px;left:4px;font:800 8px var(--tx);letter-spacing:1px;color:#4ddf7aaa;pointer-events:none}
+
+/* jauge d'armure sous les PV : bleue, vive en défense, éteinte en attaque */
+.cbt .hpg .arg{display:flex;align-items:center;gap:calc(var(--cw)*.02);margin-top:calc(var(--cw)*.03);opacity:.45;filter:saturate(.4)}
+.cbt .hpg .arg.on{opacity:1;filter:none}
+.cbt .hpg .arg s{text-decoration:none;color:#8fc8ff;font-size:calc(var(--cw)*.11);line-height:1}
+.cbt .hpg .arg b{font:800 calc(var(--cw)*.11)/1 system-ui;color:#cfe6ff;padding:0;text-shadow:none;display:inline}
+.cbt .hpg .arg span{flex:1;height:calc(var(--cw)*.035);margin:0;background:#ffffff22;border:0;box-shadow:none}
+.cbt .hpg .arg span i{background:linear-gradient(180deg,#bfe0ff,#4a90e2 60%,#2a5fb0);box-shadow:0 0 calc(var(--cw)*.04) #4a90e299}
+.cbt .hpg{width:calc(var(--cw)*.54)}

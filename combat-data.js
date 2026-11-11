@@ -145,7 +145,7 @@ const hash=n=>{let h=(n*2654435761)>>>0;h^=h>>>13;h=Math.imul(h,0x5bd1e995)>>>0;
 
 /* personnage à partir d'une fiche AniList et de son rang de popularité (0 = le plus aimé) */
 /* profils de rôle : un assaillant frappe fort mais tient peu, un défenseur encaisse et renvoie des Épines, un polyvalent est au milieu et perce l'armure */
-const ROLEP={att:{atk:1400,hp:900,arm:0,refl:0,pierce:false},pol:{atk:1300,hp:1150,arm:300,refl:0,pierce:true},def:{atk:650,hp:2050,arm:700,refl:400,pierce:false}};
+const ROLEP={att:{atk:1400,hp:900,arm:0,refl:0,pierce:false},pol:{atk:1300,hp:1150,arm:300,refl:0,pierce:true},def:{atk:650,hp:2050,arm:700,refl:250,pierce:false}};
 const r50=v=>Math.round(v/50)*50;
 function statsFor(role,L,j){const b=ROLEP[role];return {atk:Math.max(100,r50(b.atk*L*j)),def:Math.max(150,r50(b.hp*L*(2-j))),arm:r50(b.arm*L),refl:r50(b.refl*L),pierce:b.pierce,role}}
 function mkChar(c,rank){

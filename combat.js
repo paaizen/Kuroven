@@ -899,7 +899,8 @@ function monStats(pi,i){
  const mx=def(pi,m),c=m.card,pc=Math.max(0,Math.min(100,m.hp/mx*100)),col=pc>50?'#4ddf7a':pc>25?'#ffcb3d':'#ff5a4e';
  const st=m.sleep>0?'<em class="mstat">Z</em>':m.para>0?'<em class="mstat">⛓</em>':'';
  const tn=G.taunt&&G.taunt.m===m?'<em class="mstat t">!</em>':'';
- return st+tn+'<div class="hpg" data-pc="'+(pc>50?'hi':pc>25?'mid':'lo')+'" title="PV '+m.hp+' / '+mx+(m.pos==='d'&&armor(pi,m)>0?' · armure '+armor(pi,m):'')+'"><b>'+m.hp+'</b><span><i style="width:'+pc+'%"></i></span></div>';
+ const ar=armor(pi,m),arp=Math.min(100,ar/1000*100),armH=ar>0?'<div class="arg'+(m.pos==='d'?' on':'')+'" title="Armure '+ar+(m.pos==='d'?'':' (compte seulement en défense)')+'"><s>⛨</s><b>'+ar+'</b><span><i style="width:'+arp+'%"></i></span></div>':'';
+ return st+tn+'<div class="hpg" data-pc="'+(pc>50?'hi':pc>25?'mid':'lo')+'" title="PV '+m.hp+' / '+mx+'"><b>'+m.hp+'</b><span><i style="width:'+pc+'%"></i></span>'+armH+'</div>';
 }
 function monHTML(pi,i){
  const m=P(pi).mon[i];if(!m)return '';
