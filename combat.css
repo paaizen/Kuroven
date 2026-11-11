@@ -752,3 +752,18 @@ body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
 #v-cb .y.evo .desc{font-size:7.4px}
 #v-cb .y .wh{font-size:8px}
 #v-cb .y .wh span{width:11px;height:11px;font-size:8px}
+
+/* texte de description : le plus grand possible, un peu réduit seulement quand il est long */
+#v-cb .y .desc{font:500 9.2px/1.16 var(--tx)}
+#v-cb .y .desc.tl{font-size:8.4px}
+#v-cb .y.evo .desc{font-size:8.4px}
+#v-cb .y.evo .desc.tl{font-size:7.8px}
+#v-cb .y .wh{font-size:9px}
+#v-cb .y .wh span{width:12px;height:12px;font-size:8px}
+#v-cb .y .desc{font:500 10px/1.16 var(--tx)}
+#v-cb .y .desc.tl{font-size:8.8px}
+#v-cb .y.evo .desc{font-size:9px}
+#v-cb .y.evo .desc.tl{font-size:8.2px}
+#v-cb .y .wh{font-size:9.5px}
+#v-cb .y .desc.tl2{font-size:8px}
+#v-cb .y.evo .desc.tl2{font-size:7.6px}

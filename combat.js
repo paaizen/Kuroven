@@ -37,7 +37,7 @@ function cardHTML(c,o){
   return '<div class="y '+(evo?'evo holo':c.ex?'ex holo':'eff')+' k'+c.col+'"><span class="rtab r-'+roleOf(c)[0]+'">'+roleOf(c)[1]+'</span><div class="cface"></div><div class="plate"></div><div class="sticker"></div>'+
   '<div class="name">'+esc(c.n)+'</div><span class="orb">'+COL[c.col].k+'</span><div class="stars">'+'<i>★</i>'.repeat(c.lvl)+'</div>'+
   '<div class="artf"><div class="cart">'+im+'</div></div><div class="code">'+(evo?'ÉVOLUTION':esc((c.series||'KVN').slice(0,22)))+'</div>'+
-  '<div class="desc"><b>['+(evo?'Évolution':'Personnage')+' / '+COL[c.col].n+(c.ex&&!evo?' / Rare':'')+']</b> <b>「'+esc(c.sn)+'」</b> : '+esc(c.sd)+(evo?evoNote(c):whoHTML(c.col)+evoDesc(c))+'</div><div class="id">'+c.no+'</div>'+
+  (()=>{const dh='<b>['+(evo?'Évolution':'Personnage')+' / '+COL[c.col].n+(c.ex&&!evo?' / Rare':'')+']</b> <b>「'+esc(c.sn)+'」</b> : '+esc(c.sd)+(evo?evoNote(c):whoHTML(c.col)+evoDesc(c)),L=dh.replace(/<[^>]+>/g,'').length;return '<div class="desc'+(L>150?' tl tl2':L>118?' tl':'')+'">'+dh+'</div>'})()+'<div class="id">'+c.no+'</div>'+
   '<div class="stat"><span>ATK/ <u'+sa+'>'+a+'</u></span><span>PV/ <u'+sd+'>'+d+'</u></span></div></div>';
  }
  const trap=c.t==='trap';
