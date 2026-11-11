@@ -1288,12 +1288,35 @@ function rarityOf(c){
  if(c.lvl>=4)return 1;
  return 0;
 }
-const getCol=()=>ls.get('cbcol1',{})||{};
+/* « toutes mes cartes » : activé une fois par le lien ?toutes-mes-cartes=1 (désactivé par =0).
+   Gardé dans ce navigateur seulement : les autres joueurs ne sont pas concernés. Les nouvelles cartes s'ajoutent toutes seules. */
+(()=>{try{const q=new URLSearchParams(location.search).get('toutes-mes-cartes');if(q==='1')ls.set('cball',1);else if(q==='0')ls.set('cball',0)}catch(e){}})();
+const allOwned=()=>!!ls.get('cball',0);
+const getCol=()=>{const c=ls.get('cbcol1',{})||{};if(allOwned()&&typeof allCards==='function'&&POOL)allCards().forEach(x=>{if(!c[x.id])c[x.id]=1});return c};
 function addToCol(ids){const col=getCol(),nw=[];ids.forEach(id=>{if(!col[id])nw.push(id);col[id]=(col[id]||0)+1});ls.set('cbcol1',col);ls.set('cbopened',(ls.get('cbopened',0)||0)+1);return nw}
 function weightedR(sl){let t=sl.reduce((a,x)=>a+x[1],0),r=Math.random()*t;for(const x of sl){r-=x[1];if(r<=0)return x[0]}return sl[0][0]}
+const PACK_SLOTS=[[[0,70],[1,30]],[[0,70],[1,30]],[[0,70],[1,30]],[[1,55],[2,35],[3,10]],[[2,55],[3,30],[4,15]]];
+function packOdds(){
+ const all=allCards(),byR=[0,1,2,3,4].map(r=>all.filter(c=>rarityOf(c)===r));
+ const slotP=PACK_SLOTS.map(sl=>{const t=sl.reduce((a,x)=>a+x[1],0),p=[0,0,0,0,0];sl.forEach(x=>p[x[0]]=x[1]/t);return p});
+ const atLeast=[0,1,2,3,4].map(r=>1-slotP.reduce((a,p)=>a*(1-p[r]),1));
+ const perCard=[0,1,2,3,4].map(r=>byR[r].length?slotP.reduce((a,p)=>a+p[r],0)/byR[r].length:0);
+ return {byR,slotP,atLeast,perCard};
+}
+const pct=v=>(v*100>=10?Math.round(v*100):v*100>=1?(v*100).toFixed(1):(v*100).toFixed(2)).toString().replace('.',',')+' %';
+function showPackInfo(){
+ const o=packOdds();
+ let h='<h3>Contenu du booster</h3><p>Chaque booster contient <b>5 cartes</b> tirées parmi <b>toutes les cartes du jeu</b> ('+allCards().length+'). Pas de doublon dans un même booster.</p>';
+ h+='<div class="pki-t"><b>Chances par emplacement</b><table><tr><th></th>'+RN.map((n,r)=>'<th style="color:'+RCOL[r]+'">'+n+'</th>').join('')+'</tr>'+o.slotP.map((p,i)=>'<tr><td>Carte '+(i+1)+'</td>'+p.map(v=>'<td>'+(v?pct(v):'—')+'</td>').join('')+'</tr>').join('')+'</table></div>';
+ h+='<div class="pki-t"><b>Chance d’avoir au moins une carte de chaque rareté dans un booster</b><div class="pki-r">'+RN.map((n,r)=>'<span style="--rc:'+RCOL[r]+'"><i>'+n+'</i><b>'+pct(o.atLeast[r])+'</b><small>'+o.byR[r].length+' cartes</small></span>').join('')+'</div></div>';
+ h+='<div class="pki-l">'+[4,3,2,1,0].map(r=>'<details'+(r>=3?' open':'')+'><summary style="color:'+RCOL[r]+'">'+RN[r]+' · '+o.byR[r].length+' cartes · '+pct(o.perCard[r])+' par carte et par booster</summary><div class="pki-g">'+o.byR[r].map(c=>'<div class="pki-c" data-id="'+c.id+'" title="'+esc(c.n)+'">'+cardHTML(c)+'</div>').join('')+'</div></details>').join('')+'</div>';
+ h+='<div class="cbact"><button class="sec" data-x="1">Fermer</button></div>';
+ const m=modal(h);m.classList.add('pki');
+ m.onclick=e=>{const it=e.target.closest('.pki-c');if(it){const c=allCards().find(x=>x.id===it.dataset.id);if(c)openZoom(it,{c},'');return}if(e.target.closest('[data-x]')||e.target===m)closeModal(m)};
+}
 function rollPack(type){
  const pool=allCards(),bias=typeof type==='number'?type:null;
- const slots=[[[0,70],[1,30]],[[0,70],[1,30]],[[0,70],[1,30]],[[1,55],[2,35],[3,10]],[[2,55],[3,30],[4,15]]];
+ const slots=PACK_SLOTS;
  const out=[];
  slots.forEach(sl=>{
   const r=weightedR(sl);let list=pool.filter(c=>rarityOf(c)===r&&!out.includes(c));
@@ -1331,7 +1354,7 @@ function showBoosters(){
  '<div class="hb-txt"><h1>Ouvre un booster</h1><p>5 cartes tirées parmi tous les personnages et soutiens du jeu. Tranche le booster comme tu veux : une lumière te prévient quand une carte rare se cache dedans. C’est juste pour le plaisir, toutes les cartes restent disponibles pour tes decks.</p>'+
  '<div class="hb-stock"><div class="hb-n"><b id="cbStN">'+st.n+'</b><small> / '+STOCK_MAX+' boosters</small></div><div class="hb-pips" id="cbPips"></div><div class="hb-d" id="cbStD"></div></div>'+
  '<div class="hb-qty"><span class="hb-ql">Quantité</span><div class="qty-seg" id="cbQs">'+[1,3,5].map(x=>'<button type="button" class="qs" data-q="'+x+'"><b>×'+x+'</b><small>booster'+(x>1?'s':'')+'</small></button>').join('')+'<button type="button" class="qs" data-q="all"><b>TOUT</b><small>'+st.n+' en stock</small></button></div></div>'+
- '<div class="hb-cta"><button type="button" class="cta" id="cbOpenB">Ouvrir un booster</button></div></div></div>'+
+ '<div class="hb-cta"><button type="button" class="cta" id="cbOpenB">Ouvrir un booster</button><button type="button" class="hb-info" id="cbPkInfo">Contenu et probabilités</button></div></div></div>'+
  '<div class="hb-row"><div class="hb-last"><h3>Dernière ouverture</h3>'+(last.length?'<div class="hb-cards">'+last.map(c=>'<div class="hb-c r'+rarityOf(c)+'" data-id="'+c.id+'">'+cardHTML(c)+'</div>').join('')+'</div>':'<p class="hb-empty">Aucun booster ouvert pour l’instant.</p>')+'</div>'+
  '<div class="hb-tile"><b>'+own+' / '+tot+'</b><small>cartes découvertes</small></div><div class="hb-tile"><b>'+nOp+'</b><small>booster'+(nOp>1?'s':'')+' ouvert'+(nOp>1?'s':'')+'</small></div>'+
  '<button type="button" class="hb-tile hb-link" id="cbGoDeck"><b>Mes decks</b><small>'+(dck.ok?'Deck prêt · ':'Deck à finir · ')+dk.length+' / 20 cartes</small></button></div>';
@@ -1351,7 +1374,7 @@ function showBoosters(){
  document.querySelectorAll('.qs').forEach(b=>b.onclick=()=>setQ(b.dataset.q==='all'?'all':+b.dataset.q));
  setQ(boostQty);
  const go=()=>{if(stockState().n<1){toast('Plus de booster pour l’instant : prochain dans '+fmtMs(stockWait())+'.');return}openBooster('all',boostQty)};
- $('cbPk').onclick=go;$('cbOpenB').onclick=go;$('cbGoDeck').onclick=showBuild;
+ $('cbPk').onclick=go;$('cbOpenB').onclick=go;$('cbPkInfo').onclick=showPackInfo;$('cbGoDeck').onclick=showBuild;
  document.querySelectorAll('.hb-c').forEach(el=>el.onclick=()=>{const c=REG[el.dataset.id];if(c)openZoom(el,{c},'')});
 }
 function closeBoost(){const o=document.getElementById('cbOpen');if(o){o.onpointerdown=o.onpointermove=o.onpointerup=null;o.remove()}}
@@ -1549,14 +1572,14 @@ function openInspect(c){
 function showCollection(f){
  view='col';leaveGame();
  const col=getCol(),all=allCards().slice().sort((a,b)=>rarityOf(b)-rarityOf(a)||(a.k>b.k?1:-1)),own=all.filter(c=>col[c.id]).length;
- const list=all.filter(c=>f==='all'?true:f==='own'?col[c.id]:!col[c.id]);
+ const list=all.filter(c=>f==='all'?true:f==='own'?col[c.id]:f==='evo'?c.k==='e':f==='base'?(c.k==='c'&&EVOS.some(e=>e.mats.some(m=>m.id===c.id))):!col[c.id]);
  body().innerHTML=tabs('col')+
  '<div class="cbcard"><h2 style="margin-top:0">Ma collection</h2><div class="cbprog"><div><b>'+own+'</b> / '+all.length+' cartes découvertes</div><div class="cbbar"><i style="width:'+Math.round(own/all.length*100)+'%"></i></div></div>'+
- '<div class="cbact" style="margin-top:10px">'+[['all','Toutes'],['own','Obtenues'],['miss','Manquantes']].map(x=>'<button type="button" class="'+(f===x[0]?'':'sec')+'" data-f="'+x[0]+'">'+x[1]+'</button>').join('')+'<button type="button" class="sec" id="cbBackB">← Boosters</button></div></div>'+
+ '<div class="cbact" style="margin-top:10px">'+[['all','Toutes'],['own','Obtenues'],['miss','Manquantes'],['evo','✦ Évolutions'],['base','Peuvent évoluer']].map(x=>'<button type="button" class="'+(f===x[0]?'':'sec')+'" data-f="'+x[0]+'">'+x[1]+'</button>').join('')+'<button type="button" class="sec" id="cbPkInfo2">Contenu du booster</button><button type="button" class="sec" id="cbBackB">← Boosters</button></div>'+(allOwned()?'<p style="margin:8px 0 0;color:#ffd84a;font-size:.85rem">Mode « toutes mes cartes » actif sur cet appareil.</p>':'')+'</div>'+
  '<div class="cbcolgrid">'+list.map(c=>{const n=col[c.id]||0,r=rarityOf(c);return '<div class="ci'+(n?'':' miss')+'" data-id="'+c.id+'" style="--rc:'+RCOL[r]+'"><div class="ci-c">'+(n?cardHTML(c):backHTML())+'</div><span class="ci-r">'+(n?RN[r]:'?')+'</span>'+(n>1?'<span class="ci-n">×'+n+'</span>':'')+'</div>'}).join('')+'</div>';
  bindTabs();
  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>showCollection(b.dataset.f));
- $('cbBackB').onclick=showBoosters;
+ $('cbBackB').onclick=showBoosters;$('cbPkInfo2').onclick=showPackInfo;
  document.querySelectorAll('.ci:not(.miss)').forEach(el=>{
   const c=allCards().find(x=>x.id===el.dataset.id);if(!c)return;
   const insp=c.k==='e'&&c.eid==='gojo-vide-infini';
@@ -1604,7 +1627,7 @@ function sideInfo(c){
   h+='<span class="dim">Fort contre '+COL[(c.col+1)%6].n+' et '+COL[(c.col+2)%6].n+' · faible contre '+COL[(c.col+4)%6].n+' et '+COL[(c.col+5)%6].n+'.</span>';
   h+='<p>「'+esc(c.sn)+'」 : '+esc(c.sd)+'</p>';
   const evs=c.k==='c'?EVOS.filter(e=>e.mats.some(x=>x.id===c.id)):[];
-  evs.forEach(e=>{h+='<div class="dk-evo"><b>✦ Peut évoluer en « '+esc(e.n)+' »</b><br>'+(e.cond&&e.cond.length?e.cond.map(cd=>'• '+esc(condLong(cd).replace(/\.$/,''))).join('<br>'):'Aucune condition : tu peux évoluer tout de suite.')+'<br><small>Cette carte compte pour 1 de tes 2 personnages à évolution (✦) par deck.</small></div>'});
+  evs.forEach(e=>{h+='<div class="dk-evo"><div class="dk-evc" data-eid="'+e.id+'" title="Voir la carte évoluée">'+cardHTML(e)+'</div><div><b>✦ Peut évoluer en « '+esc(e.n)+' »</b><br>'+(e.cond&&e.cond.length?e.cond.map(cd=>'• '+esc(condLong(cd).replace(/\.$/,''))).join('<br>'):'Aucune condition : tu peux évoluer tout de suite.')+'<br><small>ATK '+e.atk+' · PV '+e.def+(e.arm?' · Armure '+e.arm:'')+' — clique sur la carte pour la voir en grand.</small></div></div>'});
  }else{h+='<span>Carte '+(c.t==='trap'?'Piège':'Magie')+' · '+esc(c.sub||'')+'</span><p>'+esc(c.txt)+'</p>'}
  return h+'</div>';
 }
@@ -1613,7 +1636,7 @@ function showBuild(){
  const old=document.getElementById('dkMid'),oldS=old?old.scrollTop:0;
  const d=getDeck(),ck=deckCheck(d),cnt={};d.forEach(i=>cnt[i]=(cnt[i]||0)+1);
  const chars=d.filter(i=>REG[i]&&!isSup(REG[i])).sort((a,b)=>(REG[b].lvl||0)-(REG[a].lvl||0)),sups=d.filter(i=>REG[i]&&isSup(REG[i]));
- const ex=extraFor(d);
+ const ex=extraFor(d).map(x=>typeof x==="string"?REG[x]:x).filter(Boolean);
  let list=CHARS.concat(SUP);
  if(bf.t==='c')list=list.filter(x=>x.k==='c');else if(bf.t==='m')list=list.filter(x=>x.k==='s'&&x.t!=='trap');else if(bf.t==='p')list=list.filter(x=>x.k==='s'&&x.t==='trap');else if(bf.t==='e')list=list.filter(x=>evolvableId(x.id));
  if(bf.c>=0)list=list.filter(x=>x.col===bf.c);
@@ -1655,6 +1678,7 @@ function showBuild(){
  $('cbClear').onclick=()=>{setDeck([]);reload()};
  $('cbGo').onclick=()=>{if(deckCheck(getDeck()).ok)startGame()};
  const ad=$('dkAdd');if(ad)ad.onclick=()=>{if(addToDeck(sel.id))reload()};
+ document.querySelectorAll('.dk-evc').forEach(x=>x.onclick=()=>{const e=REG[x.dataset.eid];if(e)openZoom(x,{c:e},'')});
  const rm=$('dkRem');if(rm)rm.onclick=()=>{removeFromDeck(sel.id);reload()};
  /* clic : on lit la carte en grand */
  const selectCard=id=>{dkSelId=id;reload()};

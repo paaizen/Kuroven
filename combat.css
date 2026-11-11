@@ -798,3 +798,23 @@ body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
 .ci.insp.hold .ci-c{animation:cbhold .65s linear forwards}
 @keyframes cbhold{to{transform:scale(1.08);box-shadow:0 0 0 3px #fff,0 0 26px #ffd84a}}
 .ci.insp{user-select:none;-webkit-user-select:none;touch-action:none}
+
+/* contenu et probabilités du booster */
+.hb-info{margin-left:12px;background:none;border:1.5px solid #ffffff3a;color:#eef0f8;border-radius:6px;padding:12px 16px;font:800 13px system-ui;cursor:pointer}
+.hb-info:hover{border-color:#ffd84a;color:#ffd84a}
+.cbmodal.pki .bx{max-width:min(920px,94vw);max-height:88vh;overflow:auto;text-align:left}
+.pki-t{margin:12px 0}.pki-t>b{display:block;margin-bottom:6px}
+.pki-t table{border-collapse:collapse;width:100%;font:600 13px system-ui}
+.pki-t th,.pki-t td{padding:5px 8px;border-bottom:1px solid #ffffff18;text-align:center}.pki-t td:first-child{text-align:left;opacity:.8}
+.pki-r{display:flex;gap:8px;flex-wrap:wrap}
+.pki-r span{flex:1;min-width:120px;border:1.5px solid var(--rc);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column}
+.pki-r i{font-style:normal;color:var(--rc);font:800 12px system-ui}.pki-r b{font:900 22px system-ui}.pki-r small{opacity:.65}
+.pki-l details{margin:8px 0;border:1px solid #ffffff18;border-radius:6px;padding:6px 10px}
+.pki-l summary{cursor:pointer;font:800 14px system-ui}
+.pki-g{display:grid;grid-template-columns:repeat(auto-fill,78px);gap:8px;margin-top:8px}
+.pki-c{position:relative;width:78px;height:114px;cursor:pointer}.pki-c .y{zoom:.3;position:absolute;left:0;top:0}
+/* forme évoluée visible dans Mes decks */
+.dk-evo{display:flex;gap:10px;align-items:flex-start}
+.dk-evc{position:relative;flex:none;width:78px;height:114px;cursor:pointer;border-radius:4px}
+.dk-evc .y{zoom:.3;position:absolute;left:0;top:0}
+.dk-evc:hover{transform:translateY(-2px)}
