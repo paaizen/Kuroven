@@ -1176,9 +1176,9 @@ function onOut(e){
 /* ---------- vues : menu, deck, règles, partie ---------- */
 const body=()=>$('cbBody');
 function tabs(cur){
- return '<div class="cbtabs">'+[['menu','Jouer'],['build','Mon deck'],['rules','Règles']].map(x=>'<button data-v="'+x[0]+'" class="'+(cur===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div>';
+ return '<div class="cbtabs">'+[['menu','Jouer'],['build','Mon deck'],['boost','Boosters'],['rules','Règles']].map(x=>'<button data-v="'+x[0]+'" class="'+(cur===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div>';
 }
-function bindTabs(){document.querySelectorAll('#cbBody .cbtabs button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='menu')showMenu();else if(v==='build')showBuild();else showRules()})}
+function bindTabs(){document.querySelectorAll('#cbBody .cbtabs button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='menu')showMenu();else if(v==='build')showBuild();else if(v==='boost')showBoosters();else showRules()})}
 function showMenu(){
  view='menu';leaveGame();
  let d=getDeck(),ck=deckCheck(d);
@@ -1192,6 +1192,273 @@ function showMenu(){
  $('cbBuild').onclick=showBuild;$('cbOnline').onclick=()=>showOnline();
  $('cbAuto').onclick=async()=>{const c=await pickElem();if(c==null)return;setDeck(autoDeck(c));showMenu()};
  $('cbBk').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('cbback',+b.dataset.b);showMenu()};
+}
+
+/* ---------- boosters : on découpe, on découvre, on remplit sa collection (pour le plaisir, rien de réel) ---------- */
+const RN=['Commune','Peu commune','Rare','Épique','Légendaire'],RCOL=['#9aa3b5','#6ad48a','#4aa8ff','#c07bff','#ffcb3d'];
+const allCards=()=>CHARS.concat(SUP,EVOS);
+function rarityOf(c){
+ if(c.k==='e')return 4;
+ if(c.k==='s')return c.t==='trap'||c.t==='field'?2:1;
+ if(c.ex||c.lvl>=6)return 3;
+ if(c.lvl>=5)return 2;
+ if(c.lvl>=4)return 1;
+ return 0;
+}
+const getCol=()=>ls.get('cbcol1',{})||{};
+function addToCol(ids){const col=getCol(),nw=[];ids.forEach(id=>{if(!col[id])nw.push(id);col[id]=(col[id]||0)+1});ls.set('cbcol1',col);ls.set('cbopened',(ls.get('cbopened',0)||0)+1);return nw}
+function weightedR(sl){let t=sl.reduce((a,x)=>a+x[1],0),r=Math.random()*t;for(const x of sl){r-=x[1];if(r<=0)return x[0]}return sl[0][0]}
+function rollPack(type){
+ const pool=allCards(),bias=typeof type==='number'?type:null;
+ const slots=[[[0,70],[1,30]],[[0,70],[1,30]],[[0,70],[1,30]],[[1,55],[2,35],[3,10]],[[2,55],[3,30],[4,15]]];
+ const out=[];
+ slots.forEach(sl=>{
+  const r=weightedR(sl);let list=pool.filter(c=>rarityOf(c)===r&&!out.includes(c));
+  if(bias!=null){const b=list.filter(c=>c.col===bias);if(b.length&&Math.random()<.75)list=b}
+  if(!list.length)list=pool.filter(c=>!out.includes(c));
+  out.push(list[rnd(list.length)]);
+ });
+ return out.sort((a,b)=>rarityOf(a)-rarityOf(b));
+}
+const STOCK_MAX=10,STOCK_MS=600000;
+const IMGB=new Image();IMGB.src='combat/img/booster.png?v=2';
+function stockState(){
+ let st=ls.get('cbstock1',null);const now=Date.now();
+ if(!st||typeof st.n!=='number'){st={n:STOCK_MAX,t:now};ls.set('cbstock1',st)}
+ if(st.n<STOCK_MAX){const k=Math.floor((now-st.t)/STOCK_MS);if(k>0){st.n=Math.min(STOCK_MAX,st.n+k);st.t=st.n>=STOCK_MAX?now:st.t+k*STOCK_MS;ls.set('cbstock1',st)}}
+ else if(st.t!==now){st.t=now}
+ return st;
+}
+function stockUse(k){const st=stockState(),was=st.n>=STOCK_MAX;st.n=Math.max(0,st.n-k);if(was)st.t=Date.now();ls.set('cbstock1',st)}
+const stockWait=()=>{const st=stockState();return st.n>=STOCK_MAX?0:Math.max(0,STOCK_MS-(Date.now()-st.t))};
+const fmtMs=ms=>{const t=Math.ceil(ms/1000);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
+function packHTML(t,big){
+ return '<div class="pk art'+(big?' big':'')+'"><img src="combat/img/booster.png?v=2" alt="Booster" draggable="false"><i class="pk-shine"></i></div>';
+}
+let boostQty=1,boostTm=null;
+function showBoosters(){
+ view='boost';leaveGame();clearInterval(boostTm);
+ const col=getCol(),tot=allCards().length,own=Object.keys(col).length,nOp=ls.get('cbopened',0)||0,pc=Math.round(own/tot*100);
+ const st=stockState();boostQty=Math.max(1,Math.min(boostQty,Math.max(1,st.n)));
+ body().innerHTML=tabs('boost')+
+ '<div class="cbcard"><h2 style="margin-top:0">Boosters</h2><p>Un seul booster avec <b>toutes les cartes du jeu</b> (5 cartes par booster). Tranche-le comme dans Fruit Ninja, autant de fois que tu veux : une lumière apparaît quand une carte rare se cache dedans. C’est juste pour le plaisir : toutes les cartes restent disponibles pour construire ton deck.</p>'+
+ '<div class="cbprog"><div><b>'+own+'</b> / '+tot+' cartes découvertes · '+nOp+' booster'+(nOp>1?'s':'')+' ouvert'+(nOp>1?'s':'')+'</div><div class="cbbar"><i style="width:'+pc+'%"></i></div></div>'+
+ '<div class="cbstock"><div class="cbstk-n"><b id="cbStN">'+st.n+'</b><small> / '+STOCK_MAX+' boosters</small></div><div class="cbstk-d" id="cbStD"></div><div class="cbbar"><i id="cbStB" style="width:'+Math.round(st.n/STOCK_MAX*100)+'%"></i></div></div></div>'+
+ '<div class="cbqty"><span>Combien ouvrir ?</span><button type="button" class="qb" data-d="-1">−</button><b id="cbQ">×'+boostQty+'</b><button type="button" class="qb" data-d="1">+</button>'+[1,3,5,10].map(x=>'<button type="button" class="qc'+(boostQty===x?' on':'')+'" data-q="'+x+'">×'+x+'</button>').join('')+'</div>'+
+ '<div class="cbpacks one"><button type="button" class="pkb" id="cbPk">'+packHTML(0,true)+'<span class="pkb-n" id="cbPkN">×'+boostQty+'</span></button></div>'+
+ '<div class="cbact" style="justify-content:center;margin-top:14px"><button id="cbColBtn" class="sec">Voir ma collection</button></div>';
+ bindTabs();
+ const upd=()=>{
+  const e=$('cbStN');if(!e){clearInterval(boostTm);return}
+  const s2=stockState(),w=stockWait();e.textContent=s2.n;$('cbStB').style.width=Math.round(s2.n/STOCK_MAX*100)+'%';
+  $('cbStD').textContent=s2.n>=STOCK_MAX?'Stock plein : ouvre-en pour qu’il se recharge !':(s2.n===0?'Plus de booster · ':'')+'Prochain booster dans '+fmtMs(w)+' (1 toutes les 10 minutes, 10 maximum)';
+  const pk=$('cbPk');if(pk)pk.classList.toggle('empty',s2.n<1);
+ };
+ upd();boostTm=setInterval(upd,1000);
+ const setQ=q=>{boostQty=Math.max(1,Math.min(10,Math.min(q,Math.max(1,stockState().n))));$('cbQ').textContent='×'+boostQty;$('cbPkN').textContent='×'+boostQty;document.querySelectorAll('.qc').forEach(b=>b.classList.toggle('on',+b.dataset.q===boostQty))};
+ document.querySelectorAll('.qb').forEach(b=>b.onclick=()=>setQ(boostQty+ +b.dataset.d));
+ document.querySelectorAll('.qc').forEach(b=>b.onclick=()=>setQ(+b.dataset.q));
+ $('cbPk').onclick=()=>{if(stockState().n<1){toast('Plus de booster pour l’instant : prochain dans '+fmtMs(stockWait())+'.');return}openBooster('all',boostQty)};
+ $('cbColBtn').onclick=()=>showCollection('all');
+}
+function closeBoost(){const o=document.getElementById('cbOpen');if(o){o.onpointerdown=o.onpointermove=o.onpointerup=null;o.remove()}}
+function openBooster(type,n){
+ n=Math.min(n||1,stockState().n);if(n<1){toast('Plus de booster pour l’instant.');return}closeBoost();clearInterval(boostTm);
+ const ov=document.createElement('div');ov.className='cbopen bk'+backN();ov.id='cbOpen';
+ ov.innerHTML='<div class="cbop-stage" id="cbopS"></div><button class="cbchip cbop-x" type="button">✕ Fermer</button>';
+ (document.getElementById('v-cb')||document.body).appendChild(ov);
+ ov.querySelector('.cbop-x').onclick=()=>{closeBoost();showBoosters()};
+ const stage=ov.querySelector('#cbopS');
+ const packs=Array.from({length:n},()=>rollPack(type));
+ const got=[];let idx=0,dead=false;
+ const best=cs=>Math.max.apply(null,cs.map(rarityOf));
+ const collect=cs=>{stockUse(1);const nw=addToCol(cs.map(c=>c.id));cs.forEach(c=>got.push({c,nw:nw.includes(c.id)}));return nw};
+
+
+
+ /* --- 1. le booster : on le tranche, autant de fois qu'on veut, comme Fruit Ninja --- */
+ function clipHalf(poly,P,nv,sign){
+  const out=[],f=p=>((p[0]-P[0])*nv[0]+(p[1]-P[1])*nv[1])*sign;
+  for(let i=0;i<poly.length;i++){
+   const A=poly[i],B=poly[(i+1)%poly.length],fa=f(A),fb=f(B);
+   if(fa>=0)out.push(A);
+   if((fa>=0)!==(fb>=0)){const t=fa/(fa-fb);out.push([A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t])}
+  }
+  return out;
+ }
+ const polyArea=poly=>{let a=0;for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length];a+=p[0]*q[1]-q[0]*p[1]}return Math.abs(a)/2};
+ function showPack(){
+  const ph=Math.round(Math.min(430,window.innerHeight*.56));
+  stage.innerHTML='<div class="cbop-count">Booster '+(idx+1)+' / '+n+'</div><div id="cbopSp" style="height:'+ph+'px;width:100px"></div><p class="cbop-hint" id="cbopH2">Tranche le booster ! Tu peux le découper en autant de morceaux que tu veux.</p><div class="cbact" style="justify-content:center"><button type="button" id="cbopNow" style="display:none">Ouvrir maintenant</button>'+(n-idx>1?'<button type="button" class="sec" id="cbopSkip">Tout ouvrir d’un coup</button>':'')+'</div>';
+  const sp=$('cbopSp').getBoundingClientRect(),cx=window.innerWidth/2,cy=sp.top+sp.height/2;
+  const IW=460,IH=700,sc=ph/IH,dpr=Math.min(2,window.devicePixelRatio||1);
+  const cv=document.createElement('canvas');cv.className='cbop-trail';cv.width=Math.floor(window.innerWidth*dpr);cv.height=Math.floor(window.innerHeight*dpr);cv.style.width=window.innerWidth+'px';cv.style.height=window.innerHeight+'px';ov.appendChild(cv);
+  const g=cv.getContext('2d');g.scale(dpr,dpr);
+  const mkP=(poly,x,y,cxl,cyl,rot,vx,vy,vr)=>({poly,x,y,cxl,cyl,rot,vx,vy,vr,s:sc});
+  let pieces=[mkP([[0,0],[IW,0],[IW,IH],[0,IH]],cx,cy,IW/2,IH/2,0,0,0,0)];
+  const toS=(pc,p)=>{const c=Math.cos(pc.rot),sn=Math.sin(pc.rot),dx=(p[0]-pc.cxl)*pc.s,dy=(p[1]-pc.cyl)*pc.s;return[pc.x+dx*c-dy*sn,pc.y+dx*sn+dy*c]};
+  const toL=(pc,q)=>{const c=Math.cos(pc.rot),sn=Math.sin(pc.rot),dx=q[0]-pc.x,dy=q[1]-pc.y;return[pc.cxl+(dx*c+dy*sn)/pc.s,pc.cyl+(-dx*sn+dy*c)/pc.s]};
+  const inPoly=(poly,pt)=>{let sg=0;for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length],cr=(b[0]-a[0])*(pt[1]-a[1])-(b[1]-a[1])*(pt[0]-a[0]);if(cr!==0){const s2=cr>0?1:-1;if(sg&&s2!==sg)return false;sg=s2}}return true};
+  let pts=[],raf=0,last=performance.now(),cuts=0,opening=false,fade=1,glow=null,openT=0,down=false,lastP=null,moved=false;
+  const rec=new Map(),b0=best(packs[idx]);
+  /* dessin : morceaux + lame blanche effilée */
+  const frame=now=>{
+   const dt=Math.min(.05,(now-last)/1000);last=now;
+   g.clearRect(0,0,window.innerWidth,window.innerHeight);
+   const idle=pieces.length===1&&!cuts;
+   cv.dataset.pieces=pieces.length;
+   pieces.forEach(pc=>{
+    pc.x+=pc.vx*dt;pc.y+=pc.vy*dt;pc.rot+=pc.vr*dt;const k=Math.pow(.05,dt);pc.vx*=k;pc.vy*=k;pc.vr*=Math.pow(.15,dt);
+    if(pc.x<30)pc.vx=Math.abs(pc.vx)+20;if(pc.x>window.innerWidth-30)pc.vx=-Math.abs(pc.vx)-20;if(pc.y<60)pc.vy=Math.abs(pc.vy)+20;if(pc.y>window.innerHeight-30)pc.vy=-Math.abs(pc.vy)-20;
+    g.save();g.globalAlpha=fade;
+    const bob=idle?Math.sin(now/420)*7:0;
+    g.translate(pc.x,pc.y+bob);g.rotate(pc.rot+(idle?Math.sin(now/700)*.02:0));g.scale(pc.s,pc.s);g.translate(-pc.cxl,-pc.cyl);
+    g.beginPath();pc.poly.forEach((q,i)=>i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));g.closePath();
+    if(glow){g.shadowColor=glow;g.shadowBlur=40}
+    g.save();g.clip();if(IMGB.complete)g.drawImage(IMGB,0,0,IW,IH);g.restore();
+    g.lineWidth=2/pc.s;g.strokeStyle='rgba(255,255,255,.55)';g.stroke();
+    g.restore();
+   });
+   const t=performance.now();pts=pts.filter(p=>t-p.t<340);const m=pts.length;
+   if(m>1){
+    const L=[],R=[];
+    for(let i=0;i<m;i++){
+     const p=pts[i],q=pts[Math.min(m-1,i+1)],o=pts[Math.max(0,i-1)];let dx=q.x-o.x,dy=q.y-o.y;const d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;
+     const tt=i/(m-1),age=(t-p.t)/340,w=11*Math.pow(Math.sin(Math.PI*tt),.9)*(1-age*.7);
+     L.push([p.x-dy*w,p.y+dx*w]);R.push([p.x+dy*w,p.y-dx*w]);
+    }
+    g.save();g.beginPath();g.moveTo(L[0][0],L[0][1]);for(let i=1;i<m;i++)g.lineTo(L[i][0],L[i][1]);for(let i=m-1;i>=0;i--)g.lineTo(R[i][0],R[i][1]);g.closePath();
+    const h=pts[m-1],tl=pts[0],gr=g.createLinearGradient(tl.x,tl.y,h.x,h.y);
+    gr.addColorStop(0,'rgba(235,235,235,0)');gr.addColorStop(.6,'rgba(245,245,245,.9)');gr.addColorStop(1,'rgba(255,255,255,1)');
+    g.fillStyle=gr;g.shadowColor='rgba(255,255,255,.55)';g.shadowBlur=8;g.fill();g.restore();
+   }
+   raf=requestAnimationFrame(frame);
+  };
+  raf=requestAnimationFrame(frame);
+  const cleanup=()=>{cancelAnimationFrame(raf);clearTimeout(openT);cv.remove();ov.onpointerdown=ov.onpointermove=ov.onpointerup=ov.onpointercancel=null};
+  /* coupe d'un morceau le long de la lame */
+  function cutPiece(pc,A,B){
+   let dx=B.x-A.x,dy=B.y-A.y;const L=Math.hypot(dx,dy)||1;dx/=L;dy/=L;const nv=[-dy,dx];
+   const sp=pc.poly.map(q=>toS(pc,q)),h1=clipHalf(sp,[A.x,A.y],nv,1),h2=clipHalf(sp,[A.x,A.y],nv,-1);
+   if(h1.length<3||h2.length<3||polyArea(h1)<110||polyArea(h2)<110)return false;
+   const mk=(h,sg)=>{
+    const loc=h.map(q=>toL(pc,q));let ax=0,ay=0;loc.forEach(q=>{ax+=q[0];ay+=q[1]});ax/=loc.length;ay/=loc.length;
+    const sc2=toS(pc,[ax,ay]),sp2=170+Math.random()*130;
+    return mkP(loc,sc2[0],sc2[1],ax,ay,pc.rot,pc.vx+nv[0]*sg*sp2,pc.vy+nv[1]*sg*sp2,pc.vr+(Math.random()-.5)*2.2);
+   };
+   pieces.splice(pieces.indexOf(pc),1,mk(h1,1),mk(h2,-1));
+   return true;
+  }
+  function tryCut(pc,r){
+   if(opening||!pieces.includes(pc)||pieces.length>=1000)return;
+   const sp=pc.poly.map(q=>toS(pc,q)),xs=sp.map(p=>p[0]),ys=sp.map(p=>p[1]),need=Math.min(Math.max.apply(null,xs)-Math.min.apply(null,xs),Math.max.apply(null,ys)-Math.min.apply(null,ys))*.1;
+   if(Math.hypot(r.last.x-r.entry.x,r.last.y-r.entry.y)<Math.max(8,need))return;
+   if(!cutPiece(pc,r.entry,r.last))return;
+   cuts++;
+   const mx=(r.entry.x+r.last.x)/2,my=(r.entry.y+r.last.y)/2;
+   if(cuts===1){ /* la lumière qui sort de la première coupure : rien = pas de rare ; bleu / violet / or sinon */
+    const f=document.createElement('div');f.className='cbop-flash '+(b0>=2?'t'+b0:'none');f.style.left=mx+'px';f.style.top=my+'px';ov.appendChild(f);setTimeout(()=>f.remove(),1600);
+    if(b0>=2){try{burst(ov,RCOL[b0])}catch(e){}ov.style.setProperty('--tint',RCOL[b0]);ov.classList.remove('pulse');void ov.offsetWidth;ov.classList.add('pulse');if(b0>=3){ov.classList.add('shake');setTimeout(()=>ov.classList.remove('shake'),700)}}
+    $('cbopNow').style.display='';$('cbopH2').textContent='Continue de trancher… ou attends un instant : le booster s’ouvre tout seul.';
+   }
+   if(cuts>1&&b0>=2){const f2=document.createElement('div');f2.className='cbop-flash mini t'+b0;f2.style.left=mx+'px';f2.style.top=my+'px';ov.appendChild(f2);setTimeout(()=>f2.remove(),1100)}
+   clearTimeout(openT);openT=setTimeout(openNow,1700);
+  }
+  const step=p=>{
+   pts.push({x:p.x,y:p.y,t:performance.now()});
+   pieces.slice().forEach(pc=>{
+    const sp=pc.poly.map(q=>toS(pc,q)),inside=inPoly(sp,[p.x,p.y]);let r=rec.get(pc);
+    if(inside){if(!r)rec.set(pc,{entry:p,last:p});else r.last=p}
+    else if(r){rec.delete(pc);tryCut(pc,r)}
+   });
+  };
+  const addPoint=p=>{
+   if(lastP){const dist=Math.hypot(p.x-lastP.x,p.y-lastP.y),stp=Math.max(1,Math.ceil(dist/9));for(let k=1;k<=stp;k++)step({x:lastP.x+(p.x-lastP.x)*k/stp,y:lastP.y+(p.y-lastP.y)*k/stp})}else step(p);
+   lastP=p;
+  };
+  const flush=()=>{rec.forEach((r,pc)=>tryCut(pc,r));rec.clear()};
+  async function openNow(){
+   if(opening)return;opening=true;clearTimeout(openT);ov.onpointerdown=ov.onpointermove=ov.onpointerup=ov.onpointercancel=null;
+   const nb=$('cbopNow');if(nb)nb.style.display='none';
+   const col=b0>=2?RCOL[b0]:null;glow=col||'#ffffff';
+   const f=document.createElement('div');f.className='cbop-flash '+(b0>=2?'t'+b0:'none');f.style.left=cx+'px';f.style.top=cy+'px';ov.appendChild(f);setTimeout(()=>f.remove(),1600);
+   if(b0>=3){ov.classList.add('shake');setTimeout(()=>ov.classList.remove('shake'),700)}
+   pieces.forEach(pc=>{pc.vx+=(pc.x-cx)*2.2;pc.vy+=(pc.y-cy)*2.2;pc.vr+=(Math.random()-.5)*3});
+   for(let i=0;i<14;i++){fade=1-i/14;await sleep(50)}
+   fade=0;cleanup();if(dead)return;showCards();
+  }
+  ov.onpointerdown=e=>{if(opening||e.target.closest('button'))return;down=true;moved=false;lastP=null;pts=[];addPoint({x:e.clientX,y:e.clientY})};
+  ov.onpointermove=e=>{if(!down||opening)return;moved=true;addPoint({x:e.clientX,y:e.clientY})};
+  ov.onpointerup=ov.onpointercancel=e=>{
+   if(!down||opening)return;down=false;
+   if(!moved&&pieces.length===1){ /* simple clic : un coup de lame automatique en diagonale */
+    lastP=null;const a={x:cx-pieces[0].s*IW*.6,y:cy+ph*.22},b={x:cx+pieces[0].s*IW*.6,y:cy-ph*.22};addPoint(a);addPoint(b);addPoint({x:b.x+30,y:b.y-12});
+   }
+   flush();lastP=null;
+  };
+  const nb=$('cbopNow');if(nb)nb.onclick=()=>openNow();
+  const sk=$('cbopSkip');if(sk)sk.onclick=()=>{cleanup();for(;idx<n;idx++)collect(packs[idx]);showSummary()};
+ }
+ /* --- 2. les cartes, une par une --- */
+ function showCards(){
+  const cs=packs[idx],nw=collect(cs),W=Math.min(300,Math.floor(Math.min(window.innerHeight*.52,520)/1.4577),window.innerWidth-80),zs=W/260;
+  let ci=0;
+  stage.innerHTML='<div class="cbop-count">Booster '+(idx+1)+' / '+n+' · carte <span id="cbopN">1</span> / '+cs.length+'</div><div class="cbop-cur" style="--zs:'+zs.toFixed(3)+';--w:'+W+'px"></div><p class="cbop-hint" id="cbopH">Touche la carte pour la retourner</p><div class="cbop-th" style="--zs:.2"></div><div class="cbact" id="cbopA" style="justify-content:center"><button type="button" class="sec" id="cbopAll">Tout retourner</button></div>';
+  const cur=stage.querySelector('.cbop-cur'),th=stage.querySelector('.cbop-th');
+  const thumb=(c,isNew)=>{const r=rarityOf(c),d=document.createElement('div');d.className='cbth';d.style.setProperty('--rc',RCOL[r]);d.innerHTML=cardHTML(c)+(isNew?'<span class="newtag on">NEW</span>':'');th.appendChild(d)};
+  function card(){
+   const c=cs[ci],r=rarityOf(c);
+   cur.innerHTML='<div class="cc r'+r+'"><div class="cc-in"><div class="cc-f">'+backHTML()+'</div><div class="cc-b">'+cardHTML(c)+'</div></div><span class="rtag" style="--rc:'+RCOL[r]+'">'+RN[r]+'</span>'+(nw.includes(c.id)?'<span class="newtag">NOUVELLE</span>':'')+'</div>';
+   $('cbopN').textContent=ci+1;
+   const cc=cur.firstElementChild;cc.style.animation='ccin .45s both';
+   cc.onclick=()=>{
+    if(!cc.classList.contains('flip')){
+     cc.classList.add('flip');
+     if(r>=2){ov.style.setProperty('--tint',RCOL[r]);ov.classList.remove('pulse');void ov.offsetWidth;ov.classList.add('pulse');setTimeout(()=>{try{burst(cc,RCOL[r])}catch(e){}},300);if(r>=3){ov.classList.add('shake');setTimeout(()=>ov.classList.remove('shake'),600)}}
+     $('cbopH').textContent=ci<cs.length-1?'Touche pour la carte suivante':'Touche pour terminer';
+    }else next(cc);
+   };
+  }
+  async function next(cc){
+   if(cc.dataset.busy)return;cc.dataset.busy=1;
+   const t=th.getBoundingClientRect(),c0=cc.getBoundingClientRect();
+   try{await cc.animate([{transform:'none',opacity:1},{transform:'translate('+(t.left+t.width/2-c0.left-c0.width/2)+'px,'+(t.top+t.height/2-c0.top-c0.height/2)+'px) scale(.2)',opacity:.3}],{duration:380,easing:'ease-in',fill:'forwards'}).finished}catch(e){}
+   thumb(cs[ci],nw.includes(cs[ci].id));ci++;
+   if(ci<cs.length)card();else done();
+  }
+  function done(){
+   cur.innerHTML='';
+   $('cbopH').textContent=(nw.length?nw.length+' nouvelle'+(nw.length>1?'s':'')+' carte'+(nw.length>1?'s':'')+' dans ce booster !':'Aucune nouvelle carte dans ce booster.');
+   $('cbopA').innerHTML=idx+1<n?'<button type="button" id="cbopNext">Booster suivant ('+(idx+2)+' / '+n+')</button>'+(n-idx>2?'<button type="button" class="sec" id="cbopRest">Ouvrir le reste d’un coup</button>':''):'<button type="button" id="cbopSum">Voir le résumé</button>';
+   const nx=$('cbopNext');if(nx)nx.onclick=()=>{idx++;showPack()};
+   const rs=$('cbopRest');if(rs)rs.onclick=()=>{for(idx++;idx<n;idx++)collect(packs[idx]);showSummary()};
+   const sm=$('cbopSum');if(sm)sm.onclick=showSummary;
+  }
+  $('cbopAll').onclick=async()=>{
+   while(ci<cs.length){const cc=cur.firstElementChild;if(!cc)break;if(!cc.classList.contains('flip')){cc.click();await sleep(450)}cc.click();await sleep(460);if(dead)return}
+  };
+  card();
+ }
+ /* --- 3. le résumé de tout ce qu'on a ouvert --- */
+ function showSummary(){
+  const sorted=got.slice().sort((a,b)=>rarityOf(b.c)-rarityOf(a.c)),nwN=got.filter(x=>x.nw).length,top=sorted[0];
+  stage.innerHTML='<div class="cbop-count">Résumé</div><h2 class="cbsum-t">'+n+' booster'+(n>1?'s':'')+' ouvert'+(n>1?'s':'')+'</h2><p class="cbop-hint">'+nwN+' nouvelle'+(nwN>1?'s':'')+' carte'+(nwN>1?'s':'')+(top?' · Meilleure carte : <b style="color:'+RCOL[rarityOf(top.c)]+'">'+esc(top.c.n)+'</b> ('+RN[rarityOf(top.c)]+')':'')+'</p><div class="cbsum" style="--zs:.3">'+sorted.map(x=>'<div class="cbth big" style="--rc:'+RCOL[rarityOf(x.c)]+'">'+cardHTML(x.c)+(x.nw?'<span class="newtag on">NEW</span>':'')+'</div>').join('')+'</div><div class="cbact" style="justify-content:center"><button type="button" id="cbsAgain"></button><button type="button" class="sec" id="cbsCol">Ma collection</button></div>';
+  {const left=stockState().n,ag=$('cbsAgain');if(left<1){ag.textContent='Plus de booster · prochain dans '+fmtMs(stockWait());ag.disabled=true}else{ag.textContent='Ouvrir encore ×'+Math.min(n,left)+' ('+left+' en stock)';ag.onclick=()=>openBooster(type,Math.min(n,left))}}$('cbsCol').onclick=()=>{closeBoost();showCollection('all')};
+ }
+ showPack();
+}
+function showCollection(f){
+ view='boost';leaveGame();
+ const col=getCol(),all=allCards().slice().sort((a,b)=>rarityOf(b)-rarityOf(a)||(a.k>b.k?1:-1)),own=all.filter(c=>col[c.id]).length;
+ const list=all.filter(c=>f==='all'?true:f==='own'?col[c.id]:!col[c.id]);
+ body().innerHTML=tabs('boost')+
+ '<div class="cbcard"><h2 style="margin-top:0">Ma collection</h2><div class="cbprog"><div><b>'+own+'</b> / '+all.length+' cartes découvertes</div><div class="cbbar"><i style="width:'+Math.round(own/all.length*100)+'%"></i></div></div>'+
+ '<div class="cbact" style="margin-top:10px">'+[['all','Toutes'],['own','Obtenues'],['miss','Manquantes']].map(x=>'<button type="button" class="'+(f===x[0]?'':'sec')+'" data-f="'+x[0]+'">'+x[1]+'</button>').join('')+'<button type="button" class="sec" id="cbBackB">← Boosters</button></div></div>'+
+ '<div class="cbcolgrid">'+list.map(c=>{const n=col[c.id]||0,r=rarityOf(c);return '<div class="ci'+(n?'':' miss')+'" data-id="'+c.id+'" style="--rc:'+RCOL[r]+'"><div class="ci-c">'+(n?cardHTML(c):backHTML())+'</div><span class="ci-r">'+(n?RN[r]:'?')+'</span>'+(n>1?'<span class="ci-n">×'+n+'</span>':'')+'</div>'}).join('')+'</div>';
+ bindTabs();
+ document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>showCollection(b.dataset.f));
+ $('cbBackB').onclick=showBoosters;
+ document.querySelectorAll('.ci:not(.miss)').forEach(el=>el.onclick=()=>{const c=allCards().find(x=>x.id===el.dataset.id);if(c)openZoom(el,{c},'')});
 }
 function showRules(){
  view='rules';leaveGame();
