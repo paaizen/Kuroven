@@ -791,3 +791,10 @@ body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
 #v-cb .y.full .fa-stat{position:absolute;left:16px;right:16px;bottom:11px;display:flex;justify-content:space-between;align-items:flex-end;font:900 15px/1 var(--nm);color:#fff;text-shadow:0 2px 4px #000,0 0 3px #000}
 #v-cb .y.full .fa-stat span:nth-child(2){text-align:center}#v-cb .y.full .fa-stat span:last-child{text-align:right}
 #v-cb .y.full .fa-stat small{display:block;font:700 8px var(--tx);letter-spacing:1px;color:#cfd6e4;margin-bottom:1px}
+
+/* carte inspectable dans la collection : liseré doré + anneau qui se remplit pendant le maintien */
+.ci.insp .ci-c{box-shadow:0 0 0 2px #ffd84a,0 0 14px #ffd84a99;border-radius:6px}
+.ci.insp:after{content:'Maintenir';position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:#ffd84a;color:#12151b;font:900 9px system-ui;letter-spacing:1px;padding:1px 6px;border-radius:3px;pointer-events:none}
+.ci.insp.hold .ci-c{animation:cbhold .65s linear forwards}
+@keyframes cbhold{to{transform:scale(1.08);box-shadow:0 0 0 3px #fff,0 0 26px #ffd84a}}
+.ci.insp{user-select:none;-webkit-user-select:none;touch-action:none}

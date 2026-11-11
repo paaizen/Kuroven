@@ -1540,6 +1540,12 @@ function openBooster(type,n){
  }
  showPack();
 }
+/* inspection d'une carte full art (module chargé à la demande) */
+let inspP=null;
+function openInspect(c){
+ if(!inspP)inspP=new Promise((res,rej)=>{const x=document.createElement('script');x.src='combat-inspect.js?v=3';x.onload=res;x.onerror=rej;document.head.appendChild(x)});
+ inspP.then(()=>{if(window.CBInspect)window.CBInspect(cardHTML(c))}).catch(()=>toast('Impossible de charger l’inspection.'));
+}
 function showCollection(f){
  view='col';leaveGame();
  const col=getCol(),all=allCards().slice().sort((a,b)=>rarityOf(b)-rarityOf(a)||(a.k>b.k?1:-1)),own=all.filter(c=>col[c.id]).length;
@@ -1551,7 +1557,17 @@ function showCollection(f){
  bindTabs();
  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>showCollection(b.dataset.f));
  $('cbBackB').onclick=showBoosters;
- document.querySelectorAll('.ci:not(.miss)').forEach(el=>el.onclick=()=>{const c=allCards().find(x=>x.id===el.dataset.id);if(c)openZoom(el,{c},'')});
+ document.querySelectorAll('.ci:not(.miss)').forEach(el=>{
+  const c=allCards().find(x=>x.id===el.dataset.id);if(!c)return;
+  const insp=c.k==='e'&&c.eid==='gojo-vide-infini';
+  if(insp){el.classList.add('insp');el.title='Maintiens la carte pour l’inspecter'}
+  let held=false,tm=0;
+  el.onpointerdown=e=>{if(!insp||e.button>0)return;held=false;el.classList.add('hold');tm=setTimeout(()=>{held=true;el.classList.remove('hold');openInspect(c)},650)};
+  const stop=()=>{clearTimeout(tm);el.classList.remove('hold')};
+  el.onpointerup=el.onpointerleave=el.onpointercancel=stop;
+  el.oncontextmenu=e=>{if(insp)e.preventDefault()};
+  el.onclick=()=>{if(held){held=false;return}openZoom(el,{c},'')};
+ });
 }
 function showRules(){
  view='rules';leaveGame();
