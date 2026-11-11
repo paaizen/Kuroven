@@ -13,7 +13,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const LIM=45000, MAXD=20, MAXS=8, MAXX=2, HANDMAX=7;
 let POOL=null, REG={}, CHARS=[], EVOS=[];
-let G=null, ui={}, view='menu', alive=false;
+let G=null, ui={}, view='boost', alive=false;
 
 /* ---------- cartes : rendu ---------- */
 const KM='<svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-24 50 50)"><rect x="29" y="14" width="42" height="72" rx="6" fill="none" stroke="var(--k2)" stroke-width="4"/></g><g transform="rotate(24 50 50)"><rect x="29" y="14" width="42" height="72" rx="6" fill="var(--k1)" stroke="var(--bk)" stroke-width="2"/></g><circle cx="50" cy="50" r="13" fill="var(--bk)" stroke="var(--k1)" stroke-width="3"/><path d="M44 43h3.2v14H44zM47.2 49.6l5-6.6h4.2l-6 8 6 8h-4.2l-5-6.6z" fill="var(--k1)"/></svg>';
@@ -65,27 +65,43 @@ const isSup=c=>c.k==='s';
 function ensureMats(d,e0){e0.mats.forEach(m=>{if(!d.includes(m.id)){const k=d.findIndex(id=>REG[id]&&REG[id].k==='c'&&REG[id].lvl<=4&&!e0.mats.some(x=>x.id===id));if(k>=0)d[k]=m.id}});return d}
 const evolvableId=id=>EVOS.some(e=>e.mats.some(m=>m.id===id));
 const extraFor=ids=>EVOS.filter(e=>e.mats.every(m=>ids.includes(m.id))).map(e=>e.id);
-function autoDeck(col){
- if(col==null)col=rnd(6);
- const pool=CHARS.filter(c=>!evolvableId(c.id)),mine=shuffle(pool.filter(c=>c.col===col)),other=shuffle(pool.filter(c=>c.col!==col));
- const take=(lo,hi,n)=>{const r=[];for(const c of mine.concat(other)){if(r.length>=n)break;if(c.lvl>=lo&&c.lvl<=hi&&!r.includes(c))r.push(c)}return r};
- const ch=[].concat(take(1,3,4),take(4,4,4),take(5,5,3),take(6,6,1)).map(c=>c.id);
- /* soutiens : un soin, une pioche, un équipement, le Terrain de la couleur, puis les cartes de la couleur, puis le reste */
- const S0=id=>SUP.find(x=>x.id===id),sp=[];
- const add=c=>{if(c&&!sp.includes(c)&&sp.length<8)sp.push(c)};
- add(S0(Math.random()<.5?'ramen':'senzu'));add(S0('examen'));add(S0(Math.random()<.5?'forgeron':'epee'));
- SUP.filter(x=>x.t==='field'&&x.col===col).forEach(add);
- shuffle(SUP.filter(x=>x.col===col)).forEach(add);shuffle(SUP.slice()).forEach(add);
- const spIds=sp.map(c=>c.id);
- const d=shuffle(ch.concat(spIds));
- const evs=EVOS.filter(e=>e.col===col);const e0=evs.length?evs[rnd(evs.length)]:EVOS[rnd(EVOS.length)];
- if(e0)ensureMats(d,e0);return d;
+function autoDeck(col,seed,anchor){
+ seed=(seed||[]).filter(i=>REG[i]);
+ const d=seed.slice();
+ if(anchor&&!d.includes(anchor.id))d.push(anchor.id);
+ const cs0=d.map(i=>REG[i]).filter(c=>c.k==='c'||c.k==='e');
+ if(col==null){if(cs0.length){const cnt=[0,0,0,0,0,0];cs0.forEach(c=>cnt[c.col]++);col=cnt.indexOf(Math.max.apply(null,cnt))}else col=rnd(6)}
+ const series=new Set(cs0.map(c=>c.series).filter(Boolean));
+ const isS=id=>REG[id]&&isSup(REG[id]);
+ const nSup=()=>d.filter(isS).length,nCh=()=>d.length-nSup();
+ const pool=CHARS.filter(c=>!evolvableId(c.id)&&!d.includes(c.id));
+ const sc=c=>(c.col===col?3:0)+(series.has(c.series)?2.5:0)+Math.random()*2;
+ const bucket=c=>c.lvl<=3?'low':c.lvl===4?'l4':c.lvl===5?'l5':'l6';
+ const want={low:4,l4:4,l5:3,l6:1},have={low:0,l4:0,l5:0,l6:0};
+ cs0.filter(c=>c.k==='c').forEach(c=>have[bucket(c)]++);
+ const best=f=>pool.filter(c=>!d.includes(c.id)&&f(c)).sort((a,b)=>sc(b)-sc(a))[0];
+ for(const b of ['l6','l5','l4','low']){while(have[b]<want[b]&&nCh()<13){const c=best(x=>bucket(x)===b);if(!c)break;d.push(c.id);have[b]++}}
+ while(nCh()<13){const c=best(x=>x.lvl<=4);if(!c)break;d.push(c.id)}
+ const S0=id=>SUP.find(x=>x.id===id),wish=[S0(Math.random()<.5?'ramen':'senzu'),S0('examen'),S0(Math.random()<.5?'forgeron':'epee')];
+ SUP.filter(x=>x.t==='field'&&x.col===col).forEach(x=>wish.push(x));
+ shuffle(SUP.filter(x=>x.col===col)).forEach(x=>wish.push(x));shuffle(SUP.slice()).forEach(x=>wish.push(x));
+ for(const x of wish){if(!x||d.length>=MAXD||nSup()>=MAXS)break;if(!d.includes(x.id))d.push(x.id)}
+ while(d.length<MAXD){const c=best(()=>true);if(!c)break;d.push(c.id)}
+ if(!seed.length&&!anchor&&EVOS.length){const evs=EVOS.filter(e=>e.col===col),e0=evs.length?evs[rnd(evs.length)]:EVOS[rnd(EVOS.length)];if(e0)ensureMats(d,e0)}
+ return d.slice(0,MAXD);
 }
 /* choisir l'élément du deck automatique */
 function pickElem(){
  return new Promise(res=>{
-  const m=modal('<h3>Deck automatique</h3><p>Choisis l’élément principal de ton deck : on le remplit de personnages et de soutiens qui vont bien ensemble.</p><div class="cbelem">'+COL.map((c,i)=>'<button type="button" data-c="'+i+'" style="--c:'+c.c+';--c2:'+c.c2+'"><b>'+c.k+'</b><span>'+c.n+'</span></button>').join('')+'</div><div class="cbact"><button data-c="r">Au hasard</button><button class="sec" data-x="1">Annuler</button></div>');
-  m.onclick=e=>{const b=e.target.closest('button');if(!b){if(e.target===m){closeModal(m);res(null)}return}closeModal(m);if(b.dataset.x)res(null);else res(b.dataset.c==='r'?rnd(6):+b.dataset.c)};
+  const has=getDeck().length>0;
+  const m=modal('<h3>Deck automatique</h3><p>Choisis comment on le remplit. Le deck est cohérent (couleurs, séries, niveaux, soutiens utiles), mais pas « le plus optimisé » : trouver les meilleures combinaisons, c’est ton travail !</p><div class="cbelem">'+COL.map((c,i)=>'<button type="button" data-c="'+i+'" style="--c:'+c.c+';--c2:'+c.c2+'"><b>'+c.k+'</b><span>'+c.n+'</span></button>').join('')+'</div><div class="cbact" style="flex-wrap:wrap"><button data-m="anchor">Autour d’un personnage…</button>'+(has?'<button data-m="complete">Compléter mon deck</button>':'')+'<button data-c="r" class="sec">Au hasard</button><button class="sec" data-x="1">Annuler</button></div>');
+  m.onclick=async e=>{
+   const b=e.target.closest('button');if(!b){if(e.target===m){closeModal(m);res(null)}return}
+   if(b.dataset.x){closeModal(m);res(null);return}
+   if(b.dataset.m==='anchor'){closeModal(m);const c=await chooseCard('Choisis le personnage au centre du deck',CHARS.slice().sort((a,b)=>b.lvl-a.lvl),true);res(c?{anchor:c,col:c.col,seed:[]}:null);return}
+   if(b.dataset.m==='complete'){closeModal(m);res({col:null,seed:getDeck()});return}
+   closeModal(m);res({col:b.dataset.c==='r'?rnd(6):+b.dataset.c,seed:[]});
+  };
  });
 }
 function deckCheck(ids){
@@ -1176,9 +1192,9 @@ function onOut(e){
 /* ---------- vues : menu, deck, règles, partie ---------- */
 const body=()=>$('cbBody');
 function tabs(cur){
- return '<div class="cbtabs">'+[['menu','Jouer'],['build','Mon deck'],['boost','Boosters'],['rules','Règles']].map(x=>'<button data-v="'+x[0]+'" class="'+(cur===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div>';
+ return '<div class="cbnav"><b class="cbnav-logo">KUROVEN COMBAT</b>'+[['boost','Boosters'],['col','Collection'],['build','Mes decks'],['menu','Jouer'],['rules','Règles']].map(x=>'<button data-v="'+x[0]+'" class="'+(cur===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'<span class="cbnav-sp"></span><i class="cbnav-st">'+Object.keys(getCol()).length+' / '+allCards().length+' cartes</i><button class="cbnav-out" data-v="exit">← Kuroven</button></div>';
 }
-function bindTabs(){document.querySelectorAll('#cbBody .cbtabs button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='menu')showMenu();else if(v==='build')showBuild();else if(v==='boost')showBoosters();else showRules()})}
+function bindTabs(){document.querySelectorAll('#cbBody .cbnav button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='exit'){if(typeof show==='function')show('home');else location.hash='';return}if(v==='menu')showMenu();else if(v==='build')showBuild();else if(v==='boost')showBoosters();else if(v==='col')showCollection('all');else showRules()})}
 function showMenu(){
  view='menu';leaveGame();
  let d=getDeck(),ck=deckCheck(d);
@@ -1190,7 +1206,7 @@ function showMenu(){
  bindTabs();
  $('cbPlay').onclick=()=>{if(!deckCheck(getDeck()).ok){showBuild();return}startGame()};
  $('cbBuild').onclick=showBuild;$('cbOnline').onclick=()=>showOnline();
- $('cbAuto').onclick=async()=>{const c=await pickElem();if(c==null)return;setDeck(autoDeck(c));showMenu()};
+ $('cbAuto').onclick=async()=>{const c=await pickElem();if(c==null)return;setDeck(autoDeck(c.col,c.seed,c.anchor));showMenu()};
  $('cbBk').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('cbback',+b.dataset.b);showMenu()};
 }
 
@@ -1236,30 +1252,38 @@ function packHTML(t,big){
  return '<div class="pk art'+(big?' big':'')+'"><img src="combat/img/booster.png?v=2" alt="Booster" draggable="false"><i class="pk-shine"></i></div>';
 }
 let boostQty=1,boostTm=null;
+const PKN=10;
 function showBoosters(){
  view='boost';leaveGame();clearInterval(boostTm);
  const col=getCol(),tot=allCards().length,own=Object.keys(col).length,nOp=ls.get('cbopened',0)||0,pc=Math.round(own/tot*100);
  const st=stockState();boostQty=Math.max(1,Math.min(boostQty,Math.max(1,st.n)));
+ const last=(ls.get('cblast',[])||[]).map(id=>REG[id]).filter(Boolean);
+ const dk=getDeck(),dck=deckCheck(dk);
  body().innerHTML=tabs('boost')+
- '<div class="cbcard"><h2 style="margin-top:0">Boosters</h2><p>Un seul booster avec <b>toutes les cartes du jeu</b> (5 cartes par booster). Tranche-le comme dans Fruit Ninja, autant de fois que tu veux : une lumière apparaît quand une carte rare se cache dedans. C’est juste pour le plaisir : toutes les cartes restent disponibles pour construire ton deck.</p>'+
- '<div class="cbprog"><div><b>'+own+'</b> / '+tot+' cartes découvertes · '+nOp+' booster'+(nOp>1?'s':'')+' ouvert'+(nOp>1?'s':'')+'</div><div class="cbbar"><i style="width:'+pc+'%"></i></div></div>'+
- '<div class="cbstock"><div class="cbstk-n"><b id="cbStN">'+st.n+'</b><small> / '+STOCK_MAX+' boosters</small></div><div class="cbstk-d" id="cbStD"></div><div class="cbbar"><i id="cbStB" style="width:'+Math.round(st.n/STOCK_MAX*100)+'%"></i></div></div></div>'+
+ '<div class="cbhub"><div class="hb-pack"><button type="button" class="pkb" id="cbPk">'+packHTML(0,true)+'<span class="pkb-n" id="cbPkN">×'+boostQty+'</span></button></div>'+
+ '<div class="hb-txt"><h1>Ouvre un booster</h1><p>5 cartes tirées parmi tous les personnages et soutiens du jeu. Tranche le booster comme tu veux : une lumière te prévient quand une carte rare se cache dedans. C’est juste pour le plaisir, toutes les cartes restent disponibles pour tes decks.</p>'+
+ '<div class="hb-stock"><div class="hb-n"><b id="cbStN">'+st.n+'</b><small> / '+STOCK_MAX+' boosters</small></div><div class="hb-pips" id="cbPips"></div><div class="hb-d" id="cbStD"></div></div>'+
  '<div class="cbqty"><span>Combien ouvrir ?</span><button type="button" class="qb" data-d="-1">−</button><b id="cbQ">×'+boostQty+'</b><button type="button" class="qb" data-d="1">+</button>'+[1,3,5,10].map(x=>'<button type="button" class="qc'+(boostQty===x?' on':'')+'" data-q="'+x+'">×'+x+'</button>').join('')+'</div>'+
- '<div class="cbpacks one"><button type="button" class="pkb" id="cbPk">'+packHTML(0,true)+'<span class="pkb-n" id="cbPkN">×'+boostQty+'</span></button></div>'+
- '<div class="cbact" style="justify-content:center;margin-top:14px"><button id="cbColBtn" class="sec">Voir ma collection</button></div>';
+ '<div class="hb-cta"><button type="button" class="cta" id="cbOpenB">Ouvrir un booster</button></div></div></div>'+
+ '<div class="hb-row"><div class="hb-last"><h3>Dernière ouverture</h3>'+(last.length?'<div class="hb-cards">'+last.map(c=>'<div class="hb-c r'+rarityOf(c)+'" data-id="'+c.id+'">'+cardHTML(c)+'</div>').join('')+'</div>':'<p class="hb-empty">Aucun booster ouvert pour l’instant.</p>')+'</div>'+
+ '<div class="hb-tile"><b>'+own+' / '+tot+'</b><small>cartes découvertes</small></div><div class="hb-tile"><b>'+nOp+'</b><small>booster'+(nOp>1?'s':'')+' ouvert'+(nOp>1?'s':'')+'</small></div>'+
+ '<button type="button" class="hb-tile hb-link" id="cbGoDeck"><b>Mes decks</b><small>'+(dck.ok?'Deck prêt · ':'Deck à finir · ')+dk.length+' / 20 cartes</small></button></div>';
  bindTabs();
- const upd=()=>{
-  const e=$('cbStN');if(!e){clearInterval(boostTm);return}
-  const s2=stockState(),w=stockWait();e.textContent=s2.n;$('cbStB').style.width=Math.round(s2.n/STOCK_MAX*100)+'%';
-  $('cbStD').textContent=s2.n>=STOCK_MAX?'Stock plein : ouvre-en pour qu’il se recharge !':(s2.n===0?'Plus de booster · ':'')+'Prochain booster dans '+fmtMs(w)+' (1 toutes les 10 minutes, 10 maximum)';
+ const pips=()=>{
+  const s2=stockState(),w=stockWait(),el=$('cbPips');if(!el){clearInterval(boostTm);return}
+  let h='';for(let i=0;i<PKN;i++){const cls=i<s2.n?'on':i===s2.n&&s2.n<STOCK_MAX?'next':'';h+='<i class="'+cls+'" style="--i:'+i+'"><img src="combat/img/pk/p'+(i+1)+'.jpg" alt="" draggable="false">'+(cls==='next'?'<em>'+fmtMs(w)+'</em>':'')+'</i>'}
+  el.innerHTML=h;
+  $('cbStN').textContent=s2.n;
+  $('cbStD').textContent=s2.n>=STOCK_MAX?'Stock plein : ouvre-en pour qu’il se recharge !':(s2.n===0?'Plus de booster · ':'')+'Prochain booster dans '+fmtMs(w)+' · 1 toutes les 10 minutes, 10 maximum';
   const pk=$('cbPk');if(pk)pk.classList.toggle('empty',s2.n<1);
  };
- upd();boostTm=setInterval(upd,1000);
+ pips();boostTm=setInterval(pips,1000);
  const setQ=q=>{boostQty=Math.max(1,Math.min(10,Math.min(q,Math.max(1,stockState().n))));$('cbQ').textContent='×'+boostQty;$('cbPkN').textContent='×'+boostQty;document.querySelectorAll('.qc').forEach(b=>b.classList.toggle('on',+b.dataset.q===boostQty))};
  document.querySelectorAll('.qb').forEach(b=>b.onclick=()=>setQ(boostQty+ +b.dataset.d));
  document.querySelectorAll('.qc').forEach(b=>b.onclick=()=>setQ(+b.dataset.q));
- $('cbPk').onclick=()=>{if(stockState().n<1){toast('Plus de booster pour l’instant : prochain dans '+fmtMs(stockWait())+'.');return}openBooster('all',boostQty)};
- $('cbColBtn').onclick=()=>showCollection('all');
+ const go=()=>{if(stockState().n<1){toast('Plus de booster pour l’instant : prochain dans '+fmtMs(stockWait())+'.');return}openBooster('all',boostQty)};
+ $('cbPk').onclick=go;$('cbOpenB').onclick=go;$('cbGoDeck').onclick=showBuild;
+ document.querySelectorAll('.hb-c').forEach(el=>el.onclick=()=>{const c=REG[el.dataset.id];if(c)openZoom(el,{c},'')});
 }
 function closeBoost(){const o=document.getElementById('cbOpen');if(o){o.onpointerdown=o.onpointermove=o.onpointerup=null;o.remove()}}
 function openBooster(type,n){
@@ -1272,7 +1296,7 @@ function openBooster(type,n){
  const packs=Array.from({length:n},()=>rollPack(type));
  const got=[];let idx=0,dead=false;
  const best=cs=>Math.max.apply(null,cs.map(rarityOf));
- const collect=cs=>{stockUse(1);const nw=addToCol(cs.map(c=>c.id));cs.forEach(c=>got.push({c,nw:nw.includes(c.id)}));return nw};
+ const collect=cs=>{stockUse(1);ls.set('cblast',cs.map(c=>c.id));const nw=addToCol(cs.map(c=>c.id));cs.forEach(c=>got.push({c,nw:nw.includes(c.id)}));return nw};
 
 
 
@@ -1448,10 +1472,10 @@ function openBooster(type,n){
  showPack();
 }
 function showCollection(f){
- view='boost';leaveGame();
+ view='col';leaveGame();
  const col=getCol(),all=allCards().slice().sort((a,b)=>rarityOf(b)-rarityOf(a)||(a.k>b.k?1:-1)),own=all.filter(c=>col[c.id]).length;
  const list=all.filter(c=>f==='all'?true:f==='own'?col[c.id]:!col[c.id]);
- body().innerHTML=tabs('boost')+
+ body().innerHTML=tabs('col')+
  '<div class="cbcard"><h2 style="margin-top:0">Ma collection</h2><div class="cbprog"><div><b>'+own+'</b> / '+all.length+' cartes découvertes</div><div class="cbbar"><i style="width:'+Math.round(own/all.length*100)+'%"></i></div></div>'+
  '<div class="cbact" style="margin-top:10px">'+[['all','Toutes'],['own','Obtenues'],['miss','Manquantes']].map(x=>'<button type="button" class="'+(f===x[0]?'':'sec')+'" data-f="'+x[0]+'">'+x[1]+'</button>').join('')+'<button type="button" class="sec" id="cbBackB">← Boosters</button></div></div>'+
  '<div class="cbcolgrid">'+list.map(c=>{const n=col[c.id]||0,r=rarityOf(c);return '<div class="ci'+(n?'':' miss')+'" data-id="'+c.id+'" style="--rc:'+RCOL[r]+'"><div class="ci-c">'+(n?cardHTML(c):backHTML())+'</div><span class="ci-r">'+(n?RN[r]:'?')+'</span>'+(n>1?'<span class="ci-n">×'+n+'</span>':'')+'</div>'}).join('')+'</div>';
@@ -1475,39 +1499,98 @@ function showRules(){
  bindTabs();
 }
 let bf={t:'all',c:-1,q:''};
+function addToDeck(id){
+ const c=REG[id],cur=getDeck();if(!c)return false;
+ if(cur.length>=MAXD){toast('Le deck est complet (20 cartes).');return false}
+ if(cur.filter(x=>x===id).length>=2){toast('Maximum 2 exemplaires de la même carte.');return false}
+ if(isSup(c)&&cur.filter(x=>REG[x]&&isSup(REG[x])).length>=MAXS){toast('Maximum '+MAXS+' cartes soutien.');return false}
+ if(evolvableId(id)&&cur.filter(x=>evolvableId(x)).length>=MAXX){toast('Maximum '+MAXX+' personnages à évolution (✦) dans le deck.');return false}
+ cur.push(id);setDeck(cur);return true;
+}
+function removeFromDeck(id){const cur=getDeck(),k=cur.indexOf(id);if(k>=0){cur.splice(k,1);setDeck(cur)}}
+function sideInfo(c){
+ if(!c)return '<p class="dk-hint">Clique sur une carte pour la lire en grand.</p>';
+ const isC=c.k==='c'||c.k==='e';
+ let h='<div class="dk-big bk'+backN()+'"><div class="dk-bigc">'+cardHTML(c)+'</div></div><div class="dk-info"><b>'+esc(c.n)+'</b>';
+ if(isC){
+  h+='<span>Niveau '+c.lvl+' · '+COL[c.col].k+' '+COL[c.col].n+' · ATK '+c.atk+' · DEF '+c.def+'</span>';
+  h+='<span class="dim">Fort contre '+COL[(c.col+1)%6].n+' et '+COL[(c.col+2)%6].n+' · faible contre '+COL[(c.col+4)%6].n+' et '+COL[(c.col+5)%6].n+'.</span>';
+  h+='<p>「'+esc(c.sn)+'」 : '+esc(c.sd)+'</p>';
+  const evs=c.k==='c'?EVOS.filter(e=>e.mats.some(x=>x.id===c.id)):[];
+  evs.forEach(e=>{h+='<div class="dk-evo"><b>✦ Peut évoluer en « '+esc(e.n)+' »</b><br>'+(e.cond&&e.cond.length?e.cond.map(cd=>'• '+esc(condLong(cd).replace(/\.$/,''))).join('<br>'):'Aucune condition : tu peux évoluer tout de suite.')+'<br><small>Cette carte compte pour 1 de tes 2 personnages à évolution (✦) par deck.</small></div>'});
+ }else{h+='<span>Carte '+(c.t==='trap'?'Piège':'Magie')+' · '+esc(c.sub||'')+'</span><p>'+esc(c.txt)+'</p>'}
+ return h+'</div>';
+}
 function showBuild(){
  view='build';leaveGame();
- const d=getDeck();const cnt={};d.forEach(i=>cnt[i]=(cnt[i]||0)+1);
- const ck=deckCheck(d);
+ const old=document.getElementById('dkMid'),oldS=old?old.scrollTop:0;
+ const d=getDeck(),ck=deckCheck(d),cnt={};d.forEach(i=>cnt[i]=(cnt[i]||0)+1);
+ const chars=d.filter(i=>REG[i]&&!isSup(REG[i])).sort((a,b)=>(REG[b].lvl||0)-(REG[a].lvl||0)),sups=d.filter(i=>REG[i]&&isSup(REG[i]));
+ const ex=extraFor(d);
  let list=CHARS.concat(SUP);
- if(bf.t==='c')list=list.filter(x=>x.k==='c');else if(bf.t==='m')list=list.filter(x=>x.k==='s'&&x.t!=='trap');else if(bf.t==='p')list=list.filter(x=>x.k==='s'&&x.t==='trap');
+ if(bf.t==='c')list=list.filter(x=>x.k==='c');else if(bf.t==='m')list=list.filter(x=>x.k==='s'&&x.t!=='trap');else if(bf.t==='p')list=list.filter(x=>x.k==='s'&&x.t==='trap');else if(bf.t==='e')list=list.filter(x=>evolvableId(x.id));
  if(bf.c>=0)list=list.filter(x=>x.col===bf.c);
  if(bf.q)list=list.filter(x=>x.n.toLowerCase().includes(bf.q.toLowerCase()));
- const full=d.length>=MAXD;
+ const slot=(id,kind)=>id?'<div class="dsl dfull" data-id="'+id+'"><div class="dsl-c">'+cardHTML(REG[id])+'</div></div>':'<div class="dsl dempty k'+kind+'"><i>+</i></div>';
+ const nChSlots=Math.max(12,chars.length),nextEmpty=chars.length<nChSlots?chars.length:-1;
+ let chH='';for(let i=0;i<nChSlots;i++)chH+=slot(chars[i],'c');
+ let spH='';for(let i=0;i<MAXS;i++)spH+=slot(sups[i],'s');
+ let exH='';for(let i=0;i<MAXX;i++)exH+=ex[i]?'<div class="dsl dfull dx" data-id="'+ex[i].id+'" data-auto="1"><div class="dsl-c">'+cardHTML(ex[i])+'</div></div>':'<div class="dsl dempty dx"><i>✦</i></div>';
+ const sel=dkSelId&&REG[dkSelId]?REG[dkSelId]:null,inDeck=sel&&cnt[sel.id]>0;
  body().innerHTML=tabs('build')+
- '<div class="cbbar"><span class="cbcount '+(ck.ok?'ok':d.length>MAXD||ck.s>MAXS?'bad':'')+'">Deck : '+d.length+'/'+MAXD+' · soutiens '+ck.s+'/'+MAXS+' · ✦ évolutions '+ck.ev+'/'+MAXX+'</span><span style="color:var(--mut);font-size:.85rem">'+esc(ck.ok?'Deck valide.':ck.msg)+'</span><span style="flex:1"></span><button class="cbchip" id="cbRand">Deck aléatoire</button><button class="cbchip" id="cbClear">Vider</button><button class="cbchip on" id="cbGo"'+(ck.ok?'':' disabled')+'>Jouer</button></div>'+
- '<div class="cbdeck" id="cbDeck">'+(d.length?d.slice().sort((a,b)=>(REG[b].lvl||0)-(REG[a].lvl||0)).map(id=>'<div class="cbitem mini" data-r="'+id+'">'+cardHTML(REG[id])+'</div>').join(''):'<span style="color:var(--mut)">Clique sur des cartes ci-dessous pour les ajouter. Clique sur une carte du deck pour la retirer.</span>')+'</div>'+
- '<div class="cbcard" style="margin:10px 0"><b>✦ Évolutions</b> <span style="color:var(--mut);font-size:.85rem">Les personnages marqués ✦ peuvent se transformer en cours de partie : leur transformation est disponible <b>automatiquement</b> dès que le personnage est dans ton deck. <b>2 cartes évolutives au maximum</b> dans le deck ('+ck.ev+'/'+MAXX+').</span></div>'+
- '<div class="cbtabs" id="cbF" style="margin-bottom:6px">'+[['all','Tout'],['c','Personnages'],['m','Magies'],['p','Pièges']].map(x=>'<button data-t="'+x[0]+'" class="'+(bf.t===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+COL.map((c,i)=>'<button data-c="'+i+'" class="'+(bf.c===i?'on':'')+'" style="border-color:'+c.c+'">'+c.k+'</button>').join('')+'<input class="cbsearch" id="cbQ" placeholder="Rechercher un nom…" value="'+esc(bf.q)+'"></div>'+
- '<div class="cbgrid" id="cbGrid">'+list.map(x=>{const n=cnt[x.id]||0;const mx=n>=2||(isSup(x)&&ck.s>=MAXS&&true&&false);return '<div class="cbitem'+(n>=2?' max':'')+'" data-a="'+x.id+'">'+(n?'<span class="nq">×'+n+'</span>':'')+(evolvableId(x.id)?'<span class="evb" title="'+esc(evoTitle(x.id))+'">✦</span>':'')+cardHTML(x)+'</div>'}).join('')+'</div>';
+ '<div class="dk" id="cbDk">'+
+ '<section class="dk-left" id="dkDeck"><div class="dk-auto"><div><b>Deck automatique</b><small>Choisis un élément, un personnage de départ, ou complète ce que tu as déjà posé : on te fait un deck cohérent.</small></div><button type="button" id="cbRand">Remplir</button></div>'+
+ '<div class="dk-cnt"><span class="'+(ck.ok?'ok':'')+'">Deck : '+d.length+' / '+MAXD+'</span><span>Personnages '+chars.length+'</span><span>Soutiens '+sups.length+' / '+MAXS+'</span><span>✦ '+ck.ev+' / '+MAXX+'</span></div>'+
+ '<div class="dk-msg'+(ck.ok?' ok':'')+'">'+esc(ck.ok?'Deck valide : tu peux jouer.':ck.msg)+'</div>'+
+ '<div class="dk-grp"><h4>Personnages <em>'+chars.length+' / 12+</em></h4><div class="dk-slots">'+chH+'</div></div>'+
+ '<div class="dk-grp sup"><h4>Soutiens <em>'+sups.length+' / '+MAXS+'</em></h4><div class="dk-slots">'+spH+'</div></div>'+
+ '<div class="dk-grp evo"><h4>Évolutions ✦ <em>automatiques · '+ex.length+' / '+MAXX+'</em></h4><div class="dk-slots">'+exH+'</div><p class="dk-tip">Elles arrivent toutes seules quand le personnage est dans ton deck (2 maximum).</p></div>'+
+ '<div class="dk-act"><button type="button" id="cbClear" class="sec">Vider le deck</button><button type="button" id="cbGo"'+(ck.ok?'':' disabled')+'>Jouer avec ce deck</button></div></section>'+
+ '<section class="dk-mid" id="dkMid"><div class="dk-fil" id="cbF">'+[['all','Tout'],['c','Personnages'],['m','Magies'],['p','Pièges'],['e','Évolutions ✦']].map(x=>'<button data-t="'+x[0]+'" class="'+(bf.t===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+COL.map((c,i)=>'<button data-c="'+i+'" class="dot'+(bf.c===i?' on':'')+'" style="--c:'+c.c+'" title="'+c.n+'">'+c.k+'</button>').join('')+'<input id="cbQ" placeholder="Chercher…" value="'+esc(bf.q||'')+'"></div>'+
+ '<div class="dk-hint2">Glisse une carte vers ton deck, ou clique dessus puis « Ajouter au deck ». '+list.length+' cartes.</div>'+
+ '<div class="dk-grid" id="cbGrid">'+list.map(x=>{const n=cnt[x.id]||0;return '<div class="dkc'+(sel&&sel.id===x.id?' sel':'')+(n>=2?' max':'')+'" data-a="'+x.id+'">'+(n?'<span class="nq">×'+n+'</span>':'')+(evolvableId(x.id)?'<span class="evb" title="'+esc(evoTitle(x.id))+'">✦</span>':'')+'<div class="dkc-c">'+cardHTML(x)+'</div></div>'}).join('')+'</div></section>'+
+ '<aside class="dk-side" id="dkSide">'+sideInfo(sel)+(sel&&sel.k!=='e'?'<div class="dk-btns">'+(inDeck?'<button type="button" id="dkRem" class="sec">Retirer du deck</button>':'')+'<button type="button" id="dkAdd">+ Ajouter au deck</button></div>':'')+'</aside></div>';
  bindTabs();
- const z=document.createElement('div');z.id='cbZoom';z.style.cssText='position:fixed;right:16px;top:90px;z-index:50;pointer-events:none;display:none';document.body.appendChild(z);ui.zoom=z;
- const g=$('cbGrid'),dk=$('cbDeck');
- const hov=e=>{const it=e.target.closest('.cbitem');if(!it){z.style.display='none';return}const c=REG[it.dataset.a||it.dataset.r||(it.dataset.e?'e_'+it.dataset.e:'')];if(!c||window.innerWidth<900){z.style.display='none';return}z.innerHTML='<div style="width:'+(260*.8)+'px;height:'+(379*.8)+'px;position:relative" class="bk'+backN()+'"><div style="zoom:.8">'+cardHTML(c)+'</div></div>';z.style.display='block'};
- g.onmouseover=hov;dk.onmouseover=hov;g.onmouseleave=dk.onmouseleave=()=>z.style.display='none';
- g.onclick=e=>{const it=e.target.closest('.cbitem');if(!it)return;const id=it.dataset.a,c=REG[id];const cur=getDeck();
-  if(cur.length>=MAXD)return flash('Le deck est complet (20).');
-  if(cur.filter(x=>x===id).length>=2)return flash('Maximum 2 exemplaires.');
-  if(isSup(c)&&cur.filter(x=>REG[x]&&isSup(REG[x])).length>=MAXS)return flash('Maximum '+MAXS+' cartes soutien.');
-  if(evolvableId(id)&&cur.filter(x=>evolvableId(x)).length>=MAXX)return flash('Maximum '+MAXX+' cartes évolutives (✦) dans le deck.');
-  const y=window.scrollY;cur.push(id);setDeck(cur);showBuild();window.scrollTo(0,y)};
- dk.onclick=e=>{const it=e.target.closest('.cbitem');if(!it)return;const cur=getDeck();const k=cur.indexOf(it.dataset.r);if(k>=0)cur.splice(k,1);setDeck(cur);showBuild()};
- $('cbF').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t){bf.t=b.dataset.t}else if(b.dataset.c!=null){bf.c=bf.c===+b.dataset.c?-1:+b.dataset.c}showBuild()};
- $('cbQ').oninput=e=>{bf.q=e.target.value;clearTimeout(showBuild.t);showBuild.t=setTimeout(()=>{showBuild();const q=$('cbQ');q.focus();q.setSelectionRange(q.value.length,q.value.length)},300)};
- $('cbRand').onclick=async()=>{const c=await pickElem();if(c==null)return;setDeck(autoDeck(c));showBuild()};
- $('cbClear').onclick=()=>{setDeck([]);showBuild()};
+ const mid=$('dkMid');if(mid)mid.scrollTop=oldS;
+ const fitDk=()=>{const g=$('cbGrid'),c=g&&g.querySelector('.dkc');if(c&&c.clientWidth)g.style.setProperty('--dz',(c.clientWidth/260).toFixed(4))};fitDk();requestAnimationFrame(fitDk);if(!showBuild.rs){showBuild.rs=1;window.addEventListener('resize',()=>{if(view==='build')fitDk2()})}
+ const reload=()=>showBuild();
+ $('cbF').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t){bf.t=b.dataset.t}else if(b.dataset.c!=null){bf.c=bf.c===+b.dataset.c?-1:+b.dataset.c}reload()};
+ $('cbQ').oninput=e=>{bf.q=e.target.value;clearTimeout(showBuild.t);showBuild.t=setTimeout(()=>{reload();const q=$('cbQ');q.focus();q.setSelectionRange(q.value.length,q.value.length)},300)};
+ $('cbRand').onclick=async()=>{const c=await pickElem();if(c==null)return;setDeck(autoDeck(c.col,c.seed,c.anchor));dkSelId=null;reload()};
+ $('cbClear').onclick=()=>{setDeck([]);reload()};
  $('cbGo').onclick=()=>{if(deckCheck(getDeck()).ok)startGame()};
+ const ad=$('dkAdd');if(ad)ad.onclick=()=>{if(addToDeck(sel.id))reload()};
+ const rm=$('dkRem');if(rm)rm.onclick=()=>{removeFromDeck(sel.id);reload()};
+ /* clic : on lit la carte en grand */
+ const selectCard=id=>{dkSelId=id;reload()};
+ $('cbGrid').onclick=e=>{if(dkDragged)return;const it=e.target.closest('.dkc');if(it)selectCard(it.dataset.a)};
+ $('dkDeck').onclick=e=>{if(dkDragged)return;const it=e.target.closest('.dsl.dfull');if(it)selectCard(it.dataset.id)};
+ /* glisser une carte de la collection vers le deck */
+ $('cbGrid').ondragstart=e=>e.preventDefault();
+ $('cbGrid').onpointerdown=e=>{
+  if(e.button!==0||e.pointerType==='touch')return;const it=e.target.closest('.dkc');if(!it)return;
+  const id=it.dataset.a,x0=e.clientX,y0=e.clientY;let gh=null;
+  const targets=()=>[...document.querySelectorAll('#dkDeck .dsl.dempty:not(.dx)')].filter(t=>REG[id]&&isSup(REG[id])?t.classList.contains('ks'):t.classList.contains('kc'));
+  const move=ev=>{
+   if(!gh){if(Math.hypot(ev.clientX-x0,ev.clientY-y0)<8)return;
+    gh=document.createElement('div');gh.className='cbghost bk'+backN();const r=it.getBoundingClientRect();gh.style.width='104px';gh.style.height='152px';gh.style.setProperty('--zs',(104/260).toFixed(3));gh.innerHTML=cardHTML(REG[id]);(document.getElementById('v-cb')||document.body).appendChild(gh);
+    it.classList.add('dragging');targets().forEach(t=>t.classList.add('hot'));document.getElementById('dkDeck').classList.add('drop');dkDragged=true}
+   gh.style.transform='translate('+(ev.clientX-52)+'px,'+(ev.clientY-76)+'px) rotate(-4deg) scale(1.05)';
+  };
+  const up=ev=>{
+   document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);
+   if(gh){
+    gh.remove();it.classList.remove('dragging');document.querySelectorAll('.dsl.hot').forEach(t=>t.classList.remove('hot'));const dkEl=document.getElementById('dkDeck');if(dkEl)dkEl.classList.remove('drop');
+    const el=document.elementFromPoint(ev.clientX,ev.clientY);
+    if(el&&el.closest&&el.closest('#dkDeck')){ if(addToDeck(id))reload(); }
+    setTimeout(()=>dkDragged=false,60);
+   }
+  };
+  document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);
+ };
 }
+let dkDragged=false,dkSelId=null;
+function fitDk2(){const g=document.getElementById('cbGrid'),c=g&&g.querySelector('.dkc');if(c&&c.clientWidth)g.style.setProperty('--dz',(c.clientWidth/260).toFixed(4))}
 const evoTitle=id=>{const e=EVOS.find(e=>e.mats.some(m=>m.id===id));return e?'Évolution : '+e.n+(e.cond&&e.cond.length?' — '+e.cond.map(condLong).join(' '):''):''};
 function flash(t){const b=document.querySelector('#cbBody .cbbar span');if(b){const o=b.textContent;b.textContent=t;setTimeout(()=>{if(b)b.textContent=o},1800)}}
 function leaveGame(keepNet){
@@ -1588,14 +1671,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeZoom()});
 /* ---------- API pour index.html ---------- */
 window.CB={
  async enter(){
-  alive=true;const b=body();if(!b)return;
+  alive=true;document.body.classList.add('cbfull');const b=body();if(!b)return;
   if(G&&!G.over&&view==='game'){if(G.turn===0&&!G.busy&&!G.tm)startTimer();return}
   b.innerHTML='<p class="sub" style="text-align:center">Chargement des cartes…</p>';
   try{await loadPool()}catch(e){b.innerHTML='<p class="sub" style="text-align:center">Impossible de charger les personnages (AniList ne répond pas). <button class="cbchip" id="cbRetry">Réessayer</button></p>';const r=$('cbRetry');if(r)r.onclick=()=>CB.enter();return}
   if(!getDeck().length&&deckCheck(getDeck()).n===0)setDeck(autoDeck());
-  if(view==='build')showBuild();else if(view==='rules')showRules();else showMenu();
+  if(view==='build')showBuild();else if(view==='rules')showRules();else if(view==='menu')showMenu();else if(view==='col')showCollection('all');else showBoosters();
  },
  async joinCode(code){await CB.enter();if(!getDeck().length)return;showOnline();const i=$('cbCode');if(i)i.value=code;joinDuel(code)},
- leave(){alive=false;stopTimer()}
+ leave(){alive=false;stopTimer();document.body.classList.remove('cbfull')}
 };
 })();
