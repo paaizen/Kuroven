@@ -182,6 +182,13 @@ function burst(el,col){
  sparks(el,col,10);
 }
 function shake(){const b=boardEl();if(!b)return;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}
+/* Combat est toujours sombre, quel que soit le thème choisi pour le reste du site */
+let savedTheme=null;
+function forceDark(on){
+ const r=document.documentElement;
+ if(on){if(savedTheme===null)savedTheme=r.dataset.theme||'';r.dataset.theme='dark';r.style.colorScheme='dark'}
+ else if(savedTheme!==null){if(savedTheme)r.dataset.theme=savedTheme;else delete r.dataset.theme;r.style.colorScheme='';savedTheme=null}
+}
 function toast(t){log(t);const a=$('cbHint');if(a){a.textContent=t;a.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>a.style.opacity=0,2400)}}
 function modal(html){const m=document.createElement('div');m.className='cbmodal bk'+backN();m.innerHTML='<div class="bx">'+html+'</div>';(document.getElementById('v-cb')||document.body).appendChild(m);ui.modal=m;return m}
 function closeModal(m){if(m&&m.parentNode)m.remove();ui.modal=null}
@@ -1491,7 +1498,7 @@ function showCollection(f){
 function showRules(){
  view='rules';leaveGame();
  body().innerHTML=tabs('rules')+'<div class="cbcard cbrules"><h2 style="margin-top:0">Règles</h2><ul>'+
- '<li><b>But</b> : faire tomber les points de vie de l’adversaire de 8000 à 0. Perdre sa pioche fait aussi perdre.</li>'+
+ '<li><b>But</b> : faire tomber les points de vie de l’adversaire de 8000 à 0. Si ta pioche est vide, tu ne perds pas : tu continues de jouer avec ce que tu as.</li>'+
  '<li><b>Deck</b> : 20 cartes exactement, 2 exemplaires maximum de la même carte, 8 cartes soutien au plus.</li>'+
  '<li><b>Début</b> : on pioche 5 cartes. Celui qui commence ne pioche pas et ne peut pas attaquer au premier tour. Main limitée à 7 cartes.</li>'+
  '<li><b>Invoquer</b> : un personnage par tour. Niveau 1 à 4 : gratuit. Niveau 5 et 6 : il faut sacrifier un de tes personnages. Tu as 3 zones de personnages.</li>'+
@@ -1675,7 +1682,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeZoom()});
 /* ---------- API pour index.html ---------- */
 window.CB={
  async enter(){
-  alive=true;document.body.classList.add('cbfull');const b=body();if(!b)return;
+  alive=true;document.body.classList.add('cbfull');forceDark(true);const b=body();if(!b)return;
   if(G&&!G.over&&view==='game'){if(G.turn===0&&!G.busy&&!G.tm)startTimer();return}
   b.innerHTML='<p class="sub" style="text-align:center">Chargement des cartes…</p>';
   try{await loadPool()}catch(e){b.innerHTML='<p class="sub" style="text-align:center">Impossible de charger les personnages (AniList ne répond pas). <button class="cbchip" id="cbRetry">Réessayer</button></p>';const r=$('cbRetry');if(r)r.onclick=()=>CB.enter();return}
@@ -1683,6 +1690,6 @@ window.CB={
   if(view==='build')showBuild();else if(view==='rules')showRules();else if(view==='menu')showMenu();else if(view==='col')showCollection('all');else showBoosters();
  },
  async joinCode(code){await CB.enter();if(!getDeck().length)return;showOnline();const i=$('cbCode');if(i)i.value=code;joinDuel(code)},
- leave(){alive=false;stopTimer();document.body.classList.remove('cbfull')}
+ leave(){alive=false;stopTimer();document.body.classList.remove('cbfull');forceDark(false)}
 };
 })();

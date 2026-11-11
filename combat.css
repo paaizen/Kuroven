@@ -716,3 +716,11 @@ body.cbfull #v-cb .cbcolgrid{margin-left:28px;margin-right:28px}
 body.cbfull #v-cb .cbelem button{border-radius:0}
 body.cbfull{background-attachment:fixed!important}
 body.cbfull #v-cb{background:transparent!important}
+
+/* sombre pour tout le monde : même les éléments posés hors de la vue Combat */
+body.cbfull{--bg:#0c0f17;--card:#121722;--tx:#eef0f8;--mut:#aab3c8;--bd:#ffffff1f;--panel:#121722;--in:#161c29;color-scheme:dark}
+body.cbfull .cbghost,body.cbfull .cbpop,body.cbfull .cbdrw,body.cbfull #cbDragHint,body.cbfull .cbpos{color:#eef0f8}
+body.cbfull ::-webkit-scrollbar{width:12px;height:12px}
+body.cbfull ::-webkit-scrollbar-track{background:#0a0d14}
+body.cbfull ::-webkit-scrollbar-thumb{background:#2a3350;border-radius:6px;border:2px solid #0a0d14}
+body.cbfull input,body.cbfull select,body.cbfull textarea{color-scheme:dark}
