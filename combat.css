@@ -634,7 +634,7 @@
 /* ================= mode immersif : Kuroven Combat prend toute la page, comme un autre site ================= */
 body.cbfull{background:#0c0f17!important;color:#eef0f8}
 body.cbfull header.top,body.cbfull #mtabs{display:none!important}
-body.cbfull #v-cb{--bg:#0c0f17;--card:#121722;--tx:#eef0f8;--mut:#aab3c8;--bd:#ffffff1f;--panel:#121722;--in:#161c29;--ac:#ffd84a;--onac:#12151b;color:#eef0f8;max-width:none!important;margin:0!important;padding:0 0 24px!important;min-height:100vh;background:#0c0f17}
+body.cbfull #v-cb{--bg:#0c0f17;--card:#121722;--mut:#aab3c8;--bd:#ffffff1f;--panel:#121722;--in:#161c29;--ac:#ffd84a;--onac:#12151b;color:#eef0f8;max-width:none!important;margin:0!important;padding:0 0 24px!important;min-height:100vh;background:#0c0f17}
 body.cbfull #v-cb>.btn.back{display:none}
 body.cbfull #cbBody>*:not(.cbnav):not(.cbhub):not(.dk):not(.hb-row){margin-left:28px;margin-right:28px}
 .cbnav{display:flex;gap:6px;align-items:center;padding:14px 28px;border-bottom:1px solid #ffffff14;background:#0a0d14;position:sticky;top:0;z-index:30;flex-wrap:wrap}
@@ -658,7 +658,7 @@ body.cbfull #cbBody>.cbcard,body.cbfull #cbBody>.cbhero{margin-top:18px}
 
 
 /* sombre pour tout le monde : même les éléments posés hors de la vue Combat */
-body.cbfull{--bg:#0c0f17;--card:#121722;--tx:#eef0f8;--mut:#aab3c8;--bd:#ffffff1f;--panel:#121722;--in:#161c29;color-scheme:dark}
+body.cbfull{--bg:#0c0f17;--card:#121722;--mut:#aab3c8;--bd:#ffffff1f;--panel:#121722;--in:#161c29;color-scheme:dark}
 body.cbfull .cbghost,body.cbfull .cbpop,body.cbfull .cbdrw,body.cbfull #cbDragHint,body.cbfull .cbpos{color:#eef0f8}
 body.cbfull ::-webkit-scrollbar{width:12px;height:12px}
 body.cbfull ::-webkit-scrollbar-track{background:#0a0d14}
@@ -740,3 +740,15 @@ body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
 .cbt .hpg .arg span{flex:1;height:calc(var(--cw)*.035);margin:0;background:#ffffff22;border:0;box-shadow:none}
 .cbt .hpg .arg span i{background:linear-gradient(180deg,#bfe0ff,#4a90e2 60%,#2a5fb0);box-shadow:0 0 calc(var(--cw)*.04) #4a90e299}
 .cbt .hpg{width:calc(var(--cw)*.54)}
+/* cartes : image un peu plus basse, série visible, description entière */
+#v-cb .y .artf{height:196px}
+#v-cb .y .code{top:265px;left:24px;right:24px;text-align:right;font:700 8px/1.1 var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#v-cb .y .desc{top:278px;height:73px;padding:3px 7px;font:500 6.9px/1.2 var(--tx)}
+#v-cb .y.evo .desc{font-size:6.5px}
+#v-cb .y .desc b{font-weight:700}
+#v-cb .y .wh{margin-top:1px}
+#v-cb .y .desc br{content:"";display:block;margin-top:1px}
+#v-cb .y .desc{font:500 8px/1.18 var(--tx)}
+#v-cb .y.evo .desc{font-size:7.4px}
+#v-cb .y .wh{font-size:8px}
+#v-cb .y .wh span{width:11px;height:11px;font-size:8px}
