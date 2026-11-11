@@ -123,15 +123,20 @@ const SUP=[
 {id:'reunion',n:'Réunion de guilde',t:'mag',sub:'Normale',img:'reunion',col:0,txt:'Pose un personnage de niveau 5 ou 6 depuis ta main sans sacrifice.'},
 {id:'pacte',n:'Pacte avec un démon',t:'mag',sub:'Normale',img:'pacte',col:4,txt:'Perds 350 points de vie : un de tes personnages gagne 250 ATK de façon permanente.'},
 {id:'forgeron',n:'Forgeron',t:'eq',sub:'Équipement',img:'forgeron',col:1,txt:'Équipe un de tes personnages : il gagne 150 ATK. Si le personnage quitte le terrain, cette carte est détruite.'},
-{id:'epee',n:'Épée légendaire',t:'eq',sub:'Équipement',img:'epee',col:3,txt:'Équipe un de tes personnages : il gagne 100 ATK et 100 DEF.'},
+{id:'epee',n:'Épée légendaire',t:'eq',sub:'Équipement',img:'epee',col:3,txt:'Équipe un de tes personnages : il gagne 100 ATK et 100 d’armure.'},
 {id:'cape',n:'Cape d’invisibilité',t:'eq',sub:'Équipement',img:'cape',col:5,txt:'Équipe un de tes personnages : les pièges de l’adversaire ne peuvent pas le cibler.'},
 {id:'arene',n:'Arène du tournoi',t:'field',sub:'Terrain',img:'arene',col:1,txt:'Tant que cette carte est sur le terrain, tous les personnages gagnent 75 ATK.'},
-{id:'village',n:'Village caché',t:'field',sub:'Terrain',img:'village',col:2,txt:'Tant que cette carte est sur le terrain, tous les personnages gagnent 100 DEF.'},
+{id:'village',n:'Village caché',t:'field',sub:'Terrain',img:'village',col:2,txt:'Tant que cette carte est sur le terrain, tous les personnages gagnent 100 d’armure.'},
 {id:'lune',n:'Nuit de pleine lune',t:'field',sub:'Terrain',img:'lune',col:4,txt:'Tant que cette carte est sur le terrain, les personnages Ombre (闇) gagnent 100 ATK.'},
 {id:'rival',n:'Rival jaloux',t:'trap',sub:'Normale',img:'rival',col:4,txt:'Quand un personnage de l’adversaire attaque : annule l’attaque et force-le à passer en position de défense.'},
 {id:'embuscade',n:'Embuscade',t:'trap',sub:'Normale',img:'embuscade',col:0,txt:'Quand un personnage de l’adversaire attaque avec 500 ATK ou moins : détruis-le.'},
 {id:'contre',n:'Contre-attaque',t:'trap',sub:'Normale',img:'contre',col:3,txt:'Quand un personnage de l’adversaire attaque : annule l’attaque et inflige à l’adversaire des dégâts égaux à l’ATK de l’attaquant.'},
 {id:'rideau',n:'Rideau de fumée',t:'trap',sub:'Contre',img:'rideau',col:2,txt:'Quand l’adversaire active une carte Magie : annule son effet et détruis-la.'},
+{id:'provocation',n:'Provocation',t:'mag',sub:'Rapide',img:'provocation',col:0,txt:'Choisis un de tes personnages : pendant 2 tours, l’adversaire ne peut attaquer que lui. Fais-en un défenseur, c’est fait pour ça.'},
+{id:'potion',n:'Potion',t:'mag',sub:'Rapide',img:'potion',col:3,txt:'Rends 500 PV à un de tes personnages blessés. Une seule Potion par tour.'},
+{id:'paralysie',n:'Paralysie',t:'mag',sub:'Rapide',img:'paralysie',col:4,txt:'Choisis un personnage adverse : il ne peut pas attaquer pendant son prochain tour.'},
+{id:'haki',n:'Haki des rois',t:'mag',sub:'Rapide',img:'haki',col:0,txt:'Choisis un personnage adverse dont l’ATK est inférieure à celle d’un de tes personnages : il s’endort et ne peut pas attaquer pendant 2 tours. Il se réveille s’il subit des dégâts.'},
+{id:'rappel',n:'Rappel',t:'mag',sub:'Rapide',img:'rappel',col:3,txt:'Renvoie en main un de tes personnages posés. Il revient avec tous ses PV quand tu le reposes, mais tu ne peux plus invoquer ce tour.'},
 {id:'sacrifice',n:'Sacrifice héroïque',t:'trap',sub:'Normale',img:'sacrifice',col:2,txt:'Quand un de tes personnages va être détruit au combat : détruis un autre de tes personnages à la place. Le premier survit.'},
 {id:'amitie',n:'Pouvoir de l’amitié',t:'trap',sub:'Continu',img:'amitie',col:5,txt:'Tant que tu contrôles 3 personnages, tous tes personnages gagnent 350 ATK. Si tu en contrôles moins, elle n’a aucun effet.'}];
 SUP.forEach((s,i)=>{s.k='s';s.no=(s.t==='trap'?30000000:20000000)+i+1});
@@ -139,16 +144,20 @@ SUP.forEach((s,i)=>{s.k='s';s.no=(s.t==='trap'?30000000:20000000)+i+1});
 const hash=n=>{let h=(n*2654435761)>>>0;h^=h>>>13;h=Math.imul(h,0x5bd1e995)>>>0;return h^(h>>>15)};
 
 /* personnage à partir d'une fiche AniList et de son rang de popularité (0 = le plus aimé) */
+/* profils de rôle : un assaillant frappe fort mais tient peu, un défenseur encaisse et renvoie des Épines, un polyvalent est au milieu et perce l'armure */
+const ROLEP={att:{atk:1400,hp:900,arm:0,refl:0,pierce:false},pol:{atk:1300,hp:1150,arm:300,refl:0,pierce:true},def:{atk:650,hp:2050,arm:700,refl:400,pierce:false}};
+const r50=v=>Math.round(v/50)*50;
+function statsFor(role,L,j){const b=ROLEP[role];return {atk:Math.max(100,r50(b.atk*L*j)),def:Math.max(150,r50(b.hp*L*(2-j))),arm:r50(b.arm*L),refl:r50(b.refl*L),pierce:b.pierce,role}}
 function mkChar(c,rank){
  const lvl=rank<10?6:rank<28?5:rank<60?4:rank<100?3:2;
  const h=hash(c.id);
- const base={2:300,3:450,4:550,5:750,6:950}[lvl];
- const atk=Math.round((base+(h%5)*15)/50)*50;
- const def=Math.round(atk*(0.45+((h>>3)%5)*0.1)/50)*50;
+ const L={2:300,3:450,4:550,5:750,6:950}[lvl]/950,j=1+((h%7)-3)*0.04;
+ const q=(h>>5)%10,role=q<4?'att':q<7?'pol':'def';
+ const st=statsFor(role,L,j);
  const col=c.id%6;
  const s=sigFor(c.name.full,col);
  return {k:'c',id:'c'+c.id,n:c.name.full,img:c.image.large,series:(c.media&&c.media.nodes[0]&&c.media.nodes[0].title.romaji)||'',
-  lvl,atk,def,col,ex:lvl===6,sn:s.n,sd:s.d,sig:s.sig,no:10000000+((h%80000)*10)+lvl};
+  lvl,atk:st.atk,def:st.def,arm:st.arm,refl:st.refl,pierce:st.pierce,role:st.role,col,ex:lvl===6,sn:s.n,sd:s.d,sig:s.sig,no:10000000+((h%80000)*10)+lvl};
 }
 
 /* évolutions (fusion) : mat = mots présents dans le nom des personnages à avoir sur le terrain.
@@ -173,5 +182,5 @@ const EVO=[
 {id:'asta-demon',cond:[{t:'grave',n:2}],n:'Asta : Mode démon',mat:['asta'],col:4,atk:3800,def:2600,sn:'Tranchant anti-magie',sd:'Une épée démoniaque qui annule toute la magie.'},
 {id:'kaneki-kagune',cond:[{t:'lp',max:5000}],n:'Ken Kaneki : Kagune complet',mat:['ken kaneki'],col:4,atk:3700,def:2600,sn:'Kagune Rinkaku',sd:'Des tentacules rouges qui transpercent tout.'},{id:'saitama-serieux',cond:[{t:'field',id:'arene'}],n:'Saitama : Coup sérieux',mat:['saitama'],col:1,atk:4200,def:3000,sn:'Coup sérieux',sd:'Un seul coup de poing, sans aucune retenue.'}];
 
-window.CBD={COL,beats,factor,SUP,mkChar,sigFor,EVO};
+window.CBD={COL,beats,factor,SUP,mkChar,sigFor,EVO,statsFor};
 })();

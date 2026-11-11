@@ -26,7 +26,7 @@ function evoDesc(c){
  return '<br><b style="color:#5a2fb0">✦ Évolution</b> : '+l.map(e=>e.cond&&e.cond.length?esc(e.cond.map(condShort).join(' ; ')):'aucune condition').join(' / ')+'.';
 }
 /* rôle d'un personnage, d'après ses stats : attaquant, défenseur ou polyvalent */
-function roleOf(c){const r=c.def/Math.max(1,c.atk);return r<=.55?['att','Attaquant']:r>=.75?['def','Défenseur']:['pol','Polyvalent']}
+function roleOf(c){return c.role==='att'?['att','Attaquant']:c.role==='def'?['def','Défenseur']:['pol','Polyvalent']}
 function cardHTML(c,o){
  o=o||{};
  if(c.k==='c'||c.k==='e'){
@@ -38,7 +38,7 @@ function cardHTML(c,o){
   '<div class="name">'+esc(c.n)+'</div><span class="orb">'+COL[c.col].k+'</span><div class="stars">'+'<i>★</i>'.repeat(c.lvl)+'</div>'+
   '<div class="artf"><div class="cart">'+im+'</div></div><div class="code">'+(evo?'ÉVOLUTION':esc((c.series||'KVN').slice(0,22)))+'</div>'+
   '<div class="desc"><b>['+(evo?'Évolution':'Personnage')+' / '+COL[c.col].n+(c.ex&&!evo?' / Rare':'')+']</b> <b>「'+esc(c.sn)+'」</b> : '+esc(c.sd)+(evo?evoNote(c):whoHTML(c.col)+evoDesc(c))+'</div><div class="id">'+c.no+'</div>'+
-  '<div class="stat"><span>ATK/ <u'+sa+'>'+a+'</u></span><span>DEF/ <u'+sd+'>'+d+'</u></span></div></div>';
+  '<div class="stat"><span>ATK/ <u'+sa+'>'+a+'</u></span><span>PV/ <u'+sd+'>'+d+'</u></span></div></div>';
  }
  const trap=c.t==='trap';
  return '<div class="y '+(trap?'pie':'mag')+' k'+c.col+'"><div class="cface"></div><div class="plate"></div><div class="sticker"></div>'+
@@ -60,14 +60,15 @@ async function loadPool(){
   ls.set('cbpool1',{t:Date.now(),l});
  }
  CHARS=l.map((x,i)=>mkChar(x,i));REG={};CHARS.forEach(c=>REG[c.id]=c);SUP.forEach(s=>REG[s.id]=s);
- EVOS=[];EVO.forEach(e=>{const ms=e.mat.map(k=>CHARS.find(c=>c.n.toLowerCase().includes(k)));if(ms.every(Boolean)){const ev={k:'e',id:'e_'+e.id,eid:e.id,n:e.n,img:ms[0].img,series:ms.map(m=>m.n).join(' + '),lvl:7,atk:Math.round(e.atk*.335/50)*50,def:Math.round(e.def*.335/50)*50,col:e.col,ex:true,sn:e.sn,sd:e.sd,cond:e.cond||[],mats:ms,no:90000000+EVOS.length*13};EVOS.push(ev);REG[ev.id]=ev}});
+ EVOS=[];EVO.forEach(e=>{const ms=e.mat.map(k=>CHARS.find(c=>c.n.toLowerCase().includes(k)));if(ms.every(Boolean)){const ev={k:'e',id:'e_'+e.id,eid:e.id,n:e.n,img:ms[0].img,series:ms.map(m=>m.n).join(' + '),lvl:7,...(()=>{const rr=e.def/e.atk,role=rr<.72?'att':rr<.9?'pol':'def',st=D.statsFor(role,1.25,1);return {atk:st.atk,def:st.def,arm:st.arm,refl:st.refl,pierce:st.pierce,role}})(),col:e.col,ex:true,sn:e.sn,sd:e.sd,cond:e.cond||[],mats:ms,no:90000000+EVOS.length*13};EVOS.push(ev);REG[ev.id]=ev}});
  POOL=true;return POOL;
 }
 const isSup=c=>c.k==='s';
 function ensureMats(d,e0){e0.mats.forEach(m=>{if(!d.includes(m.id)){const k=d.findIndex(id=>REG[id]&&REG[id].k==='c'&&REG[id].lvl<=4&&!e0.mats.some(x=>x.id===id));if(k>=0)d[k]=m.id}});return d}
 const evolvableId=id=>EVOS.some(e=>e.mats.some(m=>m.id===id));
 const extraFor=ids=>EVOS.filter(e=>e.mats.every(m=>ids.includes(m.id))).map(e=>e.id);
-function autoDeck(col,seed,anchor){
+const AIOFF=['provocation','haki','rappel'];
+function autoDeck(col,seed,anchor,forAI){
  seed=(seed||[]).filter(i=>REG[i]);
  const d=seed.slice();
  if(anchor&&!d.includes(anchor.id))d.push(anchor.id);
@@ -87,7 +88,7 @@ function autoDeck(col,seed,anchor){
  const S0=id=>SUP.find(x=>x.id===id),wish=[S0(Math.random()<.5?'ramen':'senzu'),S0('examen'),S0(Math.random()<.5?'forgeron':'epee')];
  SUP.filter(x=>x.t==='field'&&x.col===col).forEach(x=>wish.push(x));
  shuffle(SUP.filter(x=>x.col===col)).forEach(x=>wish.push(x));shuffle(SUP.slice()).forEach(x=>wish.push(x));
- for(const x of wish){if(!x||d.length>=MAXD||nSup()>=MAXS)break;if(!d.includes(x.id))d.push(x.id)}
+ for(const x of wish){if(!x||d.length>=MAXD||nSup()>=MAXS)continue;if(forAI&&AIOFF.includes(x.id))continue;if(!d.includes(x.id))d.push(x.id)}
  while(d.length<MAXD){const c=best(()=>true);if(!c)break;d.push(c.id)}
  if(!seed.length&&!anchor&&EVOS.length){const evs=EVOS.filter(e=>e.col===col),e0=evs.length?evs[rnd(evs.length)]:EVOS[rnd(EVOS.length)];if(e0)ensureMats(d,e0)}
  return d.slice(0,MAXD);
@@ -119,7 +120,7 @@ const getExtra=()=>extraFor(getDeck());
 
 /* ---------- état de partie ---------- */
 const mkP=(ids,ex,rng)=>({extra:(ex||[]).map(i=>REG[i]).filter(Boolean),lp:8000,deck:shuffle(ids.map(i=>REG[i]),rng),hand:[],mon:[null,null,null],st:[null,null,null],grave:[],normal:false,senzu:false});
-const mkM=(c,pos)=>({card:c,pos,atkP:0,defP:0,tmp:0,ts:G.n,att:false,chg:false});
+const mkM=(c,pos)=>({card:c,pos,atkP:0,defP:0,tmp:0,ts:G.n,att:false,chg:false,hp:c.def,full:true,para:0,sleep:0});
 const P=i=>G.p[i], nm=i=>i===0?'Toi':'L’adversaire', S=(pi,a,b)=>pi===0?'Tu '+a:'L’adversaire '+b;
 const mons=pi=>G.p[pi].mon.map((m,i)=>m?{m,i}:null).filter(Boolean);
 const eqN=(pi,m,id)=>G.p[pi].st.filter(s=>s&&s.to===m&&s.card.id===id).length;
@@ -127,7 +128,17 @@ const hasCape=(pi,m)=>eqN(pi,m,'cape')>0;
 const fld=()=>G.field&&G.field.card.id;
 const friend=pi=>mons(pi).length>=3&&G.p[pi].st.some(s=>s&&s.up&&s.card.id==='amitie');
 function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;return Math.max(0,v)}
-function def(pi,m){let v=m.card.def+m.defP+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;return Math.max(0,v)}
+function def(pi,m){return Math.max(1,m.card.def+m.defP)}
+function armor(pi,m){let v=(m.card.arm||0)+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;return v}
+const tauntIdx=att=>{const t=G&&G.taunt;if(!t||t.owner===att||!P(t.owner).mon.includes(t.m))return -1;return P(t.owner).mon.indexOf(t.m)};
+/* dégâts d'une attaque : en attaque on reçoit tout et on riposte ; en défense l'armure absorbe, les Épines renvoient */
+function calcHit(pi,A,T){
+ const a=atk(pi,A),f=factor(A.card.col,T.card.col);let dmg,back;
+ if(T.pos==='a'){dmg=Math.round(a*f);back=Math.round(atk(1-pi,T)*factor(T.card.col,A.card.col))}
+ else{const raw=a*f,arm=A.card.pierce?0:armor(1-pi,T);dmg=Math.round(Math.max(raw-arm,.2*raw)*.75);back=T.card.refl||0}
+ const kill=dmg>=T.hp&&!T.full,survive=!kill;
+ return {dmg,back,kill,dies:survive&&back>=A.hp&&!A.full,left:Math.max(0,T.hp-dmg),pierce:!!A.card.pierce&&T.pos==='d',arm:T.pos==='d'?armor(1-pi,T):0,f};
+}
 const freeMon=pi=>G.p[pi].mon.indexOf(null), freeSt=pi=>G.p[pi].st.indexOf(null);
 
 /* ---------- interface : utilitaires ---------- */
@@ -270,7 +281,7 @@ async function remoteAct(m){
   const p=P(1);
   switch(m.t){
    case 'sum':await doSummon(1,m.hi,m.slot,m.pos,m.trib);break;
-   case 'spl':{let tg=null;if(m.tgk==='m')tg=m.tg;else if(m.tgk==='g')tg=p.grave[m.tg];else if(m.tgk==='h')tg=p.hand[m.tg];await playSpell(1,m.hi,tg);break}
+   case 'spl':{let tg=null;if(m.tgk==='m'||m.tgk==='f')tg=m.tg;else if(m.tgk==='g')tg=p.grave[m.tg];else if(m.tgk==='h')tg=p.hand[m.tg];await playSpell(1,m.hi,tg);break}
    case 'drw':await drawN(1,1);break;
    case 'set':await setTrap(1,m.hi);break;
    case 'att':await battle(1,m.i,m.ti);break;
@@ -421,6 +432,16 @@ async function lunge(pi,i,ti){
  try{await A.animate([{transform:'translate(0,'+up+'px) scale(1.14)',filter:lf},{transform:'translate('+dx+'px,'+dy+'px) scale(1.25) rotate('+(pi===0?-4:4)+'deg)',offset:.45,filter:'drop-shadow(0 18px 14px #000) brightness(1.4)'},{transform:'translate(0,0) scale(1)',filter:'none'}],{duration:800,easing:'cubic-bezier(.5,0,.3,1)'}).finished}catch(e){}
  A.style.zIndex='';
 }
+async function hitMon(pi,i,d){
+ const m=P(pi).mon[i];if(!m||d<=0)return false;d=Math.round(d);let shown=d;
+ if(m.sleep){m.sleep=0;log(m.card.n+' se réveille !')}
+ if(m.full&&d>=m.hp){shown=m.hp-1;m.hp=1;m.full=false;log(m.card.n+' tient bon : Dernier souffle !');banner('DERNIER SOUFFLE','#ffd84a')}
+ else{m.hp-=d;m.full=false}
+ floatTxt(zoneEl('m',pi,i),'-'+shown);render();await sleep(380);
+ if(m.hp<=0){if(await saveBy(pi,i)){m.hp=1;return false}await destroyMon(pi,i);return true}
+ return false;
+}
+function healMon(pi,i,v){const m=P(pi).mon[i];if(!m)return;const mx=def(pi,m),g=Math.min(v,mx-m.hp);if(g<=0)return;m.hp+=g;floatTxt(zoneEl('m',pi,i),'+'+g,true);log(m.card.n+' récupère '+g+' PV.');render()}
 async function battle(pi,i,ti){
  const p=P(pi),o=P(1-pi);let A=p.mon[i];if(!A||A.att||G.over)return;
  A.att=true;let T=ti>=0?o.mon[ti]:null;
@@ -435,18 +456,11 @@ async function battle(pi,i,ti){
  if(!T){hitAt(zoneEl('p',1-pi,0));shake();hurt(1-pi,a)}
  else{
   hitAt(zoneEl('m',1-pi,ti));shake();
-  if(T.pos==='a'){
-   const x=Math.round(a*factor(A.card.col,T.card.col)),y=Math.round(atk(1-pi,T)*factor(T.card.col,A.card.col));
-   log(A.card.n+' '+x+' contre '+T.card.n+' '+y+'.');
-   if(x>y){floatTxt(zoneEl('m',1-pi,ti),'-'+x);if(!(await saveBy(1-pi,ti)))await destroyMon(1-pi,ti);hurt(1-pi,x-y)}
-   else if(x<y){floatTxt(zoneEl('m',pi,i),'-'+y);if(!(await saveBy(pi,i)))await destroyMon(pi,i);hurt(pi,y-x)}
-   else{const s1=await saveBy(1-pi,ti);if(!s1)await destroyMon(1-pi,ti);if(p.mon[i]&&!(await saveBy(pi,i)))await destroyMon(pi,i)}
-  }else{
-   const d=def(1-pi,T),x=Math.round(a*factor(A.card.col,T.card.col));
-   log(A.card.n+' '+x+' contre DEF '+d+'.');
-   if(x>d){floatTxt(zoneEl('m',1-pi,ti),'-'+x);if(!(await saveBy(1-pi,ti)))await destroyMon(1-pi,ti)}
-   else if(x<d)hurt(pi,d-x);
-  }
+  const h=calcHit(pi,A,T);
+  if(T.pos==='a')log(A.card.n+' frappe '+T.card.n+' ('+h.dmg+' dégâts) ; riposte : '+h.back+'.');
+  else log(A.card.n+' frappe '+T.card.n+' en défense : '+h.dmg+' dégâts'+(h.pierce?' (perce l’armure)':' (armure '+h.arm+')')+'.');
+  await hitMon(1-pi,ti,h.dmg);
+  if(o.mon[ti]===T&&T.hp>0&&h.back>0&&p.mon[i]===A){if(T.pos==='d')log(T.card.n+' renvoie '+h.back+' dégâts (Épines).');await hitMon(pi,i,h.back)}
  }
  render();await sleep(250);
 }
@@ -469,6 +483,11 @@ function spellInfo(pi,c){
   case 'examen':return p.deck.length<1?{ok:0,why:'Pioche vide.'}:{ok:1,tg:'none'};
   case 'flashback':return p.grave.some(x=>x.k==='c')?{ok:1,tg:'grave'}:{ok:0,why:'Aucun personnage au cimetière.'};
   case 'entrainement':return mm.length?{ok:1,tg:'mon'}:{ok:0,why:'Il faut un personnage.'};
+  case 'provocation':return mm.length?{ok:1,tg:'mon'}:{ok:0,why:'Il faut un personnage.'};
+  case 'potion':return p.potion?{ok:0,why:'Une seule Potion par tour.'}:mm.some(x=>x.m.hp<def(pi,x.m))?{ok:1,tg:'mon',hurt:1}:{ok:0,why:'Aucun de tes personnages n’est blessé.'};
+  case 'paralysie':return mons(1-pi).length?{ok:1,tg:'foe'}:{ok:0,why:'L’adversaire n’a aucun personnage.'};
+  case 'haki':{if(!mm.length)return {ok:0,why:'Il faut un personnage.'};const mx=Math.max.apply(null,mm.map(x=>atk(pi,x.m))),fs=mons(1-pi).filter(x=>atk(1-pi,x.m)<mx);return fs.length?{ok:1,tg:'foe',ids:fs.map(x=>x.i)}:{ok:0,why:'Aucun personnage adverse plus faible que les tiens.'}}
+  case 'rappel':return mm.length?{ok:1,tg:'mon'}:{ok:0,why:'Il faut un personnage.'};
   case 'pacte':return !mm.length?{ok:0,why:'Il faut un personnage.'}:p.lp<=350?{ok:0,why:'Pas assez de points de vie.'}:{ok:1,tg:'mon'};
   case 'reunion':return !p.hand.some(x=>x.k==='c'&&x.lvl>=5)?{ok:0,why:'Aucun personnage de niveau 5 ou 6 en main.'}:freeMon(pi)<0?{ok:0,why:'Aucune zone libre.'}:{ok:1,tg:'hand56'};
   case 'forgeron':case 'epee':case 'cape':return !mm.length?{ok:0,why:'Il faut un personnage.'}:freeSt(pi)<0?{ok:0,why:'Aucune zone de soutien libre.'}:{ok:1,tg:'mon'};
@@ -496,6 +515,11 @@ async function playSpell(pi,hi,tg){
   case 'examen':p.grave.push(c);await drawN(pi,2);break;
   case 'flashback':{const k=p.grave.indexOf(tg);if(k>=0){p.grave.splice(k,1);p.hand.push(tg);log(tg.n+' revient en main.')}p.grave.push(c);break}
   case 'entrainement':{const m=p.mon[tg];if(m){m.tmp+=150;log(m.card.n+' gagne 150 ATK ce tour.')}p.grave.push(c);break}
+  case 'provocation':{const m=p.mon[tg];if(m){G.taunt={owner:pi,m,left:2};log(m.card.n+' provoque l’adversaire pendant 2 tours.');banner('PROVOCATION','#e5483b')}p.grave.push(c);break}
+  case 'potion':{healMon(pi,tg,500);p.potion=true;p.grave.push(c);break}
+  case 'paralysie':{const m=P(1-pi).mon[tg];if(m){m.para=1;log(m.card.n+' est paralysé : pas d’attaque à son prochain tour.');banner('PARALYSIE','#8a56d6')}p.grave.push(c);break}
+  case 'haki':{const m=P(1-pi).mon[tg];if(m){m.sleep=2;log(m.card.n+' s’endort pendant 2 tours (il se réveille s’il est touché).');banner('HAKI DES ROIS','#e5483b')}p.grave.push(c);break}
+  case 'rappel':{const m=p.mon[tg];if(m){p.st.forEach((q,k)=>{if(q&&q.to===m){p.grave.push(q.card);p.st[k]=null}});p.mon[tg]=null;p.hand.push(m.card);p.normal=true;log(m.card.n+' revient en main.')}p.grave.push(c);break}
   case 'pacte':{const m=p.mon[tg];setLP(pi,p.lp-350);floatTxt(zoneEl('p',pi,0),'-350');if(m){m.atkP+=250;log(m.card.n+' gagne 250 ATK pour de bon.')}p.grave.push(c);checkEnd();break}
   case 'reunion':{const k=p.hand.indexOf(tg);const s=freeMon(pi);p.grave.push(c);if(k>=0&&s>=0)await doSummon(pi,k,s,'a',false,true);break}
   case 'forgeron':case 'epee':case 'cape':{const m=p.mon[tg],s=freeSt(pi);if(m&&s>=0){p.st[s]={card:c,up:true,to:m};log(c.n+' équipe '+m.card.n+'.')}else p.grave.push(c);break}
@@ -607,12 +631,13 @@ function evoMats(pi,c,any){
 async function doEvolve(pi,c,idx){
  const p=P(pi);
  banner('ÉVOLUTION !','#b79cf0');log(S(pi,'fais','fait')+' évoluer '+c.mats.map(m=>m.n).join(' + ')+' en '+c.n+'.');
+ const lost=Math.max(0,idx.reduce((t,i)=>{const o=p.mon[i];return t+(o?def(pi,o)-o.hp:0)},0)/idx.length);
  idx.forEach(i=>{const e=zoneEl('m',pi,i);if(e&&e.firstElementChild)e.firstElementChild.classList.add('sel')});
  await sleep(750);
  for(const i of idx)await destroyMon(pi,i,'evolution');
  const slot=idx[0];
  p.extra=p.extra.filter(x=>x!==c);
- p.mon[slot]=mkM(c,'a');G.pop='m'+pi+slot;
+ p.mon[slot]=mkM(c,'a');if(lost>0){p.mon[slot].hp=Math.max(1,Math.round(c.def-lost));p.mon[slot].full=false}G.pop='m'+pi+slot;
  render();hitAt(zoneEl('m',pi,slot));burst(zoneEl('m',pi,slot),'#b79cf0');await sleep(900);G.pop=null;
 }
 async function runEvolve(ci){
@@ -647,7 +672,7 @@ async function aiSummon(){
  });
  if(!best)return;
  const opp=aiStrongest(0),oppA=opp?atk(0,opp.m):0;
- const pos=!opp||best.c.atk>=oppA*0.85||best.c.def<best.c.atk*0.6?'a':'d';
+ const pos=best.c.role==='def'?'d':'a';
  const slot=best.trib?mm[0].i:freeMon(1);
  await doSummon(1,best.i,slot,pos,best.trib);
 }
@@ -666,6 +691,8 @@ async function aiSpellOnce(){
    case 'pacte':go=!!st&&p.lp>3500&&G.n>1;if(go)tg=st.i;break;
    case 'reunion':go=true;tg=p.hand.filter(x=>x.k==='c'&&x.lvl>=5).sort((a,b)=>b.atk-a.atk)[0];break;
    case 'forgeron':case 'epee':case 'cape':go=!!st;if(go)tg=st.i;break;
+   case 'potion':{const h=mons(1).filter(x=>x.m.hp<def(1,x.m)*.6).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h;if(go)tg=h.i;break}
+   case 'paralysie':{const f=aiStrongest(0);go=!!f&&G.n>1;if(go)tg=f.i;break}
   }
   if(go){await playSpell(1,k,tg);return true}
  }
@@ -686,7 +713,7 @@ async function aiMain(){
   await setTrap(1,ti);
  }
  const opp=aiStrongest(0);
- if(opp)mons(1).forEach(x=>{if(!x.m.chg&&x.m.ts!==G.n&&x.m.pos==='a'&&atk(0,opp.m)>atk(1,x.m)+200&&x.m.card.def>=x.m.card.atk-300)x.m.pos='d'});
+ if(opp)mons(1).forEach(x=>{if(!x.m.chg&&x.m.ts!==G.n&&x.m.pos==='a'&&atk(0,opp.m)>atk(1,x.m)+200&&x.m.card.role==='def')x.m.pos='d'});
  render();
 }
 async function aiBattle(){
@@ -694,15 +721,10 @@ async function aiBattle(){
  for(let g=0;g<4&&!G.over;g++){
   const my=mons(1).filter(x=>x.m.pos==='a'&&!x.m.att);if(!my.length)break;
   const x=my.sort((a,b)=>atk(1,b.m)-atk(1,a.m))[0];
-  const opps=mons(0);
-  if(!opps.length){await battle(1,x.i,-1);await sleep(300);continue}
-  const a=atk(1,x.m);let best=null,bs=0;
-  opps.forEach(t=>{
-   let s=0;
-   if(t.m.pos==='a'){const u=Math.round(a*factor(x.m.card.col,t.m.card.col)),v=Math.round(atk(0,t.m)*factor(t.m.card.col,x.m.card.col));if(u>v)s=1000+(u-v)+t.m.card.atk/10;else if(u===v&&t.m.card.atk>x.m.card.atk)s=200}
-   else{const u=Math.round(a*factor(x.m.card.col,t.m.card.col));if(u>def(0,t.m))s=500+t.m.card.atk/10}
-   if(s>bs){bs=s;best=t}
-  });
+  const ti0=tauntIdx(1),opps=mons(0).filter(o=>ti0<0||o.i===ti0);
+  if(!mons(0).length){await battle(1,x.i,-1);await sleep(300);continue}
+  let best=null,bs=0;
+  opps.forEach(t=>{const h=calcHit(1,x.m,t);let sc=(h.kill?1000:h.dmg/t.m.hp*500)+t.m.card.atk/10;if(h.dies)sc-=900;else sc-=h.back/Math.max(1,x.m.hp)*300;if(sc>bs){bs=sc;best=t}});
   if(!best){x.m.att=true;continue}
   await battle(1,x.i,best.i);await sleep(350);
  }
@@ -730,12 +752,13 @@ async function discardTo(pi){
 async function finishTurn(pi){
  await discardTo(pi);
  G.p.forEach(p=>p.mon.forEach(m=>m&&(m.tmp=0)));
+ if(G.taunt&&G.taunt.owner!==pi){G.taunt.left--;if(G.taunt.left<=0)G.taunt=null}
  G.turn=1-pi;G.n++;G.ai=false;ui.sel=null;ui.selMon=null;
  await startTurn();
 }
 async function startTurn(){
  const pi=G.turn,p=P(pi);
- p.normal=false;p.senzu=false;p.mon.forEach(m=>{if(m){m.att=false;m.chg=false}});
+ p.normal=false;p.senzu=false;p.potion=false;p.mon.forEach(m=>{if(m){m.att=false;m.chg=false;if(m.para>0){m.att=true;m.para--}if(m.sleep>0){m.att=true;m.sleep--}}});
  banner(pi===0?'À TOI DE JOUER':'TOUR ADVERSE',pi===0?'#3dae5a':'#ec5fa0');
  G.busy=true;render();await sleep(600);
  if(G.n>1){if(pi===0)G.needDraw=true;else if(!NET)await drawN(pi,1)}
@@ -793,10 +816,11 @@ async function actSpell(hi,pre){
  const inf=spellInfo(0,c);if(!inf.ok)return toast(inf.why);
  let tg=null;
  if(inf.tg==='mon'){if(pre!=null&&p.mon[pre])tg=pre;else{const t=await pick('Choisis un de tes personnages',mons(0).map(x=>({z:'m',p:0,i:x.i})),true);if(!t)return;tg=t.i}}
+ else if(inf.tg==='foe'){const ids=inf.ids||mons(1).map(x=>x.i);if(pre!=null&&ids.includes(pre))tg=pre;else{const t=await pick('Choisis un personnage adverse',ids.map(i=>({z:'m',p:1,i})),true);if(!t)return;tg=t.i}}
  else if(inf.tg==='grave'){tg=await chooseCard('Choisis un personnage du cimetière',p.grave.filter(x=>x.k==='c'),true);if(!tg)return}
  else if(inf.tg==='hand56'){tg=await chooseCard('Choisis le personnage à poser',p.hand.filter(x=>x.k==='c'&&x.lvl>=5),true);if(!tg)return}
  const hi2=p.hand.indexOf(c);if(hi2<0)return;
- if(NET){const tgk=inf.tg==='grave'?'g':inf.tg==='hand56'?'h':inf.tg==='mon'?'m':'';netSend('spl',{hi:hi2,tgk,tg:tgk==='g'?p.grave.indexOf(tg):tgk==='h'?p.hand.indexOf(tg):tg})}
+ if(NET){const tgk=inf.tg==='grave'?'g':inf.tg==='hand56'?'h':inf.tg==='mon'?'m':inf.tg==='foe'?'f':'';netSend('spl',{hi:hi2,tgk,tg:tgk==='g'?p.grave.indexOf(tg):tgk==='h'?p.hand.indexOf(tg):tg})}
  G.busy=true;ui.sel=null;await playSpell(0,hi2,tg);G.busy=false;render();
 }
 async function actSet(hi){
@@ -809,26 +833,19 @@ async function actSet(hi){
 function attackPreview(i,ti){
  const A=P(0).mon[i],T=ti>=0?P(1).mon[ti]:null,a=atk(0,A);
  if(!T)return {risky:false,direct:true,text:A.card.n+' attaque directement : l’adversaire perd '+a+' points de vie.'};
- const f=factor(A.card.col,T.card.col),x=Math.round(a*f);
- const fx=f>1?' (avantage de couleur ×1,2 → '+x+')':f<1?' (désavantage de couleur ×0,8 → '+x+')':'';
- if(T.pos==='a'){
-  const y0=atk(1,T),g=factor(T.card.col,A.card.col),y=Math.round(y0*g);
-  const gy=g>1?' (avantage de couleur ×1,2 → '+y+')':g<1?' (désavantage de couleur ×0,8 → '+y+')':'';
-  const base=A.card.n+' : ATK '+a+fx+' contre '+T.card.n+' : ATK '+y0+gy+'. ';
-  if(x>y)return {risky:false,text:base+'Tu gagnes : '+T.card.n+' est détruit et l’adversaire perd '+(x-y)+' points de vie.'};
-  if(x<y)return {risky:true,text:base+'Tu perds : '+A.card.n+' sera détruit et tu perdras '+(y-x)+' points de vie.'};
-  return {risky:true,text:base+'Égalité : les deux personnages sont détruits.'};
- }
- const d=def(1,T),base=A.card.n+' : ATK '+a+fx+' contre '+T.card.n+' en défense : DEF '+d+'. ';
- if(x>d)return {risky:false,text:base+T.card.n+' est détruit (aucun point de vie perdu).'};
- if(x<d)return {risky:true,text:base+'Trop faible : tu perdras '+(d-x)+' points de vie, personne n’est détruit.'};
- return {risky:false,text:base+'Rien ne se passe.'};
+ const h=calcHit(0,A,T),fx=h.f>1?' (avantage de couleur ×1,2)':h.f<1?' (désavantage de couleur ×0,8)':'';
+ let t=A.card.n+' inflige '+h.dmg+' dégâts à '+T.card.n+fx+' (PV '+T.hp+' → '+h.left+')';
+ if(T.pos==='d')t+=h.pierce?', l’armure est percée':', son armure absorbe '+h.arm;
+ t+='. ';
+ if(h.kill)t+=T.card.n+' est détruit. ';
+ else if(h.back>0)t+=(T.pos==='a'?'Il riposte':'Ses Épines renvoient')+' '+h.back+' dégâts : '+A.card.n+' passe à '+Math.max(0,A.hp-h.back)+' PV'+(h.dies?' et sera détruit':'')+'.';
+ return {risky:h.dies||(!h.kill&&h.back>=A.hp*.5),text:t};
 }
 async function actAttack(i,pre){
  if(!myTurn())return;
  if(G.n===1)return toast('On ne peut pas attaquer au premier tour de la partie.');
  const m=P(0).mon[i];if(!m||m.att||m.pos!=='a')return;
- const opps=mons(1);let ti=-1;
+ const ti0=tauntIdx(0),opps=mons(1).filter(x=>ti0<0||x.i===ti0);let ti=-1;
  if(pre!=null)ti=pre;else if(opps.length){const t=await pick('Choisis le personnage à attaquer',opps.map(x=>({z:'m',p:1,i:x.i})));if(!t)return;ti=t.i}
  {const pv=attackPreview(i,ti);
   if(pv.risky||(pv.direct&&pre==null)){
@@ -855,8 +872,10 @@ function evoReadyMap(){
 }
 function monStats(pi,i){
  const m=P(pi).mon[i];if(!m)return '';
- const a=atk(pi,m),d=def(pi,m),c=m.card,k=(v,b)=>v>b?' class="up"':v<b?' class="dn"':'';
- return '<span class="mlv" title="Niveau '+c.lvl+'">'+c.lvl+'</span><div class="mst'+(m.pos==='d'?' isd':'')+'"><b'+k(a,c.atk)+'>ATK '+a+'</b><i'+k(d,c.def)+'>DEF '+d+'</i></div>';
+ const mx=def(pi,m),c=m.card,pc=Math.max(0,Math.min(100,m.hp/mx*100)),col=pc>50?'#4ddf7a':pc>25?'#ffcb3d':'#ff5a4e';
+ const st=m.sleep>0?'<em class="mstat">Z</em>':m.para>0?'<em class="mstat">⛓</em>':'';
+ const tn=G.taunt&&G.taunt.m===m?'<em class="mstat t">!</em>':'';
+ return '<span class="mlv" title="Niveau '+c.lvl+'">'+c.lvl+'</span>'+st+tn+'<div class="hpg" title="PV '+m.hp+' / '+mx+(m.pos==='d'&&armor(pi,m)>0?' · armure '+armor(pi,m):'')+'"><b>'+m.hp+'</b><span><i style="width:'+pc+'%;background:'+col+'"></i></span></div>';
 }
 function monHTML(pi,i){
  const m=P(pi).mon[i];if(!m)return '';
@@ -867,7 +886,7 @@ function monHTML(pi,i){
   if(rd&&myTurn())evx='<span class="evgo" data-evo="'+rd.ci+'">✦ ÉVOLUER</span>';
   else if(P(0).extra.some(e=>e.mats.some(x=>x.id===m.card.id)))evx='<span class="evh" title="Ce personnage peut évoluer : clique dessus pour voir la condition">✦</span>';
  }
- return '<div class="bc'+cls+(evx.indexOf('evgo')>0?' evr':'')+'">'+cardHTML(m.card,{atk:atk(pi,m),def:def(pi,m)})+evx+'</div>';
+ return '<div class="bc'+cls+(evx.indexOf('evgo')>0?' evr':'')+'">'+cardHTML(m.card,{atk:atk(pi,m),def:m.hp})+evx+'</div>';
 }
 function stHTML(pi,i){
  const s=P(pi).st[i];if(!s)return '';
@@ -922,7 +941,7 @@ function render(){
 function cardAt(z,p,i){
  const pl=G.p[p];
  if(z==='h')return p===0?{c:pl.hand[i]}:null;
- if(z==='m'){const m=pl.mon[i];return m?{c:m.card,atk:atk(p,m),def:def(p,m),m}:null}
+ if(z==='m'){const m=pl.mon[i];return m?{c:m.card,atk:atk(p,m),def:m.hp,m}:null}
  if(z==='s'){const s=pl.st[i];return s&&(s.up||p===0)?{c:s.card}:null}
  if(z==='g'){const g=pl.grave;return g.length?{c:g[g.length-1]}:null}
  if(z==='f')return G.field?{c:G.field.card}:null;
@@ -967,7 +986,7 @@ function openZoom(src,info,acts){
  const c=info.c,zs=Math.max(.6,Math.min(1.25,(window.innerWidth-40)/260,(window.innerHeight-230-(c.k==='c'&&evoBlock(c,info.m)?150:0))/379));
  const o=document.createElement('div');o.className='cbzoom bk'+backN();o.style.setProperty('--zs',zs.toFixed(3));
  const isC=c.k==='c'||c.k==='e';
- const txt=isC?'「'+c.sn+'」 : '+c.sd+(c.k==='e'?evoNoteLong(c):'')+' Niveau '+c.lvl+' · ATK '+(info.atk!=null?info.atk:c.atk)+' · DEF '+(info.def!=null?info.def:c.def)+'.':c.txt;
+ const txt=isC?'「'+c.sn+'」 : '+c.sd+(c.k==='e'?evoNoteLong(c):'')+' Niveau '+c.lvl+' · ATK '+(info.atk!=null?info.atk:c.atk)+' · PV '+(info.def!=null?info.def:c.def)+(c.arm?' · Armure '+c.arm:'')+(c.refl?' · Épines '+c.refl:'')+(c.pierce?' · Perce l’armure':'')+'.':c.txt;
  const sub=isC?(c.k==='e'?'Évolution':'Personnage')+' · '+COL[c.col].k+' '+COL[c.col].n+(c.ex?' · Rare':''):'Carte '+(c.t==='trap'?'Piège':'Magie')+' · '+c.sub;
  o.innerHTML='<div class="zw"><div class="zc">'+cardHTML(c,{atk:info.atk,def:info.def})+'</div><div class="ztx"><b>'+esc(c.n)+'</b><small>'+esc(sub)+'</small><p>'+esc(txt)+'</p>'+(isC?evoBlock(c,info.m):'')+'</div><div class="cbact">'+(acts||'')+(isC&&info.m&&myTurn()&&P(0).extra.some(e=>e.mats.some(x=>x.id===c.id)&&evoReady(0,e))?'<button data-a="evo">Évoluer</button>':'')+'<button class="sec" data-a="close">Fermer</button></div></div>';
  (document.getElementById('v-cb')||document.body).appendChild(o);ui.zoomEl=o;
@@ -1037,8 +1056,8 @@ function dropTargets(src){
   if(G.n===1)return {no:'On ne peut pas attaquer au premier tour de la partie.'};
   if(m.att)return {no:'Ce personnage a déjà attaqué ce tour.'};
   if(m.pos!=='a')return {no:'Un personnage en défense ne peut pas attaquer : passe-le en attaque.'};
-  const opps=mons(1);
-  if(opps.length)return {els:q('.slot[data-z="m"][data-p="1"]').filter(e=>P(1).mon[+e.dataset.i]),act:e=>actAttack(src.i,+e.dataset.i),hint:'Dépose sur le personnage à attaquer'};
+  const ti0=tauntIdx(0),opps=mons(1).filter(x=>ti0<0||x.i===ti0);
+  if(opps.length)return {els:q('.slot[data-z="m"][data-p="1"]').filter(e=>opps.some(x=>x.i===+e.dataset.i)),act:e=>actAttack(src.i,+e.dataset.i),hint:'Dépose sur le personnage à attaquer'};
   return {els:q('.cring[data-p="1"]'),act:()=>actAttack(src.i,-1),hint:'Attaque directe : dépose sur l’adversaire'};
  }
  const hi=src.i,c=p.hand[hi];if(!c)return {no:'Carte introuvable.'};
@@ -1055,6 +1074,7 @@ function dropTargets(src){
  const inf=spellInfo(0,c);if(!inf.ok)return {no:inf.why};
  if(c.t==='field')return {els:q('.slot[data-z="f"]'),act:()=>actSpell(hi),hint:'Dépose sur le Terrain'};
  if(inf.tg==='mon')return {els:q('.slot[data-z="m"][data-p="0"]').filter(e=>p.mon[+e.dataset.i]),act:sl=>actSpell(hi,+sl.dataset.i),hint:'Dépose la carte sur le personnage visé'};
+ if(inf.tg==='foe'){const ids=inf.ids||mons(1).map(x=>x.i);return {els:q('.slot[data-z="m"][data-p="1"]').filter(e=>ids.includes(+e.dataset.i)),act:sl=>actSpell(hi,+sl.dataset.i),hint:'Dépose la carte sur le personnage adverse visé'}}
  if(freeSt(0)<0)return {no:'Aucune zone de soutien libre.'};
  return {els:q('.slot[data-z="s"][data-p="0"]').filter(e=>!p.st[+e.dataset.i]),act:()=>actSpell(hi),hint:'Dépose sur une zone de soutien'};
 }
@@ -1502,9 +1522,11 @@ function showRules(){
  '<li><b>Deck</b> : 20 cartes exactement, 2 exemplaires maximum de la même carte, 8 cartes soutien au plus.</li>'+
  '<li><b>Début</b> : on pioche 5 cartes. Celui qui commence ne pioche pas et ne peut pas attaquer au premier tour. Main limitée à 7 cartes.</li>'+
  '<li><b>Invoquer</b> : un personnage par tour. Niveau 1 à 4 : gratuit. Niveau 5 et 6 : il faut sacrifier un de tes personnages. Tu as 3 zones de personnages.</li>'+
- '<li><b>Positions</b> : un personnage est en <b>attaque</b> (debout, il utilise son ATK) ou en <b>défense</b> (couché sur le côté, il utilise sa DEF). Il peut changer de position une fois par tour, mais pas le tour où il est invoqué.</li>'+
- '<li><b>Combat</b> : chaque personnage en attaque peut attaquer une fois par tour. Contre un personnage en attaque, le plus fort détruit l’autre et la différence est retirée aux points de vie du perdant. Contre un personnage en défense, s’il est plus fort il le détruit sans dégâts, sinon l’attaquant perd la différence. Sans personnage en face, c’est une attaque directe.</li>'+
- '<li><b>Couleurs</b> : chaque couleur est forte contre les deux suivantes (+20 % d’ATK) et faible contre les deux précédentes (−20 %) : 炎 Braise → 雷 Éclair → 森 Sève → 水 Marée → 闇 Ombre → 光 Éclat → 炎.</li>'+
+ '<li><b>Points de vie des cartes</b> : chaque personnage a des <b>PV</b>, avec une barre sur la carte. Une attaque lui retire des PV ; il n’est détruit que s’il tombe à 0. Une carte à PV pleins qui reçoit un coup mortel tient bon à 1 PV, une seule fois (<b>Dernier souffle</b>).</li>'+
+'<li><b>Positions</b> : en <b>attaque</b>, un personnage peut attaquer mais il est vulnérable : s’il est attaqué il reçoit tout et <b>riposte</b>. En <b>défense</b>, il n’attaque pas mais son <b>armure</b> réduit chaque coup (ATK − armure, au moins 20 %, puis −25 %) ; les <b>défenseurs</b> renvoient des <b>Épines</b>. Il peut changer de position une fois par tour, mais pas le tour où il est invoqué.</li>'+
+'<li><b>Rôles</b> : <b>Attaquant</b> (beaucoup d’ATK, peu de PV), <b>Polyvalent</b> (équilibré, son coup perce l’armure) et <b>Défenseur</b> (beaucoup de PV, armure et Épines, peu d’ATK).</li>'+
+'<li><b>Combat</b> : chaque personnage en attaque peut attaquer une fois par tour. Le coup retire des PV à la cible, qui riposte si elle est en attaque. Sans personnage en face, c’est une attaque directe : l’adversaire perd des points de vie.</li>'+
+'<li><b>Couleurs</b> : chaque couleur est forte contre les deux suivantes (+20 % d’ATK) et faible contre les deux précédentes (−20 %) : 炎 Braise → 雷 Éclair → 森 Sève → 水 Marée → 闇 Ombre → 光 Éclat → 炎.</li>'+
  '<li><b>Soutiens</b> : les Magies se jouent pendant ton tour. Les Équipements restent attachés à un personnage. Un seul Terrain à la fois, il compte pour les deux joueurs. Les Pièges se posent face cachée et se déclenchent pendant le tour de l’adversaire.</li>'+
  '<li><b>Transformation</b> : les personnages marqués ✦ dans le constructeur ont une transformation (carte violette). Ton deck peut en contenir <b>2 au maximum</b>, et leur transformation est disponible automatiquement. Un personnage peut se transformer s’il est sur ton terrain, <b>sans attendre</b> (tu peux même attaquer avec juste après), et si la <b>condition écrite sur la carte</b> est remplie : un équipement, un Terrain en jeu, un piège posé, des cartes au cimetière, des points de vie bas, un allié de la même couleur, ou avoir joué une carte précise. Il va au cimetière et la carte évoluée prend sa place. Bouton « Évolution » à droite du plateau.</li><li><b>Duel en ligne</b> : « Duel en ligne » dans le menu. L’un crée un duel et donne le code à 4 lettres, l’autre le tape. Chacun joue avec son deck, une photo de profil et un chronomètre s’affichent pour les deux.</li><li><b>Temps</b> : 45 secondes par tour. L’anneau autour de ton avatar se vide, puis devient rouge.</li></ul></div>';
  bindTabs();
@@ -1524,7 +1546,7 @@ function sideInfo(c){
  const isC=c.k==='c'||c.k==='e';
  let h='<div class="dk-big bk'+backN()+'"><div class="dk-bigc">'+cardHTML(c)+'</div></div><div class="dk-info"><b>'+esc(c.n)+'</b>';
  if(isC){
-  h+='<span>Niveau '+c.lvl+' · '+COL[c.col].k+' '+COL[c.col].n+' · ATK '+c.atk+' · DEF '+c.def+'</span>';
+  h+='<span>Niveau '+c.lvl+' · '+COL[c.col].k+' '+COL[c.col].n+' · ATK '+c.atk+' · PV '+c.def+(c.arm?' · Armure '+c.arm:'')+(c.refl?' · Épines '+c.refl:'')+(c.pierce?' · Perce l’armure':'')+'</span>';
   h+='<span class="dim">Fort contre '+COL[(c.col+1)%6].n+' et '+COL[(c.col+2)%6].n+' · faible contre '+COL[(c.col+4)%6].n+' et '+COL[(c.col+5)%6].n+'.</span>';
   h+='<p>「'+esc(c.sn)+'」 : '+esc(c.sd)+'</p>';
   const evs=c.k==='c'?EVOS.filter(e=>e.mats.some(x=>x.id===c.id)):[];
@@ -1622,7 +1644,7 @@ function mountGame(){
 async function startGame(){
  const mine=getDeck();if(!deckCheck(mine).ok){showBuild();return}
  leaveGame();view='game';
- const ad=autoDeck();const ax=extraFor(ad);
+ const ad=autoDeck(undefined,undefined,undefined,true);const ax=extraFor(ad);
  G={pr:[who0(),aiPersona()],p:[mkP(mine,getExtra()),mkP(ad,ax)],turn:0,n:1,field:null,over:false,busy:true,ai:false,log:[],t0:0,tm:null,pop:null,newC:null};
  ui={};
  mountGame();
