@@ -748,3 +748,14 @@ body.cbfull input,body.cbfull select,body.cbfull textarea{color-scheme:dark}
 .cbt .hpg span{display:block;height:calc(var(--cw)*.055);margin-top:calc(var(--cw)*.015);background:#1b2a52;border:calc(var(--cw)*.014) solid #fff;border-radius:99px;overflow:hidden}
 .cbt .hpg span i{display:block;height:100%;border-radius:99px;transition:width .5s}
 .cbt .hpn,.cbt .hpb{display:none!important}
+
+/* ===== PV plus stylés, posés sur le coin haut droit de la carte ===== */
+.cbt .mlv{display:none!important}
+.cbt .hpg{right:calc(var(--cw)*.03);top:calc(var(--cw)*.03);width:calc(var(--cw)*.5);padding:calc(var(--cw)*.025) calc(var(--cw)*.05) calc(var(--cw)*.04);background:linear-gradient(160deg,#0d1530ee,#1a2a5cdd);border:calc(var(--cw)*.016) solid #ffffffcc;border-radius:calc(var(--cw)*.05);box-shadow:0 calc(var(--cw)*.03) calc(var(--cw)*.06) #000a,inset 0 1px 0 #ffffff44}
+.cbt .hpg b{font:900 calc(var(--cw)*.2)/1 'Arial Black',Impact,sans-serif;color:#fff;-webkit-text-stroke:0;paint-order:normal;text-align:center;padding:0;text-shadow:0 calc(var(--cw)*.015) 0 #000b,0 0 calc(var(--cw)*.05) #6aa8ff88}
+.cbt .hpg span{height:calc(var(--cw)*.05);margin-top:calc(var(--cw)*.025);border:0;background:#ffffff22;box-shadow:inset 0 1px 2px #0008}
+.cbt .hpg span i{background:linear-gradient(180deg,#9dffb8,#2fcf63 55%,#17a04a);box-shadow:0 0 calc(var(--cw)*.05) #4ddf7a99}
+.cbt .hpg[data-pc=mid] span i{background:linear-gradient(180deg,#ffe48a,#ffbf1f 55%,#d98c00);box-shadow:0 0 calc(var(--cw)*.05) #ffcb3d99}
+.cbt .hpg[data-pc=lo] span i{background:linear-gradient(180deg,#ff9a8f,#ff4a3c 55%,#c4241a);box-shadow:0 0 calc(var(--cw)*.05) #ff5a4e99;animation:hplow 1s ease-in-out infinite}
+.cbt .hpg[data-pc=lo] b{color:#ffd6d2}
+@keyframes hplow{50%{filter:brightness(1.4)}}

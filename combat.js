@@ -875,7 +875,7 @@ function monStats(pi,i){
  const mx=def(pi,m),c=m.card,pc=Math.max(0,Math.min(100,m.hp/mx*100)),col=pc>50?'#4ddf7a':pc>25?'#ffcb3d':'#ff5a4e';
  const st=m.sleep>0?'<em class="mstat">Z</em>':m.para>0?'<em class="mstat">⛓</em>':'';
  const tn=G.taunt&&G.taunt.m===m?'<em class="mstat t">!</em>':'';
- return '<span class="mlv" title="Niveau '+c.lvl+'">'+c.lvl+'</span>'+st+tn+'<div class="hpg" title="PV '+m.hp+' / '+mx+(m.pos==='d'&&armor(pi,m)>0?' · armure '+armor(pi,m):'')+'"><b>'+m.hp+'</b><span><i style="width:'+pc+'%;background:'+col+'"></i></span></div>';
+ return st+tn+'<div class="hpg" data-pc="'+(pc>50?'hi':pc>25?'mid':'lo')+'" title="PV '+m.hp+' / '+mx+(m.pos==='d'&&armor(pi,m)>0?' · armure '+armor(pi,m):'')+'"><b>'+m.hp+'</b><span><i style="width:'+pc+'%"></i></span></div>';
 }
 function monHTML(pi,i){
  const m=P(pi).mon[i];if(!m)return '';
