@@ -1265,7 +1265,7 @@ function showBoosters(){
  '<div class="cbhub"><div class="hb-pack"><button type="button" class="pkb" id="cbPk">'+packHTML(0,true)+'<span class="pkb-n" id="cbPkN">×'+boostQty+'</span></button></div>'+
  '<div class="hb-txt"><h1>Ouvre un booster</h1><p>5 cartes tirées parmi tous les personnages et soutiens du jeu. Tranche le booster comme tu veux : une lumière te prévient quand une carte rare se cache dedans. C’est juste pour le plaisir, toutes les cartes restent disponibles pour tes decks.</p>'+
  '<div class="hb-stock"><div class="hb-n"><b id="cbStN">'+st.n+'</b><small> / '+STOCK_MAX+' boosters</small></div><div class="hb-pips" id="cbPips"></div><div class="hb-d" id="cbStD"></div></div>'+
- '<div class="cbqty"><span>Combien ouvrir ?</span><button type="button" class="qb" data-d="-1">−</button><b id="cbQ">×'+boostQty+'</b><button type="button" class="qb" data-d="1">+</button>'+[1,3,5,10].map(x=>'<button type="button" class="qc'+(boostQty===x?' on':'')+'" data-q="'+x+'">×'+x+'</button>').join('')+'</div>'+
+ '<div class="hb-qty"><span class="hb-ql">Quantité</span><div class="qty-seg" id="cbQs">'+[1,3,5].map(x=>'<button type="button" class="qs" data-q="'+x+'"><b>×'+x+'</b><small>booster'+(x>1?'s':'')+'</small></button>').join('')+'<button type="button" class="qs" data-q="all"><b>TOUT</b><small>'+st.n+' en stock</small></button></div></div>'+
  '<div class="hb-cta"><button type="button" class="cta" id="cbOpenB">Ouvrir un booster</button></div></div></div>'+
  '<div class="hb-row"><div class="hb-last"><h3>Dernière ouverture</h3>'+(last.length?'<div class="hb-cards">'+last.map(c=>'<div class="hb-c r'+rarityOf(c)+'" data-id="'+c.id+'">'+cardHTML(c)+'</div>').join('')+'</div>':'<p class="hb-empty">Aucun booster ouvert pour l’instant.</p>')+'</div>'+
  '<div class="hb-tile"><b>'+own+' / '+tot+'</b><small>cartes découvertes</small></div><div class="hb-tile"><b>'+nOp+'</b><small>booster'+(nOp>1?'s':'')+' ouvert'+(nOp>1?'s':'')+'</small></div>'+
@@ -1280,9 +1280,11 @@ function showBoosters(){
   const pk=$('cbPk');if(pk)pk.classList.toggle('empty',s2.n<1);
  };
  pips();boostTm=setInterval(pips,1000);
- const setQ=q=>{boostQty=Math.max(1,Math.min(10,Math.min(q,Math.max(1,stockState().n))));$('cbQ').textContent='×'+boostQty;$('cbPkN').textContent='×'+boostQty;document.querySelectorAll('.qc').forEach(b=>b.classList.toggle('on',+b.dataset.q===boostQty))};
- document.querySelectorAll('.qb').forEach(b=>b.onclick=()=>setQ(boostQty+ +b.dataset.d));
- document.querySelectorAll('.qc').forEach(b=>b.onclick=()=>setQ(+b.dataset.q));
+ const setQ=q=>{const n=stockState().n;boostQty=Math.max(1,Math.min(10,Math.min(q==='all'?n:q,Math.max(1,n))));
+  $('cbPkN').textContent='×'+boostQty;$('cbOpenB').textContent=boostQty>1?'Ouvrir ×'+boostQty+' boosters':'Ouvrir un booster';
+  document.querySelectorAll('.qs').forEach(b=>{const v=b.dataset.q;b.classList.toggle('on',v==='all'?(q==='all'&&n>5):(+v===boostQty&&q!=='all'));b.disabled=n<1||(v!=='all'&&+v>n)})};
+ document.querySelectorAll('.qs').forEach(b=>b.onclick=()=>setQ(b.dataset.q==='all'?'all':+b.dataset.q));
+ setQ(boostQty);
  const go=()=>{if(stockState().n<1){toast('Plus de booster pour l’instant : prochain dans '+fmtMs(stockWait())+'.');return}openBooster('all',boostQty)};
  $('cbPk').onclick=go;$('cbOpenB').onclick=go;$('cbGoDeck').onclick=showBuild;
  document.querySelectorAll('.hb-c').forEach(el=>el.onclick=()=>{const c=REG[el.dataset.id];if(c)openZoom(el,{c},'')});
