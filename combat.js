@@ -127,9 +127,19 @@ const deckName=()=>deckStore().list[deckStore().cur].name;
 const getExtra=()=>extraFor(getDeck());
 
 /* ---------- état de partie ---------- */
-const mkP=(ids,ex,rng)=>({extra:(ex||[]).map(i=>REG[i]).filter(Boolean),lp:8000,deck:shuffle(ids.map(i=>REG[i]),rng),hand:[],mon:[null,null,null],st:[null,null,null],grave:[],normal:false,senzu:false});
+const mkPl=(ids,ex,rng)=>({extra:(ex||[]).map(i=>REG[i]).filter(Boolean),deck:shuffle(ids.map(i=>REG[i]),rng),hand:[],grave:[]});
+/* un « côté » = une équipe : points de vie, terrain et soutiens partagés ; mais chaque joueur a son deck, sa main et son cimetière (le joueur actif est pl[cur]) */
+function mkSide(pls,nm){
+ const sd={lp:8000,mon:Array(nm).fill(null),st:Array(nm===4?4:3).fill(null),normal:false,senzu:false,cur:0,pl:pls};
+ ['hand','deck','grave','extra'].forEach(k=>Object.defineProperty(sd,k,{get(){return this.pl[this.cur][k]},set(v){this.pl[this.cur][k]=v},enumerable:true}));
+ return sd;
+}
+const mkP=(ids,ex,rng)=>mkSide([mkPl(ids,ex,rng)],3);
+const isH=pi=>pi===0&&G.p[0].cur===0;
+/* qui possède quel emplacement de personnage (en 2 contre 2 : 2 emplacements chacun) */
+const ownsSlot=(pi,i)=>{const sd=G.p[pi];return sd.pl.length<2||Math.floor(i/(sd.mon.length/sd.pl.length))===sd.cur};
 const mkM=(c,pos)=>({card:c,pos,atkP:0,defP:0,tmp:0,ts:G.n,att:false,chg:false,hp:c.def,full:true,para:0,sleep:0});
-const P=i=>G.p[i], nm=i=>i===0?'Toi':'L’adversaire', S=(pi,a,b)=>pi===0?'Tu '+a:'L’adversaire '+b;
+const P=i=>G.p[i], nm=i=>i===0?'Toi':'L’adversaire', S=(pi,a,b)=>isH(pi)?'Tu '+a:(pi===0?'Ton coéquipier '+b:(G.v2?'Un adversaire ':'L’adversaire ')+b);
 const mons=pi=>G.p[pi].mon.map((m,i)=>m?{m,i}:null).filter(Boolean);
 const eqN=(pi,m,id)=>G.p[pi].st.filter(s=>s&&s.to===m&&s.card.id===id).length;
 const hasCape=(pi,m)=>eqN(pi,m,'cape')>0;
@@ -147,7 +157,7 @@ function calcHit(pi,A,T){
  const kill=dmg>=T.hp&&!T.full,survive=!kill;
  return {dmg,back,kill,dies:survive&&back>=A.hp&&!A.full,left:Math.max(0,T.hp-dmg),pierce:!!A.card.pierce&&T.pos==='d',arm:T.pos==='d'?armor(1-pi,T):0,f};
 }
-const freeMon=pi=>G.p[pi].mon.indexOf(null), freeSt=pi=>G.p[pi].st.indexOf(null);
+const freeMon=pi=>G.p[pi].mon.findIndex((m,i)=>!m&&ownsSlot(pi,i)), freeSt=pi=>G.p[pi].st.indexOf(null);
 
 /* ---------- interface : utilitaires ---------- */
 const boardEl=()=>$('cbT');
@@ -157,7 +167,7 @@ function zoneEl(z,p,i){const b=boardEl();return b&&b.querySelector('[data-z="'+z
 function floatTxt(el,t,heal){if(!el)return;const r=el.getBoundingClientRect();const d=document.createElement('div');d.className='cbdmg'+(heal?' heal':'');d.textContent=t;d.style.left=(r.left+r.width/2-30)+'px';d.style.top=(r.top+r.height/2-20)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1300)}
 function hitAt(el){if(!el)return;sparks(el);const r=el.getBoundingClientRect();const d=document.createElement('div');d.className='cbhit';d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+r.height/2)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),600)}
 /* ---------- animations ---------- */
-function handEl(pi,i){const b=boardEl();if(!b)return null;if(pi===0)return b.querySelector('.hnd.m .hc[data-i="'+i+'"]');const h=b.querySelectorAll('.hnd.o .hc');return h[h.length-1]||null}
+function handEl(pi,i){const b=boardEl();if(!b)return null;if(isH(pi))return b.querySelector('.hnd.m .hc[data-i="'+i+'"]');const h=b.querySelectorAll('.hnd.o .hc');return h[h.length-1]||null}
 function rectOf(el){
  if(el){const r=el.getBoundingClientRect();return {l:r.left,t:r.top,w:r.width,h:r.height}}
  const b=boardEl().getBoundingClientRect();return {l:b.left+b.width/2-30,t:b.top+10,w:60,h:88};
@@ -316,8 +326,9 @@ function checkEnd(){
 }
 function setLP(pi,v){P(pi).lp=Math.max(0,v);const n=$('cbLp'+pi);if(n){const from=+n.textContent;const t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/700);n.textContent=Math.round(from+(P(pi).lp-from)*k);if(k<1&&alive)requestAnimationFrame(step)};requestAnimationFrame(step)}}
 function bigDmg(pi,v){const b=boardEl();if(!b)return;const r=b.getBoundingClientRect(),d=document.createElement('div');d.className='cbbig';d.textContent='− '+v;d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+r.height*(pi===1?.2:.74))+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1500)}
-function hurt(pi,v){if(v<=0)return;setLP(pi,P(pi).lp-v);bigDmg(pi,v);log(S(pi,'perds','perd')+' '+v+' points de vie.');checkEnd()}
-function heal(pi,v){const e=zoneEl('p',pi,0);setLP(pi,P(pi).lp+v);floatTxt(e,'+'+v,true);log(S(pi,'récupères','récupère')+' '+v+' points de vie.')}
+const TS=(pi,a,b)=>G.v2?(pi===0?'Ton équipe '+b:'L’équipe adverse '+b):S(pi,a,b);
+function hurt(pi,v){if(v<=0)return;setLP(pi,P(pi).lp-v);bigDmg(pi,v);log(TS(pi,'perds','perd')+' '+v+' points de vie.');checkEnd()}
+function heal(pi,v){const e=zoneEl('p',pi,0);setLP(pi,P(pi).lp+v);floatTxt(e,'+'+v,true);log(TS(pi,'récupères','récupère')+' '+v+' points de vie.')}
 /* animation de pioche : la carte sort de la pioche, se retourne au milieu, puis file dans la main */
 async function drawReveal(c){
  const b=boardEl(),dk=zoneEl('d',0,0);if(!b||!dk||!alive)return;
@@ -341,7 +352,7 @@ async function drawN(pi,n,quiet){
  for(let k=0;k<n;k++){
   const p=P(pi);
   if(!p.deck.length){log(S(pi,'as','a')+' la pioche vide : aucune carte à piocher.');if(!G.emptyMsg||G.emptyMsg!==pi+':'+G.n){G.emptyMsg=pi+':'+G.n;toast(pi===0?'Ta pioche est vide, mais tu continues de jouer.':'La pioche adverse est vide, mais la partie continue.')}break}
-  if(pi===0&&!quiet&&p.deck[0])await drawReveal(p.deck[0]);
+  if(isH(pi)&&!quiet&&p.deck[0])await drawReveal(p.deck[0]);
   const c=p.deck.shift();p.hand.push(c);G.newC=c;if(!quiet)log(S(pi,'pioches','pioche')+' une carte.');
   render();await sleep(260);
  }
@@ -668,85 +679,85 @@ async function actEvolve(){
 
 /* ---------- IA ---------- */
 function aiStrongest(pi){const l=mons(pi).slice().sort((a,b)=>atk(pi,b.m)-atk(pi,a.m));return l[0]||null}
-async function aiSummon(){
- const p=P(1);if(p.normal)return;
+async function aiSummon(s){const e=1-s;
+ const p=P(s);if(p.normal)return;
  const chars=p.hand.map((c,i)=>({c,i})).filter(x=>x.c.k==='c');if(!chars.length)return;
- const mm=mons(1).slice().sort((a,b)=>a.m.card.atk-b.m.card.atk);
+ const mm=mons(s).slice().sort((a,b)=>a.m.card.atk-b.m.card.atk);
  let best=null;
  chars.forEach(x=>{
   let ok=false,trib=false;
-  if(x.c.lvl<=4)ok=freeMon(1)>=0;
+  if(x.c.lvl<=4)ok=freeMon(s)>=0;
   else if(mm.length&&x.c.atk>mm[0].m.card.atk+300){ok=true;trib=true}
   if(ok&&(!best||x.c.atk>best.c.atk))best={c:x.c,i:x.i,trib};
  });
  if(!best)return;
- const opp=aiStrongest(0),oppA=opp?atk(0,opp.m):0;
+ const opp=aiStrongest(e),oppA=opp?atk(e,opp.m):0;
  const pos=best.c.role==='def'?'d':'a';
- const slot=best.trib?mm[0].i:freeMon(1);
- await doSummon(1,best.i,slot,pos,best.trib);
+ const slot=best.trib?mm[0].i:freeMon(s);
+ await doSummon(s,best.i,slot,pos,best.trib);
 }
-async function aiSpellOnce(){
- const p=P(1);
+async function aiSpellOnce(s){const e=1-s;
+ const p=P(s);
  for(let k=0;k<p.hand.length;k++){
   const c=p.hand[k];if(c.k!=='s'||c.t==='trap'||c.t==='field')continue;
-  const inf=spellInfo(1,c);if(!inf.ok)continue;
-  let go=false,tg=null;const st=aiStrongest(1);
+  const inf=spellInfo(s,c);if(!inf.ok)continue;
+  let go=false,tg=null;const st=aiStrongest(s);
   switch(c.id){
-   case 'ramen':case 'senzu':{const h=mons(1).filter(x=>x.m.hp<def(1,x.m)*.6).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h;if(go)tg=h.i;break}
-   case 'provocation':{const t=mons(1).filter(x=>x.m.card.role==='def').sort((a,b)=>b.m.hp-a.m.hp)[0];go=!!t&&mons(1).length>1&&!G.taunt;if(go)tg=t.i;break}
-   case 'haki':{const ids=inf.ids||[];const f=ids.map(i=>({i,a:atk(0,P(0).mon[i])})).sort((a,b)=>b.a-a.a)[0];go=!!f&&G.n>1;if(go)tg=f.i;break}
-   case 'rappel':{const h=mons(1).filter(x=>x.m.hp<def(1,x.m)*.25).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h&&!P(1).normal;if(go)tg=h.i;break}
+   case 'ramen':case 'senzu':{const h=mons(s).filter(x=>x.m.hp<def(s,x.m)*.6).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h;if(go)tg=h.i;break}
+   case 'provocation':{const t=mons(s).filter(x=>x.m.card.role==='def').sort((a,b)=>b.m.hp-a.m.hp)[0];go=!!t&&mons(s).length>1&&!G.taunt;if(go)tg=t.i;break}
+   case 'haki':{const ids=inf.ids||[];const f=ids.map(i=>({i,a:atk(e,P(e).mon[i])})).sort((a,b)=>b.a-a.a)[0];go=!!f&&G.n>1;if(go)tg=f.i;break}
+   case 'rappel':{const h=mons(s).filter(x=>x.m.hp<def(s,x.m)*.25).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h&&!P(s).normal;if(go)tg=h.i;break}
    case 'examen':go=p.hand.length<=5&&p.deck.length>3;break;
    case 'flashback':go=p.hand.length<=6;if(go)tg=p.grave.filter(x=>x.k==='c').sort((a,b)=>b.atk-a.atk)[0];break;
    case 'entrainement':go=!!st&&G.n>1;if(go)tg=st.i;break;
    case 'pacte':go=!!st&&p.lp>3500&&G.n>1;if(go)tg=st.i;break;
    case 'reunion':go=true;tg=p.hand.filter(x=>x.k==='c'&&x.lvl>=5).sort((a,b)=>b.atk-a.atk)[0];break;
    case 'forgeron':case 'epee':case 'cape':go=!!st;if(go)tg=st.i;break;
-   case 'potion':{const h=mons(1).filter(x=>x.m.hp<def(1,x.m)*.6).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h;if(go)tg=h.i;break}
-   case 'paralysie':{const f=aiStrongest(0);go=!!f&&G.n>1;if(go)tg=f.i;break}
+   case 'potion':{const h=mons(s).filter(x=>x.m.hp<def(s,x.m)*.6).sort((a,b)=>a.m.hp-b.m.hp)[0];go=!!h;if(go)tg=h.i;break}
+   case 'paralysie':{const f=aiStrongest(e);go=!!f&&G.n>1;if(go)tg=f.i;break}
   }
-  if(go){await playSpell(1,k,tg);return true}
+  if(go){await playSpell(s,k,tg);return true}
  }
  return false;
 }
-async function aiMain(){
- const p=P(1);
- const fi=p.hand.findIndex(c=>c.t==='field'&&c.id!==fld()&&!(c.id==='lune'&&!mons(1).some(x=>x.m.card.col===4)));
- if(fi>=0&&Math.random()<.7){await playSpell(1,fi,null);await sleep(300)}
- await aiSummon();
- for(let g=0;g<2&&!G.over;g++){const o=P(1).extra.map(c=>({c,idx:evoReady(1,c)})).filter(x=>x.idx).sort((a,b)=>b.c.atk-a.c.atk)[0];if(!o)break;await doEvolve(1,o.c,o.idx);await sleep(300)}
- for(let g=0;g<5&&!G.over;g++){if(!(await aiSpellOnce()))break;await sleep(300)}
+async function aiMain(s){const e=1-s;
+ const p=P(s);
+ const fi=p.hand.findIndex(c=>c.t==='field'&&c.id!==fld()&&!(c.id==='lune'&&!mons(s).some(x=>x.m.card.col===4)));
+ if(fi>=0&&Math.random()<.7){await playSpell(s,fi,null);await sleep(300)}
+ await aiSummon(s);
+ for(let g=0;g<2&&!G.over;g++){const o=P(s).extra.map(c=>({c,idx:evoReady(s,c)})).filter(x=>x.idx).sort((a,b)=>b.c.atk-a.c.atk)[0];if(!o)break;await doEvolve(s,o.c,o.idx);await sleep(300)}
+ for(let g=0;g<5&&!G.over;g++){if(!(await aiSpellOnce(s)))break;await sleep(300)}
  const ai=p.hand.findIndex(c=>c.id==='amitie');
- if(ai>=0&&mons(1).length>=3&&freeSt(1)>=0)await playSpell(1,ai,null);
+ if(ai>=0&&mons(s).length>=3&&freeSt(s)>=0)await playSpell(s,ai,null);
  for(let g=0;g<3;g++){
   const ti=p.hand.findIndex(c=>c.t==='trap'&&c.id!=='amitie');
-  if(ti<0||freeSt(1)<0)break;
-  await setTrap(1,ti);
+  if(ti<0||freeSt(s)<0)break;
+  await setTrap(s,ti);
  }
- const opp=aiStrongest(0);
- if(opp)mons(1).forEach(x=>{if(!x.m.chg&&x.m.ts!==G.n&&x.m.pos==='a'&&atk(0,opp.m)>atk(1,x.m)+200&&x.m.card.role==='def')x.m.pos='d'});
+ const opp=aiStrongest(e);
+ if(opp)mons(s).forEach(x=>{if(!x.m.chg&&x.m.ts!==G.n&&x.m.pos==='a'&&atk(e,opp.m)>atk(s,x.m)+200&&x.m.card.role==='def')x.m.pos='d'});
  render();
 }
-async function aiBattle(){
+async function aiBattle(s){const e=1-s;
  if(G.n===1)return;
  for(let g=0;g<4&&!G.over;g++){
-  const my=mons(1).filter(x=>x.m.pos==='a'&&!x.m.att);if(!my.length)break;
-  const x=my.sort((a,b)=>atk(1,b.m)-atk(1,a.m))[0];
-  const ti0=tauntIdx(1),opps=mons(0).filter(o=>ti0<0||o.i===ti0);
-  if(!mons(0).length){await battle(1,x.i,-1);await sleep(300);continue}
+  const my=mons(s).filter(x=>x.m.pos==='a'&&!x.m.att&&ownsSlot(s,x.i)&&!(G.n===1));if(!my.length)break;
+  const x=my.sort((a,b)=>atk(s,b.m)-atk(s,a.m))[0];
+  const ti0=tauntIdx(s),opps=mons(e).filter(o=>ti0<0||o.i===ti0);
+  if(!mons(e).length){await battle(s,x.i,-1);await sleep(300);continue}
   let best=null,bs=0;
-  opps.forEach(t=>{const h=calcHit(1,x.m,t);let sc=(h.kill?1000:h.dmg/t.m.hp*500)+t.m.card.atk/10;if(h.dies)sc-=900;else sc-=h.back/Math.max(1,x.m.hp)*300;if(sc>bs){bs=sc;best=t}});
+  opps.forEach(t=>{const h=calcHit(s,x.m,t.m);let sc=(h.kill?1000:h.dmg/t.m.hp*500)+t.m.card.atk/10;if(h.dies)sc-=900;else sc-=h.back/Math.max(1,x.m.hp)*300;if(sc>bs){bs=sc;best=t}});
   if(!best){x.m.att=true;continue}
-  await battle(1,x.i,best.i);await sleep(350);
+  await battle(s,x.i,best.i);await sleep(350);
  }
 }
-async function aiTurn(){
- G.ai=true;render();
+async function aiTurn(pi){
+ const s=pi==null?1:pi;G.ai=true;render();
  await sleep(700);
- try{await aiMain();if(!G.over)await aiBattle()}catch(e){console.error(e)}
+ try{await aiMain(s);if(!G.over)await aiBattle(s)}catch(e){console.error(e)}
  if(G.over)return;
  await sleep(400);
- await finishTurn(1);
+ await finishTurn(s);
 }
 
 /* ---------- tours ---------- */
@@ -754,7 +765,7 @@ async function discardTo(pi){
  const p=P(pi);
  while(p.hand.length>HANDMAX&&!G.over){
   let c;
-  if(pi===0){c=await chooseCard('Défausse une carte (main limitée à '+HANDMAX+')',p.hand.slice(),false);if(NET)netSend('ans',{v:p.hand.indexOf(c)})}
+  if(isH(pi)){c=await chooseCard('Défausse une carte (main limitée à '+HANDMAX+')',p.hand.slice(),false);if(NET)netSend('ans',{v:p.hand.indexOf(c)})}
   else if(NET){const ix=await recvAns();c=p.hand[ix];if(!c)break}
   else c=p.hand.slice().sort((a,b)=>(a.k==='c'?a.lvl:0)-(b.k==='c'?b.lvl:0))[0];
   const k=p.hand.indexOf(c);if(k>=0){p.hand.splice(k,1);p.grave.push(c);log(S(pi,'défausses','défausse')+' '+c.n+'.')}
@@ -762,6 +773,7 @@ async function discardTo(pi){
 }
 async function finishTurn(pi){
  await discardTo(pi);
+ {const sd=P(pi);if(sd.pl.length>1)sd.cur=1-sd.cur}
  G.p.forEach(p=>p.mon.forEach(m=>m&&(m.tmp=0)));
  if(G.taunt&&G.taunt.owner!==pi){G.taunt.left--;if(G.taunt.left<=0)G.taunt=null}
  G.turn=1-pi;G.n++;G.ai=false;ui.sel=null;ui.selMon=null;
@@ -770,12 +782,12 @@ async function finishTurn(pi){
 async function startTurn(){
  const pi=G.turn,p=P(pi);
  p.normal=false;p.senzu=false;p.potion=false;p.mon.forEach(m=>{if(m){m.att=false;m.chg=false;if(m.para>0){m.att=true;m.para--}if(m.sleep>0){m.att=true;m.sleep--}}});
- banner(pi===0?'À TOI DE JOUER':'TOUR ADVERSE',pi===0?'#3dae5a':'#ec5fa0');
+ banner(isH(pi)?'À TOI DE JOUER':pi===0?'TOUR DE TON COÉQUIPIER':'TOUR ADVERSE',pi===0?'#3dae5a':'#ec5fa0');
  G.busy=true;render();await sleep(600);
- if(G.n>1){if(pi===0)G.needDraw=true;else if(!NET)await drawN(pi,1)}
+ if(G.n>1){if(isH(pi))G.needDraw=true;else if(!NET)await drawN(pi,1)}
  if(G.over)return;
  G.busy=false;render();
- if(pi===0)startTimer();else if(NET){startTimer();remoteLoop()}else aiTurn();
+ if(isH(pi))startTimer();else if(NET){startTimer();remoteLoop()}else aiTurn(pi);
 }
 function startTimer(){stopTimer();G.t0=Date.now();G.tm=setInterval(tick,200)}
 function stopTimer(){if(G&&G.tm){clearInterval(G.tm);G.tm=null}}
@@ -785,7 +797,7 @@ function tick(){
  const pi=G.turn;if(pi===1&&!NET)return;
  const left=Math.max(0,LIM-(Date.now()-G.t0)),pc=left/LIM*100,r=$('cbR'+pi);
  if(r){r.style.setProperty('--tp',pc);r.style.setProperty('--c',ringCol(pc));r.classList.toggle('low',left<10000)}
- if(pi===0&&left<=0&&!G.busy&&!ui.modal&&!ui.pick){stopTimer();humanEnd()}
+ if(isH(pi)&&left<=0&&!G.busy&&!ui.modal&&!ui.pick){stopTimer();humanEnd()}
 }
 async function humanEnd(){
  if(!G||G.over||G.turn!==0||G.busy||G.ai||ui.modal)return;
@@ -803,7 +815,7 @@ function endGame(winner,why){
 }
 
 /* ---------- actions du joueur ---------- */
-const myTurn=()=>G&&!G.over&&G.turn===0&&!G.busy&&!G.ai&&!G.needDraw&&!ui.pick&&!ui.modal;
+const myTurn=()=>G&&!G.over&&G.turn===0&&G.p[0].cur===0&&!G.busy&&!G.ai&&!G.needDraw&&!ui.pick&&!ui.modal;
 async function doDraw(){
  if(!G||!G.needDraw||G.turn!==0||G.over||G.busy)return;
  G.needDraw=false;netSend('drw');G.busy=true;render();
@@ -817,7 +829,7 @@ async function actSummon(hi,pos,pre){
  if(c.lvl>=5){
   const l=mons(0);if(!l.length)return toast('Il faut sacrifier un personnage pour invoquer le niveau '+c.lvl+'.');
   if(pre!=null&&p.mon[pre]){slot=pre;trib=true}else{const t=await pick('Choisis le personnage à sacrifier',l.map(x=>({z:'m',p:0,i:x.i})),true);if(!t)return;slot=t.i;trib=true}
- }else{slot=(pre!=null&&!p.mon[pre])?pre:freeMon(0);if(slot<0)return toast('Aucune zone de personnage libre.')}
+ }else{slot=(pre!=null&&!p.mon[pre]&&ownsSlot(0,pre))?pre:freeMon(0);if(slot<0)return toast('Aucune zone de personnage libre.')}
  netSend('sum',{hi,slot,pos,trib});
  G.busy=true;ui.sel=null;await doSummon(0,hi,slot,pos,trib);G.busy=false;render();
 }
@@ -854,6 +866,7 @@ function attackPreview(i,ti){
 }
 async function actAttack(i,pre){
  if(!myTurn())return;
+ if(!ownsSlot(0,i))return toast('Cette carte appartient à ton coéquipier.');
  if(G.n===1)return toast('On ne peut pas attaquer au premier tour de la partie.');
  const m=P(0).mon[i];if(!m||m.att||m.pos!=='a')return;
  const ti0=tauntIdx(0),opps=mons(1).filter(x=>ti0<0||x.i===ti0);let ti=-1;
@@ -877,7 +890,7 @@ async function actPos(i){
 /* ---------- rendu du plateau ---------- */
 function slot(z,p,i,label,inner,cls){return '<div class="slot '+(cls||'')+(ui.pick&&ui.pick.cands.some(c=>c.z===z&&c.p===p&&c.i===i)?' tg':'')+'" data-z="'+z+'" data-p="'+p+'" data-i="'+i+'" data-l="'+label+'">'+(inner||'')+'</div>'}
 function evoReadyMap(){
- const r={};if(!G||G.over||G.turn!==0)return r;
+ const r={};if(!G||G.over||G.turn!==0||G.p[0].cur!==0)return r;
  P(0).extra.forEach((e,ci)=>{const idx=evoReady(0,e);if(idx)idx.forEach(i=>{if(!r[i])r[i]={ci,e}})});
  return r;
 }
@@ -907,21 +920,22 @@ function stHTML(pi,i){
 function render(){
  const b=boardEl();if(!b||!G)return;
  hidePop();popTarget=null;
- const me=P(0),op=P(1),can=myTurn(),mob=window.innerWidth<700;G.mob=mob;
- const gv=pi=>{const g=P(pi).grave,t=g[g.length-1];return t?'<div class="bc">'+cardHTML(t)+'</div><span class="cnt">'+g.length+'</span>':''};
- const dk=pi=>{const n=P(pi).deck.length;return n?'<div class="bc">'+backHTML()+'</div><span class="cnt">'+n+'</span>':''};
+ const me=G.p[0].pl[0],mes=P(0),op=P(1),can=myTurn(),mob=window.innerWidth<700;G.mob=mob;
+ const v2=!!G.v2,deckN=pi=>pi===0?G.p[0].pl[0].deck.length:G.p[pi].pl.reduce((t,x)=>t+x.deck.length,0),graveOf=pi=>pi===0?G.p[0].pl[0].grave:P(pi).grave;
+ const gv=pi=>{const g=graveOf(pi),t=g[g.length-1];return t?'<div class="bc">'+cardHTML(t)+'</div><span class="cnt">'+g.length+'</span>':''};
+ const dk=pi=>{const n=deckN(pi);return n?'<div class="bc">'+backHTML()+'</div><span class="cnt">'+n+'</span>':''};
  const hand=me.hand.map((c,i)=>{
-  const inf=c.k==='c'?{ok:!me.normal&&(c.lvl<5||mons(0).length>0)&&(c.lvl>=5||freeMon(0)>=0)}:c.t==='trap'?{ok:freeSt(0)>=0}:spellInfo(0,c);
+  const inf=c.k==='c'?{ok:!mes.normal&&(c.lvl<5||mons(0).length>0)&&(c.lvl>=5||freeMon(0)>=0)}:c.t==='trap'?{ok:freeSt(0)>=0}:spellInfo(0,c);
   const r=(i-(me.hand.length-1)/2)*(me.hand.length>6?5:7),y=Math.abs(i-(me.hand.length-1)/2)*4;
   return '<div class="hc'+(ui.sel===i?' sel':'')+(!inf.ok&&can?' off':'')+(G.newC===c?' new':'')+'" data-z="h" data-p="0" data-i="'+i+'" style="transform:rotate('+r+'deg) translateY('+y+'px)">'+cardHTML(c)+'</div>';
  }).join('');
- const oh=op.hand.map(()=>'<div class="hc">'+backHTML()+'</div>').join('');
+ const oh=op.pl.flatMap(x=>x.hand).slice(0,10).map(()=>'<div class="hc">'+backHTML()+'</div>').join('');
  const fcard=G.field?'<div class="bc">'+cardHTML(G.field.card)+'</div>':'';
  const dglow=G.needDraw&&G.turn===0&&!G.over;
- const st=pi=>[0,1,2].map(i=>slot('s',pi,i,'Soutien',stHTML(pi,i),'st'));
- const mn=pi=>[0,1,2].map(i=>slot('m',pi,i,'Personnage',monHTML(pi,i)+monStats(pi,i),''));
+ const st=pi=>P(pi).st.map((_,i)=>slot('s',pi,i,'Soutien',stHTML(pi,i),'st'));
+ const mn=pi=>P(pi).mon.map((_,i)=>slot('m',pi,i,v2?(pi===0?(i<2?'Toi':'Allié'):'Adversaire'):'Personnage',monHTML(pi,i)+monStats(pi,i),v2&&pi===0&&i>=2?'mate':''));
  const chip=(z,pi,i,label,n,gl)=>'<span class="chip'+(gl?' glow':'')+'" data-z="'+z+'" data-p="'+pi+'" data-i="'+i+'">'+label+(n!=null?' · '+n:'')+'</span>';
- const strip=pi=>'<div class="strip">'+chip('g',pi,0,'Cimetière',P(pi).grave.length)+chip('d',pi,0,dglow&&pi===0?'Pioche !':'Pioche',P(pi).deck.length,dglow&&pi===0)+(pi===1?chip('f',0,0,'Terrain',G.field?1:0):'')+'</div>';
+ const strip=pi=>'<div class="strip">'+chip('g',pi,0,'Cimetière',graveOf(pi).length)+chip('d',pi,0,dglow&&pi===0?'Pioche !':'Pioche',deckN(pi),dglow&&pi===0)+(pi===1?chip('f',0,0,'Terrain',G.field?1:0):'')+'</div>';
  const row=(a,c)=>'<div class="crw '+(c||'')+'">'+a.join('')+'</div>';
  const rowF=a=>'<div class="crw first bk">'+a.join('')+'</div>';
  const grp=(a,c)=>'<div class="grp '+c+'">'+a.join('')+'</div>';
@@ -932,11 +946,12 @@ function render(){
  const oppMon=mob?mn(1):[slot('x',0,0,'','','e')].concat(mn(1),[slot('x',0,0,'','','e')]);
  const myMon=mob?mn(0):[slot('x',0,1,'','','e')].concat(mn(0),[slot('x',0,2,'','','e')]);
  const mySt=mob?st(0):[slot('d',0,0,dglow?'Pioche !':'Pioche',dk(0),'deck sd'+(dglow?' glow':''))].concat(st(0),[slot('g',0,0,'Cimetière',gv(0),'sd')]);
- b.classList.toggle('mob',mob);b.classList.toggle('mine',G.turn===0&&!G.over);b.classList.toggle('theirs',G.turn===1&&!G.over);
- const mid=G.over?'PARTIE TERMINÉE':G.turn===0?(G.needDraw?'À TOI DE PIOCHER · TOUR '+G.n:'À TOI DE JOUER · TOUR '+G.n):'TOUR DE L’ADVERSAIRE · TOUR '+G.n;
+ b.classList.toggle('mob',mob);b.classList.toggle('v2',v2);b.classList.toggle('mine',G.turn===0&&!G.over);b.classList.toggle('theirs',G.turn===1&&!G.over);
+ const nameOf=pi=>G.prs?G.prs[pi][P(pi).cur]:G.pr[pi],teamOf=pi=>G.prs?G.prs[pi].map(x=>x.n).join(' & '):G.pr[pi].n;
+ const mid=G.over?'PARTIE TERMINÉE':G.turn===0?(isH(0)?(G.needDraw?'À TOI DE PIOCHER · TOUR '+G.n:'À TOI DE JOUER · TOUR '+G.n):'TOUR DE '+esc(nameOf(0).n.toUpperCase())+' (ALLIÉ) · TOUR '+G.n):(v2?'TOUR DE '+esc(nameOf(1).n.toUpperCase())+' · TOUR '+G.n:'TOUR DE L’ADVERSAIRE · TOUR '+G.n);
  b.innerHTML=
  '<div class="ban" id="cbBan"><b></b></div>'+
- '<div class="cpl o'+(G.turn===1&&!G.over?' act':'')+'"><div class="cring'+(G.ai?' think':'')+'" id="cbR1" data-z="p" data-p="1" data-i="0" style="--tp:'+(G.turn===1&&NET&&G.t0?Math.max(0,100-(Date.now()-G.t0)/LIM*100):0)+'">'+avHTML(G.pr[1])+'</div><div class="cpt"><small>'+esc(G.pr[1].n.toUpperCase())+'</small><em class="tag">SON TOUR</em><b id="cbLp1">'+op.lp+'</b></div></div>'+
+ '<div class="cpl o'+(G.turn===1&&!G.over?' act':'')+'"><div class="cring'+(G.ai?' think':'')+'" id="cbR1" data-z="p" data-p="1" data-i="0" style="--tp:'+(G.turn===1&&NET&&G.t0?Math.max(0,100-(Date.now()-G.t0)/LIM*100):0)+'">'+avHTML(nameOf(1))+'</div><div class="cpt"><small>'+esc(teamOf(1).toUpperCase())+'</small><em class="tag">'+(v2?'ÉQUIPE ADVERSE':'SON TOUR')+'</em><b id="cbLp1">'+op.lp+'</b></div></div>'+
  '<div class="hnd o">'+oh+'</div>'+
  (mob?strip(1):'')+
  rowF(oppSt)+row(oppMon,'fr')+
@@ -945,13 +960,13 @@ function render(){
  (mob?strip(0):'')+
  '<div class="hnd m">'+hand+'</div>'+
  '<button class="endb" id="cbEnd"'+(can?'':' disabled')+'>Fin du tour</button>'+(dglow?'<div class="needd"><span>À toi de piocher</span><button type="button">Piocher</button></div>':'')+(!dglow&&can&&Object.keys(evoReadyMap()).length?'<div class="needd evp"><span>✦ Une de tes cartes peut évoluer !</span><button type="button">Évoluer</button></div>':'')+
- '<div class="cpl m'+(G.turn===0&&!G.over?' act':'')+'"><div class="cring" id="cbR0" data-z="p" data-p="0" data-i="0" style="--tp:'+(G.turn===0&&G.t0?Math.max(0,100-(Date.now()-G.t0)/LIM*100):0)+'">'+avHTML(G.pr[0])+'</div><div class="cpt"><small>'+esc(G.pr[0].n.toUpperCase())+'</small><em class="tag">À TOI</em><b id="cbLp0">'+me.lp+'</b></div></div>';
+ '<div class="cpl m'+(G.turn===0&&!G.over?' act':'')+'"><div class="cring" id="cbR0" data-z="p" data-p="0" data-i="0" style="--tp:'+(G.turn===0&&G.t0?Math.max(0,100-(Date.now()-G.t0)/LIM*100):0)+'">'+avHTML(nameOf(0))+'</div><div class="cpt"><small>'+esc(teamOf(0).toUpperCase())+'</small><em class="tag">'+(v2?'ÉQUIPE':'À TOI')+'</em><b id="cbLp0">'+mes.lp+'</b></div></div>';
  if(G.fxChanged){b.classList.toggle('fa',fld()==='arene');G.fxChanged=0}
  renderPanel();
 }
 function cardAt(z,p,i){
  const pl=G.p[p];
- if(z==='h')return p===0?{c:pl.hand[i]}:null;
+ if(z==='h')return p===0?{c:G.p[0].pl[0].hand[i]}:null;
  if(z==='m'){const m=pl.mon[i];return m?{c:m.card,atk:atk(p,m),def:m.hp,m}:null}
  if(z==='s'){const s=pl.st[i];return s&&(s.up||p===0)?{c:s.card}:null}
  if(z==='g'){const g=pl.grave;return g.length?{c:g[g.length-1]}:null}
@@ -986,7 +1001,7 @@ function actHTML(){
 }
 function renderPanel(){
  const el=$('cbAct');if(!el||!G)return;
- const ev=$('cbEvoW');if(ev){const n=P(0).extra.length,rd=P(0).extra.some(c=>evoReady(0,c));ev.innerHTML=n?'<button class="sec'+(rd&&myTurn()?' ready':'')+'" data-a="evo">✦ Évolution ('+n+')'+(rd?' · PRÊTE !':'')+'</button>':''}
+ const ev=$('cbEvoW');if(ev){const ex0=G.p[0].pl[0].extra,n=ex0.length,rd=ex0.some(c=>evoReady(0,c));ev.innerHTML=n?'<button class="sec'+(rd&&myTurn()?' ready':'')+'" data-a="evo">✦ Évolution ('+n+')'+(rd?' · PRÊTE !':'')+'</button>':''}
  const h=actHTML();
  el.innerHTML=h||'<small style="color:#b8c2d8">'+(G.needDraw&&G.turn===0?'<b style="color:#ffd84a">C’est à toi de piocher : clique sur ta pioche (elle brille).</b>':myTurn()?'Clique sur une carte pour la lire et la jouer.':G.turn===1?'C’est le tour de l’adversaire.':'')+'</small>';
 }
@@ -1024,7 +1039,7 @@ function fit(){
  const set=c=>{b.style.setProperty('--cw',c+'px');b.style.setProperty('--s0',(c/260).toFixed(4))};
  if(mob){set(Math.max(60,Math.min(130,Math.floor(w/3.3))));return}
  const top=b.getBoundingClientRect().top+window.scrollY,H=Math.max(420,window.innerHeight-top-10);
- const cap=()=>Math.max(60,Math.min(170,Math.floor(w/5.9)));
+ const cap=()=>Math.max(60,Math.min(170,Math.floor(w/(G&&G.v2?6.9:5.9))));
  let cw=Math.max(60,Math.min(cap(),Math.floor((H-30)/7.2)));
  set(cw);
  for(let i=0;i<4;i++){const h=b.offsetHeight;if(h>H||h<H*.95){const n=Math.max(60,Math.min(cap(),Math.floor(cw*H/h*.995)));if(n===cw)break;cw=n;set(cw)}else break}
@@ -1065,6 +1080,7 @@ function dropTargets(src){
  if(src.z==='m'){
   const m=p.mon[src.i];if(!m)return {no:'Rien à faire avec cette carte.'};
   if(G.n===1)return {no:'On ne peut pas attaquer au premier tour de la partie.'};
+  if(!ownsSlot(0,src.i))return {no:'Cette carte appartient à ton coéquipier : seul lui peut la faire attaquer.'};
   if(m.att)return {no:'Ce personnage a déjà attaqué ce tour.'};
   if(m.pos!=='a')return {no:'Un personnage en défense ne peut pas attaquer : passe-le en attaque.'};
   const ti0=tauntIdx(0),opps=mons(1).filter(x=>ti0<0||x.i===ti0);
@@ -1076,7 +1092,7 @@ function dropTargets(src){
   if(p.normal)return {no:'Tu as déjà invoqué un personnage ce tour.'};
   if(c.lvl>=5){if(!mons(0).length)return {no:'Il faut sacrifier un personnage pour invoquer le niveau '+c.lvl+' : aucun personnage à sacrifier.'};return {els:q('.slot[data-z="m"][data-p="0"]').filter(e=>p.mon[+e.dataset.i]),act:async sl=>{const pos=await askPos(sl);if(pos)actSummon(hi,pos,+sl.dataset.i)},hint:'Dépose sur le personnage à sacrifier'}}
   if(freeMon(0)<0)return {no:'Aucune zone de personnage libre.'};
-  return {els:q('.slot[data-z="m"][data-p="0"]').filter(e=>!p.mon[+e.dataset.i]),act:async sl=>{const pos=await askPos(sl);if(pos)actSummon(hi,pos,+sl.dataset.i)},hint:'Dépose sur une zone libre'};
+  return {els:q('.slot[data-z="m"][data-p="0"]').filter(e=>!p.mon[+e.dataset.i]&&ownsSlot(0,+e.dataset.i)),act:async sl=>{const pos=await askPos(sl);if(pos)actSummon(hi,pos,+sl.dataset.i)},hint:'Dépose sur une zone libre'};
  }
  if(c.t==='trap'){
   if(freeSt(0)<0)return {no:'Aucune zone de soutien libre.'};
@@ -1240,11 +1256,12 @@ function showMenu(){
  let d=getDeck(),ck=deckCheck(d);
  body().innerHTML=tabs('menu')+
  '<div class="cbhero bk'+backN()+'"><div><h2>Kuroven Combat</h2><p>Compose un deck de 20 cartes avec tes personnages préférés, puis affronte l’adversaire. Les six couleurs se battent en cercle : chaque couleur domine deux autres.</p>'+
- '<button class="cbbtn" id="cbPlay">'+(ck.ok?'Jouer contre l’IA':'Prépare ton deck pour jouer')+'</button><button class="cbbtn sec" id="cbOnline">Duel en ligne</button><button class="cbbtn sec" id="cbBuild">Mes decks · '+esc(deckName())+' ('+d.length+'/20)</button><button class="cbbtn sec" id="cbAuto">Deck aléatoire</button></div>'+
+ '<button class="cbbtn" id="cbPlay">'+(ck.ok?'Jouer contre l’IA':'Prépare ton deck pour jouer')+'</button><button class="cbbtn sec" id="cb2v2">2 contre 2</button><button class="cbbtn sec" id="cbOnline">Duel en ligne</button><button class="cbbtn sec" id="cbBuild">Mes decks · '+esc(deckName())+' ('+d.length+'/20)</button><button class="cbbtn sec" id="cbAuto">Deck aléatoire</button></div>'+
  '<div class="em">'+KM+'</div></div>'+
  '<div class="cbcard"><b>Dos des cartes</b><div class="cbtabs" id="cbBk" style="margin:8px 0 0">'+['Noir','Bleu nuit','Rouge sobre','Clair'].map((n,i)=>'<button data-b="'+(i+1)+'" class="'+(backN()===i+1?'on':'')+'">'+n+'</button>').join('')+'</div></div>';
  bindTabs();
  $('cbPlay').onclick=()=>{if(!deckCheck(getDeck()).ok){showBuild();return}startGame()};
+ $('cb2v2').onclick=()=>{if(!deckCheck(getDeck()).ok){showBuild();return}startGame2v2()};
  $('cbBuild').onclick=showBuild;$('cbOnline').onclick=()=>showOnline();
  $('cbAuto').onclick=()=>{setDeck(autoDeck(null,[],null));showMenu()};
  $('cbBk').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('cbback',+b.dataset.b);showMenu()};
@@ -1669,6 +1686,17 @@ async function startGame(){
  mountGame();
  for(let k=0;k<5;k++){P(0).hand.push(P(0).deck.shift());P(1).hand.push(P(1).deck.shift())}
  log('La partie commence. Tu joues en premier.');
+ await startTurn();
+}
+async function startGame2v2(){
+ const mine=getDeck();if(!deckCheck(mine).ok){showBuild();return}
+ leaveGame();view='game';
+ const mk=()=>{const ids=autoDeck(undefined,undefined,undefined,true);return mkPl(ids,extraFor(ids))};
+ G={v2:true,pr:[who0(),aiPersona()],prs:[[who0(),aiPersona()],[aiPersona(),aiPersona()]],p:[mkSide([mkPl(mine,getExtra()),mk()],4),mkSide([mk(),mk()],4)],turn:0,n:1,field:null,over:false,busy:true,ai:false,log:[],t0:0,tm:null,pop:null,newC:null};
+ ui={};
+ mountGame();
+ G.p.forEach(sd=>sd.pl.forEach(pl=>{for(let k=0;k<5;k++)pl.hand.push(pl.deck.shift())}));
+ log('La partie 2 contre 2 commence. Ordre des tours : toi, adversaire 1, ton coéquipier, adversaire 2.');
  await startTurn();
 }
 async function startOnline(o){

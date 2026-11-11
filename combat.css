@@ -726,3 +726,8 @@ body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
 .dk-autob{display:flex;flex-direction:column;gap:6px}
 .dk-autob button.sec{background:#ffffff14!important;color:#eef0f8!important}
 .dk-auto{justify-content:space-between}
+
+/* 2 contre 2 : 4 emplacements de personnages par équipe */
+.cbt.v2 .crw{grid-template-columns:repeat(6,var(--cw))}
+.cbt.v2 .slot.mate{border-color:#4ddf7a66;background:#4ddf7a0a}
+.cbt.v2 .slot.mate:before{content:'ALLIÉ';position:absolute;top:2px;left:4px;font:800 8px var(--tx);letter-spacing:1px;color:#4ddf7aaa;pointer-events:none}
