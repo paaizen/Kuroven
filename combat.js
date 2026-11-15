@@ -1391,8 +1391,28 @@ const SND=(()=>{let ac=null;const on=()=>ls.get('cbsnd',1)!==0;
   hit:i=>{tone(115+i*20,36,.5,'sine',.55);noise(.09,2400,600,.25);tone(196*Math.pow(1.26,i),196*Math.pow(1.26,i),.55,'sawtooth',.03)},
   reveal:r=>chord(r,0)};
 })();
+/* ouverture « magazine » : les cartes tirées sont envoyées à combat/mag/, qui joue toute l'animation.
+   Si le navigateur ne sait pas l'afficher, on garde l'ancienne ouverture ci-dessous. */
+function openMagazine(type,n){
+ try{if(!document.createElement('canvas').getContext('webgl'))return false}catch(e){return false}
+ closeBoost();clearInterval(boostTm);
+ const all=[];
+ for(let i=0;i<n;i++){const cs=rollPack(type);stockUse(1);ls.set('cblast',cs.map(c=>c.id));const nw=addToCol(cs.map(c=>c.id));cs.forEach(c=>all.push({c,nw:nw.includes(c.id)}))}
+ const ov=document.createElement('div');ov.id='cbOpen';ov.className='cbmag';
+ ov.innerHTML='<iframe src="combat/mag/index.html?v=1" title="Ouverture du magazine" allow="autoplay"></iframe>';
+ (document.getElementById('v-cb')||document.body).appendChild(ov);
+ const fr=ov.firstChild;
+ const data={t:'kvmag',snd:SND.on(),cards:all.map(({c,nw})=>({n:c.n,ser:(c.k==='e'?(c.mats&&c.mats[0]&&c.mats[0].series):c.series)||(c.k==='s'?(c.t==='trap'?'Carte Piège':c.t==='field'?'Carte Terrain':'Carte Magie'):'Kuroven'),r:rarityOf(c),full:c.k==='e'&&FULLART.has(c.eid),nw,html:cardHTML(c),img:c.k==='e'?'combat/img/evo-'+c.eid+'.jpg':(c.img||'')}))};
+ const onMsg=e=>{if(!fr.isConnected){removeEventListener('message',onMsg);return}if(e.source!==fr.contentWindow||!e.data)return;
+  if(e.data.t==='kvmag-ready')fr.contentWindow.postMessage(data,'*');
+  if(e.data.t==='kvmag-close'){removeEventListener('message',onMsg);closeBoost();showBoosters()}};
+ addEventListener('message',onMsg);
+ return true;
+}
 function openBooster(type,n){
- n=Math.min(n||1,stockState().n);if(n<1){toast('Plus de booster pour l’instant.');return}closeBoost();clearInterval(boostTm);
+ n=Math.min(n||1,stockState().n);if(n<1){toast('Plus de booster pour l’instant.');return}
+ if(!ls.get('cbclassic',0)&&openMagazine(type,n))return;
+ closeBoost();clearInterval(boostTm);
  const ov=document.createElement('div');ov.className='cbopen bk'+backN();ov.id='cbOpen';
  ov.innerHTML='<canvas class="cbop-fx"></canvas><div class="cbop-stage" id="cbopS"></div><canvas class="cbop-trail"></canvas><button class="cbchip cbop-snd" type="button"></button><button class="cbchip cbop-x" type="button">✕ Fermer</button>';
  (document.getElementById('v-cb')||document.body).appendChild(ov);
