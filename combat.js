@@ -144,17 +144,17 @@ function mkSide(pls,nm){
  return sd;
 }
 const mkP=(ids,ex,rng)=>mkSide([mkPl(ids,ex,rng)],3);
-const isH=pi=>pi===0&&G.p[0].cur===0;
+const isH=pi=>pi===0&&G.p[0].cur===0&&!G.auto;
 /* qui possède quel emplacement de personnage (en 2 contre 2 : 2 emplacements chacun) */
 const ownsSlot=(pi,i)=>{const sd=G.p[pi];return sd.pl.length<2||Math.floor(i/(sd.mon.length/sd.pl.length))===sd.cur};
 const mkM=(c,pos)=>({card:c,pos,atkP:0,defP:0,tmp:0,ts:G.n,att:false,chg:false,hp:c.def,full:true,para:0,sleep:0,armLost:0});
-const P=i=>G.p[i], nm=i=>i===0?'Toi':'L’adversaire', S=(pi,a,b)=>isH(pi)?'Tu '+a:(pi===0?'Ton coéquipier '+b:(G.v2?'Un adversaire ':'L’adversaire ')+b);
+const P=i=>G.p[i], nm=i=>i===0?'Toi':'L’adversaire', S=(pi,a,b)=>(isH(pi)||(pi===0&&G.auto&&G.p[0].cur===0))?'Tu '+a:(pi===0?'Ton coéquipier '+b:(G.v2?'Un adversaire ':'L’adversaire ')+b);
 const mons=pi=>G.p[pi].mon.map((m,i)=>m?{m,i}:null).filter(Boolean);
 const eqN=(pi,m,id)=>G.p[pi].st.filter(s=>s&&s.to===m&&s.card.id===id).length;
 const hasCape=(pi,m)=>eqN(pi,m,'cape')>0;
 const fld=()=>G.field&&G.field.card.id;
 const friend=pi=>mons(pi).length>=3&&G.p[pi].st.some(s=>s&&s.up&&s.card.id==='amitie');
-function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;if(G&&G.arena)v+=pi===0?G.arena.fx.atk+30*G.arena.fx.cres*Math.min(10,Math.floor(G.n/2)):G.arena.ai.atk;return Math.max(0,v)}
+function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;if(G&&G.story&&pi===1)v+=G.story.L.atk;if(G&&G.arena)v+=pi===0?G.arena.fx.atk+30*G.arena.fx.cres*Math.min(10,Math.floor(G.n/2)):G.arena.ai.atk;return Math.max(0,v)}
 function def(pi,m){return Math.max(1,m.card.def+m.defP)}
 function armor(pi,m){let v=Math.max(0,(m.card.arm||0)-(m.armLost||0))+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;if(G&&G.arena&&pi===0)v+=G.arena.fx.arm;return v}
 const tauntIdx=att=>{const t=G&&G.taunt;if(!t||t.owner===att||!P(t.owner).mon.includes(t.m))return -1;return P(t.owner).mon.indexOf(t.m)};
@@ -414,7 +414,7 @@ async function trapWindow(pi,i){
  const od=1-pi,A=P(pi).mon[i];
  const list=trapChoices(od,pi,i);if(!list.length)return false;
  let k=-1;
- if(od===0){
+ if(od===0&&!G.auto){
   k=await ask('Piège !',A.card.n+' (ATK '+atk(pi,A)+') attaque. Activer un piège ?',list.map(x=>({v:x,t:'Activer : '+P(0).st[x].card.n})).concat([{v:-1,t:'Ne rien faire',sec:1}]),list.map(x=>P(0).st[x].card));if(NET)netSend('ans',{v:k});
  }else if(NET){k=await recvAns()}else{await sleep(400);k=aiPickTrap(od,pi,i,list)}
  if(k==null||k<0)return false;
@@ -430,13 +430,13 @@ async function saveBy(owner,i){
  if(k<0)return false;
  const others=mons(owner).filter(x=>x.i!==i);if(!others.length)return false;
  let yes=true;
- if(owner===0){yes=await ask('Sacrifice héroïque',o.mon[i].card.n+' va être détruit. Détruire un autre de tes personnages à la place ?',[{v:true,t:'Oui, sacrifier'},{v:false,t:'Non',sec:1}],[P(0).st[k].card]);if(NET)netSend('ans',{v:yes})}
+ if(owner===0&&!G.auto){yes=await ask('Sacrifice héroïque',o.mon[i].card.n+' va être détruit. Détruire un autre de tes personnages à la place ?',[{v:true,t:'Oui, sacrifier'},{v:false,t:'Non',sec:1}],[P(0).st[k].card]);if(NET)netSend('ans',{v:yes})}
  else if(NET){yes=await recvAns()}
  else yes=true;
  if(!yes)return false;
  others.sort((a,b)=>a.m.card.atk-b.m.card.atk);
  let tgt=others[0];
- if(owner===0&&others.length>1){const r=await pick('Choisis le personnage à sacrifier',others.map(x=>({z:'m',p:0,i:x.i})),false);if(r)tgt=others.find(x=>x.i===r.i)||tgt;if(NET)netSend('ans',{v:tgt.i})}
+ if(owner===0&&!G.auto&&others.length>1){const r=await pick('Choisis le personnage à sacrifier',others.map(x=>({z:'m',p:0,i:x.i})),false);if(r)tgt=others.find(x=>x.i===r.i)||tgt;if(NET)netSend('ans',{v:tgt.i})}
  else if(owner===1&&NET&&others.length>1){const ti=await recvAns();const f=others.find(x=>x.i===ti);if(f)tgt=f}
  await flipTrap(owner,k);banner('SACRIFICE HÉROÏQUE !','#7fd0ff');log(S(owner,'actives','active')+' Sacrifice héroïque.');await sleep(600);
  dropTrap(owner,k);await destroyMon(owner,tgt.i,'sacrifice');return true;
@@ -445,7 +445,7 @@ async function spellWindow(pi,card){
  const od=1-pi,o=P(od),k=o.st.findIndex(s=>s&&!s.up&&s.card.id==='rideau');
  if(k<0)return false;
  let yes;
- if(od===0){yes=await ask('Piège !','L’adversaire active « '+card.n+' ». Activer Rideau de fumée ?',[{v:true,t:'Activer Rideau de fumée'},{v:false,t:'Non',sec:1}],[o.st[k].card]);if(NET)netSend('ans',{v:yes})}
+ if(od===0&&!G.auto){yes=await ask('Piège !','L’adversaire active « '+card.n+' ». Activer Rideau de fumée ?',[{v:true,t:'Activer Rideau de fumée'},{v:false,t:'Non',sec:1}],[o.st[k].card]);if(NET)netSend('ans',{v:yes})}
  else if(NET){yes=await recvAns()}
  else{await sleep(300);yes=Math.random()<.8}
  if(!yes)return false;
@@ -796,7 +796,8 @@ async function finishTurn(pi){
 async function startTurn(){
  const pi=G.turn,p=P(pi);
  p.normal=false;p.senzu=false;p.potion=false;p.mon.forEach(m=>{if(m){m.att=false;m.chg=false;if(m.para>0){m.att=true;m.para--}if(m.sleep>0){m.att=true;m.sleep--}}});
- banner(isH(pi)?'À TOI DE JOUER':pi===0?'TOUR DE TON COÉQUIPIER':'TOUR ADVERSE',pi===0?'#3dae5a':'#ec5fa0');
+ if(pi===0&&G.vsai&&G.p[0].cur===0){G.myT=(G.myT|0)+1;if(G.auto)G.autoT=(G.autoT|0)+1}
+ banner(isH(pi)?'À TOI DE JOUER':pi===0?(G.auto?'MODE AUTO':'TOUR DE TON COÉQUIPIER'):'TOUR ADVERSE',pi===0?'#3dae5a':'#ec5fa0');
  G.busy=true;render();await sleep(600);
  if(pi===0&&G.arena&&G.arena.fx.regen){const h=Math.min(G.arena.fx.regen,Math.max(0,G.arena.mx-P(0).lp));if(h>0)heal(0,h)}
  if(G.n>1){if(isH(pi))G.needDraw=true;else if(!NET)await drawN(pi,1)}
@@ -823,6 +824,7 @@ async function humanEnd(){
 function endGame(winner,why){
  if(G.over)return;G.over=true;stopTimer();
  if(G.arena){arEnd(winner);return}
+ if(G.story){stEnd(winner,why);return}
  const xr=(G.rk&&G.rk.ranked)?rkApply(winner===0,G.rk):'';
  setTimeout(async()=>{
   if(!alive)return;
@@ -832,7 +834,7 @@ function endGame(winner,why){
 }
 
 /* ---------- actions du joueur ---------- */
-const myTurn=()=>G&&!G.over&&G.turn===0&&G.p[0].cur===0&&!G.busy&&!G.ai&&!G.needDraw&&!ui.pick&&!ui.modal;
+const myTurn=()=>G&&!G.over&&!G.auto&&G.turn===0&&G.p[0].cur===0&&!G.busy&&!G.ai&&!G.needDraw&&!ui.pick&&!ui.modal;
 async function doDraw(){
  if(!G||!G.needDraw||G.turn!==0||G.over||G.busy)return;
  G.needDraw=false;netSend('drw');G.busy=true;render();
@@ -966,7 +968,7 @@ function render(){
  const mySt=mob?st(0):[slot('d',0,0,dglow?'Pioche !':'Pioche',dk(0),'deck sd'+(dglow?' glow':''))].concat(st(0),[slot('g',0,0,'Cimetière',gv(0),'sd')]);
  b.classList.toggle('mob',mob);b.classList.toggle('v2',v2);b.classList.toggle('mine',G.turn===0&&!G.over);b.classList.toggle('theirs',G.turn===1&&!G.over);
  const nameOf=pi=>G.prs?G.prs[pi][P(pi).cur]:G.pr[pi],teamOf=pi=>G.prs?G.prs[pi].map(x=>x.n).join(' & '):G.pr[pi].n;
- const mid=G.over?'PARTIE TERMINÉE':G.turn===0?(isH(0)?(G.needDraw?'À TOI DE PIOCHER · TOUR '+G.n:'À TOI DE JOUER · TOUR '+G.n):'TOUR DE '+esc(nameOf(0).n.toUpperCase())+' (ALLIÉ) · TOUR '+G.n):(v2?'TOUR DE '+esc(nameOf(1).n.toUpperCase())+' · TOUR '+G.n:'TOUR DE L’ADVERSAIRE · TOUR '+G.n);
+ const mid=G.over?'PARTIE TERMINÉE':G.turn===0?(isH(0)?(G.needDraw?'À TOI DE PIOCHER · TOUR '+G.n:'À TOI DE JOUER · TOUR '+G.n):G.auto?'MODE AUTO · TOUR '+G.n:'TOUR DE '+esc(nameOf(0).n.toUpperCase())+' (ALLIÉ) · TOUR '+G.n):(v2?'TOUR DE '+esc(nameOf(1).n.toUpperCase())+' · TOUR '+G.n:'TOUR DE L’ADVERSAIRE · TOUR '+G.n);
  b.innerHTML=
  '<div class="ban" id="cbBan"><b></b></div>'+
  '<div class="cpl o'+(G.turn===1&&!G.over?' act':'')+'"><div class="cring'+(G.ai?' think':'')+'" id="cbR1" data-z="p" data-p="1" data-i="0" style="--tp:'+(G.turn===1&&NET&&G.t0?Math.max(0,100-(Date.now()-G.t0)/LIM*100):0)+'">'+avHTML(nameOf(1))+'</div><div class="cpt"><small>'+esc(teamOf(1).toUpperCase())+'</small><em class="tag">'+(v2?'ÉQUIPE ADVERSE':'SON TOUR')+'</em><b id="cbLp1">'+op.lp+'</b></div></div>'+
@@ -1267,7 +1269,7 @@ function onOut(e){
 const body=()=>$('cbBody');
 /* navigation : colonne de catégories et sous-catégories (à gauche sur ordinateur, en haut sur téléphone) */
 const NAV=[
- ['boost','Boosters','<rect x="6.500" y="2.500" width="11" height="19" rx="2"/><path d="M6.500 7.500h11M12 12v4M10 14h4"/>',[['open','Ouvrir un booster'],['gift','Cadeau du jour'],['odds','Contenu et probabilités']]],
+ ['boost','Boosters','<rect x="6.500" y="2.500" width="11" height="19" rx="2"/><path d="M6.500 7.500h11M12 12v4M10 14h4"/>',[['open','Ouvrir un booster'],['shop','Boutique'],['gift','Cadeau du jour'],['odds','Contenu et probabilités']]],
  ['col','Collection','<rect x="3.500" y="5" width="10" height="14" rx="1.600" transform="rotate(-8 8.500 12)"/><rect x="10.500" y="5" width="10" height="14" rx="1.600" transform="rotate(8 15.500 12)"/>',[['cards','Mes cartes'],['atelier','Atelier des doublons']]],
  ['build','Mes decks','<path d="M5 8h14v12H5zM7 5.500h10M9 3h6"/>',[['decks','Tous mes decks']]],
  ['play','Combat','<path d="M5 4l10 10M4 20l4-1 1-4M19 4 9 14M20 20l-4-1-1-4"/>',[['duel','Duels'],['story','Mode histoire']]],
@@ -1287,7 +1289,7 @@ function tabs(cur){
   '<div class="cbs-me"><button class="cbs-meb" data-v="me">'+(img?'<img src="'+esc(img)+'" alt="">':'<i>'+esc(String(nm).charAt(0).toUpperCase())+'</i>')+'<span>'+esc(nm)+'</span><em>▾</em></button><div class="cbs-med">'+PROFIL.map(p=>'<button data-v="soon:'+p[0]+'">'+p[1]+'</button>').join('')+'</div></div>'+
   '<nav class="cbs-nav">'+NAV.map(g=>'<div class="cbs-g'+(c[0]===g[0]?' open':'')+'"><button class="cbs-c" data-v="'+g[0]+':'+g[3][0][0]+'"><svg viewBox="0 0 24 24">'+g[2]+'</svg>'+g[1]+'</button><div class="cbs-sub">'+g[3].map(x=>'<button data-v="'+g[0]+':'+x[0]+'" class="'+(c[0]===g[0]&&c[1]===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div></div>').join('')+'</nav>'+
   '<div class="cbs-bot"><span class="cbs-l">Deck actif</span><div class="cbs-dk"><b>'+esc(dn)+'</b><small>'+dk.length+' / 20 · <span class="'+(ok?'ok':'ko')+'">'+(ok?'prêt':'à compléter')+'</span></small></div>'+
-  '<button class="cbs-cta" data-v="play:duel">Combattre</button><i class="cbs-st">'+Object.keys(getCol()).length+' / '+allCards().length+' cartes</i>'+
+  '<button class="cbs-ku" data-v="boost:shop" title="Boutique">'+kuIcon+'<b id="cbKu">'+kuGet()+'</b><span>Kuros</span></button><button class="cbs-cta" data-v="play:duel">Combattre</button><i class="cbs-st">'+Object.keys(getCol()).length+' / '+allCards().length+' cartes</i>'+
   '<div class="cbs-foot"><a data-v="rules">Règles</a><a data-v="soon:news">Nouveautés</a><a data-v="legal">Mentions légales</a><a data-v="exit">← Kuroven</a></div></div></aside>';
 }
 function navGo(v){
@@ -1297,10 +1299,10 @@ function navGo(v){
  if(v==='rules'){showRules();return}if(v==='legal'){showLegal();return}
  const p=v.split(':'),a=p[0],b=p[1];
  if(a==='soon'){showSoon('',b);return}
- if(a==='boost'){if(b==='open')showBoosters();else if(b==='odds'){showBoosters();showPackInfo()}else showSoon(a,b);return}
+ if(a==='boost'){if(b==='shop')showShop();else if(b==='gift')showGift();else if(b==='open')showBoosters();else if(b==='odds'){showBoosters();showPackInfo()}else showSoon(a,b);return}
  if(a==='col'){if(b==='cards')showCollection('all');else showSoon(a,b);return}
  if(a==='build'){showBuild();return}
- if(a==='play'){if(b==='duel')showMenu();else showSoon(a,b);return}
+ if(a==='play'){if(b==='duel')showMenu();else if(b==='story')showStory();else showSoon(a,b);return}
  showSoon(a,b);
 }
 function showSoon(cat,key){
@@ -1375,7 +1377,7 @@ async function startArenaDuel(){
  G.arena={n,boss:ai.boss,fx,ai,mx:arMax(run)};
  P(0).lp=Math.max(1,Math.min(arMax(run),run.lp));P(1).lp=ai.lp;
  ui={};
- mountGame();
+ mountGame();autoMount();
  const sd=$('cbSide');if(sd&&sd.firstElementChild)sd.firstElementChild.insertAdjacentHTML('afterend',arHud(run,ai));
  for(let k=0;k<5;k++){P(0).hand.push(P(0).deck.shift());P(1).hand.push(P(1).deck.shift())}
  for(let k=0;k<fx.draw;k++){const c=P(0).deck.shift();if(c)P(0).hand.push(c)}
@@ -1396,6 +1398,7 @@ function arEnd(winner){
   if(winner===0){
    run.lp=Math.max(1,Math.min(arMax(run),lpEnd));run.wins=(run.wins|0)+1;if(A.boss)run.rr=(run.rr|0)+1;run.n=A.n+1;
    {const bt=(run.boons&&run.boons.butin)|0;if(bt)run.lp=Math.min(arMax(run),run.lp+300*bt)}
+   {const g=kuPay(15+3*A.n+(A.boss?90:0));kuAdd(g);run.coins=(run.coins|0)+g;run.lastGain=g;if(A.boss){stockAdd(1);run.packs=(run.packs|0)+1}}
    run.boss=A.boss;run.choices=arChoices(run,A.boss);arSave(st);
    banner(A.boss?'BOSS VAINCU':'VICTOIRE','#5be08a');
    setTimeout(()=>{if(alive)arReward(arStore().run)},1200);
@@ -1405,17 +1408,23 @@ function arEnd(winner){
 /* écran de choix après une victoire */
 function arReward(run){
  if(!run)return;
+ clearTimeout(arReward.t);
  let m=$('arM');if(!m){m=document.createElement('div');m.id='arM';m.className='dl-m';document.body.appendChild(m)}
  const w=run.wins|0,from=Math.max(1,w-3);
  let rt='';for(let k=from;k<=w+6;k++){const bossN=k%5===0,done=k<=w,cur=k===w+1;rt+=(k>from?'<u></u>':'')+'<i class="'+(done?'d':cur?'c':bossN?'b':'')+'">'+k+(bossN?' · BOSS':'')+'</i>'}
  const MXH=arMax(run),pc=Math.round(run.lp/MXH*100),nextBoss=(w+1)%5===0;
- m.innerHTML='<div class="dl-mw"><div class="dl-rt">'+rt+'</div><div class="dl-mt"><small>'+(run.boss?'BOSS VAINCU · DUEL '+w:'DUEL '+w+' REMPORTÉ')+'</small><h2>Victoire ! Choisis une capacité</h2></div>'+
+ m.innerHTML='<div class="dl-mw"><div class="dl-rt">'+rt+'</div><div class="dl-mt"><small>'+(run.boss?'BOSS VAINCU · DUEL '+w:'DUEL '+w+' REMPORTÉ')+(run.lastGain?' · +'+run.lastGain+' KUROS'+(run.boss?' · +1 BOOSTER':''):'')+'</small><h2>Victoire ! Choisis une capacité</h2></div>'+
   '<div class="dl-hp"><span>Vie</span><u><i style="width:'+pc+'%"></i></u><b>'+run.lp+' / '+MXH+'</b><span>· Prochain : duel '+(w+1)+(nextBoss?' · BOSS':', adversaire plus fort')+'</span></div>'+
   '<div class="dl-bn">'+run.choices.map((id,i)=>{const b=arB(id),c=AR_RC[b.r];return '<button class="dl-b" type="button" style="--rc:'+c+'" data-id="'+id+'"><span class="rr">'+AR_RN[b.r]+'</span><svg viewBox="0 0 24 24">'+AR_IC[b.ic]+'</svg><b>'+b.t+'</b><span class="ty">'+b.ty+'</span><span class="ef">'+b.ef+'</span><span class="cs">'+(b.cs||'&nbsp;')+'</span></button>'}).join('')+'</div>'+
   '<div class="dl-mf2"><button type="button" data-k="rr"'+((run.rr|0)>0?'':' disabled')+'>↻ Relancer · '+(run.rr|0)+' restant'+((run.rr|0)>1?'s':'')+'</button><button type="button" data-k="pass">Passer · récupère 500 de vie</button></div>'+
   '<div class="ar-act">Capacités actives : '+(Object.keys(run.boons||{}).filter(id=>run.boons[id]>0&&arB(id)).map(id=>'<span>'+esc(arB(id).t)+(run.boons[id]>1?' ×'+run.boons[id]:'')+'</span>').join('')||'<span>aucune</span>')+'</div></div>';
+ if(ls.get('cbauto',false)&&run.choices){
+  m.querySelector('.dl-mt').insertAdjacentHTML('beforeend','<small class="ar-autoh">Mode auto : choix automatique dans 3 secondes. <button type="button" data-k="autooff">Désactiver l’auto</button></small>');
+  arReward.t=setTimeout(()=>{const r=arStore().run;if(!r||!r.choices||!ls.get('cbauto',false)||!$('arM'))return;const ok=r.choices.filter(id=>id!=='pacte'&&id!=='sang'),pool=ok.length?ok:r.choices,id=pool.slice().sort((a,b)=>arB(b).r-arB(a).r)[0],bt=m.querySelector('[data-id="'+id+'"]');if(bt)bt.click()},3000)}
  m.onclick=e=>{
   const b=e.target.closest('button');if(!b||b.disabled)return;
+  clearTimeout(arReward.t);
+  if(b.dataset.k==='autooff'){ls.set('cbauto',false);arReward(arStore().run);return}
   const st=arStore(),r=st.run;if(!r||!r.choices)return;
   if(b.dataset.id){
    const id=b.dataset.id;if(!r.choices.includes(id))return;
@@ -1434,11 +1443,91 @@ function arFinish(forfeit){
  let m=$('arM');if(!m){m=document.createElement('div');m.id='arM';m.className='dl-m';document.body.appendChild(m)}
  m.innerHTML='<div class="dl-mw ar-end"><div class="dl-mt"><small>'+(forfeit?'SÉRIE ABANDONNÉE':'SÉRIE TERMINÉE')+'</small><h2>'+(wins?wins+' victoire'+(wins>1?'s':''):'Aucune victoire')+'</h2></div>'+
   '<p class="ar-best">'+(rec&&wins>0?'Nouveau record !':'Meilleure série : '+st.best+' victoire'+(st.best>1?'s':''))+'</p>'+
+  (run&&run.coins?'<p class="ar-best">Gagné pendant la série : <b>'+run.coins+' Kuros</b>'+(run.packs?' et '+run.packs+' booster'+(run.packs>1?'s':'')+' de boss':'')+'</p>':'')+
   (list.length?'<div class="ar-act">Capacités gagnées : '+list.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>':'')+
   '<div class="dl-mf2"><button type="button" data-k="again">Nouvelle série</button><button type="button" data-k="back">Retour aux Duels</button></div></div>';
  m.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.k==='again'){arStart()}else if(b.dataset.k==='back'){m.remove();showMenu()}};
 }
 async function arAbandon(){const r=await ask('Abandonner la série ?','Ta série en cours sera terminée.',[{v:true,t:'Abandonner'},{v:false,t:'Annuler',sec:1}]);if(!r)return;arFinish(true)}
+/* ---------- Kuros : la monnaie du jeu. On les gagne en jouant et on les dépense en boutique pour des boosters ---------- */
+const KU_KEY='cbkuros1',PACK_PRICE=120;
+const kuGet=()=>Math.max(0,ls.get(KU_KEY,0)|0);
+const kuIcon='<svg class="ku-i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.5 7.5v9M9.5 12l5-4.5M11.5 11l3.5 5.5"/></svg>';
+function kuAdd(n){const v=Math.max(0,kuGet()+(n|0));ls.set(KU_KEY,v);['cbKu','cbKu2'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=v});return v}
+/* un duel joué en mode auto rapporte jusqu'à moitié moins */
+const autoShare=()=>G&&G.myT?Math.min(1,(G.autoT|0)/G.myT):0;
+const kuPay=base=>Math.max(1,Math.round(base*(1-.5*autoShare())));
+function stockAdd(k){const st=stockState();st.n+=k;ls.set('cbstock1',st)}
+const SHOP=[[1,120,'1 booster'],[5,550,'5 boosters'],[10,1000,'10 boosters']];
+function showShop(){
+ view='shop';try{leaveGame();clearInterval(boostTm)}catch(e){}
+ const k=kuGet(),st=stockState();
+ body().innerHTML=tabs('boost:shop')+'<div class="cbcard sh"><span class="cbsoon-t">BOUTIQUE</span><h2>Boutique de boosters</h2><p>Les Kuros se gagnent en jouant : mode histoire, Arène, cadeau du jour. Ils servent à acheter des boosters en plus de ceux qui se rechargent tout seuls.</p><div class="sh-bal">'+kuIcon+'<b id="cbKu2">'+k+'</b> Kuros · '+st.n+' booster'+(st.n>1?'s':'')+' en stock</div><div class="sh-g">'+SHOP.map((o,i)=>'<button type="button" class="sh-o'+(k<o[1]?' no':'')+'" data-i="'+i+'"><b>'+o[2]+'</b><span>'+kuIcon+o[1]+'</span><small>'+(i?'−'+Math.round((1-o[1]/(o[0]*PACK_PRICE))*100)+' %':'&nbsp;')+'</small></button>').join('')+'</div><button class="cbbtn" id="cbShO">Ouvrir mes boosters</button></div>';
+ bindTabs();$('cbShO').onclick=showBoosters;
+ body().querySelector('.sh-g').onclick=e=>{const b=e.target.closest('.sh-o');if(!b)return;const o=SHOP[+b.dataset.i];if(kuGet()<o[1]){dlNote('Pas assez de Kuros : il t’en manque '+(o[1]-kuGet())+'.');return}kuAdd(-o[1]);stockAdd(o[0]);dlNote('Achat : '+o[2]+' ajouté'+(o[0]>1?'s':'')+' à ton stock.');showShop()};
+}
+function showGift(){
+ view='gift';try{leaveGame();clearInterval(boostTm)}catch(e){}
+ const day=new Date().toISOString().slice(0,10),got=ls.get('cbgift1','')===day;
+ body().innerHTML=tabs('boost:gift')+'<div class="cbcard sh"><span class="cbsoon-t">CADEAU DU JOUR</span><h2>'+(got?'Déjà récupéré aujourd’hui':'Ton cadeau t’attend')+'</h2><p>Chaque jour : <b>60 Kuros</b> et <b>1 booster</b>.</p><button class="cbbtn" id="cbGf"'+(got?' disabled':'')+'>'+(got?'Reviens demain':'Récupérer mon cadeau')+'</button></div>';
+ bindTabs();$('cbGf').onclick=()=>{if(ls.get('cbgift1','')===day)return;ls.set('cbgift1',day);kuAdd(60);stockAdd(1);dlNote('+60 Kuros et +1 booster !');showGift()};
+}
+/* ---------- mode auto : ton camp joue tout seul (jamais en ligne, jamais contre un vrai joueur) ---------- */
+function autoDraw(){const b=$('cbAutoB');if(b){b.textContent='Auto : '+(G&&G.auto?'OUI':'NON');b.classList.toggle('on',!!(G&&G.auto))}}
+function autoMount(){
+ if(!G||NET)return;G.vsai=true;G.myT=0;G.autoT=0;G.auto=!!ls.get('cbauto',false);
+ const sd=$('cbSide');if(sd&&sd.firstElementChild)sd.firstElementChild.insertAdjacentHTML('beforeend','<button class="cbchip" id="cbAutoB" title="Ton camp joue tout seul. Les récompenses baissent selon la part de tours joués en auto."></button>');
+ const b=$('cbAutoB');if(b)b.onclick=()=>autoSet(!G.auto);autoDraw();
+}
+async function autoSet(v){
+ if(!G||G.over||NET)return;G.auto=v;ls.set('cbauto',v);autoDraw();
+ if(v&&G.turn===0&&G.p[0].cur===0&&!G.busy&&!G.ai&&!ui.modal&&!ui.pick){
+  stopTimer();G.autoT=(G.autoT|0)+1;G.busy=true;
+  if(G.needDraw){G.needDraw=false;await drawN(0,1)}
+  G.busy=false;aiTurn(0);
+ }else render();
+}
+/* ---------- MODE HISTOIRE : 20 niveaux contre l'IA, un boss tous les 5 niveaux ---------- */
+const ST_KEY='cbstory1',ST_N=20;
+const ST_ARCS=['Les premiers pas','Le tournoi des rivaux','La forêt des ombres','Le trône du chaos'];
+const stStore=()=>{const o=ls.get(ST_KEY,null);return{done:Math.min(ST_N,(o&&o.done)|0)}};
+const stLvl=n=>{const boss=n%5===0;return{n,boss,atk:35*(n-1)+(boss?150:0),lp:8000+250*(n-1)+(boss?1500:0),draw:n>=12?1:0}};
+const stRew=(n,first)=>first?{k:40+8*n+(n%5===0?150:0),pk:n%5===0?1:0}:{k:12+(n%5===0?20:0),pk:0};
+function showStory(){
+ view='story';DRAFT_ON=null;try{leaveGame();clearInterval(boostTm)}catch(e){}
+ const s=stStore();let arcs='';
+ for(let a=0;a<4;a++){let nodes='';for(let k=1;k<=5;k++){const n=a*5+k,L=stLvl(n),c=n<=s.done?'d':n===s.done+1?'c':'l',rw=stRew(n,n>s.done);nodes+='<button type="button" class="st-n '+c+(L.boss?' b':'')+'" data-n="'+n+'"'+(c==='l'?' disabled':'')+'><i>'+(L.boss?'BOSS':n)+'</i><b>Niveau '+n+'</b><span>'+(c==='d'?'✓ Terminé':kuIcon+rw.k+(rw.pk?' + 1 booster':''))+'</span></button>'}
+  arcs+='<section class="st-a"><h3>Chapitre '+(a+1)+' · '+ST_ARCS[a]+'</h3><div class="st-p">'+nodes+'</div></section>'}
+ body().innerHTML=tabs('play:story')+'<div class="cbcard st"><span class="cbsoon-t">MODE HISTOIRE</span><h2>'+(s.done>=ST_N?'Histoire terminée !':'Niveau '+(s.done+1)+' : à toi de jouer')+'</h2><p>'+ST_N+' niveaux contre l’IA, un boss tous les 5 niveaux. La première victoire d’un niveau donne la récompense complète (Kuros, et un booster pour chaque boss). Rejouer un niveau rapporte un peu de Kuros. Pendant un duel, le bouton <b>Auto</b> fait jouer ton camp tout seul, avec des récompenses réduites en proportion.</p>'+arcs+'</div>';
+ bindTabs();body().querySelector('.st').onclick=e=>{const b=e.target.closest('.st-n');if(!b||b.disabled)return;if(dlDeckOk())stStart(+b.dataset.n)};
+}
+async function stStart(n){
+ const mine=getDeck();if(!deckCheck(mine).ok){showBuild();return}
+ leaveGame();view='game';
+ const L=stLvl(n),ad=autoDeck(undefined,undefined,undefined,true),ax=extraFor(ad),pa=aiPersona();
+ G={pr:[who0(),{n:(L.boss?'Boss · ':'')+pa.n,img:pa.img}],p:[mkP(mine,getExtra()),mkP(ad,ax)],turn:0,n:1,field:null,over:false,busy:true,ai:false,log:[],t0:0,tm:null,pop:null,newC:null};
+ G.story={n,L};P(1).lp=L.lp;
+ ui={};mountGame();autoMount();
+ for(let k=0;k<5;k++){P(0).hand.push(P(0).deck.shift());P(1).hand.push(P(1).deck.shift())}
+ for(let k=0;k<L.draw;k++){const c=P(1).deck.shift();if(c)P(1).hand.push(c)}
+ log('Histoire · niveau '+n+(L.boss?' · BOSS':'')+'. L’adversaire a '+L.lp+' points de vie.');
+ await startTurn();
+}
+function stEnd(winner,why){
+ const A=G.story,pay=winner===0;
+ setTimeout(async()=>{
+  if(!alive)return;
+  let txt=why;
+  if(pay){
+   const s=stStore(),first=A.n>s.done,rw=stRew(A.n,first),g=kuPay(rw.k);
+   kuAdd(g);if(rw.pk)stockAdd(rw.pk);if(first){s.done=A.n;ls.set(ST_KEY,s)}
+   txt+='\n+'+g+' Kuros'+(rw.pk?' et +1 booster':'')+(first?' (première victoire)':'')+(autoShare()>0?' · réduit car joué en auto':'')+'.';
+  }
+  const last=A.n>=ST_N,btns=pay?(last?[{v:'back',t:'Retour à l’histoire'}]:[{v:'next',t:'Niveau suivant'},{v:'back',t:'Retour à l’histoire',sec:1}]):[{v:'again',t:'Réessayer'},{v:'back',t:'Retour à l’histoire',sec:1}];
+  const r=await ask(pay?(A.L.boss?'Boss vaincu !':'Niveau '+A.n+' réussi !'):'Défaite',txt,btns);
+  if(r==='next')stStart(A.n+1);else if(r==='again')stStart(A.n);else showStory();
+ },900);
+}
 /* ---------- CLASSÉ : rangs façon échecs (Elo). Bronze → Grand maître ---------- */
 let RK_PEND=null;
 const RK_T=[['Bronze I',0],['Bronze II',900],['Bronze III',1000],['Argent I',1100],['Argent II',1200],['Argent III',1300],['Or I',1400],['Or II',1500],['Or III',1600],['Platine I',1700],['Platine II',1800],['Platine III',1900],['Diamant I',2000],['Diamant II',2100],['Diamant III',2200],['Maître I',2300],['Maître II',2400],['Maître III',2500],['Grand maître',2600]];
@@ -1573,7 +1662,7 @@ function showMenu(){
  '<div class="dl-r">'+M.map(dlPanel).join('')+'</div>'+
  '<div class="dl-k"><div class="dl-dk"><div class="dl-mfan">'+fan+'</div><div><b>'+esc(deckName())+'</b><small>'+d.length+' / 20 · <span class="'+(ck.ok?'ok':'ko')+'">'+(ck.ok?'prêt':'à compléter')+'</span></small></div><div class="dl-bt"><button data-a="deck">Mes decks</button><button data-a="auto">Aléatoire</button></div></div>'+
  '<div class="dl-nd"><b>Aucun deck à préparer</b><small>Ton deck sera construit pendant le tirage.</small></div>'+
- '<div class="dl-ai"><span>En attendant le mode histoire</span><button data-a="ai">Contre l’IA</button><button data-a="ai2">2 contre 2 avec l’IA</button></div><span class="dl-sp"></span>'+
+ '<div class="dl-ai"><span>Contre l’IA</span><button data-a="story">Mode histoire</button><button data-a="ai2">2 contre 2 avec l’IA</button></div><span class="dl-sp"></span>'+
  '<div class="dl-bk"><span>Dos des cartes</span>'+DL_BK.map((n,i)=>'<button data-a="back" data-b="'+(i+1)+'" class="'+(backN()===i+1?'on':'')+'">'+n+'</button>').join('')+'</div></div></div>';
  bindTabs();dlBind();
 }
@@ -1596,6 +1685,7 @@ function dlBind(){
   else if(a==='ar-resume'){if(dlDeckOk())arPlay()}
   else if(a==='ar-quit'){arAbandon()}
   else if(a==='ai'){if(dlDeckOk())startGame()}
+  else if(a==='story')showStory();
   else if(a==='ai2'){if(dlDeckOk())startGame2v2()}
   else if(a==='deck')showBuild();
   else if(a==='auto'){setDeck(autoDeck(null,[],null));showMenu()}
@@ -1693,7 +1783,7 @@ function showBoosters(){try{preloadMag()}catch(e){}
  body().innerHTML=tabs('boost')+
  '<div class="cbhub"><div class="hb-pack"><button type="button" class="pkb" id="cbPk">'+packHTML(0,true)+'<span class="pkb-n" id="cbPkN">×'+boostQty+'</span></button></div>'+
  '<div class="hb-txt"><h1>Ouvre un booster</h1><p>5 cartes tirées parmi tous les personnages et soutiens du jeu. Tranche le booster comme tu veux : une lumière te prévient quand une carte rare se cache dedans. C’est juste pour le plaisir, toutes les cartes restent disponibles pour tes decks.</p>'+
- '<div class="hb-stock"><div class="hb-n"><b id="cbStN">'+st.n+'</b><small> / '+STOCK_MAX+' boosters</small></div><div class="hb-pips" id="cbPips"></div><div class="hb-d" id="cbStD"></div></div>'+
+ '<div class="hb-stock"><div class="hb-n"><b id="cbStN">'+st.n+'</b><small>'+(st.n>STOCK_MAX?' boosters':' / '+STOCK_MAX+' boosters')+'</small></div><div class="hb-pips" id="cbPips"></div><div class="hb-d" id="cbStD"></div></div>'+
  '<div class="hb-qty"><span class="hb-ql">Quantité</span><div class="qty-seg" id="cbQs">'+[1,3,5].map(x=>'<button type="button" class="qs" data-q="'+x+'"><b>×'+x+'</b><small>booster'+(x>1?'s':'')+'</small></button>').join('')+'<button type="button" class="qs" data-q="all"><b>TOUT</b><small>'+st.n+' en stock</small></button></div></div>'+
  '<div class="hb-cta"><button type="button" class="cta" id="cbOpenB">Ouvrir un booster</button><button type="button" class="hb-info" id="cbPkInfo">Contenu et probabilités</button></div></div></div>'+
  '<div class="hb-row"><div class="hb-last"><h3>Dernière ouverture</h3>'+(last.length?'<div class="hb-cards">'+last.map(c=>'<div class="hb-c r'+rarityOf(c)+'" data-id="'+c.id+'">'+cardHTML(c)+'</div>').join('')+'</div>':'<p class="hb-empty">Aucun booster ouvert pour l’instant.</p>')+'</div>'+
@@ -2222,7 +2312,7 @@ function mountGame(){
  if(G&&RK_PEND){G.rk=RK_PEND;RK_PEND=null;if(G.rk.ranked)ls.set('cbrkpend',{oe:G.rk.oe,t:Date.now()})}
  const vc=document.getElementById('v-cb');if(vc)vc.classList.add('ingame');window.scrollTo(0,0);
  body().innerHTML='<div id="cbGame"><div class="cbt bk'+backN()+'" id="cbT"></div><div class="cbside" id="cbSide"><div><button class="cbchip" id="cbQuit">← Quitter la partie</button></div><div class="cbprev" id="cbPrev"></div><div class="cbact" id="cbAct"></div><div class="cbact" id="cbEvoW"></div><div id="cbHint" style="color:#e5483b;font-size:.85rem;min-height:1.2em;opacity:0;transition:opacity .3s"></div><div class="cblog" id="cbLog"></div></div></div>';
- $('cbQuit').onclick=async()=>{if(G&&!G.over){const r=await ask('Quitter la partie ?',G.arena?'La série d’Arène sera terminée.':'La partie en cours sera perdue.',[{v:true,t:'Quitter'},{v:false,t:'Continuer',sec:1}]);if(!r)return;if(G.arena){arFinish(true);return}if(G.rk&&G.rk.ranked){const t=rkApply(false,G.rk);setTimeout(()=>dlNote('Abandon : '+t),400)}}showMenu()};
+ $('cbQuit').onclick=async()=>{if(G&&!G.over){const r=await ask('Quitter la partie ?',G.arena?'La série d’Arène sera terminée.':'La partie en cours sera perdue.',[{v:true,t:'Quitter'},{v:false,t:'Continuer',sec:1}]);if(!r)return;if(G.arena){arFinish(true);return}if(G.story){showStory();return}if(G.rk&&G.rk.ranked){const t=rkApply(false,G.rk);setTimeout(()=>dlNote('Abandon : '+t),400)}}showMenu()};
  const b=boardEl();fit();requestAnimationFrame(fit);setTimeout(fit,150);setTimeout(fit,600);b.onclick=onBoardClick;b.onpointerdown=onDragStart;b.ondragstart=e=>e.preventDefault();b.onmouseover=onOver;b.onmouseout=onOut;$('cbAct').onclick=onAct;$('cbEvoW').onclick=onAct;
  renderPrev(null);
 }
@@ -2232,7 +2322,7 @@ async function startGame(){
  const ad=autoDeck(undefined,undefined,undefined,true);const ax=extraFor(ad);
  G={pr:[who0(),aiPersona()],p:[mkP(mine,getExtra()),mkP(ad,ax)],turn:0,n:1,field:null,over:false,busy:true,ai:false,log:[],t0:0,tm:null,pop:null,newC:null};
  ui={};
- mountGame();
+ mountGame();autoMount();
  for(let k=0;k<5;k++){P(0).hand.push(P(0).deck.shift());P(1).hand.push(P(1).deck.shift())}
  log('La partie commence. Tu joues en premier.');
  await startTurn();
@@ -2243,7 +2333,7 @@ async function startGame2v2(){
  const mk=()=>{const ids=autoDeck(undefined,undefined,undefined,true);return mkPl(ids,extraFor(ids))};
  G={v2:true,pr:[who0(),aiPersona()],prs:[[who0(),aiPersona()],[aiPersona(),aiPersona()]],p:[mkSide([mkPl(mine,getExtra()),mk()],4),mkSide([mk(),mk()],4)],turn:0,n:1,field:null,over:false,busy:true,ai:false,log:[],t0:0,tm:null,pop:null,newC:null};
  ui={};
- mountGame();
+ mountGame();autoMount();
  G.p.forEach(sd=>sd.pl.forEach(pl=>{for(let k=0;k<5;k++)pl.hand.push(pl.deck.shift())}));
  log('La partie 2 contre 2 commence. Ordre des tours : toi, adversaire 1, ton coéquipier, adversaire 2.');
  await startTurn();

@@ -1101,3 +1101,31 @@ body.cbmag-on #cbBody{visibility:hidden}
 .dr-m{display:flex;flex-direction:column;align-items:center;gap:4px;background:#0e1018;border:1px solid #ffffff1a;border-radius:10px;padding:8px 6px;text-align:center}.dr-m img{width:64px;height:64px;object-fit:cover;border-radius:8px}.dr-m b{font:700 11.5px system-ui;line-height:1.15}
 .dr-play{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
 .dr-play .dl-jn{display:flex;gap:6px}.dr-play .dl-jn input{width:108px;border-radius:10px;border:1px solid #ffffff2e;background:#0b0d14b3;padding:0 12px;height:42px;color:#fff;font:800 14px system-ui;letter-spacing:4px;text-transform:uppercase;outline:0}
+
+/* Kuros, boutique, histoire, auto */
+.ku-i{width:1.1em;height:1.1em;vertical-align:-.18em;fill:#ffd84a22;stroke:#ffd84a;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-right:4px}
+.cbs-ku{display:flex;align-items:center;gap:6px;width:100%;margin:8px 0 6px;padding:8px 12px;border-radius:10px;border:1px solid #ffd84a55;background:#ffd84a12;color:#ffd84a;font:700 14px Georgia,serif;cursor:pointer;text-align:left}
+.cbs-ku span{color:#c9b36a;font:600 11px system-ui,sans-serif;letter-spacing:.5px;margin-left:auto}
+.cbs-ku:hover{background:#ffd84a22}
+.sh-bal{font:700 1.15rem Georgia,serif;color:#ffd84a;margin:10px 0 14px}
+.sh-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:0 0 16px}
+.sh-o{display:flex;flex-direction:column;gap:6px;align-items:center;padding:16px 10px;border-radius:12px;border:1px solid #ffd84a55;background:#10131c;color:#f1e6c8;cursor:pointer;font:600 1rem Georgia,serif}
+.sh-o:hover{border-color:#ffd84a;background:#161a26}
+.sh-o.no{opacity:.5}
+.sh-o span{color:#ffd84a;font-weight:700}
+.sh-o small{color:#5be08a;font:700 11px system-ui,sans-serif;min-height:1em}
+#cbAutoB{margin-left:6px}
+#cbAutoB.on{background:#ffd84a;color:#14100a;border-color:#ffd84a}
+.ar-autoh{display:block;margin-top:6px;color:#c9b36a}
+.ar-autoh button{background:none;border:0;color:#ffd84a;text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+.st-a{margin:18px 0 0}
+.st-a h3{margin:0 0 8px;font:700 .95rem Georgia,serif;color:#e4cf93;letter-spacing:.5px}
+.st-p{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.st-n{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border-radius:12px;border:1px solid #ffffff22;background:#10131c;color:#f1e6c8;cursor:pointer;font:600 .8rem system-ui,sans-serif}
+.st-n i{font:700 1.3rem Georgia,serif;font-style:normal;color:#ffd84a}
+.st-n.b{border-color:#ff5a36aa}.st-n.b i{color:#ff5a36;font-size:1rem;letter-spacing:2px;line-height:1.7rem}
+.st-n.d{opacity:.75;border-color:#5be08a66}
+.st-n.c{border-color:#ffd84a;box-shadow:0 0 16px #ffd84a33}
+.st-n.l{opacity:.35;cursor:not-allowed}
+.st-n:not(:disabled):hover{background:#161a26}
+.st-p{align-items:start}.st-n{aspect-ratio:auto!important;height:auto!important;min-height:0!important}
