@@ -1078,3 +1078,26 @@ body.cbmag-on #cbBody{visibility:hidden}
 .dl-bn{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important}
 .dl-b{min-height:280px}
 #v-cb .dl-p[data-k="rk"] .ph{object-position:50% 40%}
+
+/* ===== Classé : carte de rang ===== */
+.rk-card{margin-top:12px;max-width:430px;background:#0b0d14b3;border:1px solid #ffffff2e;border-left:4px solid var(--c);border-radius:12px;padding:11px 14px;backdrop-filter:blur(6px);font-family:system-ui}
+.rk-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.rk-top b{font:900 22px Georgia,serif;color:var(--c)}.rk-top span{font:800 13px system-ui;color:#fff}
+.rk-bar{height:7px;border-radius:9px;background:#ffffff1a;margin:8px 0 6px;overflow:hidden}.rk-bar i{display:block;height:100%;border-radius:9px;background:var(--c)}
+.rk-card small{color:#b9bfd2;font-size:12px}
+.rk-fam{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.rk-fam span{font:800 10px system-ui;letter-spacing:.5px;padding:3px 8px;border-radius:99px;background:#ffffff0f;color:#8f98ad;border:1px solid transparent}.rk-fam span.on{color:#111;background:var(--c)}
+.q-r{text-align:center;color:#aab3c8;font-size:14px;margin:6px 0 0}
+/* ===== Tirage de deck ===== */
+.dr{max-width:1000px;margin:18px auto 30px;padding:0 20px;color:#fff;font-family:system-ui}
+.dr header small{font:800 11px system-ui;letter-spacing:4px;color:#c05cff}.dr h1{font:900 32px/1.05 Georgia,serif;margin:6px 0 4px}.dr h1 em{font-style:normal;color:#ffd84a;font-size:.7em;margin-left:8px}.dr header p{color:#aab3c8;margin:0 0 6px;max-width:560px}
+.dr-o{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:22px 0}
+.dr-c{background:#0e1018;border:1.5px solid #ffffff1f;border-radius:16px;padding:16px 16px 12px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .2s,border-color .2s,box-shadow .25s;font-family:system-ui}
+.dr-c:hover{transform:translateY(-8px);border-color:#c05cff;box-shadow:0 20px 40px #000a,0 0 40px #c05cff44}
+.dr-card{position:relative;display:block;width:182px;height:265px}.dr-card .y{zoom:.7;position:absolute;left:0;top:0;pointer-events:none}
+.dr-c b{font:800 15px Georgia,serif}.dr-c small{color:#aab3c8;font-size:12px}
+.dr-s{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:6px 0 14px}
+.dr-s i{width:34px;height:46px;border-radius:5px;border:1px solid #ffffff2e;background:#ffffff0a;overflow:hidden}.dr-s i.f{border-color:#c05cff}.dr-s i img{width:100%;height:100%;object-fit:cover;display:block}
+.dr-a{text-align:center}
+.dr-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:18px 0}
+.dr-m{display:flex;flex-direction:column;align-items:center;gap:4px;background:#0e1018;border:1px solid #ffffff1a;border-radius:10px;padding:8px 6px;text-align:center}.dr-m img{width:64px;height:64px;object-fit:cover;border-radius:8px}.dr-m b{font:700 11.5px system-ui;line-height:1.15}
+.dr-play{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
+.dr-play .dl-jn{display:flex;gap:6px}.dr-play .dl-jn input{width:108px;border-radius:10px;border:1px solid #ffffff2e;background:#0b0d14b3;padding:0 12px;height:42px;color:#fff;font:800 14px system-ui;letter-spacing:4px;text-transform:uppercase;outline:0}

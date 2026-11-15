@@ -129,7 +129,8 @@ function deckStore(){
  if(st.cur>=st.list.length)st.cur=0;
  return st;
 }
-const getDeck=()=>(deckStore().list[deckStore().cur].ids||[]).filter(i=>REG[i]);
+let DRAFT_ON=null;
+const getDeck=()=>DRAFT_ON?DRAFT_ON.filter(i=>REG[i]):(deckStore().list[deckStore().cur].ids||[]).filter(i=>REG[i]);
 const setDeck=d=>{const st=deckStore();st.list[st.cur].ids=d;ls.set('cbdecks1',st)};
 const deckName=()=>deckStore().list[deckStore().cur].name;
 const getExtra=()=>extraFor(getDeck());
@@ -822,9 +823,10 @@ async function humanEnd(){
 function endGame(winner,why){
  if(G.over)return;G.over=true;stopTimer();
  if(G.arena){arEnd(winner);return}
+ const xr=(G.rk&&G.rk.ranked)?rkApply(winner===0,G.rk):'';
  setTimeout(async()=>{
   if(!alive)return;
-  const r=await ask(winner===0?'Victoire !':'Défaite',why,NET?[{v:'menu',t:'Retour au menu'}]:[{v:'again',t:'Rejouer'},{v:'menu',t:'Retour au menu',sec:1}]);
+  const r=await ask(winner===0?'Victoire !':'Défaite',why+(xr?' '+xr:''),NET?[{v:'menu',t:'Retour au menu'}]:[{v:'again',t:'Rejouer'},{v:'menu',t:'Retour au menu',sec:1}]);
   if(r==='again')startGame();else showMenu();
  },900);
 }
@@ -1289,6 +1291,7 @@ function tabs(cur){
   '<div class="cbs-foot"><a data-v="rules">Règles</a><a data-v="soon:news">Nouveautés</a><a data-v="legal">Mentions légales</a><a data-v="exit">← Kuroven</a></div></div></aside>';
 }
 function navGo(v){
+ DRAFT_ON=null;qStop();
  if(v==='exit'){if(typeof show==='function')show('home');else location.hash='';return}
  if(v==='me'){const d=document.querySelector('#cbBody .cbs-me');if(d)d.classList.toggle('open');return}
  if(v==='rules'){showRules();return}if(v==='legal'){showLegal();return}
@@ -1436,6 +1439,101 @@ function arFinish(forfeit){
  m.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.k==='again'){arStart()}else if(b.dataset.k==='back'){m.remove();showMenu()}};
 }
 async function arAbandon(){const r=await ask('Abandonner la série ?','Ta série en cours sera terminée.',[{v:true,t:'Abandonner'},{v:false,t:'Annuler',sec:1}]);if(!r)return;arFinish(true)}
+/* ---------- CLASSÉ : rangs façon échecs (Elo). Bronze → Grand maître ---------- */
+let RK_PEND=null;
+const RK_T=[['Bronze I',0],['Bronze II',900],['Bronze III',1000],['Argent I',1100],['Argent II',1200],['Argent III',1300],['Or I',1400],['Or II',1500],['Or III',1600],['Platine I',1700],['Platine II',1800],['Platine III',1900],['Diamant I',2000],['Diamant II',2100],['Diamant III',2200],['Maître I',2300],['Maître II',2400],['Maître III',2500],['Grand maître',2600]];
+const RK_COL=['#c58a55','#cfd6e3','#ffd84a','#6fe0d0','#6ab7ff','#c05cff','#ff5a36'];
+const rkStore=()=>{const o=ls.get('cbrank1',null);return o&&typeof o==='object'?{elo:o.elo|0,w:o.w|0,l:o.l|0,peak:o.peak|0}:{elo:1000,w:0,l:0,peak:1000}};
+function rkInfo(elo){let i=0;for(let k=0;k<RK_T.length;k++)if(elo>=RK_T[k][1])i=k;return{i,name:RK_T[i][0],min:RK_T[i][1],next:RK_T[i+1]||null,col:RK_COL[Math.min(6,Math.floor(i/3))]}}
+/* résultat d'un duel classé : Elo standard (adversaire attendu = 1/(1+10^((adv-moi)/400))) */
+function rkApply(win,rk){
+ ls.set('cbrkpend',null);
+ const st=rkStore(),before=rkInfo(st.elo),K=(st.w+st.l)<10?40:32,ex=1/(1+Math.pow(10,((rk.oe||1000)-st.elo)/400)),d=Math.round(K*((win?1:0)-ex));
+ st.elo=Math.max(0,st.elo+d);if(win)st.w++;else st.l++;st.peak=Math.max(st.peak,st.elo);ls.set('cbrank1',st);
+ const after=rkInfo(st.elo),ch=after.i>before.i?' Tu montes en '+after.name+' !':after.i<before.i?' Tu descends en '+after.name+'.':'';
+ return 'Classé : '+(d>=0?'+':'')+d+' Elo → '+st.elo+' ('+after.name+').'+ch;
+}
+function rkCheckPending(){const p=ls.get('cbrkpend',null);if(p&&p.t&&!G){const t=rkApply(false,{oe:p.oe||1000,ranked:true});setTimeout(()=>dlNote('Partie classée interrompue : '+t),600)}}
+function rkCard(){
+ const st=rkStore(),r=rkInfo(st.elo),pc=r.next?Math.max(0,Math.min(100,Math.round((st.elo-r.min)/(r.next[1]-r.min)*100))):100;
+ const fam=['Bronze','Argent','Or','Platine','Diamant','Maître','Grand maître'];
+ return '<div class="rk-card" style="--c:'+r.col+'"><div class="rk-top"><b>'+r.name+'</b><span>'+st.elo+' Elo</span></div><div class="rk-bar"><i style="width:'+pc+'%"></i></div><small>'+(r.next?'Prochain rang : '+r.next[0]+' à '+r.next[1]+' Elo':'Rang maximum atteint')+' · '+st.w+' V · '+st.l+' D</small>'+
+  '<div class="rk-fam">'+fam.map((f,i)=>'<span class="'+(Math.min(6,Math.floor(r.i/3))===i?'on':'')+'" style="--c:'+RK_COL[i]+'">'+f+'</span>').join('')+'</div></div>';
+}
+/* ---------- recherche d'adversaire (partie rapide et classé) : file d'attente partagée, sans base de données ---------- */
+let QS=null;
+function qStop(){if(!QS)return;const q=QS;QS=null;clearInterval(q.iv);clearInterval(q.tm);try{sb.removeChannel(q.ch)}catch(e){}const m=document.getElementById('qM');if(m)m.remove()}
+function qSearch(ranked){
+ if(typeof sb==='undefined'||!sb){dlNote('Connexion au serveur impossible.');return}
+ qStop();
+ const w=who0(),rk=rkStore(),u=Math.random().toString(36).slice(2,10),t0=Date.now(),code4=()=>Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('');
+ const m=document.createElement('div');m.id='qM';m.className='dl-m';
+ const ri=rkInfo(rk.elo);
+ m.innerHTML='<div class="dl-mw ar-end"><div class="dl-mt"><small>'+(ranked?'DUEL CLASSÉ':'PARTIE RAPIDE')+'</small><h2 id="qT">Recherche d’un adversaire…</h2></div><p class="ar-best" id="qS">0:00</p>'+(ranked?'<p class="q-r">Ton rang : <b style="color:'+ri.col+'">'+ri.name+'</b> · '+rk.elo+' Elo</p>':'')+'<div class="dl-mf2"><button type="button" id="qC">Annuler</button></div></div>';
+ document.body.appendChild(m);
+ const ch=sb.channel('cbq:'+(ranked?'r':'q'),{config:{broadcast:{self:false},presence:{key:u}}});
+ const q={ch,u,iv:0,tm:0,busy:false};QS=q;
+ $('qC').onclick=()=>qStop();
+ const win=x=>100+Math.floor((Date.now()-x.t)/1000)*25;
+ const eligible=(a,b)=>!ranked||Math.abs(a.e-b.e)<=Math.max(win(a),win(b));
+ const announce=(host,guest)=>{
+  q.busy=true;const code=code4();
+  RK_PEND={oe:guest.e,on:guest.n,ranked};
+  hostDuel(false,code,()=>{try{ch.send({type:'broadcast',event:'m',payload:{t:'match',h:host.u,g:guest.u,code,he:host.e,ge:guest.e,hn:host.n,gn:guest.n}})}catch(e){}setTimeout(()=>{if(QS===q)qStop()},600)});
+ };
+ const tryPair=()=>{
+  if(QS!==q||q.busy)return;
+  const st=ch.presenceState(),all=[];Object.keys(st).forEach(k=>(st[k]||[]).forEach(x=>{if(x&&x.u&&!all.find(y=>y.u===x.u))all.push(x)}));
+  all.sort((a,b)=>a.t-b.t||(a.u<b.u?-1:1));const used=new Set();
+  for(let i=0;i<all.length;i++){const a=all[i];if(used.has(a.u))continue;
+   for(let j=i+1;j<all.length;j++){const b=all[j];if(used.has(b.u))continue;
+    if(eligible(a,b)){used.add(a.u);used.add(b.u);if(a.u===u||b.u===u){const host=a.u<b.u?a:b,guest=host===a?b:a;if(host.u===u)announce(host,guest)}break}}}
+ };
+ ch.on('broadcast',{event:'m'},ev=>{const p=ev.payload;if(!p||p.t!=='match'||p.g!==u||QS!==q||q.busy)return;q.busy=true;RK_PEND={oe:p.he,on:p.hn,ranked};const c=p.code;qStop();joinDuel(c)});
+ ch.on('presence',{event:'sync'},tryPair);
+ ch.subscribe(st=>{
+  if(st==='SUBSCRIBED'){try{ch.track({u,e:rk.elo,t:t0,n:w.n})}catch(e){}q.iv=setInterval(tryPair,2000)}
+  else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT'){qStop();dlNote('Connexion au serveur impossible.')}
+ });
+ q.tm=setInterval(()=>{
+  if(QS!==q)return;const s=Math.floor((Date.now()-t0)/1000),e=$('qS');if(e)e.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')+(ranked?' · écart de niveau accepté : ±'+(100+s*25):'');
+  if(s>=150&&!q.busy){qStop();dlNote('Aucun adversaire trouvé pour l’instant. Réessaie dans un moment.')}
+ },1000);
+}
+/* ---------- TIRAGE DE DECK (comme le « Triple Draft » de Clash Royale) : 3 cartes proposées, on en garde une, 20 fois ---------- */
+let DR=null;const DR_OPT=3;
+function drOffer(picks){
+ const have=new Set(picks),sup=picks.filter(i=>REG[i]&&isSup(REG[i])).length,ev=picks.filter(i=>evolvableId(i)).length,low=picks.some(i=>REG[i]&&REG[i].k==='c'&&REG[i].lvl<=4),left=MAXD-picks.length;
+ let pool=CHARS.concat(SUP).filter(c=>!have.has(c.id)&&!(isSup(c)&&sup>=MAXS)&&!(evolvableId(c.id)&&ev>=MAXX));
+ if(!low&&left<=DR_OPT)pool=pool.filter(c=>c.k==='c'&&c.lvl<=4);
+ const out=[],tr=()=>{const x=Math.random();return x<.55?[0,1]:x<.82?[2]:[3,4]};
+ let g=0;while(out.length<Math.min(DR_OPT,pool.length)&&g++<200){const rs=tr(),c=pool.filter(k=>rs.includes(rarityOf(k))&&!out.includes(k));const k=c.length?c[rnd(c.length)]:pool[rnd(pool.length)];if(k&&!out.includes(k))out.push(k)}
+ return out;
+}
+function drStart(){DRAFT_ON=null;DR={picks:[],offer:null};drNext()}
+function drNext(){DR.offer=drOffer(DR.picks);drRender()}
+function drRender(){
+ view='draft';try{leaveGame()}catch(e){}
+ const n=DR.picks.length;let slots='';for(let i=0;i<MAXD;i++){const id=DR.picks[i];slots+='<i class="'+(id?'f':'')+'">'+(id&&REG[id]?'<img src="'+esc(REG[id].img||'')+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'')+'</i>'}
+ body().innerHTML=tabs('menu')+'<div class="dr"><header><small>TIRAGE DE DECK</small><h1>Choisis une carte <em>'+(n+1)+' / '+MAXD+'</em></h1><p>Tu en gardes une parmi '+DR_OPT+', puis c’est reparti. À la fin, ton deck de '+MAXD+' cartes est prêt pour un duel.</p></header>'+
+  '<div class="dr-o">'+DR.offer.map((c,i)=>'<button type="button" class="dr-c" data-i="'+i+'"><span class="dr-card">'+cardHTML(c)+'</span><b>'+esc(c.n)+'</b><small>'+(isSup(c)?'Soutien':roleOf(c)[1])+' · '+RN[Math.min(4,rarityOf(c))]+'</small></button>').join('')+'</div>'+
+  '<div class="dr-s">'+slots+'</div><div class="dr-a"><button type="button" class="dl-sc" id="drQ">Abandonner le tirage</button></div></div>';
+ bindTabs();
+ body().querySelector('.dr-o').onclick=e=>{const b=e.target.closest('.dr-c');if(!b||!DR)return;const c=DR.offer[+b.dataset.i];if(!c)return;DR.picks.push(c.id);if(DR.picks.length>=MAXD)drDone();else drNext()};
+ $('drQ').onclick=()=>{DR=null;DRAFT_ON=null;showMenu()};
+}
+function drDone(){
+ const ids=DR.picks.slice();DR=null;DRAFT_ON=ids;view='draft';
+ const ck=deckCheck(ids);
+ body().innerHTML=tabs('menu')+'<div class="dr dr-end"><header><small>TIRAGE TERMINÉ</small><h1>Ton deck est prêt</h1><p>'+(ck.ok?'Il sera utilisé pour le prochain duel, puis disparaîtra.':'Deck invalide : '+esc(ck.msg))+'</p></header>'+
+  '<div class="dr-g">'+ids.map(id=>REG[id]?'<span class="dr-m"><img src="'+esc(REG[id].img||'')+'" alt="" loading="lazy" referrerpolicy="no-referrer"><b>'+esc(REG[id].n)+'</b></span>':'').join('')+'</div>'+
+  '<div class="dr-play"><button class="dl-go" data-a="host">Créer un duel · inviter un ami</button><div class="dl-jn"><input id="drCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="dl-sc" data-a="join">Rejoindre</button></div><button class="dl-sc" data-a="quick">Chercher un adversaire</button><button class="dl-sc" data-a="ai">Contre l’IA</button><button class="dl-sc" data-a="ai2">2 contre 2 avec l’IA</button><button class="dl-sc" data-a="again">Refaire un tirage</button></div></div>';
+ bindTabs();
+ const code=$('drCode');code.oninput=()=>{code.value=code.value.toUpperCase().replace(/[^A-Z]/g,'')};
+ body().querySelector('.dr-play').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
+  if(a==='host')hostDuel(true);else if(a==='join')joinDuel((code.value||'').trim().toUpperCase());else if(a==='quick')qSearch(false);
+  else if(a==='ai')startGame();else if(a==='ai2')startGame2v2();else if(a==='again')drStart()};
+}
 /* ---------- écran Duels : une rangée de lames qui s'ouvrent au clic ---------- */
 function dlNote(t){let n=document.getElementById('dlNote');if(!n){n=document.createElement('div');n.id='dlNote';n.className='dl-note';document.body.appendChild(n)}n.textContent=t;n.classList.add('on');clearTimeout(dlNote.t);dlNote.t=setTimeout(()=>n.classList.remove('on'),2800)}
 const DL_BK=['Noir','Bleu nuit','Rouge sobre','Clair'];
@@ -1454,16 +1552,17 @@ function dlPanel(m){
   '<div class="dl-f"><div class="dl-t"><span class="dl-tg">'+m.tag+'</span><h2>'+m.h+'</h2><p>'+m.p+'</p><div class="dl-c">'+m.chips.map(c=>'<span>'+c+'</span>').join('')+'</div>'+(m.extra||'')+'</div><div class="dl-a">'+m.acts+'</div></div></article>';
 }
 function showMenu(){
- view='menu';leaveGame();
+ DRAFT_ON=null;DR=null;view='menu';leaveGame();qStop();rkCheckPending();
  const d=getDeck(),ck=deckCheck(d);
  const soon=t=>'<button class="dl-go" data-a="soon" data-t="'+t+'">Bientôt disponible</button>';
  const arS=arStore(),arR=arS.run;
  const M=[
-  {k:'d1',ac:'#4aa9ff',art:'<img class="ph" src="combat/img/duel/gojo-sukuna.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'EN LIGNE · 1 CONTRE 1',h:'Duel',p:'Affronte un autre joueur : invite un ami de ton compte, ou joue avec un code à 4 lettres.',chips:['Entre amis','Code à 4 lettres'],
-   acts:'<button class="dl-go dl-big" data-a="friends"><span>Entre amis</span><small>Invite un ami de ton compte Kuroven</small></button><button class="dl-sc dl-big" data-a="soon" data-t="La partie rapide"><span>Partie rapide</span><small>Bientôt : un adversaire trouvé automatiquement</small></button><div class="dl-jn"><input id="dlCode" maxlength="4" placeholder="CODE" autocomplete="off" aria-label="Code du duel"><button class="dl-sc" data-a="join">Rejoindre</button><button class="dl-sc" data-a="host">Créer un code</button></div>'},
-  {k:'rk',ac:'#ffd84a',art:'<img class="ph" src="combat/img/duel/classe.jpg" alt="">',bd:'Bientôt',bc:'',tag:'EN LIGNE · CLASSÉ',h:'Classé',p:'Grimpe dans le classement de la saison. Ton niveau monte et descend à chaque duel, comme sur les autres jeux du site.',chips:['Niveau (Elo)','Saisons'],acts:soon('Le classé')},
-  {k:'d2',ac:'#ffb02e',art:'<img class="ph" src="combat/img/duel/jojo-2v2.jpg" alt="">',bd:'Bientôt',bc:'',tag:'EN LIGNE · 2 CONTRE 2',h:'2 contre 2',p:'Forme une équipe avec un ami et affrontez deux autres joueurs. Les tours alternent entre les deux camps.',chips:['Équipes de 2','4 joueurs'],acts:soon('Le 2 contre 2 en ligne')},
-  {k:'dr',ac:'#c05cff',art:'<div class="dl-drbg"></div>'+dlDraftArt(),bd:'Bientôt',bc:'',tag:'EN LIGNE · NOUVEAU MODE',h:'Tirage de deck',p:'Pas de deck à préparer : chacun construit le sien en direct, par tirage, carte après carte, puis vous vous affrontez.',chips:['Deck construit en direct','Aucun deck requis'],acts:soon('Le tirage de deck')},
+  {k:'d1',ac:'#4aa9ff',art:'<img class="ph" src="combat/img/duel/gojo-sukuna.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'EN LIGNE · 1 CONTRE 1',h:'Duel',p:'Affronte un autre joueur : cherche un adversaire en partie rapide, invite un ami de ton compte, ou joue avec un code à 4 lettres.',chips:['Entre amis','Partie rapide','Code à 4 lettres'],
+   acts:'<button class="dl-go dl-big" data-a="friends"><span>Entre amis</span><small>Invite un ami de ton compte Kuroven</small></button><button class="dl-sc dl-big" data-a="quick"><span>Partie rapide</span><small>Cherche un adversaire, sans classement</small></button><div class="dl-jn"><input id="dlCode" maxlength="4" placeholder="CODE" autocomplete="off" aria-label="Code du duel"><button class="dl-sc" data-a="join">Rejoindre</button><button class="dl-sc" data-a="host">Créer un code</button></div>'},
+  {k:'rk',ac:'#ffd84a',art:'<img class="ph" src="combat/img/duel/classe.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'EN LIGNE · CLASSÉ',h:'Classé',p:'Affronte des joueurs de ton niveau. Chaque victoire fait monter ton Elo, chaque défaite le fait baisser, comme aux échecs. Monte de Bronze jusqu’à Grand maître.',chips:['Elo','Bronze → Grand maître','Adversaire de ton niveau'],extra:rkCard(),
+   acts:'<button class="dl-go dl-big" data-a="rank"><span>Chercher un duel classé</span><small>Un adversaire proche de ton rang</small></button>'},
+  {k:'d2',ac:'#ffb02e',art:'<img class="ph" src="combat/img/duel/jojo-2v2.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'2 CONTRE 2',h:'2 contre 2',p:'Toi et un coéquipier IA affrontez deux adversaires IA. Les tours alternent entre les deux camps. Le 2 contre 2 en ligne, avec de vrais joueurs, arrive plus tard.',chips:['Équipes de 2','Avec l’IA'],acts:'<button class="dl-go" data-a="ai2">Jouer en 2 contre 2</button>'},
+  {k:'dr',ac:'#c05cff',art:'<div class="dl-drbg"></div>'+dlDraftArt(),bd:'Nouveau',bc:'nw',tag:'TIRAGE · SOLO OU EN LIGNE',h:'Tirage de deck',p:'Pas de deck à préparer : on te propose 3 cartes, tu en gardes une, et tu recommences jusqu’à avoir 20 cartes. Ensuite, affronte l’IA, un ami (code ou invitation) ou un adversaire trouvé.',chips:['3 cartes proposées','20 picks','Avec amis','2 contre 2 avec l’IA'],acts:'<button class="dl-go" data-a="draft">Lancer un tirage</button>'},
   {k:'ar',ac:'#ff5a36',art:'<img class="ph" src="combat/img/duel/arene.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'SOLO · SURVIE',h:'Arène',p:'Enchaîne les duels contre des adversaires de plus en plus forts. Tes points de vie ne se rechargent pas : après chaque victoire, choisis une capacité.',chips:['Vie reportée','1 capacité par victoire','Boss tous les 5 duels'],
    extra:'<div class="dl-st"><div>Meilleure série<b>'+arS.best+' victoire'+(arS.best>1?'s':'')+'</b></div><div>Série en cours<b>'+(arR?'Duel '+arR.n+' · '+arR.lp+' PV':'—')+'</b></div></div>',
    acts:(arR?'<button class="dl-go" data-a="ar-resume">Reprendre la série</button><button class="dl-sc" data-a="ar-quit">Abandonner</button>':'<button class="dl-go" data-a="ar-start">Commencer une série</button>')+'<button class="dl-sc" data-a="reward">Voir un exemple de choix</button>'}
@@ -1490,6 +1589,9 @@ function dlBind(){
   else if(a==='join'){if(dlDeckOk())joinDuel(($('dlCode').value||'').trim().toUpperCase())}
   else if(a==='soon')dlNote((b.dataset.t||'Ce mode')+' : bientôt disponible.');
   else if(a==='reward')dlReward();
+  else if(a==='quick'){if(dlDeckOk())qSearch(false)}
+  else if(a==='rank'){if(dlDeckOk())qSearch(true)}
+  else if(a==='draft')drStart();
   else if(a==='ar-start'){if(dlDeckOk())arStart()}
   else if(a==='ar-resume'){if(dlDeckOk())arPlay()}
   else if(a==='ar-quit'){arAbandon()}
@@ -2117,9 +2219,10 @@ function leaveGame(keepNet){
  {const vc=document.getElementById('v-cb');if(vc)vc.classList.remove('ingame')}
 }
 function mountGame(){
+ if(G&&RK_PEND){G.rk=RK_PEND;RK_PEND=null;if(G.rk.ranked)ls.set('cbrkpend',{oe:G.rk.oe,t:Date.now()})}
  const vc=document.getElementById('v-cb');if(vc)vc.classList.add('ingame');window.scrollTo(0,0);
  body().innerHTML='<div id="cbGame"><div class="cbt bk'+backN()+'" id="cbT"></div><div class="cbside" id="cbSide"><div><button class="cbchip" id="cbQuit">← Quitter la partie</button></div><div class="cbprev" id="cbPrev"></div><div class="cbact" id="cbAct"></div><div class="cbact" id="cbEvoW"></div><div id="cbHint" style="color:#e5483b;font-size:.85rem;min-height:1.2em;opacity:0;transition:opacity .3s"></div><div class="cblog" id="cbLog"></div></div></div>';
- $('cbQuit').onclick=async()=>{if(G&&!G.over){const r=await ask('Quitter la partie ?',G.arena?'La série d’Arène sera terminée.':'La partie en cours sera perdue.',[{v:true,t:'Quitter'},{v:false,t:'Continuer',sec:1}]);if(!r)return;if(G.arena){arFinish(true);return}}showMenu()};
+ $('cbQuit').onclick=async()=>{if(G&&!G.over){const r=await ask('Quitter la partie ?',G.arena?'La série d’Arène sera terminée.':'La partie en cours sera perdue.',[{v:true,t:'Quitter'},{v:false,t:'Continuer',sec:1}]);if(!r)return;if(G.arena){arFinish(true);return}if(G.rk&&G.rk.ranked){const t=rkApply(false,G.rk);setTimeout(()=>dlNote('Abandon : '+t),400)}}showMenu()};
  const b=boardEl();fit();requestAnimationFrame(fit);setTimeout(fit,150);setTimeout(fit,600);b.onclick=onBoardClick;b.onpointerdown=onDragStart;b.ondragstart=e=>e.preventDefault();b.onmouseover=onOver;b.onmouseout=onOut;$('cbAct').onclick=onAct;$('cbEvoW').onclick=onAct;
  renderPrev(null);
 }
@@ -2156,11 +2259,12 @@ async function startOnline(o){
  await startTurn();
 }
 function showOnline(msg){showMenu();if(msg)dlNote(msg)}
-async function hostDuel(inv){
- const code=Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('');
+async function hostDuel(inv,given,onReady){
+ const code=given||Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('');
  dlNote('Création du duel…');
  try{await netOpen(code)}catch(e){showOnline(e.message);return}
- body().innerHTML=tabs('menu')+'<div class="cbcard" style="text-align:center"><h2 style="margin-top:0">En attente d’un ami…</h2><p>Donne ce code à ton ami :</p><div style="font:900 3rem Georgia,serif;letter-spacing:.3em;margin:10px 0">'+code+'</div><p style="color:var(--mut)">Il doit aller dans Kuroven Combat, « Duel en ligne », puis taper le code. La partie démarre toute seule.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cbbtn lt" id="cbInv">📨 Inviter des amis</button><button class="cbbtn" id="cbCancel">Annuler</button></div></div>';
+ if(onReady)onReady();
+ body().innerHTML=tabs('menu')+'<div class="cbcard" style="text-align:center"><h2 style="margin-top:0">'+(given?'Adversaire trouvé…':'En attente d’un ami…')+'</h2><p>Donne ce code à ton ami :</p><div style="font:900 3rem Georgia,serif;letter-spacing:.3em;margin:10px 0">'+code+'</div><p style="color:var(--mut)">Il doit aller dans Kuroven Combat, « Duel en ligne », puis taper le code. La partie démarre toute seule.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cbbtn lt" id="cbInv">📨 Inviter des amis</button><button class="cbbtn" id="cbCancel">Annuler</button></div></div>';
  bindTabs();$('cbCancel').onclick=()=>showOnline();$('cbInv').onclick=()=>{if(typeof cbInvite==='function')cbInvite(code);else dlNote('Connecte-toi pour inviter tes amis.')};
  if(inv&&typeof cbInvite==='function')cbInvite(code);
  NET.onLobby=pl=>{
