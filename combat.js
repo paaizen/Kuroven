@@ -1452,7 +1452,7 @@ function openMagazine(type,n){preloadMag();
  const all=[];
  for(let i=0;i<n;i++){const cs=rollPack(type);stockUse(1);ls.set('cblast',cs.map(c=>c.id));const nw=addToCol(cs.map(c=>c.id));cs.forEach(c=>all.push({c,nw:nw.includes(c.id)}))}
  const ov=document.createElement('div');ov.id='cbOpen';ov.className='cbmag';
- ov.innerHTML='<iframe src="combat/mag/index.html?v=9" title="Ouverture du magazine" allow="autoplay"></iframe>';
+ ov.innerHTML='<iframe src="combat/mag/index.html?v=10" title="Ouverture du magazine" allow="autoplay"></iframe>';
  (document.getElementById('v-cb')||document.body).appendChild(ov);
  const fr=ov.firstChild;
  const data={t:'kvmag',snd:SND.on(),left:stockState().n,cards:all.map(({c,nw})=>({n:c.n,ser:(c.k==='e'?(c.mats&&c.mats[0]&&c.mats[0].series):c.series)||(c.k==='s'?(c.t==='trap'?'Carte Piège':c.t==='field'?'Carte Terrain':'Carte Magie'):'Kuroven'),r:rarityOf(c),full:c.k==='e'&&FULLART.has(c.eid),nw,html:cardHTML(c),img:c.k==='e'?'combat/img/evo-'+c.eid+'.jpg':(c.img||'')}))};
