@@ -1310,20 +1310,79 @@ function showLegal(){
  bindTabs();
 }
 function bindTabs(){document.querySelectorAll('#cbBody .cbside [data-v]').forEach(b=>b.onclick=()=>navGo(b.dataset.v))}
+/* ---------- écran Duels : une rangée de lames qui s'ouvrent au clic ---------- */
+function dlNote(t){let n=document.getElementById('dlNote');if(!n){n=document.createElement('div');n.id='dlNote';n.className='dl-note';document.body.appendChild(n)}n.textContent=t;n.classList.add('on');clearTimeout(dlNote.t);dlNote.t=setTimeout(()=>n.classList.remove('on'),2800)}
+const DL_BK=['Noir','Bleu nuit','Rouge sobre','Clair'];
+const DL_TROPHY='<svg viewBox="0 0 200 200" class="dl-tr"><defs><linearGradient id="dlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".55" stop-color="#ffd84a"/><stop offset="1" stop-color="#c98a1a"/></linearGradient></defs><path d="M60 30h80v50c0 26-18 44-40 48-22-4-40-22-40-48zM60 44H30c0 22 12 36 34 40M140 44h30c0 22-12 36-34 40M100 128v28M70 172h60M82 156h36" fill="none" stroke="url(#dlg)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function dlDraftArt(){
+ /* trois vraies cartes en éventail (celle du milieu est mise en avant) et un deck de 20 cases qui se remplit */
+ const pool=allCards().filter(c=>c.k==='c'||c.k==='e'),rare=pool.filter(c=>rarityOf(c)>=3),pickC=l=>l.length?l[rnd(l.length)]:null;
+ const mid=pickC(rare)||pickC(pool),a=pickC(pool),b=pickC(pool);
+ const fc=(c,cls)=>c?'<span class="dl-fc '+cls+'">'+cardHTML(c)+'</span>':'';
+ let slots='';for(let i=0;i<20;i++)slots+='<i'+(i<7?' class="f"':'')+'></i>';
+ return '<div class="dl-dr"><div class="dl-dfan">'+fc(a,'l')+fc(b,'r')+fc(mid,'m')+'</div><div class="dl-slots">'+slots+'</div><small class="dl-ex">Exemple de tirage · deck de 20 cartes</small></div>';
+}
+function dlPanel(m){
+ const on=m.k==='d1'?' on':'';
+ return '<article class="dl-p'+on+'" data-k="'+m.k+'" tabindex="0" role="button" aria-label="'+esc(m.h)+'" style="--ac:'+m.ac+'"><div class="dl-i">'+m.art+'</div><i class="dl-s"></i><i class="dl-d"></i><span class="dl-bg '+m.bc+'">'+m.bd+'</span><b class="dl-vt">'+m.h+'</b>'+
+  '<div class="dl-f"><div class="dl-t"><span class="dl-tg">'+m.tag+'</span><h2>'+m.h+'</h2><p>'+m.p+'</p><div class="dl-c">'+m.chips.map(c=>'<span>'+c+'</span>').join('')+'</div>'+(m.extra||'')+'</div><div class="dl-a">'+m.acts+'</div></div></article>';
+}
 function showMenu(){
  view='menu';leaveGame();
- let d=getDeck(),ck=deckCheck(d);
+ const d=getDeck(),ck=deckCheck(d);
+ const soon=t=>'<button class="dl-go" data-a="soon" data-t="'+t+'">Bientôt disponible</button>';
+ const M=[
+  {k:'d1',ac:'#4aa9ff',art:'<img class="ph" src="combat/img/duel/gojo-sukuna.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'EN LIGNE · 1 CONTRE 1',h:'Duel',p:'Affronte un autre joueur : invite un ami de ton compte, ou joue avec un code à 4 lettres.',chips:['Entre amis','Code à 4 lettres'],
+   acts:'<button class="dl-go dl-big" data-a="friends"><span>Entre amis</span><small>Invite un ami de ton compte Kuroven</small></button><button class="dl-sc dl-big" data-a="soon" data-t="La partie rapide"><span>Partie rapide</span><small>Bientôt : un adversaire trouvé automatiquement</small></button><div class="dl-jn"><input id="dlCode" maxlength="4" placeholder="CODE" autocomplete="off" aria-label="Code du duel"><button class="dl-sc" data-a="join">Rejoindre</button><button class="dl-sc" data-a="host">Créer un code</button></div>'},
+  {k:'rk',ac:'#ffd84a',art:'<div class="dl-rk">'+DL_TROPHY+'</div>',bd:'Bientôt',bc:'',tag:'EN LIGNE · CLASSÉ',h:'Classé',p:'Grimpe dans le classement de la saison. Ton niveau monte et descend à chaque duel, comme sur les autres jeux du site.',chips:['Niveau (Elo)','Saisons'],acts:soon('Le classé')},
+  {k:'d2',ac:'#ffb02e',art:'<img class="ph" src="combat/img/duel/jojo-2v2.jpg" alt="">',bd:'Bientôt',bc:'',tag:'EN LIGNE · 2 CONTRE 2',h:'2 contre 2',p:'Forme une équipe avec un ami et affrontez deux autres joueurs. Les tours alternent entre les deux camps.',chips:['Équipes de 2','4 joueurs'],acts:soon('Le 2 contre 2 en ligne')},
+  {k:'dr',ac:'#c05cff',art:'<div class="dl-drbg"></div>'+dlDraftArt(),bd:'Bientôt',bc:'',tag:'EN LIGNE · NOUVEAU MODE',h:'Tirage de deck',p:'Pas de deck à préparer : chacun construit le sien en direct, par tirage, carte après carte, puis vous vous affrontez.',chips:['Deck construit en direct','Aucun deck requis'],acts:soon('Le tirage de deck')},
+  {k:'ar',ac:'#ff5a36',art:'<img class="ph" src="combat/img/duel/arene.jpg" alt="">',bd:'Bientôt',bc:'',tag:'SOLO · SURVIE',h:'Arène',p:'Enchaîne les duels contre des adversaires de plus en plus forts. Tes points de vie ne se rechargent pas : après chaque victoire, choisis une capacité.',chips:['Vie reportée','1 capacité par victoire','Boss tous les 5 duels'],
+   extra:'<div class="dl-st"><div>Meilleure série<b>0 victoire</b></div><div>Série en cours<b>—</b></div></div>',acts:'<button class="dl-go" data-a="soon" data-t="L’arène">Bientôt disponible</button><button class="dl-sc" data-a="reward">Voir une récompense</button>'}
+ ];
+ const fan=d.slice(0,3).map((id,i)=>REG[id]?'<span class="dl-mf" style="--r:'+(-14+i*14)+'deg;left:'+(i*17)+'px">'+cardHTML(REG[id])+'</span>':'').join('');
  body().innerHTML=tabs('menu')+
- '<div class="cbhero bk'+backN()+'"><div><h2>Kuroven Combat</h2><p>Compose un deck de 20 cartes avec tes personnages préférés, puis affronte l’adversaire. Les six couleurs se battent en cercle : chaque couleur domine deux autres.</p>'+
- '<button class="cbbtn" id="cbPlay">'+(ck.ok?'Jouer contre l’IA':'Prépare ton deck pour jouer')+'</button><button class="cbbtn sec" id="cb2v2">2 contre 2</button><button class="cbbtn sec" id="cbOnline">Duel en ligne</button><button class="cbbtn sec" id="cbBuild">Mes decks · '+esc(deckName())+' ('+d.length+'/20)</button><button class="cbbtn sec" id="cbAuto">Deck aléatoire</button></div>'+
- '<div class="em">'+KM+'</div></div>'+
- '<div class="cbcard"><b>Dos des cartes</b><div class="cbtabs" id="cbBk" style="margin:8px 0 0">'+['Noir','Bleu nuit','Rouge sobre','Clair'].map((n,i)=>'<button data-b="'+(i+1)+'" class="'+(backN()===i+1?'on':'')+'">'+n+'</button>').join('')+'</div></div>';
- bindTabs();
- $('cbPlay').onclick=()=>{if(!deckCheck(getDeck()).ok){showBuild();return}startGame()};
- $('cb2v2').onclick=()=>{if(!deckCheck(getDeck()).ok){showBuild();return}startGame2v2()};
- $('cbBuild').onclick=showBuild;$('cbOnline').onclick=()=>showOnline();
- $('cbAuto').onclick=()=>{setDeck(autoDeck(null,[],null));showMenu()};
- $('cbBk').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('cbback',+b.dataset.b);showMenu()};
+ '<div class="dl" id="dl" data-on="d1"><header class="dl-h"><div><small>COMBAT · DUELS</small><h1>Choisis ton mode</h1></div><p>Clique sur un mode pour l’ouvrir.</p></header>'+
+ '<div class="dl-r">'+M.map(dlPanel).join('')+'</div>'+
+ '<div class="dl-k"><div class="dl-dk"><div class="dl-mfan">'+fan+'</div><div><b>'+esc(deckName())+'</b><small>'+d.length+' / 20 · <span class="'+(ck.ok?'ok':'ko')+'">'+(ck.ok?'prêt':'à compléter')+'</span></small></div><div class="dl-bt"><button data-a="deck">Mes decks</button><button data-a="auto">Aléatoire</button></div></div>'+
+ '<div class="dl-nd"><b>Aucun deck à préparer</b><small>Ton deck sera construit pendant le tirage.</small></div>'+
+ '<div class="dl-ai"><span>En attendant le mode histoire</span><button data-a="ai">Contre l’IA</button><button data-a="ai2">2 contre 2 avec l’IA</button></div><span class="dl-sp"></span>'+
+ '<div class="dl-bk"><span>Dos des cartes</span>'+DL_BK.map((n,i)=>'<button data-a="back" data-b="'+(i+1)+'" class="'+(backN()===i+1?'on':'')+'">'+n+'</button>').join('')+'</div></div></div>';
+ bindTabs();dlBind();
+}
+function dlDeckOk(){const ck=deckCheck(getDeck());if(!ck.ok){dlNote('Ton deck n’est pas valide : '+ck.msg);showBuild();return false}return true}
+function dlBind(){
+ const R=$('dl');if(!R)return;
+ const pick=p=>{R.querySelectorAll('.dl-p').forEach(x=>x.classList.toggle('on',x===p));R.dataset.on=p.dataset.k};
+ R.querySelectorAll('.dl-p').forEach(p=>{p.onclick=()=>{if(!p.classList.contains('on'))pick(p)};p.onkeydown=e=>{if(e.target===p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();pick(p)}}});
+ const code=$('dlCode');if(code){code.onclick=e=>e.stopPropagation();code.oninput=()=>{code.value=code.value.toUpperCase().replace(/[^A-Z]/g,'')};code.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(dlDeckOk())joinDuel(code.value.trim().toUpperCase())}}}
+ R.onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;e.stopPropagation();const a=b.dataset.a;
+  if(a==='friends'){if(dlDeckOk())hostDuel(true)}
+  else if(a==='host'){if(dlDeckOk())hostDuel(false)}
+  else if(a==='join'){if(dlDeckOk())joinDuel(($('dlCode').value||'').trim().toUpperCase())}
+  else if(a==='soon')dlNote((b.dataset.t||'Ce mode')+' : bientôt disponible.');
+  else if(a==='reward')dlReward();
+  else if(a==='ai'){if(dlDeckOk())startGame()}
+  else if(a==='ai2'){if(dlDeckOk())startGame2v2()}
+  else if(a==='deck')showBuild();
+  else if(a==='auto'){setDeck(autoDeck(null,[],null));showMenu()}
+  else if(a==='back'){ls.set('cbback',+b.dataset.b);R.querySelectorAll('.dl-bk button').forEach(x=>x.classList.toggle('on',x===b))}};
+}
+/* exemple d'écran de récompense de l'Arène (le mode n'est pas encore jouable) */
+function dlReward(){
+ if($('dlM'))return;
+ const IC={heart:'<path d="M12 21C6 16.5 3 13 3 9.5 3 7 5 5 7.5 5c1.8 0 3.5 1 4.5 2.6C13 6 14.7 5 16.5 5 19 5 21 7 21 9.5c0 3.5-3 7-9 11.5z"/>',sword:'<path d="M14.5 4.5 20 4l-.5 5.5L9 20l-5-5zM4 20l4-4M7 17l-3 3"/>',flame:'<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/>'};
+ const BN=[{r:'COMMUNE',c:'#9fb4d8',i:'heart',t:'Second souffle',ty:'Soin',ef:'Récupère <em>2 000</em> points de vie tout de suite.',cs:''},{r:'RARE',c:'#4aa9ff',i:'sword',t:'Lame affûtée',ty:'Puissance',ef:'Tous tes personnages gagnent <em>+150 attaque</em> jusqu’à la fin de la série.',cs:''},{r:'ÉPIQUE',c:'#c05cff',i:'flame',t:'Pacte de sang',ty:'Puissance · risque',ef:'Tous tes personnages gagnent <em>+500 attaque</em>.',cs:'Contrepartie : tu perds 1 500 points de vie.'}];
+ const m=document.createElement('div');m.id='dlM';m.className='dl-m';
+ m.innerHTML='<button class="dl-mx" type="button">✕ Fermer</button><div class="dl-mw"><div class="dl-rt"><i class="d">1</i><u></u><i class="d">2</i><u></u><i class="d">3</i><u></u><i class="d">4</i><u></u><i class="d">5 · BOSS</i><u></u><i class="c">6</i><u></u><i>7</i><u></u><i>8</i><u></u><i>9</i><u></u><i class="b">10 · BOSS</i></div>'+
+  '<div class="dl-mt"><small>EXEMPLE · APRÈS LE BOSS DU DUEL 5</small><h2>Victoire ! Choisis une capacité</h2></div><div class="dl-hp"><span>Vie</span><u><i></i></u><b>5 100 / 8 000</b><span>· Prochain : duel 6, adversaire plus fort</span></div>'+
+  '<div class="dl-bn">'+BN.map((b,i)=>'<button class="dl-b" type="button" style="--rc:'+b.c+'" data-i="'+i+'"><span class="rr">'+b.r+'</span><svg viewBox="0 0 24 24">'+IC[b.i]+'</svg><b>'+b.t+'</b><span class="ty">'+b.ty+'</span><span class="ef">'+b.ef+'</span><span class="cs">'+(b.cs||'&nbsp;')+'</span></button>').join('')+'</div>'+
+  '<div class="dl-mf2"><button type="button" data-n="Relancer les choix">↻ Relancer · 1 restant</button><button type="button" data-n="Passer et récupérer 500 de vie">Passer · récupère 500 de vie</button></div><p class="dl-mn">Aperçu : l’Arène n’est pas encore jouable.</p></div>';
+ document.body.appendChild(m);
+ const close=()=>{m.remove();document.removeEventListener('keydown',esc2)};const esc2=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',esc2);
+ m.querySelector('.dl-mx').onclick=close;
+ m.querySelectorAll('.dl-b').forEach(b=>b.onclick=()=>{m.querySelectorAll('.dl-b').forEach(x=>x.classList.toggle('on',x===b));dlNote('Aperçu : « '+BN[b.dataset.i].t+' » choisie. L’Arène arrive bientôt.')});
+ m.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>dlNote('Aperçu : '+b.dataset.n+'.'));
 }
 
 /* ---------- boosters : on découpe, on découvre, on remplit sa collection (pour le plaisir, rien de réel) ---------- */
@@ -1965,23 +2024,14 @@ async function startOnline(o){
  log(o.first?'La partie en ligne commence. Tu joues en premier.':'La partie en ligne commence. L’adversaire joue en premier.');
  await startTurn();
 }
-function showOnline(msg){
- view='online';leaveGame();
- const ck=deckCheck(getDeck());
- body().innerHTML=tabs('menu')+'<div class="cbcard"><h2 style="margin-top:0">Duel en ligne</h2><p style="color:var(--mut)">Affronte un ami : l’un de vous crée un duel et donne le code à l’autre, qui le tape. Chacun joue avec son propre deck.</p>'+
-  (ck.ok?'':'<p style="color:#e5483b">Ton deck n’est pas valide : '+esc(ck.msg)+' <button class="cbchip" id="cbFix">Mon deck</button></p>')+
-  '<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end"><div><button class="cbbtn lt" id="cbHost"'+(ck.ok?'':' disabled')+'>Créer un duel</button></div>'+
-  '<div><input class="cbsearch" id="cbCode" maxlength="4" placeholder="Code à 4 lettres" style="text-transform:uppercase;width:160px"> <button class="cbbtn lt" id="cbJoin"'+(ck.ok?'':' disabled')+'>Rejoindre</button></div></div>'+
-  '<p id="cbOnMsg" style="min-height:1.4em;margin:12px 0 0">'+(msg?esc(msg):'')+'</p></div>';
- bindTabs();if(!ck.ok&&$('cbFix'))$('cbFix').onclick=showBuild;
- $('cbHost').onclick=hostDuel;$('cbJoin').onclick=()=>joinDuel($('cbCode').value.trim().toUpperCase());
-}
-async function hostDuel(){
+function showOnline(msg){showMenu();if(msg)dlNote(msg)}
+async function hostDuel(inv){
  const code=Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('');
- $('cbOnMsg').textContent='Création du duel…';
+ dlNote('Création du duel…');
  try{await netOpen(code)}catch(e){showOnline(e.message);return}
  body().innerHTML=tabs('menu')+'<div class="cbcard" style="text-align:center"><h2 style="margin-top:0">En attente d’un ami…</h2><p>Donne ce code à ton ami :</p><div style="font:900 3rem Georgia,serif;letter-spacing:.3em;margin:10px 0">'+code+'</div><p style="color:var(--mut)">Il doit aller dans Kuroven Combat, « Duel en ligne », puis taper le code. La partie démarre toute seule.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cbbtn lt" id="cbInv">📨 Inviter des amis</button><button class="cbbtn" id="cbCancel">Annuler</button></div></div>';
- bindTabs();$('cbCancel').onclick=()=>showOnline();$('cbInv').onclick=()=>{if(typeof cbInvite==='function')cbInvite(code);else toast('Connecte-toi pour inviter tes amis.')};
+ bindTabs();$('cbCancel').onclick=()=>showOnline();$('cbInv').onclick=()=>{if(typeof cbInvite==='function')cbInvite(code);else dlNote('Connecte-toi pour inviter tes amis.')};
+ if(inv&&typeof cbInvite==='function')cbInvite(code);
  NET.onLobby=pl=>{
   if(pl.t!=='hello')return;NET.onLobby=null;
   const deck=getDeck(),extra=getExtra(),first=Math.random()<.5,sh=1+rnd(2e9),sg=1+rnd(2e9);
@@ -1990,7 +2040,7 @@ async function hostDuel(){
  };
 }
 async function joinDuel(code){
- const msg=$('cbOnMsg');
+ const msg={set textContent(t){dlNote(t)}};
  if(!/^[A-Z]{4}$/.test(code)){msg.textContent='Entre le code à 4 lettres.';return}
  msg.textContent='Connexion…';
  try{await netOpen(code)}catch(e){showOnline(e.message);return}
