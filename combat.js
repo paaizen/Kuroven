@@ -1257,10 +1257,59 @@ function onOut(e){
 
 /* ---------- vues : menu, deck, règles, partie ---------- */
 const body=()=>$('cbBody');
+/* navigation : colonne de catégories et sous-catégories (à gauche sur ordinateur, en haut sur téléphone) */
+const NAV=[
+ ['boost','Boosters','<rect x="6.500" y="2.500" width="11" height="19" rx="2"/><path d="M6.500 7.500h11M12 12v4M10 14h4"/>',[['open','Ouvrir un booster'],['gift','Cadeau du jour'],['odds','Contenu et probabilités']]],
+ ['col','Collection','<rect x="3.500" y="5" width="10" height="14" rx="1.600" transform="rotate(-8 8.500 12)"/><rect x="10.500" y="5" width="10" height="14" rx="1.600" transform="rotate(8 15.500 12)"/>',[['cards','Mes cartes'],['atelier','Atelier des doublons']]],
+ ['build','Mes decks','<path d="M5 8h14v12H5zM7 5.500h10M9 3h6"/>',[['decks','Tous mes decks']]],
+ ['play','Combat','<path d="M5 4l10 10M4 20l4-1 1-4M19 4 9 14M20 20l-4-1-1-4"/>',[['duel','Duels'],['story','Mode histoire']]],
+ ['event','Événements','<path d="M12 3l2.600 5.600 6 .7-4.400 4.200 1.100 6-5.300-3-5.300 3 1.100-6L3.400 9.300l6-.7z"/>',[['now','En ce moment'],['missions','Missions']]],
+ ['social','Social','<circle cx="9" cy="8.500" r="3.200"/><path d="M3 19c.6-3.400 3-4.800 6-4.800s5.400 1.400 6 4.800M16 5.600a3.200 3.200 0 0 1 0 5.800M18 14.600c1.800.6 2.800 2 3.100 4.400"/>',[['friends','Amis'],['pdecks','Decks des joueurs'],['pulls','Derniers gros tirages']]],
+ ['market','Marché','<path d="M4 8h13l-3-3M20 16H7l3 3"/>',[['trade','Échanger'],['offers','Mes offres']]],
+ ['rank','Classement','<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H4.500c0 3 1.500 4.500 3.700 4.800M16 6h3.500c0 3-1.500 4.500-3.700 4.800M12 13v4M8.500 20h7"/>',[['season','Saison en cours']]]
+].map(x=>[x[0],x[1],x[2].replace(/(\d)00\b/g,'$1'),x[3]]);
+const PROFIL=[['profil','Profil'],['vitrine','Vitrine'],['succes','Succès'],['histo','Historique des duels'],['perso','Personnalisation'],['params','Paramètres']];
+/* ce qui n'est pas encore construit : une page d'attente qui dit ce qui arrive */
+const SOON={gift:['Cadeau du jour','Un booster ou une carte offerts chaque jour où tu te connectes.'],atelier:['Atelier des doublons','Échange tes cartes en double contre de nouvelles cartes.'],story:['Mode histoire','Des niveaux à passer et des boss à battre, avec un mode automatique.'],now:['Événements','Des défis à durée limitée avec des récompenses.'],missions:['Missions','Des objectifs à remplir chaque jour et chaque semaine.'],friends:['Amis','Retrouve tes amis et défie-les.'],pdecks:['Decks des joueurs','Regarde les decks des autres joueurs.'],pulls:['Derniers gros tirages','Les plus belles cartes tirées récemment par les joueurs.'],trade:['Échanger','Propose une carte contre une autre.'],offers:['Mes offres','Tes échanges en cours.'],season:['Classement','Le classement des meilleurs duellistes de la saison.'],profil:['Profil','Ton niveau, tes statistiques et ta carte préférée.'],vitrine:['Vitrine','Expose tes plus belles cartes.'],succes:['Succès','Les exploits que tu as débloqués.'],histo:['Historique des duels','Tes derniers combats.'],perso:['Personnalisation','Dos de cartes, plateau et couleurs.'],params:['Paramètres','Son, animations et affichage.'],news:['Nouveautés','Ce qui a changé dans le jeu.']};
 function tabs(cur){
- return '<div class="cbnav"><b class="cbnav-logo">KUROVEN COMBAT</b>'+[['boost','Boosters'],['col','Collection'],['build','Mes decks'],['menu','Jouer'],['rules','Règles']].map(x=>'<button data-v="'+x[0]+'" class="'+(cur===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'<span class="cbnav-sp"></span><i class="cbnav-st">'+Object.keys(getCol()).length+' / '+allCards().length+' cartes</i><button class="cbnav-out" data-v="exit">← Kuroven</button></div>';
+ const M={boost:['boost','open'],col:['col','cards'],build:['build','decks'],menu:['play','duel'],rules:['',''],odds:['boost','odds']},c=(cur||'').indexOf(':')>0?cur.split(':'):(M[cur]||['','']);
+ let nm='Invité',img='';try{const w=who0();if(w){nm=w.n||w.name||nm;img=w.img||''}}catch(e){}
+ let dk=[],ok=false,dn='Deck';try{dk=getDeck()||[];ok=!!deckCheck(dk).ok;dn=deckName()}catch(e){}
+ return '<aside class="cbside"><div class="cbs-logo"><img src="combat/img/logo-k.svg" alt=""><div><b>KUROVEN</b><small>COMBAT</small></div></div>'+
+  '<div class="cbs-me"><button class="cbs-meb" data-v="me">'+(img?'<img src="'+esc(img)+'" alt="">':'<i>'+esc(String(nm).charAt(0).toUpperCase())+'</i>')+'<span>'+esc(nm)+'</span><em>▾</em></button><div class="cbs-med">'+PROFIL.map(p=>'<button data-v="soon:'+p[0]+'">'+p[1]+'</button>').join('')+'</div></div>'+
+  '<nav class="cbs-nav">'+NAV.map(g=>'<div class="cbs-g'+(c[0]===g[0]?' open':'')+'"><button class="cbs-c" data-v="'+g[0]+':'+g[3][0][0]+'"><svg viewBox="0 0 24 24">'+g[2]+'</svg>'+g[1]+'</button><div class="cbs-sub">'+g[3].map(x=>'<button data-v="'+g[0]+':'+x[0]+'" class="'+(c[0]===g[0]&&c[1]===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div></div>').join('')+'</nav>'+
+  '<div class="cbs-bot"><span class="cbs-l">Deck actif</span><div class="cbs-dk"><b>'+esc(dn)+'</b><small>'+dk.length+' / 20 · <span class="'+(ok?'ok':'ko')+'">'+(ok?'prêt':'à compléter')+'</span></small></div>'+
+  '<button class="cbs-cta" data-v="play:duel">Combattre</button><i class="cbs-st">'+Object.keys(getCol()).length+' / '+allCards().length+' cartes</i>'+
+  '<div class="cbs-foot"><a data-v="rules">Règles</a><a data-v="soon:news">Nouveautés</a><a data-v="legal">Mentions légales</a><a data-v="exit">← Kuroven</a></div></div></aside>';
 }
-function bindTabs(){document.querySelectorAll('#cbBody .cbnav button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='exit'){if(typeof show==='function')show('home');else location.hash='';return}if(v==='menu')showMenu();else if(v==='build')showBuild();else if(v==='boost')showBoosters();else if(v==='col')showCollection('all');else showRules()})}
+function navGo(v){
+ if(v==='exit'){if(typeof show==='function')show('home');else location.hash='';return}
+ if(v==='me'){const d=document.querySelector('#cbBody .cbs-me');if(d)d.classList.toggle('open');return}
+ if(v==='rules'){showRules();return}if(v==='legal'){showLegal();return}
+ const p=v.split(':'),a=p[0],b=p[1];
+ if(a==='soon'){showSoon('',b);return}
+ if(a==='boost'){if(b==='open')showBoosters();else if(b==='odds'){showBoosters();showPackInfo()}else showSoon(a,b);return}
+ if(a==='col'){if(b==='cards')showCollection('all');else showSoon(a,b);return}
+ if(a==='build'){showBuild();return}
+ if(a==='play'){if(b==='duel')showMenu();else showSoon(a,b);return}
+ showSoon(a,b);
+}
+function showSoon(cat,key){
+ view='soon';try{leaveGame();clearInterval(boostTm)}catch(e){}
+ const d=SOON[key]||['Bientôt','Cette page arrive bientôt.'];
+ body().innerHTML=tabs(cat?cat+':'+key:'')+'<div class="cbcard cbsoon"><span class="cbsoon-t">Bientôt disponible</span><h2>'+d[0]+'</h2><p>'+d[1]+'</p><button class="cbbtn" id="cbSoonB">Ouvrir un booster en attendant</button></div>';
+ bindTabs();$('cbSoonB').onclick=showBoosters;
+}
+function showLegal(){
+ view='legal';try{leaveGame();clearInterval(boostTm)}catch(e){}
+ body().innerHTML=tabs('')+'<div class="cbcard cbrules"><h2 style="margin-top:0">Mentions légales</h2>'+
+  '<p>Kuroven est un site de fans, gratuit et sans publicité. Il n’est lié à aucun éditeur, studio ou ayant droit.</p>'+
+  '<p>Les personnages, images, noms, extraits et sons appartiennent à leurs auteurs et éditeurs respectifs. Ils sont utilisés ici à titre d’hommage, sans but lucratif.</p>'+
+  '<h3>Signaler un contenu</h3><p>Tu es l’auteur ou l’ayant droit d’un contenu et tu souhaites qu’il soit retiré ? Indique la carte ou la page concernée et il sera retiré rapidement.</p>'+
+  '<p><a class="cbbtn" href="https://github.com/paaizen/Kuroven/issues/new" target="_blank" rel="noopener">Faire un signalement</a></p></div>';
+ bindTabs();
+}
+function bindTabs(){document.querySelectorAll('#cbBody .cbside [data-v]').forEach(b=>b.onclick=()=>navGo(b.dataset.v))}
 function showMenu(){
  view='menu';leaveGame();
  let d=getDeck(),ck=deckCheck(d);
