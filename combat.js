@@ -153,9 +153,9 @@ const eqN=(pi,m,id)=>G.p[pi].st.filter(s=>s&&s.to===m&&s.card.id===id).length;
 const hasCape=(pi,m)=>eqN(pi,m,'cape')>0;
 const fld=()=>G.field&&G.field.card.id;
 const friend=pi=>mons(pi).length>=3&&G.p[pi].st.some(s=>s&&s.up&&s.card.id==='amitie');
-function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;return Math.max(0,v)}
+function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;if(G&&G.arena)v+=pi===0?G.arena.fx.atk:G.arena.ai.atk;return Math.max(0,v)}
 function def(pi,m){return Math.max(1,m.card.def+m.defP)}
-function armor(pi,m){let v=Math.max(0,(m.card.arm||0)-(m.armLost||0))+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;return v}
+function armor(pi,m){let v=Math.max(0,(m.card.arm||0)-(m.armLost||0))+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;if(G&&G.arena&&pi===0)v+=G.arena.fx.arm;return v}
 const tauntIdx=att=>{const t=G&&G.taunt;if(!t||t.owner===att||!P(t.owner).mon.includes(t.m))return -1;return P(t.owner).mon.indexOf(t.m)};
 /* dégâts d'une attaque : en attaque on reçoit tout et on riposte ; en défense l'armure absorbe, les Épines renvoient */
 function calcHit(pi,A,T){
@@ -793,6 +793,7 @@ async function startTurn(){
  p.normal=false;p.senzu=false;p.potion=false;p.mon.forEach(m=>{if(m){m.att=false;m.chg=false;if(m.para>0){m.att=true;m.para--}if(m.sleep>0){m.att=true;m.sleep--}}});
  banner(isH(pi)?'À TOI DE JOUER':pi===0?'TOUR DE TON COÉQUIPIER':'TOUR ADVERSE',pi===0?'#3dae5a':'#ec5fa0');
  G.busy=true;render();await sleep(600);
+ if(pi===0&&G.arena&&G.arena.fx.regen){const h=Math.min(G.arena.fx.regen,Math.max(0,AR_MAX-P(0).lp));if(h>0)heal(0,h)}
  if(G.n>1){if(isH(pi))G.needDraw=true;else if(!NET)await drawN(pi,1)}
  if(G.over)return;
  G.busy=false;render();
@@ -816,6 +817,7 @@ async function humanEnd(){
 }
 function endGame(winner,why){
  if(G.over)return;G.over=true;stopTimer();
+ if(G.arena){arEnd(winner);return}
  setTimeout(async()=>{
   if(!alive)return;
   const r=await ask(winner===0?'Victoire !':'Défaite',why,NET?[{v:'menu',t:'Retour au menu'}]:[{v:'again',t:'Rejouer'},{v:'menu',t:'Retour au menu',sec:1}]);
@@ -1310,6 +1312,111 @@ function showLegal(){
  bindTabs();
 }
 function bindTabs(){document.querySelectorAll('#cbBody .cbside [data-v]').forEach(b=>b.onclick=()=>navGo(b.dataset.v))}
+/* ---------- ARÈNE : série de duels contre l'IA. La vie se reporte d'un duel à l'autre ; chaque victoire donne une capacité ---------- */
+const AR_MAX=8000,AR_KEY='cbarena1';
+const arStore=()=>{const o=ls.get(AR_KEY,null);return o&&typeof o==='object'?{best:o.best|0,run:o.run||null}:{best:0,run:null}};
+const arSave=st=>ls.set(AR_KEY,st);
+const AR_IC={heart:'<path d="M12 21C6 16.5 3 13 3 9.5 3 7 5 5 7.5 5c1.8 0 3.5 1 4.5 2.6C13 6 14.7 5 16.5 5 19 5 21 7 21 9.5c0 3.5-3 7-9 11.5z"/>',sword:'<path d="M14.5 4.5 20 4l-.5 5.5L9 20l-5-5zM4 20l4-4M7 17l-3 3"/>',flame:'<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/>',shield:'<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>',cards:'<rect x="4" y="5" width="10" height="14" rx="1.6" transform="rotate(-8 9 12)"/><rect x="10" y="5" width="10" height="14" rx="1.6" transform="rotate(8 15 12)"/>'};
+const AR_BOONS=[
+ {id:'soin',r:0,t:'Second souffle',ty:'Soin',ic:'heart',ef:'Récupère <em>2 000</em> points de vie tout de suite.',heal:true},
+ {id:'main',r:0,t:'Main pleine',ty:'Pioche',ic:'cards',ef:'Tu commences chaque duel avec <em>1 carte de plus</em>.'},
+ {id:'peau',r:0,t:'Peau dure',ty:'Défense',ic:'shield',ef:'<em>+50 armure</em> à tous tes personnages.'},
+ {id:'lame',r:1,t:'Lame affûtée',ty:'Puissance',ic:'sword',ef:'<em>+150 attaque</em> à tous tes personnages.'},
+ {id:'regen',r:1,t:'Régénération',ty:'Soin',ic:'heart',ef:'Tu récupères <em>250</em> points de vie au début de chaque tour.',heal:true},
+ {id:'fer',r:1,t:'Armure de fer',ty:'Défense',ic:'shield',ef:'<em>+100 armure</em> à tous tes personnages.'},
+ {id:'pacte',r:2,t:'Pacte de sang',ty:'Puissance · risque',ic:'flame',ef:'<em>+500 attaque</em> à tous tes personnages.',cs:'Contrepartie : tu perds 1 500 points de vie.'},
+ {id:'festin',r:2,t:'Festin',ty:'Soin',ic:'heart',ef:'Récupère <em>4 000</em> points de vie tout de suite.',heal:true},
+ {id:'rage',r:2,t:'Rage de combat',ty:'Puissance · défense',ic:'sword',ef:'<em>+250 attaque</em> et <em>+75 armure</em> à tous tes personnages.'}
+];
+const AR_RN=['COMMUNE','RARE','ÉPIQUE'],AR_RC=['#9fb4d8','#4aa9ff','#c05cff'];
+const arB=id=>AR_BOONS.find(b=>b.id===id);
+/* total des capacités déjà gagnées */
+function arFx(run){const b=run.boons||{},c=id=>b[id]|0;return{atk:150*c('lame')+500*c('pacte')+250*c('rage'),arm:50*c('peau')+100*c('fer')+75*c('rage'),regen:250*c('regen'),draw:c('main')}}
+/* force de l'adversaire : de plus en plus de vie et d'attaque, et un boss tous les 5 duels */
+function arAi(n){const boss=n%5===0;return{boss,atk:40*(n-1)+(boss?150:0),lp:AR_MAX+300*(n-1)+(boss?1500:0),draw:n>=8?1:0}}
+/* trois capacités au hasard : la rareté monte après un boss, et on ne propose pas de soin quand la vie est presque pleine */
+function arChoices(run,boss){
+ const pool=AR_BOONS.filter(b=>!(b.heal&&run.lp>=AR_MAX-300)),w=boss?[0,.6,.4]:[.62,.31,.07],out=[];let g=0;
+ while(out.length<3&&g++<80){const x=Math.random(),r=x<w[0]?0:x<w[0]+w[1]?1:2,c=pool.filter(b=>b.r===r&&!out.includes(b.id));if(c.length)out.push(c[rnd(c.length)].id)}
+ while(out.length<3){const c=pool.filter(b=>!out.includes(b.id));out.push(c[rnd(c.length)].id)}
+ return out;
+}
+function arStart(){const st=arStore();st.run={n:1,lp:AR_MAX,wins:0,boons:{},rr:1,choices:null,boss:false};arSave(st);arPlay()}
+function arPlay(){const st=arStore(),run=st.run;if(!run){showMenu();return}const o=$('arM');if(o)o.remove();if(run.choices){arReward(run);return}startArenaDuel()}
+async function startArenaDuel(){
+ const st=arStore(),run=st.run;if(!run){showMenu();return}
+ const mine=getDeck();if(!deckCheck(mine).ok){showBuild();return}
+ const o=$('arM');if(o)o.remove();
+ leaveGame();view='game';
+ const n=run.n,ai=arAi(n),fx=arFx(run);
+ const ad=autoDeck(undefined,undefined,undefined,true),ax=extraFor(ad),pa=aiPersona();
+ G={pr:[who0(),{n:(ai.boss?'Boss · ':'')+pa.n,img:pa.img}],p:[mkP(mine,getExtra()),mkP(ad,ax)],turn:0,n:1,field:null,over:false,busy:true,ai:false,log:[],t0:0,tm:null,pop:null,newC:null};
+ G.arena={n,boss:ai.boss,fx,ai};
+ P(0).lp=Math.max(1,Math.min(AR_MAX,run.lp));P(1).lp=ai.lp;
+ ui={};
+ mountGame();
+ const sd=$('cbSide');if(sd&&sd.firstElementChild)sd.firstElementChild.insertAdjacentHTML('afterend',arHud(run,ai));
+ for(let k=0;k<5;k++){P(0).hand.push(P(0).deck.shift());P(1).hand.push(P(1).deck.shift())}
+ for(let k=0;k<fx.draw;k++){const c=P(0).deck.shift();if(c)P(0).hand.push(c)}
+ for(let k=0;k<ai.draw;k++){const c=P(1).deck.shift();if(c)P(1).hand.push(c)}
+ log('Arène · duel '+n+(ai.boss?' · BOSS':'')+' · tu as '+P(0).lp+' points de vie.');
+ await startTurn();
+}
+function arHud(run,ai){
+ const list=Object.keys(run.boons||{}).filter(id=>run.boons[id]>0&&arB(id)).map(id=>'<span>'+esc(arB(id).t)+(run.boons[id]>1?' ×'+run.boons[id]:'')+'</span>').join('');
+ return '<div class="ar-hud"><small>ARÈNE</small><b>Duel '+run.n+(ai.boss?'<i>BOSS</i>':'')+'</b><div>'+(list||'<em>Aucune capacité pour l’instant</em>')+'</div></div>';
+}
+/* fin d'un duel d'Arène */
+function arEnd(winner){
+ const A=G.arena,lpEnd=P(0).lp;
+ setTimeout(()=>{
+  if(!alive)return;
+  const st=arStore(),run=st.run;if(!run){showMenu();return}
+  if(winner===0){
+   run.lp=Math.max(1,Math.min(AR_MAX,lpEnd));run.wins=(run.wins|0)+1;if(A.boss)run.rr=(run.rr|0)+1;run.n=A.n+1;
+   run.boss=A.boss;run.choices=arChoices(run,A.boss);arSave(st);
+   banner(A.boss?'BOSS VAINCU':'VICTOIRE','#5be08a');
+   setTimeout(()=>{if(alive)arReward(arStore().run)},1200);
+  }else{arFinish(false)}
+ },900);
+}
+/* écran de choix après une victoire */
+function arReward(run){
+ if(!run)return;
+ let m=$('arM');if(!m){m=document.createElement('div');m.id='arM';m.className='dl-m';document.body.appendChild(m)}
+ const w=run.wins|0,from=Math.max(1,w-3);
+ let rt='';for(let k=from;k<=w+6;k++){const bossN=k%5===0,done=k<=w,cur=k===w+1;rt+=(k>from?'<u></u>':'')+'<i class="'+(done?'d':cur?'c':bossN?'b':'')+'">'+k+(bossN?' · BOSS':'')+'</i>'}
+ const pc=Math.round(run.lp/AR_MAX*100),nextBoss=(w+1)%5===0;
+ m.innerHTML='<div class="dl-mw"><div class="dl-rt">'+rt+'</div><div class="dl-mt"><small>'+(run.boss?'BOSS VAINCU · DUEL '+w:'DUEL '+w+' REMPORTÉ')+'</small><h2>Victoire ! Choisis une capacité</h2></div>'+
+  '<div class="dl-hp"><span>Vie</span><u><i style="width:'+pc+'%"></i></u><b>'+run.lp+' / '+AR_MAX+'</b><span>· Prochain : duel '+(w+1)+(nextBoss?' · BOSS':', adversaire plus fort')+'</span></div>'+
+  '<div class="dl-bn">'+run.choices.map((id,i)=>{const b=arB(id),c=AR_RC[b.r];return '<button class="dl-b" type="button" style="--rc:'+c+'" data-id="'+id+'"><span class="rr">'+AR_RN[b.r]+'</span><svg viewBox="0 0 24 24">'+AR_IC[b.ic]+'</svg><b>'+b.t+'</b><span class="ty">'+b.ty+'</span><span class="ef">'+b.ef+'</span><span class="cs">'+(b.cs||'&nbsp;')+'</span></button>'}).join('')+'</div>'+
+  '<div class="dl-mf2"><button type="button" data-k="rr"'+((run.rr|0)>0?'':' disabled')+'>↻ Relancer · '+(run.rr|0)+' restant'+((run.rr|0)>1?'s':'')+'</button><button type="button" data-k="pass">Passer · récupère 500 de vie</button></div>'+
+  '<div class="ar-act">Capacités actives : '+(Object.keys(run.boons||{}).filter(id=>run.boons[id]>0&&arB(id)).map(id=>'<span>'+esc(arB(id).t)+(run.boons[id]>1?' ×'+run.boons[id]:'')+'</span>').join('')||'<span>aucune</span>')+'</div></div>';
+ m.onclick=e=>{
+  const b=e.target.closest('button');if(!b||b.disabled)return;
+  const st=arStore(),r=st.run;if(!r||!r.choices)return;
+  if(b.dataset.id){
+   const id=b.dataset.id;if(!r.choices.includes(id))return;
+   r.boons=r.boons||{};r.boons[id]=(r.boons[id]|0)+1;
+   if(id==='soin')r.lp=Math.min(AR_MAX,r.lp+2000);if(id==='festin')r.lp=Math.min(AR_MAX,r.lp+4000);if(id==='pacte')r.lp=Math.max(1,r.lp-1500);
+   r.choices=null;arSave(st);arPlay();
+  }else if(b.dataset.k==='rr'){if((r.rr|0)<1)return;r.rr--;r.choices=arChoices(r,r.boss);arSave(st);arReward(r)}
+  else if(b.dataset.k==='pass'){r.lp=Math.min(AR_MAX,r.lp+500);r.choices=null;arSave(st);arPlay()}
+ };
+}
+/* fin de série (défaite ou abandon) */
+function arFinish(forfeit){
+ const st=arStore(),run=st.run,wins=run?(run.wins|0):0,rec=wins>st.best,list=run?Object.keys(run.boons||{}).filter(id=>run.boons[id]>0&&arB(id)).map(id=>arB(id).t+(run.boons[id]>1?' ×'+run.boons[id]:'')):[];
+ st.best=Math.max(st.best,wins);st.run=null;arSave(st);
+ if(G){G.over=true}stopTimer();
+ let m=$('arM');if(!m){m=document.createElement('div');m.id='arM';m.className='dl-m';document.body.appendChild(m)}
+ m.innerHTML='<div class="dl-mw ar-end"><div class="dl-mt"><small>'+(forfeit?'SÉRIE ABANDONNÉE':'SÉRIE TERMINÉE')+'</small><h2>'+(wins?wins+' victoire'+(wins>1?'s':''):'Aucune victoire')+'</h2></div>'+
+  '<p class="ar-best">'+(rec&&wins>0?'Nouveau record !':'Meilleure série : '+st.best+' victoire'+(st.best>1?'s':''))+'</p>'+
+  (list.length?'<div class="ar-act">Capacités gagnées : '+list.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>':'')+
+  '<div class="dl-mf2"><button type="button" data-k="again">Nouvelle série</button><button type="button" data-k="back">Retour aux Duels</button></div></div>';
+ m.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.k==='again'){arStart()}else if(b.dataset.k==='back'){m.remove();showMenu()}};
+}
+async function arAbandon(){const r=await ask('Abandonner la série ?','Ta série en cours sera terminée.',[{v:true,t:'Abandonner'},{v:false,t:'Annuler',sec:1}]);if(!r)return;arFinish(true)}
 /* ---------- écran Duels : une rangée de lames qui s'ouvrent au clic ---------- */
 function dlNote(t){let n=document.getElementById('dlNote');if(!n){n=document.createElement('div');n.id='dlNote';n.className='dl-note';document.body.appendChild(n)}n.textContent=t;n.classList.add('on');clearTimeout(dlNote.t);dlNote.t=setTimeout(()=>n.classList.remove('on'),2800)}
 const DL_BK=['Noir','Bleu nuit','Rouge sobre','Clair'];
@@ -1331,14 +1438,16 @@ function showMenu(){
  view='menu';leaveGame();
  const d=getDeck(),ck=deckCheck(d);
  const soon=t=>'<button class="dl-go" data-a="soon" data-t="'+t+'">Bientôt disponible</button>';
+ const arS=arStore(),arR=arS.run;
  const M=[
   {k:'d1',ac:'#4aa9ff',art:'<img class="ph" src="combat/img/duel/gojo-sukuna.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'EN LIGNE · 1 CONTRE 1',h:'Duel',p:'Affronte un autre joueur : invite un ami de ton compte, ou joue avec un code à 4 lettres.',chips:['Entre amis','Code à 4 lettres'],
    acts:'<button class="dl-go dl-big" data-a="friends"><span>Entre amis</span><small>Invite un ami de ton compte Kuroven</small></button><button class="dl-sc dl-big" data-a="soon" data-t="La partie rapide"><span>Partie rapide</span><small>Bientôt : un adversaire trouvé automatiquement</small></button><div class="dl-jn"><input id="dlCode" maxlength="4" placeholder="CODE" autocomplete="off" aria-label="Code du duel"><button class="dl-sc" data-a="join">Rejoindre</button><button class="dl-sc" data-a="host">Créer un code</button></div>'},
   {k:'rk',ac:'#ffd84a',art:'<div class="dl-rk">'+DL_TROPHY+'</div>',bd:'Bientôt',bc:'',tag:'EN LIGNE · CLASSÉ',h:'Classé',p:'Grimpe dans le classement de la saison. Ton niveau monte et descend à chaque duel, comme sur les autres jeux du site.',chips:['Niveau (Elo)','Saisons'],acts:soon('Le classé')},
   {k:'d2',ac:'#ffb02e',art:'<img class="ph" src="combat/img/duel/jojo-2v2.jpg" alt="">',bd:'Bientôt',bc:'',tag:'EN LIGNE · 2 CONTRE 2',h:'2 contre 2',p:'Forme une équipe avec un ami et affrontez deux autres joueurs. Les tours alternent entre les deux camps.',chips:['Équipes de 2','4 joueurs'],acts:soon('Le 2 contre 2 en ligne')},
   {k:'dr',ac:'#c05cff',art:'<div class="dl-drbg"></div>'+dlDraftArt(),bd:'Bientôt',bc:'',tag:'EN LIGNE · NOUVEAU MODE',h:'Tirage de deck',p:'Pas de deck à préparer : chacun construit le sien en direct, par tirage, carte après carte, puis vous vous affrontez.',chips:['Deck construit en direct','Aucun deck requis'],acts:soon('Le tirage de deck')},
-  {k:'ar',ac:'#ff5a36',art:'<img class="ph" src="combat/img/duel/arene.jpg" alt="">',bd:'Bientôt',bc:'',tag:'SOLO · SURVIE',h:'Arène',p:'Enchaîne les duels contre des adversaires de plus en plus forts. Tes points de vie ne se rechargent pas : après chaque victoire, choisis une capacité.',chips:['Vie reportée','1 capacité par victoire','Boss tous les 5 duels'],
-   extra:'<div class="dl-st"><div>Meilleure série<b>0 victoire</b></div><div>Série en cours<b>—</b></div></div>',acts:'<button class="dl-go" data-a="soon" data-t="L’arène">Bientôt disponible</button><button class="dl-sc" data-a="reward">Voir une récompense</button>'}
+  {k:'ar',ac:'#ff5a36',art:'<img class="ph" src="combat/img/duel/arene.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'SOLO · SURVIE',h:'Arène',p:'Enchaîne les duels contre des adversaires de plus en plus forts. Tes points de vie ne se rechargent pas : après chaque victoire, choisis une capacité.',chips:['Vie reportée','1 capacité par victoire','Boss tous les 5 duels'],
+   extra:'<div class="dl-st"><div>Meilleure série<b>'+arS.best+' victoire'+(arS.best>1?'s':'')+'</b></div><div>Série en cours<b>'+(arR?'Duel '+arR.n+' · '+arR.lp+' PV':'—')+'</b></div></div>',
+   acts:(arR?'<button class="dl-go" data-a="ar-resume">Reprendre la série</button><button class="dl-sc" data-a="ar-quit">Abandonner</button>':'<button class="dl-go" data-a="ar-start">Commencer une série</button>')+'<button class="dl-sc" data-a="reward">Voir un exemple de choix</button>'}
  ];
  const fan=d.slice(0,3).map((id,i)=>REG[id]?'<span class="dl-mf" style="--r:'+(-14+i*14)+'deg;left:'+(i*17)+'px">'+cardHTML(REG[id])+'</span>':'').join('');
  body().innerHTML=tabs('menu')+
@@ -1362,6 +1471,9 @@ function dlBind(){
   else if(a==='join'){if(dlDeckOk())joinDuel(($('dlCode').value||'').trim().toUpperCase())}
   else if(a==='soon')dlNote((b.dataset.t||'Ce mode')+' : bientôt disponible.');
   else if(a==='reward')dlReward();
+  else if(a==='ar-start'){if(dlDeckOk())arStart()}
+  else if(a==='ar-resume'){if(dlDeckOk())arPlay()}
+  else if(a==='ar-quit'){arAbandon()}
   else if(a==='ai'){if(dlDeckOk())startGame()}
   else if(a==='ai2'){if(dlDeckOk())startGame2v2()}
   else if(a==='deck')showBuild();
@@ -1988,7 +2100,7 @@ function leaveGame(keepNet){
 function mountGame(){
  const vc=document.getElementById('v-cb');if(vc)vc.classList.add('ingame');window.scrollTo(0,0);
  body().innerHTML='<div id="cbGame"><div class="cbt bk'+backN()+'" id="cbT"></div><div class="cbside" id="cbSide"><div><button class="cbchip" id="cbQuit">← Quitter la partie</button></div><div class="cbprev" id="cbPrev"></div><div class="cbact" id="cbAct"></div><div class="cbact" id="cbEvoW"></div><div id="cbHint" style="color:#e5483b;font-size:.85rem;min-height:1.2em;opacity:0;transition:opacity .3s"></div><div class="cblog" id="cbLog"></div></div></div>';
- $('cbQuit').onclick=async()=>{if(G&&!G.over){const r=await ask('Quitter la partie ?','La partie en cours sera perdue.',[{v:true,t:'Quitter'},{v:false,t:'Continuer',sec:1}]);if(!r)return}showMenu()};
+ $('cbQuit').onclick=async()=>{if(G&&!G.over){const r=await ask('Quitter la partie ?',G.arena?'La série d’Arène sera terminée.':'La partie en cours sera perdue.',[{v:true,t:'Quitter'},{v:false,t:'Continuer',sec:1}]);if(!r)return;if(G.arena){arFinish(true);return}}showMenu()};
  const b=boardEl();fit();requestAnimationFrame(fit);setTimeout(fit,150);setTimeout(fit,600);b.onclick=onBoardClick;b.onpointerdown=onDragStart;b.ondragstart=e=>e.preventDefault();b.onmouseover=onOver;b.onmouseout=onOut;$('cbAct').onclick=onAct;$('cbEvoW').onclick=onAct;
  renderPrev(null);
 }

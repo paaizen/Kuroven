@@ -1063,3 +1063,15 @@ body.cbmag-on #cbBody{visibility:hidden}
 #v-cb .dl-p:not(.on) .dl-fc.l,#v-cb .dl-p:not(.on) .dl-fc.r{opacity:.9}
 @media(max-height:780px){#v-cb .dl-ex{display:none}}
 @media(max-width:900px){#v-cb .dl-ex{display:none}}
+
+/* ===== Arène ===== */
+.ar-hud{margin:10px 0;padding:10px 12px;border-radius:12px;background:#ff5a361a;border:1px solid #ff5a3655;color:#fff;font-family:system-ui}
+.ar-hud small{display:block;font:800 10px system-ui;letter-spacing:3px;color:#ff8a70}
+.ar-hud b{display:flex;align-items:center;gap:8px;font:900 20px Georgia,serif;margin:2px 0 6px}
+.ar-hud b i{font:900 10px system-ui;font-style:normal;letter-spacing:1.5px;background:#ff5a36;color:#fff;border-radius:4px;padding:2px 6px}
+.ar-hud div{display:flex;flex-wrap:wrap;gap:4px}.ar-hud span{font:700 11px system-ui;padding:3px 8px;border-radius:99px;background:#ffffff14}.ar-hud em{font:600 11px system-ui;font-style:normal;color:#aab3c8}
+.ar-act{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;color:#aab3c8;font-size:12px;font-weight:700;align-items:center}
+.ar-act span{padding:4px 10px;border-radius:99px;background:#ffffff12;border:1px solid #ffffff1f;color:#d8dcea}
+.ar-end{text-align:center}.ar-end .dl-mt h2{font-size:56px}
+.ar-best{font:800 15px system-ui;color:#ffd84a;margin:10px 0 0}
+.dl-mf2 button:disabled{opacity:.4;cursor:not-allowed}
