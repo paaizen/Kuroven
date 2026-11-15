@@ -1077,3 +1077,4 @@ body.cbmag-on #cbBody{visibility:hidden}
 .dl-mf2 button:disabled{opacity:.4;cursor:not-allowed}
 .dl-bn{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important}
 .dl-b{min-height:280px}
+#v-cb .dl-p[data-k="rk"] .ph{object-position:50% 40%}
