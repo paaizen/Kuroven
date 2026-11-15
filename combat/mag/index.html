@@ -147,7 +147,7 @@ body.still .float{animation-play-state:paused}
 @keyframes tapeout{to{clip-path:inset(0 0 0 100%);opacity:0}}
 /* la carte qui bondit : reflet qui la balaie */
 .leapw{position:fixed;z-index:30;pointer-events:none;transform-style:preserve-3d}
-.leapw img{width:100%;height:100%;display:block;border-radius:10px;box-shadow:0 30px 70px #000c}
+.leapw>img{width:100%;height:100%;display:block;border-radius:10px;box-shadow:0 30px 70px #000c}
 .leapw:after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(112deg,#fff0 30%,#ffffff9e 47%,#fff0 60%);background-size:260% 100%;animation:sheen 1.1s ease-in-out .5s 2 both;mix-blend-mode:screen}
 @keyframes sheen{from{background-position:130% 0}to{background-position:-60% 0}}
 .punch{animation:punch .32s cubic-bezier(.2,1.6,.3,1)}
@@ -190,11 +190,11 @@ body.still .float{animation-play-state:paused}
 .lastp h2{font:900 40px/1 Impact,sans-serif;letter-spacing:2px;color:#e8283c;border-bottom:5px solid #1b1f33;padding-bottom:6px;margin-bottom:12px}
 .lastp .ls{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
 .lastp .th{display:flex;align-items:center;gap:12px;background:#fff8;border-radius:8px;padding:6px 10px 6px 6px;cursor:zoom-in;flex:1;min-height:0}
-.lastp .th img{height:100%;max-height:88px;border-radius:5px;box-shadow:0 3px 8px #0006}
-.lastp .th div{flex:1;min-width:0}.lastp .th b{display:block;font:800 15px Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lastp .th span{font:700 11px system-ui;letter-spacing:1px;opacity:.7}
-.lastp .th em{font:900 20px Impact,sans-serif;font-style:normal;opacity:.35}
+.lastp .th>img{height:100%;max-height:88px;border-radius:5px;box-shadow:0 3px 8px #0006}
+.lastp .th>div{flex:1;min-width:0}.lastp .th>div>b{display:block;font:800 15px Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lastp .th>div>span{font:700 11px system-ui;letter-spacing:1px;opacity:.7}
+.lastp .th>em{font:900 20px Impact,sans-serif;font-style:normal;opacity:.35}
 .zoomc{position:fixed;inset:0;z-index:20;background:#000c;display:grid;place-items:center;cursor:zoom-out;opacity:0;pointer-events:none;transition:opacity .25s}
-.zoomc.on{opacity:1;pointer-events:auto}.zoomc img{height:min(86vh,720px);border-radius:16px;box-shadow:0 30px 80px #000;transform:scale(.8);transition:transform .35s cubic-bezier(.2,1.3,.3,1)}.zoomc.on img{transform:none}
+.zoomc.on{opacity:1;pointer-events:auto}.zoomc>img{height:min(86vh,720px);border-radius:16px;box-shadow:0 30px 80px #000;transform:scale(.8);transition:transform .35s cubic-bezier(.2,1.3,.3,1)}.zoomc.on>img{transform:none}
 /* tranches : la pile de feuilles, dessinée feuille par feuille */
 .edge{background-size:100% 100%}
 .fore{width:var(--T);height:calc(var(--H) - 8px);left:calc((var(--W) - var(--T))/2);top:4px;transform:rotateY(90deg) translateZ(calc(var(--W)/2 - 6px))}
@@ -222,9 +222,9 @@ body.open .float,.emb .float{animation:none}
 body.open .scene{cursor:pointer}
 #v-cb.kvw{display:contents;max-width:none;margin:0;padding:0}
 .top,.views,.sons,.try{display:none!important}
-#kvx{position:fixed;right:14px;top:12px;z-index:45}
+#kvx{position:fixed;right:14px;top:12px;z-index:45}#kvs{position:fixed;right:118px;top:12px;z-index:45}
 .kc{display:block;position:relative;flex:none;border-radius:10px}
-.kc>.kci{position:absolute;left:0;top:0;width:260px;height:379px;transform-origin:0 0;transform:scale(var(--k,1));pointer-events:none}
+.kc>.kci{position:absolute;left:0;top:0;width:260px;height:379px;zoom:var(--k,1);pointer-events:none}
 .kc>.kci .y{box-shadow:none}
 .pg .cw .kc{aspect-ratio:260/379;width:auto}
 .lastp .th .kc{flex:none!important;height:88px;width:60.4px;box-shadow:0 3px 8px #0006}.lastp .th .kci{flex:none!important}
@@ -258,7 +258,7 @@ body:not(.rdy) .scene{opacity:0}.scene{transition:opacity .2s}
 <div class="sons"><a class="btn on" href="sons.html" style="text-decoration:none">♪ Choisir le son des cartes</a><b>Écouter les sons</b><button class="btn" data-s="page">Page qui passe</button><button class="btn" data-s="riff">Défilement</button><button class="btn" data-s="f5">★ Les quatre ensemble</button><button class="btn" data-s="f1">Carte 1 · glissé + tintement</button><button class="btn" data-s="f2">Carte 2 · glissé + note boisée</button><button class="btn" data-s="f3">Carte 3 · petit carillon</button><button class="btn" data-s="f4">Carte 4 · juste la carte</button><b style="margin-top:6px">Les sons d’avant, du plus récent au plus ancien</b><button class="btn" data-s="ff">A · refabriqué d’après la vidéo</button><button class="btn" data-s="fe">B · vidéo 38,6 s sans musique</button><button class="btn" data-s="fc">C · vidéo 41 s sans musique (grave)</button><button class="btn" data-s="fa">D · vidéo 41 s avec musique</button><button class="btn" data-s="fb">E · vidéo 38,6 s avec musique</button><button class="btn" data-s="fp">F · coup de poing</button><button class="btn" data-s="jeu">▶ Comme dans le jeu</button><button class="btn" data-s="hit">Ancien coup</button><button class="btn" data-s="whoosh">Souffle</button><button class="btn" data-s="rip">Papier déchiré</button><button class="btn" data-s="zap">Éclairs</button><button class="btn" data-s="ink">Encre</button><button class="btn" data-s="gojo">Gojo (version longue)</button></div>
 <div class="zoomc" id="zoomc"><img alt=""></div>
 <canvas class="fx" id="fxB"></canvas><canvas class="fx dif" id="fxA"></canvas>
-<button class="btn" id="kvx">✕ Fermer</button>
+<button class="btn" id="kvs">🔊 Son</button><button class="btn" id="kvx">✕ Fermer</button>
 <div class="hint" id="hint">Fais glisser pour le tourner dans tous les sens · molette pour zoomer · double-clic pour le reposer</div>
 <script>
 const $=id=>document.getElementById(id),mag=$('mag'),sc=$('sc');
@@ -582,8 +582,10 @@ window.__fin=()=>closeGame();
 window.__again=()=>{try{parent.postMessage({t:'kvmag-again'},'*')}catch(e){}};
 function closeGame(){try{parent.postMessage({t:'kvmag-close'},'*')}catch(e){}}
 $('kvx').onclick=closeGame;
-addEventListener('message',e=>{const d=e.data;if(!d||d.t!=='kvmag'||isOpen||pending)return;window.MUTE=!d.snd;
- window.LEFT=d.left|0;for(const k in CARDS)delete CARDS[k];d.cards.forEach((c,i)=>{CARDS[i]=[c.n,c.ser,c.full?5:c.r,!!c.full,c.html,c.img,!!c.nw]});
+window.__lab=()=>{$('kvs').textContent=window.MUTE?'🔇 Son coupé':'🔊 Son'};window.__lab();
+$('kvs').onclick=()=>{window.MUTE=!window.MUTE;window.__lab();try{parent.postMessage({t:'kvmag-snd',on:!window.MUTE},'*')}catch(e){}};
+addEventListener('message',e=>{const d=e.data;if(!d||d.t!=='kvmag'||isOpen||pending)return;window.MUTE=!d.snd;window.__lab&&window.__lab();
+ window.LEFT=d.left|0;for(const k in CARDS)delete CARDS[k];d.cards.forEach((c,i)=>{CARDS[i]=[c.n,c.ser,c.full?5:c.r,!!c.full,String(c.html).replace(/ loading="lazy"/g,''),c.img,!!c.nw]});
  const ids=d.cards.map((c,i)=>i),best=Math.max.apply(null,ids.map(i=>CARDS[i][2])),kind=best>=5?'jack':best===4?'leg':best===3?'epic':'com';PULLS[kind]=ids;
  const go=()=>{if(texReady[0]&&texReady[1]&&texReady[2])startOpen(kind);else setTimeout(go,80)};let t0=performance.now()+2300;const chk=()=>{if(down)t0=performance.now()+800;if(performance.now()>=t0)go();else setTimeout(chk,100)};chk()});
 {let tries=0;const rdy=()=>{document.body.classList.add('rdy');try{parent.postMessage({t:'kvmag-ready'},'*')}catch(e){}};const chk=()=>{if(texReady[0]&&texReady[1]&&texReady[2]){requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(rdy,60)))}else if(++tries>60)rdy();else setTimeout(chk,80)};chk()}

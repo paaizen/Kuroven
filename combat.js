@@ -1452,12 +1452,13 @@ function openMagazine(type,n){preloadMag();
  const all=[];
  for(let i=0;i<n;i++){const cs=rollPack(type);stockUse(1);ls.set('cblast',cs.map(c=>c.id));const nw=addToCol(cs.map(c=>c.id));cs.forEach(c=>all.push({c,nw:nw.includes(c.id)}))}
  const ov=document.createElement('div');ov.id='cbOpen';ov.className='cbmag';
- ov.innerHTML='<iframe src="combat/mag/index.html?v=7" title="Ouverture du magazine" allow="autoplay"></iframe>';
+ ov.innerHTML='<iframe src="combat/mag/index.html?v=8" title="Ouverture du magazine" allow="autoplay"></iframe>';
  (document.getElementById('v-cb')||document.body).appendChild(ov);
  const fr=ov.firstChild;
  const data={t:'kvmag',snd:SND.on(),left:stockState().n,cards:all.map(({c,nw})=>({n:c.n,ser:(c.k==='e'?(c.mats&&c.mats[0]&&c.mats[0].series):c.series)||(c.k==='s'?(c.t==='trap'?'Carte Piège':c.t==='field'?'Carte Terrain':'Carte Magie'):'Kuroven'),r:rarityOf(c),full:c.k==='e'&&FULLART.has(c.eid),nw,html:cardHTML(c),img:c.k==='e'?'combat/img/evo-'+c.eid+'.jpg':(c.img||'')}))};
  const onMsg=e=>{if(!fr.isConnected){removeEventListener('message',onMsg);return}if(e.source!==fr.contentWindow||!e.data)return;
   if(e.data.t==='kvmag-ready'){fr._ok=1;fr.contentWindow.postMessage(data,'*')}
+  if(e.data.t==='kvmag-snd')ls.set('cbsnd',e.data.on?1:0);
   if(e.data.t==='kvmag-close'){removeEventListener('message',onMsg);closeBoost();showBoosters()}
   if(e.data.t==='kvmag-again'){removeEventListener('message',onMsg);closeBoost();if(stockState().n>=1)openBooster(type,1);else showBoosters()}};
  addEventListener('message',onMsg);
