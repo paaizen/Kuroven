@@ -333,6 +333,13 @@ function checkEnd(){
  if(!G||G.over)return;
  if(P(0).lp<=0&&G.arena&&G.arena.fx.phenix>0&&P(1).lp>0){G.arena.fx.phenix--;arSpendPhoenix();setLP(0,2000);log('Phénix : tu reviens avec 2 000 points de vie.');banner('PHÉNIX','#ffb02e');return}
  if(P(0).lp<=0)endGame(1,'Tes points de vie tombent à 0.');else if(P(1).lp<=0)endGame(0,'Les points de vie adverses tombent à 0.');
+ else{
+  /* plus aucune carte (pioche, main et terrain vides) : impossible de jouer, la partie est décidée tout de suite */
+  const nc=pi=>G.p[pi].pl.every(pl=>!pl.deck.length&&!pl.hand.length)&&G.p[pi].mon.every(m=>!m),a=nc(0),b=nc(1);
+  if(a&&!b)endGame(1,'Tu n’as plus aucune carte : défaite automatique.');
+  else if(b&&!a)endGame(0,'L’adversaire n’a plus aucune carte : victoire automatique.');
+  else if(a&&b)P(0).lp>P(1).lp?endGame(0,'Plus aucune carte de chaque côté : tu gagnes avec plus de points de vie.'):endGame(1,'Plus aucune carte de chaque côté : l’adversaire gagne avec plus de points de vie.')
+ }
 }
 function setLP(pi,v){P(pi).lp=Math.max(0,v);const n=$('cbLp'+pi);if(n){const from=+n.textContent;const t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/700);n.textContent=Math.round(from+(P(pi).lp-from)*k);if(k<1&&alive)requestAnimationFrame(step)};requestAnimationFrame(step)}}
 function bigDmg(pi,v){const b=boardEl();if(!b)return;const r=b.getBoundingClientRect(),d=document.createElement('div');d.className='cbbig';d.textContent='− '+v;d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+r.height*(pi===1?.2:.74))+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1500)}
@@ -802,6 +809,7 @@ async function startTurn(){
  if(pi===0&&G.arena&&G.arena.fx.regen){const h=Math.min(G.arena.fx.regen,Math.max(0,G.arena.mx-P(0).lp));if(h>0)heal(0,h)}
  if(G.n>1){if(isH(pi))G.needDraw=true;else if(!NET)await drawN(pi,1)}
  if(G.over)return;
+ checkEnd();if(G.over)return;
  G.busy=false;render();
  if(isH(pi))startTimer();else if(NET){startTimer();remoteLoop()}else aiTurn(pi);
 }
@@ -1555,7 +1563,7 @@ function qStop(){if(!QS)return;const q=QS;QS=null;clearInterval(q.iv);clearInter
 function qSearch(ranked){
  if(typeof sb==='undefined'||!sb){dlNote('Connexion au serveur impossible.');return}
  qStop();
- const w=who0(),rk=rkStore(),u=Math.random().toString(36).slice(2,10),t0=Date.now(),code4=()=>Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('');
+ const w=who0(),rk=rkStore(),u=Math.random().toString(36).slice(2,10),t0=Date.now(),code4=()=>Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXY'[rnd(22)]).join('');
  const m=document.createElement('div');m.id='qM';m.className='dl-m';
  const ri=rkInfo(rk.elo);
  m.innerHTML='<div class="dl-mw ar-end"><div class="dl-mt"><small>'+(ranked?'DUEL CLASSÉ':'PARTIE RAPIDE')+'</small><h2 id="qT">Recherche d’un adversaire…</h2></div><p class="ar-best" id="qS">0:00</p>'+(ranked?'<p class="q-r">Ton rang : <b style="color:'+ri.col+'">'+ri.name+'</b> · '+rk.elo+' Elo</p>':'')+'<div class="dl-mf2"><button type="button" id="qC">Annuler</button></div></div>';
@@ -1590,7 +1598,7 @@ function qSearch(ranked){
  },1000);
 }
 /* ---------- TIRAGE DE DECK (comme le « Triple Draft » de Clash Royale) : 3 cartes proposées, on en garde une, 20 fois ---------- */
-let DR=null;const DR_OPT=3;
+let DR=null;const DR_ALPHA='ABCDEFGHJKMNPQRSTUVWXY',DR_OPT=3;
 function drOffer(picks){
  const have=new Set(picks),sup=picks.filter(i=>REG[i]&&isSup(REG[i])).length,ev=picks.filter(i=>evolvableId(i)).length,low=picks.some(i=>REG[i]&&REG[i].k==='c'&&REG[i].lvl<=4),left=MAXD-picks.length;
  let pool=CHARS.concat(SUP).filter(c=>!have.has(c.id)&&!(isSup(c)&&sup>=MAXS)&&!(evolvableId(c.id)&&ev>=MAXX));
@@ -1599,7 +1607,8 @@ function drOffer(picks){
  let g=0;while(out.length<Math.min(DR_OPT,pool.length)&&g++<200){const rs=tr(),c=pool.filter(k=>rs.includes(rarityOf(k))&&!out.includes(k));const k=c.length?c[rnd(c.length)]:pool[rnd(pool.length)];if(k&&!out.includes(k))out.push(k)}
  return out;
 }
-function drStart(){DRAFT_ON=null;DR={picks:[],offer:null};drNext()}
+let DR_NEXT=null;
+function drStart(next){DRAFT_ON=null;DR_NEXT=next||null;DR={picks:[],offer:null};drNext()}
 function drNext(){DR.offer=drOffer(DR.picks);drRender()}
 function drRender(){
  view='draft';try{leaveGame()}catch(e){}
@@ -1614,13 +1623,14 @@ function drRender(){
 function drDone(){
  const ids=DR.picks.slice();DR=null;DRAFT_ON=ids;view='draft';
  const ck=deckCheck(ids);
+ {const nx=DR_NEXT;DR_NEXT=null;if(nx&&ck.ok){if(nx==='host'){hostDuel(true,'Z'+Array.from({length:3},()=>DR_ALPHA[rnd(DR_ALPHA.length)]).join(''));return}if(nx.join){joinDuel(nx.join);return}}}
  body().innerHTML=tabs('menu')+'<div class="dr dr-end"><header><small>TIRAGE TERMINÉ</small><h1>Ton deck est prêt</h1><p>'+(ck.ok?'Il sera utilisé pour le prochain duel, puis disparaîtra.':'Deck invalide : '+esc(ck.msg))+'</p></header>'+
   '<div class="dr-g">'+ids.map(id=>REG[id]?'<span class="dr-m"><img src="'+esc(REG[id].img||'')+'" alt="" loading="lazy" referrerpolicy="no-referrer"><b>'+esc(REG[id].n)+'</b></span>':'').join('')+'</div>'+
   '<div class="dr-play"><button class="dl-go" data-a="host">Créer un duel · inviter un ami</button><div class="dl-jn"><input id="drCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="dl-sc" data-a="join">Rejoindre</button></div><button class="dl-sc" data-a="quick">Chercher un adversaire</button><button class="dl-sc" data-a="ai">Contre l’IA</button><button class="dl-sc" data-a="ai2">2 contre 2 avec l’IA</button><button class="dl-sc" data-a="again">Refaire un tirage</button></div></div>';
  bindTabs();
  const code=$('drCode');code.oninput=()=>{code.value=code.value.toUpperCase().replace(/[^A-Z]/g,'')};
  body().querySelector('.dr-play').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
-  if(a==='host')hostDuel(true);else if(a==='join')joinDuel((code.value||'').trim().toUpperCase());else if(a==='quick')qSearch(false);
+  if(a==='host')hostDuel(true,'Z'+Array.from({length:3},()=>DR_ALPHA[rnd(DR_ALPHA.length)]).join(''));else if(a==='join')joinDuel((code.value||'').trim().toUpperCase());else if(a==='quick')qSearch(false);
   else if(a==='ai')startGame();else if(a==='ai2')startGame2v2();else if(a==='again')drStart()};
 }
 /* ---------- écran Duels : une rangée de lames qui s'ouvrent au clic ---------- */
@@ -1651,7 +1661,7 @@ function showMenu(){
   {k:'rk',ac:'#ffd84a',art:'<img class="ph" src="combat/img/duel/classe.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'EN LIGNE · CLASSÉ',h:'Classé',p:'Affronte des joueurs de ton niveau. Chaque victoire fait monter ton Elo, chaque défaite le fait baisser, comme aux échecs. Monte de Bronze jusqu’à Grand maître.',chips:['Elo','Bronze → Grand maître','Adversaire de ton niveau'],extra:rkCard(),
    acts:'<button class="dl-go dl-big" data-a="rank"><span>Chercher un duel classé</span><small>Un adversaire proche de ton rang</small></button>'},
   {k:'d2',ac:'#ffb02e',art:'<img class="ph" src="combat/img/duel/jojo-2v2.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'2 CONTRE 2',h:'2 contre 2',p:'Toi et un coéquipier IA affrontez deux adversaires IA. Les tours alternent entre les deux camps. Le 2 contre 2 en ligne, avec de vrais joueurs, arrive plus tard.',chips:['Équipes de 2','Avec l’IA'],acts:'<button class="dl-go" data-a="ai2">Jouer en 2 contre 2</button>'},
-  {k:'dr',ac:'#c05cff',art:'<div class="dl-drbg"></div>'+dlDraftArt(),bd:'Nouveau',bc:'nw',tag:'TIRAGE · SOLO OU EN LIGNE',h:'Tirage de deck',p:'Pas de deck à préparer : on te propose 3 cartes, tu en gardes une, et tu recommences jusqu’à avoir 20 cartes. Ensuite, affronte l’IA, un ami (code ou invitation) ou un adversaire trouvé.',chips:['3 cartes proposées','20 picks','Avec amis','2 contre 2 avec l’IA'],acts:'<button class="dl-go" data-a="draft">Lancer un tirage</button>'},
+  {k:'dr',ac:'#c05cff',art:'<div class="dl-drbg"></div>'+dlDraftArt(),bd:'Nouveau',bc:'nw',tag:'TIRAGE · SOLO OU EN LIGNE',h:'Tirage de deck',p:'Pas de deck à préparer : on te propose 3 cartes, tu en gardes une, et tu recommences jusqu’à avoir 20 cartes. Ensuite, affronte l’IA, un ami (code ou invitation) ou un adversaire trouvé.',chips:['3 cartes proposées','20 picks','Avec amis','2 contre 2 avec l’IA'],acts:'<button class="dl-go" data-a="drfriend">Tirage avec un ami (invitation)</button><button class="dl-sc" data-a="draft">Tirage seul : IA, adversaire trouvé, 2 contre 2</button>'},
   {k:'ar',ac:'#ff5a36',art:'<img class="ph" src="combat/img/duel/arene.jpg" alt="">',bd:'Disponible',bc:'ok',tag:'SOLO · SURVIE',h:'Arène',p:'Enchaîne les duels contre des adversaires de plus en plus forts. Tes points de vie ne se rechargent pas : après chaque victoire, choisis une capacité.',chips:['Vie reportée','1 capacité par victoire','Boss tous les 5 duels'],
    extra:'<div class="dl-st"><div>Meilleure série<b>'+arS.best+' victoire'+(arS.best>1?'s':'')+'</b></div><div>Série en cours<b>'+(arR?'Duel '+arR.n+' · '+arR.lp+' PV':'—')+'</b></div></div>',
    acts:(arR?'<button class="dl-go" data-a="ar-resume">Reprendre la série</button><button class="dl-sc" data-a="ar-quit">Abandonner</button>':'<button class="dl-go" data-a="ar-start">Commencer une série</button>')+'<button class="dl-sc" data-a="reward">Voir un exemple de choix</button>'}
@@ -1681,6 +1691,7 @@ function dlBind(){
   else if(a==='quick'){if(dlDeckOk())qSearch(false)}
   else if(a==='rank'){if(dlDeckOk())qSearch(true)}
   else if(a==='draft')drStart();
+  else if(a==='drfriend')drStart('host');
   else if(a==='ar-start'){if(dlDeckOk())arStart()}
   else if(a==='ar-resume'){if(dlDeckOk())arPlay()}
   else if(a==='ar-quit'){arAbandon()}
@@ -2350,11 +2361,11 @@ async function startOnline(o){
 }
 function showOnline(msg){showMenu();if(msg)dlNote(msg)}
 async function hostDuel(inv,given,onReady){
- const code=given||Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('');
+ const code=given||Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXY'[rnd(22)]).join('');
  dlNote('Création du duel…');
  try{await netOpen(code)}catch(e){showOnline(e.message);return}
  if(onReady)onReady();
- body().innerHTML=tabs('menu')+'<div class="cbcard" style="text-align:center"><h2 style="margin-top:0">'+(given?'Adversaire trouvé…':'En attente d’un ami…')+'</h2><p>Donne ce code à ton ami :</p><div style="font:900 3rem Georgia,serif;letter-spacing:.3em;margin:10px 0">'+code+'</div><p style="color:var(--mut)">Il doit aller dans Kuroven Combat, « Duel en ligne », puis taper le code. La partie démarre toute seule.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cbbtn lt" id="cbInv">📨 Inviter des amis</button><button class="cbbtn" id="cbCancel">Annuler</button></div></div>';
+ body().innerHTML=tabs('menu')+'<div class="cbcard" style="text-align:center"><h2 style="margin-top:0">'+(given&&given[0]!=='Z'?'Adversaire trouvé…':'En attente d’un ami…')+'</h2><p>'+(given&&given[0]==='Z'?'Duel avec tirage de deck : ton ami tire aussi ses 20 cartes avant de te rejoindre. Donne-lui ce code :':'Donne ce code à ton ami :')+'</p><div style="font:900 3rem Georgia,serif;letter-spacing:.3em;margin:10px 0">'+code+'</div><p style="color:var(--mut)">Il doit aller dans Kuroven Combat, « Duel en ligne », puis taper le code. La partie démarre toute seule.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cbbtn lt" id="cbInv">📨 Inviter des amis</button><button class="cbbtn" id="cbCancel">Annuler</button></div></div>';
  bindTabs();$('cbCancel').onclick=()=>showOnline();$('cbInv').onclick=()=>{if(typeof cbInvite==='function')cbInvite(code);else dlNote('Connecte-toi pour inviter tes amis.')};
  if(inv&&typeof cbInvite==='function')cbInvite(code);
  NET.onLobby=pl=>{
@@ -2367,6 +2378,7 @@ async function hostDuel(inv,given,onReady){
 async function joinDuel(code){
  const msg={set textContent(t){dlNote(t)}};
  if(!/^[A-Z]{4}$/.test(code)){msg.textContent='Entre le code à 4 lettres.';return}
+ if(code[0]==='Z'&&!DRAFT_ON){dlNote('Duel avec tirage de deck : tire d’abord tes 20 cartes.');drStart({join:code});return}
  msg.textContent='Connexion…';
  try{await netOpen(code)}catch(e){showOnline(e.message);return}
  const n=NET;let ok=false;
