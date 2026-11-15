@@ -929,3 +929,12 @@ body.cbfull,body.cbfull #v-cb{background:#0c0f17!important}
  .cbs-sub{display:none!important}
  .cbs-bot{flex-direction:row;flex-wrap:wrap;align-items:center;margin-top:0;padding:6px 8px;gap:6px 10px}.cbs-l,.cbs-dk,.cbs-st{display:none}.cbs-cta{padding:6px 14px;font-size:12px}.cbs-foot{border:0;padding:0;flex:1;justify-content:flex-end}
 }
+body.cbmag-on #cbBody{visibility:hidden}
+
+/* le booster de l'accueil : le magazine entier, avec sa tranche et ses pages */
+.pk.art.mag{background:none!important;box-shadow:none!important;border-radius:0;overflow:visible;aspect-ratio:564/1000;height:auto;width:170px}
+.pk.art.mag.big{width:200px;height:auto}
+.hb-pack .pk.art.mag{width:min(310px,64vw);height:auto;aspect-ratio:564/1000;border-radius:0;box-shadow:none!important}
+.pk.art.mag img{filter:drop-shadow(0 22px 26px #000c);transition:transform .35s cubic-bezier(.2,.9,.3,1)}
+.pkb:hover .pk.art.mag img{transform:translateY(-6px) rotate(-1.5deg) scale(1.03)}
+.pk.art.mag:before,.pk.art.mag:after{display:none!important;content:none!important}

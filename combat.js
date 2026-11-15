@@ -1388,7 +1388,7 @@ function stockUse(k){const st=stockState(),was=st.n>=STOCK_MAX;st.n=Math.max(0,s
 const stockWait=()=>{const st=stockState();return st.n>=STOCK_MAX?0:Math.max(0,STOCK_MS-(Date.now()-st.t))};
 const fmtMs=ms=>{const t=Math.ceil(ms/1000);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
 function packHTML(t,big){
- return '<div class="pk art'+(big?' big':'')+'"><img src="combat/img/booster.png?v=2" alt="Booster" draggable="false"><i class="pk-shine"></i></div>';
+ return '<div class="pk art mag'+(big?' big':'')+'"><img src="combat/img/mag-home.png?v=2" alt="Magazine Weekly Kuroven Jump" draggable="false"></div>';
 }
 let boostQty=1,boostTm=null;
 const PKN=10;
@@ -1426,7 +1426,7 @@ function showBoosters(){
  $('cbPk').onclick=go;$('cbOpenB').onclick=go;$('cbPkInfo').onclick=showPackInfo;$('cbGoDeck').onclick=showBuild;
  document.querySelectorAll('.hb-c').forEach(el=>el.onclick=()=>{const c=REG[el.dataset.id];if(c)openZoom(el,{c},'')});
 }
-function closeBoost(){const o=document.getElementById('cbOpen');if(o){o.onpointerdown=o.onpointermove=o.onpointerup=null;o.remove()}}
+function closeBoost(){document.body.classList.remove('cbmag-on');const o=document.getElementById('cbOpen');if(o){o.onpointerdown=o.onpointermove=o.onpointerup=null;o.remove()}}
 /* sons fabriqués par le navigateur (aucun fichier audio) ; coupables avec le bouton Son */
 const SND=(()=>{let ac=null;const on=()=>ls.get('cbsnd',1)!==0;
  const ctx=()=>{if(!on())return null;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();return ac}catch(e){return null}};
@@ -1442,22 +1442,23 @@ const SND=(()=>{let ac=null;const on=()=>ls.get('cbsnd',1)!==0;
 })();
 /* ouverture « magazine » : les cartes tirées sont envoyées à combat/mag/, qui joue toute l'animation.
    Si le navigateur ne sait pas l'afficher, on garde l'ancienne ouverture ci-dessous. */
-/* le magazine est coupé pour tout le monde tant qu'il n'est pas fluide ; on peut le tester avec ?mag=1 ou localStorage cbmag=1 */
-const MAG_ON=()=>{try{return /[?&]mag=1/.test(location.search)||localStorage.getItem('cbmag')==='1'}catch(e){return false}};
+/* le magazine est actif pour tout le monde ; on peut le couper avec ?mag=0 ou localStorage cbmag=0 */
+const MAG_ON=()=>{try{return !/[?&]mag=0/.test(location.search)&&localStorage.getItem('cbmag')!=='0'}catch(e){return true}};
 function openMagazine(type,n){
  try{if(!document.createElement('canvas').getContext('webgl'))return false}catch(e){return false}
- closeBoost();clearInterval(boostTm);
+ closeBoost();clearInterval(boostTm);document.body.classList.add('cbmag-on');
  const all=[];
  for(let i=0;i<n;i++){const cs=rollPack(type);stockUse(1);ls.set('cblast',cs.map(c=>c.id));const nw=addToCol(cs.map(c=>c.id));cs.forEach(c=>all.push({c,nw:nw.includes(c.id)}))}
  const ov=document.createElement('div');ov.id='cbOpen';ov.className='cbmag';
- ov.innerHTML='<iframe src="combat/mag/index.html?v=1" title="Ouverture du magazine" allow="autoplay"></iframe>';
+ ov.innerHTML='<iframe src="combat/mag/index.html?v=5" title="Ouverture du magazine" allow="autoplay"></iframe>';
  (document.getElementById('v-cb')||document.body).appendChild(ov);
  const fr=ov.firstChild;
  const data={t:'kvmag',snd:SND.on(),cards:all.map(({c,nw})=>({n:c.n,ser:(c.k==='e'?(c.mats&&c.mats[0]&&c.mats[0].series):c.series)||(c.k==='s'?(c.t==='trap'?'Carte Piège':c.t==='field'?'Carte Terrain':'Carte Magie'):'Kuroven'),r:rarityOf(c),full:c.k==='e'&&FULLART.has(c.eid),nw,html:cardHTML(c),img:c.k==='e'?'combat/img/evo-'+c.eid+'.jpg':(c.img||'')}))};
  const onMsg=e=>{if(!fr.isConnected){removeEventListener('message',onMsg);return}if(e.source!==fr.contentWindow||!e.data)return;
-  if(e.data.t==='kvmag-ready')fr.contentWindow.postMessage(data,'*');
+  if(e.data.t==='kvmag-ready'){fr._ok=1;fr.contentWindow.postMessage(data,'*')}
   if(e.data.t==='kvmag-close'){removeEventListener('message',onMsg);closeBoost();showBoosters()}};
  addEventListener('message',onMsg);
+ setTimeout(()=>{if(fr.isConnected&&!fr._ok){removeEventListener('message',onMsg);closeBoost();toast('Tes cartes ont été ajoutées à ta collection.');showCollection('all')}},9000);
  return true;
 }
 function openBooster(type,n){
