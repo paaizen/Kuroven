@@ -1075,3 +1075,5 @@ body.cbmag-on #cbBody{visibility:hidden}
 .ar-end{text-align:center}.ar-end .dl-mt h2{font-size:56px}
 .ar-best{font:800 15px system-ui;color:#ffd84a;margin:10px 0 0}
 .dl-mf2 button:disabled{opacity:.4;cursor:not-allowed}
+.dl-bn{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important}
+.dl-b{min-height:280px}

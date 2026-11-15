@@ -153,7 +153,7 @@ const eqN=(pi,m,id)=>G.p[pi].st.filter(s=>s&&s.to===m&&s.card.id===id).length;
 const hasCape=(pi,m)=>eqN(pi,m,'cape')>0;
 const fld=()=>G.field&&G.field.card.id;
 const friend=pi=>mons(pi).length>=3&&G.p[pi].st.some(s=>s&&s.up&&s.card.id==='amitie');
-function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;if(G&&G.arena)v+=pi===0?G.arena.fx.atk:G.arena.ai.atk;return Math.max(0,v)}
+function atk(pi,m){let v=m.card.atk+m.atkP+m.tmp+150*eqN(pi,m,'forgeron')+100*eqN(pi,m,'epee');if(fld()==='arene')v+=75;if(fld()==='lune'&&m.card.col===4)v+=100;if(friend(pi))v+=350;if(G&&G.arena)v+=pi===0?G.arena.fx.atk+30*G.arena.fx.cres*Math.min(10,Math.floor(G.n/2)):G.arena.ai.atk;return Math.max(0,v)}
 function def(pi,m){return Math.max(1,m.card.def+m.defP)}
 function armor(pi,m){let v=Math.max(0,(m.card.arm||0)-(m.armLost||0))+100*eqN(pi,m,'epee');if(fld()==='village')v+=100;if(G&&G.arena&&pi===0)v+=G.arena.fx.arm;return v}
 const tauntIdx=att=>{const t=G&&G.taunt;if(!t||t.owner===att||!P(t.owner).mon.includes(t.m))return -1;return P(t.owner).mon.indexOf(t.m)};
@@ -330,12 +330,16 @@ async function remoteLoop(){
 /* ---------- effets de base ---------- */
 function checkEnd(){
  if(!G||G.over)return;
+ if(P(0).lp<=0&&G.arena&&G.arena.fx.phenix>0&&P(1).lp>0){G.arena.fx.phenix--;arSpendPhoenix();setLP(0,2000);log('Phénix : tu reviens avec 2 000 points de vie.');banner('PHÉNIX','#ffb02e');return}
  if(P(0).lp<=0)endGame(1,'Tes points de vie tombent à 0.');else if(P(1).lp<=0)endGame(0,'Les points de vie adverses tombent à 0.');
 }
 function setLP(pi,v){P(pi).lp=Math.max(0,v);const n=$('cbLp'+pi);if(n){const from=+n.textContent;const t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/700);n.textContent=Math.round(from+(P(pi).lp-from)*k);if(k<1&&alive)requestAnimationFrame(step)};requestAnimationFrame(step)}}
 function bigDmg(pi,v){const b=boardEl();if(!b)return;const r=b.getBoundingClientRect(),d=document.createElement('div');d.className='cbbig';d.textContent='− '+v;d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+r.height*(pi===1?.2:.74))+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1500)}
 const TS=(pi,a,b)=>G.v2?(pi===0?'Ton équipe '+b:'L’équipe adverse '+b):S(pi,a,b);
-function hurt(pi,v){if(v<=0)return;setLP(pi,P(pi).lp-v);bigDmg(pi,v);log(TS(pi,'perds','perd')+' '+v+' points de vie.');checkEnd()}
+function hurt(pi,v){if(v<=0)return;
+ let vamp=0;if(G&&G.arena){const f=G.arena.fx;if(pi===0)v=Math.max(1,Math.round(v*(1-Math.min(.5,.08*f.tough))));else{v=Math.max(1,Math.round(v*(1+.1*f.strike)));vamp=Math.round(v*.1*f.vamp)}}
+ setLP(pi,P(pi).lp-v);bigDmg(pi,v);log(TS(pi,'perds','perd')+' '+v+' points de vie.');checkEnd();
+ if(vamp>0&&G&&!G.over&&P(0).lp>0){const h=Math.min(vamp,Math.max(0,G.arena.mx-P(0).lp));if(h>0)heal(0,h)}}
 function heal(pi,v){const e=zoneEl('p',pi,0);setLP(pi,P(pi).lp+v);floatTxt(e,'+'+v,true);log(TS(pi,'récupères','récupère')+' '+v+' points de vie.')}
 /* animation de pioche : la carte sort de la pioche, se retourne au milieu, puis file dans la main */
 async function drawReveal(c){
@@ -793,7 +797,7 @@ async function startTurn(){
  p.normal=false;p.senzu=false;p.potion=false;p.mon.forEach(m=>{if(m){m.att=false;m.chg=false;if(m.para>0){m.att=true;m.para--}if(m.sleep>0){m.att=true;m.sleep--}}});
  banner(isH(pi)?'À TOI DE JOUER':pi===0?'TOUR DE TON COÉQUIPIER':'TOUR ADVERSE',pi===0?'#3dae5a':'#ec5fa0');
  G.busy=true;render();await sleep(600);
- if(pi===0&&G.arena&&G.arena.fx.regen){const h=Math.min(G.arena.fx.regen,Math.max(0,AR_MAX-P(0).lp));if(h>0)heal(0,h)}
+ if(pi===0&&G.arena&&G.arena.fx.regen){const h=Math.min(G.arena.fx.regen,Math.max(0,G.arena.mx-P(0).lp));if(h>0)heal(0,h)}
  if(G.n>1){if(isH(pi))G.needDraw=true;else if(!NET)await drawN(pi,1)}
  if(G.over)return;
  G.busy=false;render();
@@ -1314,6 +1318,7 @@ function showLegal(){
 function bindTabs(){document.querySelectorAll('#cbBody .cbside [data-v]').forEach(b=>b.onclick=()=>navGo(b.dataset.v))}
 /* ---------- ARÈNE : série de duels contre l'IA. La vie se reporte d'un duel à l'autre ; chaque victoire donne une capacité ---------- */
 const AR_MAX=8000,AR_KEY='cbarena1';
+const arMax=run=>AR_MAX+1000*((run&&run.boons&&run.boons.vie)|0);
 const arStore=()=>{const o=ls.get(AR_KEY,null);return o&&typeof o==='object'?{best:o.best|0,run:o.run||null}:{best:0,run:null}};
 const arSave=st=>ls.set(AR_KEY,st);
 const AR_IC={heart:'<path d="M12 21C6 16.5 3 13 3 9.5 3 7 5 5 7.5 5c1.8 0 3.5 1 4.5 2.6C13 6 14.7 5 16.5 5 19 5 21 7 21 9.5c0 3.5-3 7-9 11.5z"/>',sword:'<path d="M14.5 4.5 20 4l-.5 5.5L9 20l-5-5zM4 20l4-4M7 17l-3 3"/>',flame:'<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/>',shield:'<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>',cards:'<rect x="4" y="5" width="10" height="14" rx="1.6" transform="rotate(-8 9 12)"/><rect x="10" y="5" width="10" height="14" rx="1.6" transform="rotate(8 15 12)"/>'};
@@ -1326,21 +1331,34 @@ const AR_BOONS=[
  {id:'fer',r:1,t:'Armure de fer',ty:'Défense',ic:'shield',ef:'<em>+100 armure</em> à tous tes personnages.'},
  {id:'pacte',r:2,t:'Pacte de sang',ty:'Puissance · risque',ic:'flame',ef:'<em>+500 attaque</em> à tous tes personnages.',cs:'Contrepartie : tu perds 1 500 points de vie.'},
  {id:'festin',r:2,t:'Festin',ty:'Soin',ic:'heart',ef:'Récupère <em>4 000</em> points de vie tout de suite.',heal:true},
- {id:'rage',r:2,t:'Rage de combat',ty:'Puissance · défense',ic:'sword',ef:'<em>+250 attaque</em> et <em>+75 armure</em> à tous tes personnages.'}
+ {id:'rage',r:2,t:'Rage de combat',ty:'Puissance · défense',ic:'sword',ef:'<em>+250 attaque</em> et <em>+75 armure</em> à tous tes personnages.'},
+ {id:'butin',r:0,t:'Récolte',ty:'Soin',ic:'heart',ef:'Après chaque victoire, tu récupères <em>300</em> points de vie.',heal:true},
+ {id:'chance',r:0,t:'Coup de dés',ty:'Choix',ic:'cards',ef:'<em>+2 relances</em> des choix de capacité.'},
+ {id:'vie',r:1,t:'Vitalité',ty:'Vie',ic:'heart',ef:'<em>+1 000 vie maximale</em>, et tu récupères 1 000 points de vie.',heal:true},
+ {id:'tenace',r:1,t:'Ténacité',ty:'Défense',ic:'shield',ef:'Tu subis <em>8 % de dégâts directs en moins</em> (jusqu’à 48 %).'},
+ {id:'vampire',r:1,t:'Morsure',ty:'Soin · puissance',ic:'flame',ef:'Tu récupères <em>10 %</em> des dégâts directs que tu infliges.',heal:true},
+ {id:'frappe',r:1,t:'Coup au but',ty:'Puissance',ic:'sword',ef:'Tes dégâts directs sont <em>augmentés de 10 %</em>.'},
+ {id:'cres',r:1,t:'Crescendo',ty:'Puissance',ic:'sword',ef:'<em>+30 attaque</em> à chaque tour du duel, jusqu’à 10 tours.'},
+ {id:'chasseur',r:1,t:'Chasseur de boss',ty:'Puissance',ic:'sword',ef:'<em>+600 attaque</em> contre les boss.'},
+ {id:'vet',r:2,t:'Vétéran',ty:'Puissance',ic:'sword',ef:'<em>+20 attaque</em> par victoire de la série. Plus tu durerais, plus tu frapperais.'},
+ {id:'phenix',r:2,t:'Phénix',ty:'Survie',ic:'flame',ef:'Si tu tombes à 0, tu reviens <em>une fois</em> avec 2 000 points de vie.',cs:'Se consume : un exemplaire par résurrection.'},
+ {id:'sang',r:2,t:'Sang-froid',ty:'Défense · puissance',ic:'shield',ef:'<em>+300 attaque</em> et <em>+300 armure</em> à tous tes personnages.',cs:'Contrepartie : tu perds 1 000 points de vie.'},
+ {id:'oeil',r:2,t:'Œil de lynx',ty:'Choix',ic:'cards',ef:'Tu vois <em>1 capacité de plus</em> à chaque choix (2 exemplaires au maximum).'}
 ];
 const AR_RN=['COMMUNE','RARE','ÉPIQUE'],AR_RC=['#9fb4d8','#4aa9ff','#c05cff'];
 const arB=id=>AR_BOONS.find(b=>b.id===id);
 /* total des capacités déjà gagnées */
-function arFx(run){const b=run.boons||{},c=id=>b[id]|0;return{atk:150*c('lame')+500*c('pacte')+250*c('rage'),arm:50*c('peau')+100*c('fer')+75*c('rage'),regen:250*c('regen'),draw:c('main')}}
+function arFx(run,boss){const b=run.boons||{},c=id=>b[id]|0,w=run.wins|0;return{atk:150*c('lame')+500*c('pacte')+250*c('rage')+300*c('sang')+20*c('vet')*w+(boss?600*c('chasseur'):0),arm:50*c('peau')+100*c('fer')+75*c('rage')+300*c('sang'),regen:250*c('regen'),draw:c('main'),cres:c('cres'),tough:c('tenace'),vamp:c('vampire'),strike:c('frappe'),phenix:c('phenix')}}
 /* force de l'adversaire : de plus en plus de vie et d'attaque, et un boss tous les 5 duels */
 function arAi(n){const boss=n%5===0;return{boss,atk:40*(n-1)+(boss?150:0),lp:AR_MAX+300*(n-1)+(boss?1500:0),draw:n>=8?1:0}}
 /* trois capacités au hasard : la rareté monte après un boss, et on ne propose pas de soin quand la vie est presque pleine */
 function arChoices(run,boss){
- const pool=AR_BOONS.filter(b=>!(b.heal&&run.lp>=AR_MAX-300)),w=boss?[0,.6,.4]:[.62,.31,.07],out=[];let g=0;
- while(out.length<3&&g++<80){const x=Math.random(),r=x<w[0]?0:x<w[0]+w[1]?1:2,c=pool.filter(b=>b.r===r&&!out.includes(b.id));if(c.length)out.push(c[rnd(c.length)].id)}
- while(out.length<3){const c=pool.filter(b=>!out.includes(b.id));out.push(c[rnd(c.length)].id)}
+ const cb=id=>(run.boons&&run.boons[id])|0,N=3+Math.min(2,cb('oeil')),pool=AR_BOONS.filter(b=>!(b.heal&&run.lp>=arMax(run)-300)&&!(b.id==='tenace'&&cb('tenace')>=6)&&!(b.id==='oeil'&&cb('oeil')>=2)),w=boss?[0,.6,.4]:[.62,.31,.07],out=[];let g=0;
+ while(out.length<N&&g++<120){const x=Math.random(),r=x<w[0]?0:x<w[0]+w[1]?1:2,c=pool.filter(b=>b.r===r&&!out.includes(b.id));if(c.length)out.push(c[rnd(c.length)].id)}
+ while(out.length<N){const c=pool.filter(b=>!out.includes(b.id));if(!c.length)break;out.push(c[rnd(c.length)].id)}
  return out;
 }
+function arSpendPhoenix(){const st=arStore();if(st.run&&st.run.boons&&st.run.boons.phenix>0){st.run.boons.phenix--;if(!st.run.boons.phenix)delete st.run.boons.phenix;arSave(st)}}
 function arStart(){const st=arStore();st.run={n:1,lp:AR_MAX,wins:0,boons:{},rr:1,choices:null,boss:false};arSave(st);arPlay()}
 function arPlay(){const st=arStore(),run=st.run;if(!run){showMenu();return}const o=$('arM');if(o)o.remove();if(run.choices){arReward(run);return}startArenaDuel()}
 async function startArenaDuel(){
@@ -1348,11 +1366,11 @@ async function startArenaDuel(){
  const mine=getDeck();if(!deckCheck(mine).ok){showBuild();return}
  const o=$('arM');if(o)o.remove();
  leaveGame();view='game';
- const n=run.n,ai=arAi(n),fx=arFx(run);
+ const n=run.n,ai=arAi(n),fx=arFx(run,ai.boss);
  const ad=autoDeck(undefined,undefined,undefined,true),ax=extraFor(ad),pa=aiPersona();
  G={pr:[who0(),{n:(ai.boss?'Boss · ':'')+pa.n,img:pa.img}],p:[mkP(mine,getExtra()),mkP(ad,ax)],turn:0,n:1,field:null,over:false,busy:true,ai:false,log:[],t0:0,tm:null,pop:null,newC:null};
- G.arena={n,boss:ai.boss,fx,ai};
- P(0).lp=Math.max(1,Math.min(AR_MAX,run.lp));P(1).lp=ai.lp;
+ G.arena={n,boss:ai.boss,fx,ai,mx:arMax(run)};
+ P(0).lp=Math.max(1,Math.min(arMax(run),run.lp));P(1).lp=ai.lp;
  ui={};
  mountGame();
  const sd=$('cbSide');if(sd&&sd.firstElementChild)sd.firstElementChild.insertAdjacentHTML('afterend',arHud(run,ai));
@@ -1373,7 +1391,8 @@ function arEnd(winner){
   if(!alive)return;
   const st=arStore(),run=st.run;if(!run){showMenu();return}
   if(winner===0){
-   run.lp=Math.max(1,Math.min(AR_MAX,lpEnd));run.wins=(run.wins|0)+1;if(A.boss)run.rr=(run.rr|0)+1;run.n=A.n+1;
+   run.lp=Math.max(1,Math.min(arMax(run),lpEnd));run.wins=(run.wins|0)+1;if(A.boss)run.rr=(run.rr|0)+1;run.n=A.n+1;
+   {const bt=(run.boons&&run.boons.butin)|0;if(bt)run.lp=Math.min(arMax(run),run.lp+300*bt)}
    run.boss=A.boss;run.choices=arChoices(run,A.boss);arSave(st);
    banner(A.boss?'BOSS VAINCU':'VICTOIRE','#5be08a');
    setTimeout(()=>{if(alive)arReward(arStore().run)},1200);
@@ -1386,9 +1405,9 @@ function arReward(run){
  let m=$('arM');if(!m){m=document.createElement('div');m.id='arM';m.className='dl-m';document.body.appendChild(m)}
  const w=run.wins|0,from=Math.max(1,w-3);
  let rt='';for(let k=from;k<=w+6;k++){const bossN=k%5===0,done=k<=w,cur=k===w+1;rt+=(k>from?'<u></u>':'')+'<i class="'+(done?'d':cur?'c':bossN?'b':'')+'">'+k+(bossN?' · BOSS':'')+'</i>'}
- const pc=Math.round(run.lp/AR_MAX*100),nextBoss=(w+1)%5===0;
+ const MXH=arMax(run),pc=Math.round(run.lp/MXH*100),nextBoss=(w+1)%5===0;
  m.innerHTML='<div class="dl-mw"><div class="dl-rt">'+rt+'</div><div class="dl-mt"><small>'+(run.boss?'BOSS VAINCU · DUEL '+w:'DUEL '+w+' REMPORTÉ')+'</small><h2>Victoire ! Choisis une capacité</h2></div>'+
-  '<div class="dl-hp"><span>Vie</span><u><i style="width:'+pc+'%"></i></u><b>'+run.lp+' / '+AR_MAX+'</b><span>· Prochain : duel '+(w+1)+(nextBoss?' · BOSS':', adversaire plus fort')+'</span></div>'+
+  '<div class="dl-hp"><span>Vie</span><u><i style="width:'+pc+'%"></i></u><b>'+run.lp+' / '+MXH+'</b><span>· Prochain : duel '+(w+1)+(nextBoss?' · BOSS':', adversaire plus fort')+'</span></div>'+
   '<div class="dl-bn">'+run.choices.map((id,i)=>{const b=arB(id),c=AR_RC[b.r];return '<button class="dl-b" type="button" style="--rc:'+c+'" data-id="'+id+'"><span class="rr">'+AR_RN[b.r]+'</span><svg viewBox="0 0 24 24">'+AR_IC[b.ic]+'</svg><b>'+b.t+'</b><span class="ty">'+b.ty+'</span><span class="ef">'+b.ef+'</span><span class="cs">'+(b.cs||'&nbsp;')+'</span></button>'}).join('')+'</div>'+
   '<div class="dl-mf2"><button type="button" data-k="rr"'+((run.rr|0)>0?'':' disabled')+'>↻ Relancer · '+(run.rr|0)+' restant'+((run.rr|0)>1?'s':'')+'</button><button type="button" data-k="pass">Passer · récupère 500 de vie</button></div>'+
   '<div class="ar-act">Capacités actives : '+(Object.keys(run.boons||{}).filter(id=>run.boons[id]>0&&arB(id)).map(id=>'<span>'+esc(arB(id).t)+(run.boons[id]>1?' ×'+run.boons[id]:'')+'</span>').join('')||'<span>aucune</span>')+'</div></div>';
@@ -1398,10 +1417,10 @@ function arReward(run){
   if(b.dataset.id){
    const id=b.dataset.id;if(!r.choices.includes(id))return;
    r.boons=r.boons||{};r.boons[id]=(r.boons[id]|0)+1;
-   if(id==='soin')r.lp=Math.min(AR_MAX,r.lp+2000);if(id==='festin')r.lp=Math.min(AR_MAX,r.lp+4000);if(id==='pacte')r.lp=Math.max(1,r.lp-1500);
+   {const MX=arMax(r);if(id==='soin')r.lp=Math.min(MX,r.lp+2000);if(id==='festin')r.lp=Math.min(MX,r.lp+4000);if(id==='vie')r.lp=Math.min(MX,r.lp+1000);if(id==='pacte')r.lp=Math.max(1,r.lp-1500);if(id==='sang')r.lp=Math.max(1,r.lp-1000);if(id==='chance')r.rr=(r.rr|0)+2}
    r.choices=null;arSave(st);arPlay();
   }else if(b.dataset.k==='rr'){if((r.rr|0)<1)return;r.rr--;r.choices=arChoices(r,r.boss);arSave(st);arReward(r)}
-  else if(b.dataset.k==='pass'){r.lp=Math.min(AR_MAX,r.lp+500);r.choices=null;arSave(st);arPlay()}
+  else if(b.dataset.k==='pass'){r.lp=Math.min(arMax(r),r.lp+500);r.choices=null;arSave(st);arPlay()}
  };
 }
 /* fin de série (défaite ou abandon) */
