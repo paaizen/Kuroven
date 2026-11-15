@@ -1442,6 +1442,8 @@ const SND=(()=>{let ac=null;const on=()=>ls.get('cbsnd',1)!==0;
 })();
 /* ouverture « magazine » : les cartes tirées sont envoyées à combat/mag/, qui joue toute l'animation.
    Si le navigateur ne sait pas l'afficher, on garde l'ancienne ouverture ci-dessous. */
+/* le magazine est coupé pour tout le monde tant qu'il n'est pas fluide ; on peut le tester avec ?mag=1 ou localStorage cbmag=1 */
+const MAG_ON=()=>{try{return /[?&]mag=1/.test(location.search)||localStorage.getItem('cbmag')==='1'}catch(e){return false}};
 function openMagazine(type,n){
  try{if(!document.createElement('canvas').getContext('webgl'))return false}catch(e){return false}
  closeBoost();clearInterval(boostTm);
@@ -1460,7 +1462,7 @@ function openMagazine(type,n){
 }
 function openBooster(type,n){
  n=Math.min(n||1,stockState().n);if(n<1){toast('Plus de booster pour l’instant.');return}
- if(!ls.get('cbclassic',0)&&openMagazine(type,n))return;
+ if(MAG_ON()&&openMagazine(type,n))return;
  closeBoost();clearInterval(boostTm);
  const ov=document.createElement('div');ov.className='cbopen bk'+backN();ov.id='cbOpen';
  ov.innerHTML='<canvas class="cbop-fx"></canvas><div class="cbop-stage" id="cbopS"></div><canvas class="cbop-trail"></canvas><button class="cbchip cbop-snd" type="button"></button><button class="cbchip cbop-x" type="button">✕ Fermer</button>';
