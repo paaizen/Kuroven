@@ -1289,7 +1289,7 @@ function tabs(cur){
   '<div class="cbs-me"><button class="cbs-meb" data-v="me">'+(img?'<img src="'+esc(img)+'" alt="">':'<i>'+esc(String(nm).charAt(0).toUpperCase())+'</i>')+'<span>'+esc(nm)+'</span><em>▾</em></button><div class="cbs-med">'+PROFIL.map(p=>'<button data-v="soon:'+p[0]+'">'+p[1]+'</button>').join('')+'</div></div>'+
   '<nav class="cbs-nav">'+NAV.map(g=>'<div class="cbs-g'+(c[0]===g[0]?' open':'')+'"><button class="cbs-c" data-v="'+g[0]+':'+g[3][0][0]+'"><svg viewBox="0 0 24 24">'+g[2]+'</svg>'+g[1]+'</button><div class="cbs-sub">'+g[3].map(x=>'<button data-v="'+g[0]+':'+x[0]+'" class="'+(c[0]===g[0]&&c[1]===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div></div>').join('')+'</nav>'+
   '<div class="cbs-bot"><span class="cbs-l">Deck actif</span><div class="cbs-dk"><b>'+esc(dn)+'</b><small>'+dk.length+' / 20 · <span class="'+(ok?'ok':'ko')+'">'+(ok?'prêt':'à compléter')+'</span></small></div>'+
-  '<button class="cbs-ku" data-v="boost:shop" title="Boutique">'+kuIcon+'<b id="cbKu">'+kuGet()+'</b><span>Kuros</span></button><button class="cbs-cta" data-v="play:duel">Combattre</button><i class="cbs-st">'+Object.keys(getCol()).length+' / '+allCards().length+' cartes</i>'+
+  '<button class="cbs-ku" data-v="boost:shop" title="Boutique">'+kuIcon+'<b id="cbKu">'+kuGet()+'</b><span>Berries</span></button><button class="cbs-cta" data-v="play:duel">Combattre</button><i class="cbs-st">'+Object.keys(getCol()).length+' / '+allCards().length+' cartes</i>'+
   '<div class="cbs-foot"><a data-v="rules">Règles</a><a data-v="soon:news">Nouveautés</a><a data-v="legal">Mentions légales</a><a data-v="exit">← Kuroven</a></div></div></aside>';
 }
 function navGo(v){
@@ -1413,7 +1413,7 @@ function arReward(run){
  const w=run.wins|0,from=Math.max(1,w-3);
  let rt='';for(let k=from;k<=w+6;k++){const bossN=k%5===0,done=k<=w,cur=k===w+1;rt+=(k>from?'<u></u>':'')+'<i class="'+(done?'d':cur?'c':bossN?'b':'')+'">'+k+(bossN?' · BOSS':'')+'</i>'}
  const MXH=arMax(run),pc=Math.round(run.lp/MXH*100),nextBoss=(w+1)%5===0;
- m.innerHTML='<div class="dl-mw"><div class="dl-rt">'+rt+'</div><div class="dl-mt"><small>'+(run.boss?'BOSS VAINCU · DUEL '+w:'DUEL '+w+' REMPORTÉ')+(run.lastGain?' · +'+run.lastGain+' KUROS'+(run.boss?' · +1 BOOSTER':''):'')+'</small><h2>Victoire ! Choisis une capacité</h2></div>'+
+ m.innerHTML='<div class="dl-mw"><div class="dl-rt">'+rt+'</div><div class="dl-mt"><small>'+(run.boss?'BOSS VAINCU · DUEL '+w:'DUEL '+w+' REMPORTÉ')+(run.lastGain?' · +'+run.lastGain+' BERRIES'+(run.boss?' · +1 BOOSTER':''):'')+'</small><h2>Victoire ! Choisis une capacité</h2></div>'+
   '<div class="dl-hp"><span>Vie</span><u><i style="width:'+pc+'%"></i></u><b>'+run.lp+' / '+MXH+'</b><span>· Prochain : duel '+(w+1)+(nextBoss?' · BOSS':', adversaire plus fort')+'</span></div>'+
   '<div class="dl-bn">'+run.choices.map((id,i)=>{const b=arB(id),c=AR_RC[b.r];return '<button class="dl-b" type="button" style="--rc:'+c+'" data-id="'+id+'"><span class="rr">'+AR_RN[b.r]+'</span><svg viewBox="0 0 24 24">'+AR_IC[b.ic]+'</svg><b>'+b.t+'</b><span class="ty">'+b.ty+'</span><span class="ef">'+b.ef+'</span><span class="cs">'+(b.cs||'&nbsp;')+'</span></button>'}).join('')+'</div>'+
   '<div class="dl-mf2"><button type="button" data-k="rr"'+((run.rr|0)>0?'':' disabled')+'>↻ Relancer · '+(run.rr|0)+' restant'+((run.rr|0)>1?'s':'')+'</button><button type="button" data-k="pass">Passer · récupère 500 de vie</button></div>'+
@@ -1443,16 +1443,16 @@ function arFinish(forfeit){
  let m=$('arM');if(!m){m=document.createElement('div');m.id='arM';m.className='dl-m';document.body.appendChild(m)}
  m.innerHTML='<div class="dl-mw ar-end"><div class="dl-mt"><small>'+(forfeit?'SÉRIE ABANDONNÉE':'SÉRIE TERMINÉE')+'</small><h2>'+(wins?wins+' victoire'+(wins>1?'s':''):'Aucune victoire')+'</h2></div>'+
   '<p class="ar-best">'+(rec&&wins>0?'Nouveau record !':'Meilleure série : '+st.best+' victoire'+(st.best>1?'s':''))+'</p>'+
-  (run&&run.coins?'<p class="ar-best">Gagné pendant la série : <b>'+run.coins+' Kuros</b>'+(run.packs?' et '+run.packs+' booster'+(run.packs>1?'s':'')+' de boss':'')+'</p>':'')+
+  (run&&run.coins?'<p class="ar-best">Gagné pendant la série : <b>'+run.coins+' Berries</b>'+(run.packs?' et '+run.packs+' booster'+(run.packs>1?'s':'')+' de boss':'')+'</p>':'')+
   (list.length?'<div class="ar-act">Capacités gagnées : '+list.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>':'')+
   '<div class="dl-mf2"><button type="button" data-k="again">Nouvelle série</button><button type="button" data-k="back">Retour aux Duels</button></div></div>';
  m.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.k==='again'){arStart()}else if(b.dataset.k==='back'){m.remove();showMenu()}};
 }
 async function arAbandon(){const r=await ask('Abandonner la série ?','Ta série en cours sera terminée.',[{v:true,t:'Abandonner'},{v:false,t:'Annuler',sec:1}]);if(!r)return;arFinish(true)}
-/* ---------- Kuros : la monnaie du jeu. On les gagne en jouant et on les dépense en boutique pour des boosters ---------- */
+/* ---------- Berries : la monnaie du jeu (les berries, comme dans One Piece). On les gagne en jouant et on les dépense en boutique pour des boosters ---------- */
 const KU_KEY='cbkuros1',PACK_PRICE=120;
 const kuGet=()=>Math.max(0,ls.get(KU_KEY,0)|0);
-const kuIcon='<svg class="ku-i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.5 7.5v9M9.5 12l5-4.5M11.5 11l3.5 5.5"/></svg>';
+const kuIcon='<span class="ku-i">฿</span>';
 function kuAdd(n){const v=Math.max(0,kuGet()+(n|0));ls.set(KU_KEY,v);['cbKu','cbKu2'].forEach(i=>{const e=document.getElementById(i);if(e)e.textContent=v});return v}
 /* un duel joué en mode auto rapporte jusqu'à moitié moins */
 const autoShare=()=>G&&G.myT?Math.min(1,(G.autoT|0)/G.myT):0;
@@ -1462,15 +1462,15 @@ const SHOP=[[1,120,'1 booster'],[5,550,'5 boosters'],[10,1000,'10 boosters']];
 function showShop(){
  view='shop';try{leaveGame();clearInterval(boostTm)}catch(e){}
  const k=kuGet(),st=stockState();
- body().innerHTML=tabs('boost:shop')+'<div class="cbcard sh"><span class="cbsoon-t">BOUTIQUE</span><h2>Boutique de boosters</h2><p>Les Kuros se gagnent en jouant : mode histoire, Arène, cadeau du jour. Ils servent à acheter des boosters en plus de ceux qui se rechargent tout seuls.</p><div class="sh-bal">'+kuIcon+'<b id="cbKu2">'+k+'</b> Kuros · '+st.n+' booster'+(st.n>1?'s':'')+' en stock</div><div class="sh-g">'+SHOP.map((o,i)=>'<button type="button" class="sh-o'+(k<o[1]?' no':'')+'" data-i="'+i+'"><b>'+o[2]+'</b><span>'+kuIcon+o[1]+'</span><small>'+(i?'−'+Math.round((1-o[1]/(o[0]*PACK_PRICE))*100)+' %':'&nbsp;')+'</small></button>').join('')+'</div><button class="cbbtn" id="cbShO">Ouvrir mes boosters</button></div>';
+ body().innerHTML=tabs('boost:shop')+'<div class="cbcard sh"><span class="cbsoon-t">BOUTIQUE</span><h2>Boutique de boosters</h2><p>Les Berries se gagnent en jouant : mode histoire, Arène, cadeau du jour. Elles servent à acheter des boosters en plus de ceux qui se rechargent tout seuls.</p><div class="sh-bal">'+kuIcon+'<b id="cbKu2">'+k+'</b> Berries · '+st.n+' booster'+(st.n>1?'s':'')+' en stock</div><div class="sh-g">'+SHOP.map((o,i)=>'<button type="button" class="sh-o'+(k<o[1]?' no':'')+'" data-i="'+i+'"><b>'+o[2]+'</b><span>'+kuIcon+o[1]+'</span><small>'+(i?'−'+Math.round((1-o[1]/(o[0]*PACK_PRICE))*100)+' %':'&nbsp;')+'</small></button>').join('')+'</div><button class="cbbtn" id="cbShO">Ouvrir mes boosters</button></div>';
  bindTabs();$('cbShO').onclick=showBoosters;
- body().querySelector('.sh-g').onclick=e=>{const b=e.target.closest('.sh-o');if(!b)return;const o=SHOP[+b.dataset.i];if(kuGet()<o[1]){dlNote('Pas assez de Kuros : il t’en manque '+(o[1]-kuGet())+'.');return}kuAdd(-o[1]);stockAdd(o[0]);dlNote('Achat : '+o[2]+' ajouté'+(o[0]>1?'s':'')+' à ton stock.');showShop()};
+ body().querySelector('.sh-g').onclick=e=>{const b=e.target.closest('.sh-o');if(!b)return;const o=SHOP[+b.dataset.i];if(kuGet()<o[1]){dlNote('Pas assez de Berries : il t’en manque '+(o[1]-kuGet())+'.');return}kuAdd(-o[1]);stockAdd(o[0]);dlNote('Achat : '+o[2]+' ajouté'+(o[0]>1?'s':'')+' à ton stock.');showShop()};
 }
 function showGift(){
  view='gift';try{leaveGame();clearInterval(boostTm)}catch(e){}
  const day=new Date().toISOString().slice(0,10),got=ls.get('cbgift1','')===day;
- body().innerHTML=tabs('boost:gift')+'<div class="cbcard sh"><span class="cbsoon-t">CADEAU DU JOUR</span><h2>'+(got?'Déjà récupéré aujourd’hui':'Ton cadeau t’attend')+'</h2><p>Chaque jour : <b>60 Kuros</b> et <b>1 booster</b>.</p><button class="cbbtn" id="cbGf"'+(got?' disabled':'')+'>'+(got?'Reviens demain':'Récupérer mon cadeau')+'</button></div>';
- bindTabs();$('cbGf').onclick=()=>{if(ls.get('cbgift1','')===day)return;ls.set('cbgift1',day);kuAdd(60);stockAdd(1);dlNote('+60 Kuros et +1 booster !');showGift()};
+ body().innerHTML=tabs('boost:gift')+'<div class="cbcard sh"><span class="cbsoon-t">CADEAU DU JOUR</span><h2>'+(got?'Déjà récupéré aujourd’hui':'Ton cadeau t’attend')+'</h2><p>Chaque jour : <b>60 Berries</b> et <b>1 booster</b>.</p><button class="cbbtn" id="cbGf"'+(got?' disabled':'')+'>'+(got?'Reviens demain':'Récupérer mon cadeau')+'</button></div>';
+ bindTabs();$('cbGf').onclick=()=>{if(ls.get('cbgift1','')===day)return;ls.set('cbgift1',day);kuAdd(60);stockAdd(1);dlNote('+60 Berries et +1 booster !');showGift()};
 }
 /* ---------- mode auto : ton camp joue tout seul (jamais en ligne, jamais contre un vrai joueur) ---------- */
 function autoDraw(){const b=$('cbAutoB');if(b){b.textContent='Auto : '+(G&&G.auto?'OUI':'NON');b.classList.toggle('on',!!(G&&G.auto))}}
@@ -1498,7 +1498,7 @@ function showStory(){
  const s=stStore();let arcs='';
  for(let a=0;a<4;a++){let nodes='';for(let k=1;k<=5;k++){const n=a*5+k,L=stLvl(n),c=n<=s.done?'d':n===s.done+1?'c':'l',rw=stRew(n,n>s.done);nodes+='<button type="button" class="st-n '+c+(L.boss?' b':'')+'" data-n="'+n+'"'+(c==='l'?' disabled':'')+'><i>'+(L.boss?'BOSS':n)+'</i><b>Niveau '+n+'</b><span>'+(c==='d'?'✓ Terminé':kuIcon+rw.k+(rw.pk?' + 1 booster':''))+'</span></button>'}
   arcs+='<section class="st-a"><h3>Chapitre '+(a+1)+' · '+ST_ARCS[a]+'</h3><div class="st-p">'+nodes+'</div></section>'}
- body().innerHTML=tabs('play:story')+'<div class="cbcard st"><span class="cbsoon-t">MODE HISTOIRE</span><h2>'+(s.done>=ST_N?'Histoire terminée !':'Niveau '+(s.done+1)+' : à toi de jouer')+'</h2><p>'+ST_N+' niveaux contre l’IA, un boss tous les 5 niveaux. La première victoire d’un niveau donne la récompense complète (Kuros, et un booster pour chaque boss). Rejouer un niveau rapporte un peu de Kuros. Pendant un duel, le bouton <b>Auto</b> fait jouer ton camp tout seul, avec des récompenses réduites en proportion.</p>'+arcs+'</div>';
+ body().innerHTML=tabs('play:story')+'<div class="cbcard st"><span class="cbsoon-t">MODE HISTOIRE</span><h2>'+(s.done>=ST_N?'Histoire terminée !':'Niveau '+(s.done+1)+' : à toi de jouer')+'</h2><p>'+ST_N+' niveaux contre l’IA, un boss tous les 5 niveaux. La première victoire d’un niveau donne la récompense complète (Berries, et un booster pour chaque boss). Rejouer un niveau rapporte un peu de Berries. Pendant un duel, le bouton <b>Auto</b> fait jouer ton camp tout seul, avec des récompenses réduites en proportion.</p>'+arcs+'</div>';
  bindTabs();body().querySelector('.st').onclick=e=>{const b=e.target.closest('.st-n');if(!b||b.disabled)return;if(dlDeckOk())stStart(+b.dataset.n)};
 }
 async function stStart(n){
@@ -1521,7 +1521,7 @@ function stEnd(winner,why){
   if(pay){
    const s=stStore(),first=A.n>s.done,rw=stRew(A.n,first),g=kuPay(rw.k);
    kuAdd(g);if(rw.pk)stockAdd(rw.pk);if(first){s.done=A.n;ls.set(ST_KEY,s)}
-   txt+='\n+'+g+' Kuros'+(rw.pk?' et +1 booster':'')+(first?' (première victoire)':'')+(autoShare()>0?' · réduit car joué en auto':'')+'.';
+   txt+='\n+'+g+' Berries'+(rw.pk?' et +1 booster':'')+(first?' (première victoire)':'')+(autoShare()>0?' · réduit car joué en auto':'')+'.';
   }
   const last=A.n>=ST_N,btns=pay?(last?[{v:'back',t:'Retour à l’histoire'}]:[{v:'next',t:'Niveau suivant'},{v:'back',t:'Retour à l’histoire',sec:1}]):[{v:'again',t:'Réessayer'},{v:'back',t:'Retour à l’histoire',sec:1}];
   const r=await ask(pay?(A.L.boss?'Boss vaincu !':'Niveau '+A.n+' réussi !'):'Défaite',txt,btns);
